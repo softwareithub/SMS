@@ -9,6 +9,7 @@ namespace SERP.UI.Controllers.Master
     [Route("Master/{controller}/{action}")]
     public class AcademicMasterController : Controller
     {
+        [Route("Master/Academic/Index")]
         public IActionResult Index()
         {
             return View();
