@@ -1,0 +1,42 @@
+﻿
+@{
+    ViewData["Title"] = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<script src="~/AjaxUnobrrusive/AjaxUnobtrusive.js"></script>
+<aside class="sidebar">
+    <nav>
+        <ul>
+            <li><a href="#" class="active">Institute Details</a></li>
+            <li>
+                <a data-ajax="true" data-ajax-mode="replace"
+                   asp-action="Index" asp-controller="AcademicMaster"
+                   data-ajax-update="#_divSetting" data-ajax-loading="#_divLoading"
+                   class="nav-link">Academic Detail</a>
+            </li>
+
+            <li><a href="products.html">Student Import</a></li>
+            <li><a href="products.html">Employee Import</a></li>
+            <li><a href="products.html">Employee Application</a></li>
+            <li><a href="products.html">Applicant List</a></li>
+            <li><a href="products.html">Cast & Religion</a></li>
+        </ul>
+    </nav><!--side bar navigation end-->
+    <a href="#/" class="slideNav beforeIco">Slide Navigation</a>
+</aside><!--left side bar end-->
+
+<section class="main">
+    <div class="row" id="_divSetting">
+        <div class="row" id="_divLoading">
+            .....Loading Please wait...
+        </div>
+        <div class="col-md-12 col-lg-12">
+            <div class="form-block">
+                <div class="head"><h2>Basic Information</h2></div>
+                <div class="body">
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+

@@ -1,175 +1,117 @@
-﻿<div class="kt-aside-menu-wrapper kt-grid__item kt-grid__item--fluid" id="kt_aside_menu_wrapper">
-    <div id="kt_aside_menu"
-         class="kt-aside-menu "
-         data-ktmenu-vertical="1"
-         data-ktmenu-scroll="1" data-ktmenu-dropdown-timeout="500">
-        <ul class="kt-menu__nav ">
-            <li class="kt-menu__item " aria-haspopup="true">
-                <a href="index.html" class="kt-menu__link ">
-                    <i class="kt-menu__link-icon flaticon2-architecture-and-city"></i>
-                    <span class="kt-menu__link-text">Dashboard</span>
+﻿@{
+    Layout = null;
+}
+
+<script src="~/lib/jquery-validation/dist/jquery.validate.js"></script>
+<script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.js"></script>
+
+<aside class="main-sidebar">
+
+    <!-- sidebar: style can be found in sidebar.less -->
+    <section class="sidebar">
+
+        <!-- Sidebar user panel (optional) -->
+        <div class="user-panel">
+            <div class="pull-left image">
+                <img src="dist/img/user2-160x160.jpg" class="img-circle" alt="User Image">
+            </div>
+            <div class="pull-left info">
+                <p>Alexander Pierce</p>
+                <!-- Status -->
+                <a href="#"><i class="fa fa-circle text-success"></i> Online</a>
+            </div>
+        </div>
+
+        <!-- search form (Optional) -->
+        <form action="#" method="get" class="sidebar-form">
+            <div class="input-group">
+                <input type="text" name="q" class="form-control" placeholder="Search...">
+                <span class="input-group-btn">
+                    <button type="submit" name="search" id="search-btn" class="btn btn-flat">
+                        <i class="fa fa-search"></i>
+                    </button>
+                </span>
+            </div>
+        </form>
+        <!-- /.search form -->
+        <!-- Sidebar Menu -->
+        <ul class="sidebar-menu" data-widget="tree">
+            <li class="treeview">
+                <a href="#">
+                    <i class="fa fa-link"></i> <span>Setting</span>
+                    <span class="pull-right-container">
+                        <i class="fa fa-angle-left pull-right"></i>
+                    </span>
                 </a>
+                <ul class="treeview-menu">
+                    <li>
+                        <a data-ajax="true" data-ajax-mode="replace"
+                           asp-action="Index" asp-controller="AcademicMaster"
+                           data-ajax-update="#divSERP" data-ajax-loading="#loading"
+                           class="nav-link">Institute Detail</a>
+                    </li>
+                    <li><a href="#">Academic Detail</a></li>
+                    <li><a href="#">Student Import</a></li>
+                    <li><a href="#">Employee Import</a></li>
+                    <li><a href="#">Applicant List</a></li>
+                    <li><a href="#">Employee Application</a></li>
+                    <li><a href="#">Cast & Religion</a></li>
+                </ul>
             </li>
-            <li class="kt-menu__item  kt-menu__item--submenu" aria-haspopup="true" data-ktmenu-submenu-toggle="hover">
-                <a href="javascript:;" class="kt-menu__link kt-menu__toggle"><i class="kt-menu__link-icon flaticon2-telegram-logo"></i><span class="kt-menu__link-text">Academic Master</span><i class="kt-menu__ver-arrow la la-angle-right"></i></a>
-                <div class="kt-menu__submenu ">
-                    <span class="kt-menu__arrow"></span>
-                    <ul class="kt-menu__subnav">
-                        <li class="kt-menu__item  kt-menu__item--parent" aria-haspopup="true"><span class="kt-menu__link"><span class="kt-menu__link-text">Academic Master</span></span></li>
-                        <li class="kt-menu__item  kt-menu__item--submenu" aria-haspopup="true" data-ktmenu-submenu-toggle="hover">
-                            <a href="javascript:;" class="kt-menu__link kt-menu__toggle"><i class="kt-menu__link-bullet kt-menu__link-bullet--line"><span></span></i><span class="kt-menu__link-text">Subject</span><i class="kt-menu__ver-arrow la la-angle-right"></i></a>
-                            <div class="kt-menu__submenu ">
-                                <span class="kt-menu__arrow"></span>
-                                <ul class="kt-menu__subnav">
-                                    <li class="kt-menu__item " aria-haspopup="true">
-                                        <a href="custom/apps/user/list-default.html" class="kt-menu__link ">
-                                            <i class="kt-menu__link-bullet kt-menu__link-bullet--dot"><span></span></i>
-                                            <span class="kt-menu__link-text">Assign Subject</span>
-                                        </a>
-                                    </li>
-                                    <li class="kt-menu__item " aria-haspopup="true">
-                                        <a href="custom/apps/user/list-datatable.html" class="kt-menu__link ">
-                                            <i class="kt-menu__link-bullet kt-menu__link-bullet--dot"><span></span></i><span class="kt-menu__link-text">Subject Allocation</span>
-                                        </a>
-                                    </li>
-                                    <li class="kt-menu__item " aria-haspopup="true">
-
-                                        <a href="#" class="kt-menu__link ">
-                                            <i class="kt-menu__link-bullet kt-menu__link-bullet--dot"><span></span></i><span class="kt-menu__link-text">Elective Subject</span>
-                                        </a>
-                                    </li>
-                                    <li class="kt-menu__item " aria-haspopup="true">
-
-                                        <a href="#" class="kt-menu__link ">
-                                            <i class="kt-menu__link-bullet kt-menu__link-bullet--dot"><span></span></i><span class="kt-menu__link-text">Subject Allocation Import</span>
-                                        </a>
-                                    </li>
-                                    <li class="kt-menu__item " aria-haspopup="true">
-                                        <a href="#" class="kt-menu__link ">
-                                            <i class="kt-menu__link-bullet kt-menu__link-bullet--dot"><span></span></i>
-                                            <span class="kt-menu__link-text">Add User</span>
-                                        </a>
-                                    </li>
-                                    <li class="kt-menu__item " aria-haspopup="true">
-                                        <a href="custom/apps/user/edit-user.html" class="kt-menu__link "><i class="kt-menu__link-bullet kt-menu__link-bullet--dot"><span></span></i><span class="kt-menu__link-text">Edit User</span></a>
-                                    </li>
-                                    <li class="kt-menu__item  kt-menu__item--submenu" aria-haspopup="true" data-ktmenu-submenu-toggle="hover">
-                                        <a href="javascript:;" class="kt-menu__link kt-menu__toggle"><i class="kt-menu__link-bullet kt-menu__link-bullet--dot"><span></span></i><span class="kt-menu__link-text">Profile 1</span><i class="kt-menu__ver-arrow la la-angle-right"></i></a>
-                                        <div class="kt-menu__submenu ">
-                                            <span class="kt-menu__arrow"></span>
-                                            <ul class="kt-menu__subnav">
-                                                <li class="kt-menu__item " aria-haspopup="true"><a href="custom/apps/user/profile-1/overview.html" class="kt-menu__link "><i class="kt-menu__link-bullet kt-menu__link-bullet--line"><span></span></i><span class="kt-menu__link-text">Overview</span></a></li>
-                                                <li class="kt-menu__item " aria-haspopup="true"><a href="custom/apps/user/profile-1/personal-information.html" class="kt-menu__link "><i class="kt-menu__link-bullet kt-menu__link-bullet--line"><span></span></i><span class="kt-menu__link-text">Personal Information</span></a></li>
-                                                <li class="kt-menu__item " aria-haspopup="true"><a href="custom/apps/user/profile-1/account-information.html" class="kt-menu__link "><i class="kt-menu__link-bullet kt-menu__link-bullet--line"><span></span></i><span class="kt-menu__link-text">Account Information</span></a></li>
-                                                <li class="kt-menu__item " aria-haspopup="true"><a href="custom/apps/user/profile-1/change-password.html" class="kt-menu__link "><i class="kt-menu__link-bullet kt-menu__link-bullet--line"><span></span></i><span class="kt-menu__link-text">Change Password</span></a></li>
-                                                <li class="kt-menu__item " aria-haspopup="true"><a href="custom/apps/user/profile-1/email-settings.html" class="kt-menu__link "><i class="kt-menu__link-bullet kt-menu__link-bullet--line"><span></span></i><span class="kt-menu__link-text">Email Settings</span></a></li>
-                                            </ul>
-                                        </div>
-                                    </li>
-                                    <li class="kt-menu__item " aria-haspopup="true"><a href="custom/apps/user/profile-2.html" class="kt-menu__link "><i class="kt-menu__link-bullet kt-menu__link-bullet--dot"><span></span></i><span class="kt-menu__link-text">Profile 2</span></a></li>
-                                    <li class="kt-menu__item " aria-haspopup="true"><a href="custom/apps/user/profile-3.html" class="kt-menu__link "><i class="kt-menu__link-bullet kt-menu__link-bullet--dot"><span></span></i><span class="kt-menu__link-text">Profile 3</span></a></li>
-                                    <li class="kt-menu__item " aria-haspopup="true"><a href="custom/apps/user/profile-4.html" class="kt-menu__link "><i class="kt-menu__link-bullet kt-menu__link-bullet--dot"><span></span></i><span class="kt-menu__link-text">Profile 4</span></a></li>
-                                </ul>
-                            </div>
-                        </li>
-                        <li class="kt-menu__item  kt-menu__item--submenu" aria-haspopup="true" data-ktmenu-submenu-toggle="hover">
-                            <a href="javascript:;" class="kt-menu__link kt-menu__toggle"><i class="kt-menu__link-bullet kt-menu__link-bullet--line"><span></span></i><span class="kt-menu__link-text">Lesson PLaning</span><i class="kt-menu__ver-arrow la la-angle-right"></i></a>
-                            <div class="kt-menu__submenu ">
-                                <span class="kt-menu__arrow"></span>
-                                <ul class="kt-menu__subnav">
-                                    <li class="kt-menu__item " aria-haspopup="true"><a href="custom/apps/contacts/list-columns.html" class="kt-menu__link "><i class="kt-menu__link-bullet kt-menu__link-bullet--dot"><span></span></i><span class="kt-menu__link-text">Lesson Planning</span></a></li>
-
-                                </ul>
-                            </div>
-                        </li>
-                        <li class="kt-menu__item  kt-menu__item--submenu" aria-haspopup="true" data-ktmenu-submenu-toggle="hover">
-                            <a href="javascript:;" class="kt-menu__link kt-menu__toggle"><i class="kt-menu__link-bullet kt-menu__link-bullet--line"><span></span></i><span class="kt-menu__link-text">Time Table</span><i class="kt-menu__ver-arrow la la-angle-right"></i></a>
-                            <div class="kt-menu__submenu ">
-                                <span class="kt-menu__arrow"></span>
-                                <ul class="kt-menu__subnav">
-                                    <li class="kt-menu__item " aria-haspopup="true"><a href="custom/apps/chat/private.html" class="kt-menu__link "><i class="kt-menu__link-bullet kt-menu__link-bullet--dot"><span></span></i><span class="kt-menu__link-text">Set Time Table</span></a></li>
-                                    <li class="kt-menu__item " aria-haspopup="true"><a href="custom/apps/chat/group.html" class="kt-menu__link "><i class="kt-menu__link-bullet kt-menu__link-bullet--dot"><span></span></i><span class="kt-menu__link-text">Active Time Table</span></a></li>
-                                    <li class="kt-menu__item " aria-haspopup="true"><a href="custom/apps/chat/popup.html" class="kt-menu__link "><i class="kt-menu__link-bullet kt-menu__link-bullet--dot"><span></span></i><span class="kt-menu__link-text">Batch Time Table</span></a></li>
-                                    <li class="kt-menu__item " aria-haspopup="true"><a href="custom/apps/chat/private.html" class="kt-menu__link "><i class="kt-menu__link-bullet kt-menu__link-bullet--dot"><span></span></i><span class="kt-menu__link-text">Teacher Time Table</span></a></li>
-                                    <li class="kt-menu__item " aria-haspopup="true"><a href="custom/apps/chat/group.html" class="kt-menu__link "><i class="kt-menu__link-bullet kt-menu__link-bullet--dot"><span></span></i><span class="kt-menu__link-text">Search Proxy</span></a></li>
-                                    <li class="kt-menu__item " aria-haspopup="true"><a href="custom/apps/chat/popup.html" class="kt-menu__link "><i class="kt-menu__link-bullet kt-menu__link-bullet--dot"><span></span></i><span class="kt-menu__link-text">Teacher Working Hour</span></a></li>
-                                </ul>
-                            </div>
-                        </li>
-                        <li class="kt-menu__item  kt-menu__item--submenu" aria-haspopup="true" data-ktmenu-submenu-toggle="hover">
-                            <a href="javascript:;" class="kt-menu__link kt-menu__toggle"><i class="kt-menu__link-bullet kt-menu__link-bullet--line"><span></span></i><span class="kt-menu__link-text">Exam Master</span><i class="kt-menu__ver-arrow la la-angle-right"></i></a>
-                            @*<div class="kt-menu__submenu ">
-                                    <span class="kt-menu__arrow"></span>
-                                    <ul class="kt-menu__subnav">
-                                        <li class="kt-menu__item " aria-haspopup="true"><a href="custom/apps/projects/list-columns-1.html" class="kt-menu__link "><i class="kt-menu__link-bullet kt-menu__link-bullet--dot"><span></span></i><span class="kt-menu__link-text">List - Columns 1</span></a></li>
-                                        <li class="kt-menu__item " aria-haspopup="true"><a href="custom/apps/projects/list-columns-2.html" class="kt-menu__link "><i class="kt-menu__link-bullet kt-menu__link-bullet--dot"><span></span></i><span class="kt-menu__link-text">List - Columns 2</span></a></li>
-                                        <li class="kt-menu__item " aria-haspopup="true"><a href="custom/apps/projects/list-columns-3.html" class="kt-menu__link "><i class="kt-menu__link-bullet kt-menu__link-bullet--dot"><span></span></i><span class="kt-menu__link-text">List - Columns 3</span></a></li>
-                                        <li class="kt-menu__item " aria-haspopup="true"><a href="custom/apps/projects/list-columns-4.html" class="kt-menu__link "><i class="kt-menu__link-bullet kt-menu__link-bullet--dot"><span></span></i><span class="kt-menu__link-text">List - Columns 4</span></a></li>
-                                        <li class="kt-menu__item " aria-haspopup="true"><a href="custom/apps/projects/list-datatable.html" class="kt-menu__link "><i class="kt-menu__link-bullet kt-menu__link-bullet--dot"><span></span></i><span class="kt-menu__link-text">List - Datatable</span></a></li>
-                                        <li class="kt-menu__item " aria-haspopup="true"><a href="custom/apps/projects/view-project.html" class="kt-menu__link "><i class="kt-menu__link-bullet kt-menu__link-bullet--dot"><span></span></i><span class="kt-menu__link-text">View Project</span></a></li>
-                                        <li class="kt-menu__item " aria-haspopup="true"><a href="custom/apps/projects/add-project.html" class="kt-menu__link "><i class="kt-menu__link-bullet kt-menu__link-bullet--dot"><span></span></i><span class="kt-menu__link-text">Add Project</span></a></li>
-                                        <li class="kt-menu__item " aria-haspopup="true"><a href="custom/apps/projects/edit-project.html" class="kt-menu__link "><i class="kt-menu__link-bullet kt-menu__link-bullet--dot"><span></span></i><span class="kt-menu__link-text">Edit Project</span></a></li>
-                                    </ul>
-                                </div>*@
-                        </li>
-
-                        <li class="kt-menu__item  kt-menu__item--submenu" aria-haspopup="true" data-ktmenu-submenu-toggle="hover">
-                            <a href="javascript:;" class="kt-menu__link kt-menu__toggle"><i class="kt-menu__link-bullet kt-menu__link-bullet--line"><span></span></i><span class="kt-menu__link-text">Assignment And Notes</span><i class="kt-menu__ver-arrow la la-angle-right"></i></a>
-                            @*<div class="kt-menu__submenu ">
-                                    <span class="kt-menu__arrow"></span>
-                                    <ul class="kt-menu__subnav">
-                                        <li class="kt-menu__item " aria-haspopup="true"><a href="custom/apps/projects/list-columns-1.html" class="kt-menu__link "><i class="kt-menu__link-bullet kt-menu__link-bullet--dot"><span></span></i><span class="kt-menu__link-text">List - Columns 1</span></a></li>
-                                        <li class="kt-menu__item " aria-haspopup="true"><a href="custom/apps/projects/list-columns-2.html" class="kt-menu__link "><i class="kt-menu__link-bullet kt-menu__link-bullet--dot"><span></span></i><span class="kt-menu__link-text">List - Columns 2</span></a></li>
-                                        <li class="kt-menu__item " aria-haspopup="true"><a href="custom/apps/projects/list-columns-3.html" class="kt-menu__link "><i class="kt-menu__link-bullet kt-menu__link-bullet--dot"><span></span></i><span class="kt-menu__link-text">List - Columns 3</span></a></li>
-                                        <li class="kt-menu__item " aria-haspopup="true"><a href="custom/apps/projects/list-columns-4.html" class="kt-menu__link "><i class="kt-menu__link-bullet kt-menu__link-bullet--dot"><span></span></i><span class="kt-menu__link-text">List - Columns 4</span></a></li>
-                                        <li class="kt-menu__item " aria-haspopup="true"><a href="custom/apps/projects/list-datatable.html" class="kt-menu__link "><i class="kt-menu__link-bullet kt-menu__link-bullet--dot"><span></span></i><span class="kt-menu__link-text">List - Datatable</span></a></li>
-                                        <li class="kt-menu__item " aria-haspopup="true"><a href="custom/apps/projects/view-project.html" class="kt-menu__link "><i class="kt-menu__link-bullet kt-menu__link-bullet--dot"><span></span></i><span class="kt-menu__link-text">View Project</span></a></li>
-                                        <li class="kt-menu__item " aria-haspopup="true"><a href="custom/apps/projects/add-project.html" class="kt-menu__link "><i class="kt-menu__link-bullet kt-menu__link-bullet--dot"><span></span></i><span class="kt-menu__link-text">Add Project</span></a></li>
-                                        <li class="kt-menu__item " aria-haspopup="true"><a href="custom/apps/projects/edit-project.html" class="kt-menu__link "><i class="kt-menu__link-bullet kt-menu__link-bullet--dot"><span></span></i><span class="kt-menu__link-text">Edit Project</span></a></li>
-                                    </ul>
-                                </div>*@
-                        </li>
-
-
-                        <li class="kt-menu__item  kt-menu__item--submenu" aria-haspopup="true" data-ktmenu-submenu-toggle="hover">
-                            <a href="javascript:;" class="kt-menu__link kt-menu__toggle"><i class="kt-menu__link-bullet kt-menu__link-bullet--line"><span></span></i><span class="kt-menu__link-text">Certification</span><i class="kt-menu__ver-arrow la la-angle-right"></i></a>
-                            @*<div class="kt-menu__submenu ">
-                                    <span class="kt-menu__arrow"></span>
-                                    <ul class="kt-menu__subnav">
-                                        <li class="kt-menu__item " aria-haspopup="true"><a href="custom/apps/projects/list-columns-1.html" class="kt-menu__link "><i class="kt-menu__link-bullet kt-menu__link-bullet--dot"><span></span></i><span class="kt-menu__link-text">List - Columns 1</span></a></li>
-                                        <li class="kt-menu__item " aria-haspopup="true"><a href="custom/apps/projects/list-columns-2.html" class="kt-menu__link "><i class="kt-menu__link-bullet kt-menu__link-bullet--dot"><span></span></i><span class="kt-menu__link-text">List - Columns 2</span></a></li>
-                                        <li class="kt-menu__item " aria-haspopup="true"><a href="custom/apps/projects/list-columns-3.html" class="kt-menu__link "><i class="kt-menu__link-bullet kt-menu__link-bullet--dot"><span></span></i><span class="kt-menu__link-text">List - Columns 3</span></a></li>
-                                        <li class="kt-menu__item " aria-haspopup="true"><a href="custom/apps/projects/list-columns-4.html" class="kt-menu__link "><i class="kt-menu__link-bullet kt-menu__link-bullet--dot"><span></span></i><span class="kt-menu__link-text">List - Columns 4</span></a></li>
-                                        <li class="kt-menu__item " aria-haspopup="true"><a href="custom/apps/projects/list-datatable.html" class="kt-menu__link "><i class="kt-menu__link-bullet kt-menu__link-bullet--dot"><span></span></i><span class="kt-menu__link-text">List - Datatable</span></a></li>
-                                        <li class="kt-menu__item " aria-haspopup="true"><a href="custom/apps/projects/view-project.html" class="kt-menu__link "><i class="kt-menu__link-bullet kt-menu__link-bullet--dot"><span></span></i><span class="kt-menu__link-text">View Project</span></a></li>
-                                        <li class="kt-menu__item " aria-haspopup="true"><a href="custom/apps/projects/add-project.html" class="kt-menu__link "><i class="kt-menu__link-bullet kt-menu__link-bullet--dot"><span></span></i><span class="kt-menu__link-text">Add Project</span></a></li>
-                                        <li class="kt-menu__item " aria-haspopup="true"><a href="custom/apps/projects/edit-project.html" class="kt-menu__link "><i class="kt-menu__link-bullet kt-menu__link-bullet--dot"><span></span></i><span class="kt-menu__link-text">Edit Project</span></a></li>
-                                    </ul>
-                                </div>*@
-                        </li>
-
-                        <li class="kt-menu__item  kt-menu__item--submenu" aria-haspopup="true" data-ktmenu-submenu-toggle="hover">
-                            <a href="javascript:;" class="kt-menu__link kt-menu__toggle"><i class="kt-menu__link-bullet kt-menu__link-bullet--line"><span></span></i><span class="kt-menu__link-text">Placement</span><i class="kt-menu__ver-arrow la la-angle-right"></i></a>
-                            @*<div class="kt-menu__submenu ">
-                                    <span class="kt-menu__arrow"></span>
-                                    <ul class="kt-menu__subnav">
-                                        <li class="kt-menu__item " aria-haspopup="true"><a href="custom/apps/projects/list-columns-1.html" class="kt-menu__link "><i class="kt-menu__link-bullet kt-menu__link-bullet--dot"><span></span></i><span class="kt-menu__link-text">List - Columns 1</span></a></li>
-                                        <li class="kt-menu__item " aria-haspopup="true"><a href="custom/apps/projects/list-columns-2.html" class="kt-menu__link "><i class="kt-menu__link-bullet kt-menu__link-bullet--dot"><span></span></i><span class="kt-menu__link-text">List - Columns 2</span></a></li>
-                                        <li class="kt-menu__item " aria-haspopup="true"><a href="custom/apps/projects/list-columns-3.html" class="kt-menu__link "><i class="kt-menu__link-bullet kt-menu__link-bullet--dot"><span></span></i><span class="kt-menu__link-text">List - Columns 3</span></a></li>
-                                        <li class="kt-menu__item " aria-haspopup="true"><a href="custom/apps/projects/list-columns-4.html" class="kt-menu__link "><i class="kt-menu__link-bullet kt-menu__link-bullet--dot"><span></span></i><span class="kt-menu__link-text">List - Columns 4</span></a></li>
-                                        <li class="kt-menu__item " aria-haspopup="true"><a href="custom/apps/projects/list-datatable.html" class="kt-menu__link "><i class="kt-menu__link-bullet kt-menu__link-bullet--dot"><span></span></i><span class="kt-menu__link-text">List - Datatable</span></a></li>
-                                        <li class="kt-menu__item " aria-haspopup="true"><a href="custom/apps/projects/view-project.html" class="kt-menu__link "><i class="kt-menu__link-bullet kt-menu__link-bullet--dot"><span></span></i><span class="kt-menu__link-text">View Project</span></a></li>
-                                        <li class="kt-menu__item " aria-haspopup="true"><a href="custom/apps/projects/add-project.html" class="kt-menu__link "><i class="kt-menu__link-bullet kt-menu__link-bullet--dot"><span></span></i><span class="kt-menu__link-text">Add Project</span></a></li>
-                                        <li class="kt-menu__item " aria-haspopup="true"><a href="custom/apps/projects/edit-project.html" class="kt-menu__link "><i class="kt-menu__link-bullet kt-menu__link-bullet--dot"><span></span></i><span class="kt-menu__link-text">Edit Project</span></a></li>
-                                    </ul>
-                                </div>*@
-                        </li>
-                        <li class="kt-menu__item " aria-haspopup="true"><a href="custom/apps/inbox.html" class="kt-menu__link "><i class="kt-menu__link-bullet kt-menu__link-bullet--line"><span></span></i><span class="kt-menu__link-text">Inbox</span><span class="kt-menu__link-badge"><span class="kt-badge kt-badge--danger kt-badge--inline">new</span></span></a></li>
-                    </ul>
-                </div>
-            </li>
-
-
         </ul>
-    </div>
-</div>
+
+        <ul class="sidebar-menu" data-widget="tree">
+            <li class="treeview">
+                <a href="#">
+                    <i class="fa fa-link"></i> <span>Academic Detail</span>
+                    <span class="pull-right-container">
+                        <i class="fa fa-angle-left pull-right"></i>
+                    </span>
+                </a>
+                <ul class="treeview-menu">
+                    <li><a href="#">Course</a></li>
+                    <li><a href="#">Batch</a></li>
+                    <li><a href="#">Class Teacher Allocation</a></li>
+                </ul>
+            </li>
+        </ul>
+
+        <ul class="sidebar-menu" data-widget="tree">
+            <li class="treeview">
+                <a href="#">
+                    <i class="fa fa-link"></i> <span>Subject</span>
+                    <span class="pull-right-container">
+                        <i class="fa fa-angle-left pull-right"></i>
+                    </span>
+                </a>
+                <ul class="treeview-menu">
+                    <li><a href="#">Subjects</a></li>
+                    <li><a href="#">Assign Subjects</a></li>
+                    <li><a href="#">Subject Allocation</a></li>
+                    <li><a href="#">Elective Subject</a></li>
+                    <li><a href="#">Subjec Allocation Import</a></li>
+                </ul>
+            </li>
+        </ul>
+        <ul class="sidebar-menu" data-widget="tree">
+            <li class="treeview">
+                <a href="#">
+                    <i class="fa fa-link"></i> <span>Student</span>
+                    <span class="pull-right-container">
+                        <i class="fa fa-angle-left pull-right"></i>
+                    </span>
+                </a>
+                <ul class="treeview-menu">
+                    <li><a href="#">Category</a></li>
+                    <li><a href="#">Student Admission</a></li>
+                    <li><a href="#">Attendence</a></li>
+                    <li><a href="#">Guardian List</a></li>
+                    <li><a href="#">Student Gate Pass</a></li>
+                    <li><a href="#">Student ID Card</a></li>
+                </ul>
+            </li>
+        </ul>
+        <!-- /.sidebar-menu -->
+    </section>
+    <!-- /.sidebar -->
+</aside>

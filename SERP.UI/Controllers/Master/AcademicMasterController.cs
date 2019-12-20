@@ -1,18 +1,21 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using System.Threading;
+using SERP.Core.Entities.Entity.Core.Master;
 
 namespace SERP.UI.Controllers.Master
 {
-    [Route("Master/{controller}/{action}")]
     public class AcademicMasterController : Controller
     {
-        [Route("Master/Academic")]
         public IActionResult Index()
         {
-            return View();
+            Thread.Sleep(5000);
+            return PartialView();
+        }
+        [HttpPost]
+        public async Task<IActionResult> Create(AcademicMaster model)
+        {
+            return await Task.Run(() => Json("Data Added"));
         }
     }
 }
