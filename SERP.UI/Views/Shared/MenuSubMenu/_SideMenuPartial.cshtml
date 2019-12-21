@@ -44,22 +44,23 @@
                     </span>
                 </a>
                 <ul class="treeview-menu">
-                    <li>
+                    <li class="active">
                         <a data-ajax="true" data-ajax-mode="replace"
                            asp-action="Index" asp-controller="InstituteMaster"
                            data-ajax-update="#divSERP" data-ajax-loading="#loading"
                            class="nav-link">
-                        <i class="fa fa-university"></i>
-                        <span>
-                            Institute Detail
-                        </span>
+                            <i class="fa fa-university"></i>
+                            <span>
+                                Institute Detail
+                            </span>
                         </a>
                     </li>
-                    <li><a data-ajax="true" data-ajax-mode="replace"
+                    <li>
+                        <a data-ajax="true" data-ajax-mode="replace"
                            asp-action="Index" asp-controller="AcademicMaster"
                            data-ajax-update="#divSERP" data-ajax-loading="#loading">
-                        <i class="fa fa-bank"></i>
-                        <span>Academic Detail</span>
+                            <i class="fa fa-bank"></i>
+                            <span>Academic Detail</span>
                         </a>
                     </li>
                     <li><a href="#">Student Import</a></li>
@@ -126,3 +127,11 @@
     </section>
     <!-- /.sidebar -->
 </aside>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        $('a').click(function () {
+            this.parentElement.setAttribute('class', 'active');
+        })
+    })
+</script>

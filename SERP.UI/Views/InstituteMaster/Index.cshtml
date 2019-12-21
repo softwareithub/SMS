@@ -45,6 +45,7 @@
                         <div class="col-md-12">
                             <div class="col-md-4">
                                 <div class="form-group">
+                                    <input type="hidden" asp-for="Id"/>
                                     <label asp-for="Name">Institute Name</label>
                                     <input asp-for="Name" class="form-control">
                                     <span asp-validation-for="Name" class="text-danger"></span>
@@ -108,6 +109,7 @@
                             </div>
                             <div class="col-md-4">
                                 <div class="form-group">
+                                 
                                     <label asp-for="InstituteLogo">Institute Logo</label>
                                     <input asp-for="InstituteLogo" type="file" class="form-control">
                                     <span asp-validation-for="InstituteLogo" class="text-danger"></span>
@@ -126,7 +128,15 @@
                         </div>
 
                         <div class="col-md-12">
-                            <img />
+
+                            @if (Model != null)
+                            {
+                                <input type="hidden" asp-for="InstituteLogo" />
+                                <input type="hidden" asp-for="CreatedDate" />
+                                <input type="hidden" asp-for="CreatedBy" />
+                                <img src="@Model.InstituteLogo" style="width:100px;height:100px;" />
+                            }
+
                         </div>
                     </div>
                     <!-- /.box-body -->
@@ -161,4 +171,5 @@
 
     </div>
 </section>
+
 

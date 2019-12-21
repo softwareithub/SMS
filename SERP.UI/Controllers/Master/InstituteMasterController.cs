@@ -32,13 +32,24 @@ namespace SERP.UI.Controllers.Master
         {
             model.IsActive = 1;
             model.IsDeleted = 0;
-            model.CreatedBy = 1;
-            model.CreatedDate = DateTime.Now;
+            model.InstituteLogo =model.InstituteLogo?? await UploadImage(InstituteLogo);
+            if (model.Id == 0)
+            {
+                model.CreatedBy = 1;
+                model.CreatedDate = DateTime.Now.Date;
+                model.UpdatedDate = DateTime.Now.Date;
+                var result = await _IGenericRepo.CreateEntity(model);
+                return Json("Institute Detail Created Successfully.");
+            }
+            else
+            {
+                model.UpdatedBy = 1;
+                model.UpdatedDate = DateTime.Now.Date;
+                
+                var result = _IGenericRepo.Update(model);
+                return Json("Institute data updated successfully");
+            }
 
-            model.InstituteLogo = await UploadImage(InstituteLogo);
-
-            var result = await _IGenericRepo.CreateEntity(model);
-            return Json("Institute Detail Created Successfully.");
         }
 
         private async Task<string> UploadImage(IFormFile formFile)

@@ -12,7 +12,7 @@ namespace SERP.Core.Entities.Context
     {
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseSqlServer("Server= DESKTOP-SF1G3N8\\VIPRAIT; Database= SERP; Integrated Security=True;");
+            optionsBuilder.UseSqlServer("Server= DESKTOP-SF1G3N8\\VIPRAIT; Database= SERP; User Id=sa;Password = vi@pra91");
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -22,6 +22,7 @@ namespace SERP.Core.Entities.Context
 
         DbSet<AcademicMaster> AcademicMasters { get; set; }
         DbSet<InstituteMaster> InstituteMaster { get; set; }
+        DbSet<CourseMaster> CourseMaster { get; set; }
 
     }
 }
