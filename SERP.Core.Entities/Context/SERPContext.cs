@@ -7,6 +7,7 @@ using System.Text;
 namespace SERP.Core.Entities.Context
 {
     //test
+    //test2
     public class SERPContext : DbContext
     {
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
