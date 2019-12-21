@@ -50,6 +50,7 @@
   <ItemGroup>
     <ProjectReference Include="..\SERP.Core.Entities\SERP.Core.Entities.csproj" />
     <ProjectReference Include="..\SERP.Core.Model\SERP.Core.Model.csproj" />
+    <ProjectReference Include="..\SERP.Infrastructure.Implementation\SERP.Infrastructure.Implementation.csproj" />
     <ProjectReference Include="..\SERP.Infrastructure.Repository\SERP.Infrastructure.Repository.csproj" />
     <ProjectReference Include="..\SERP.Utilities\SERP.Utilities.csproj" />
   </ItemGroup>

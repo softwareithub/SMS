@@ -1,42 +1,164 @@
 ﻿
 @{
     ViewData["Title"] = "Index";
-    Layout = "~/Views/Shared/_Layout.cshtml";
+    Layout = null;
 }
-<script src="~/AjaxUnobrrusive/AjaxUnobtrusive.js"></script>
-<aside class="sidebar">
-    <nav>
-        <ul>
-            <li><a href="#" class="active">Institute Details</a></li>
-            <li>
-                <a data-ajax="true" data-ajax-mode="replace"
-                   asp-action="Index" asp-controller="AcademicMaster"
-                   data-ajax-update="#_divSetting" data-ajax-loading="#_divLoading"
-                   class="nav-link">Academic Detail</a>
-            </li>
+@model SERP.Core.Entities.Entity.Core.Master.InstituteMaster
 
-            <li><a href="products.html">Student Import</a></li>
-            <li><a href="products.html">Employee Import</a></li>
-            <li><a href="products.html">Employee Application</a></li>
-            <li><a href="products.html">Applicant List</a></li>
-            <li><a href="products.html">Cast & Religion</a></li>
-        </ul>
-    </nav><!--side bar navigation end-->
-    <a href="#/" class="slideNav beforeIco">Slide Navigation</a>
-</aside><!--left side bar end-->
 
-<section class="main">
-    <div class="row" id="_divSetting">
-        <div class="row" id="_divLoading">
-            .....Loading Please wait...
-        </div>
-        <div class="col-md-12 col-lg-12">
-            <div class="form-block">
-                <div class="head"><h2>Basic Information</h2></div>
-                <div class="body">
+<script src="~/lib/jquery-validation/dist/jquery.validate.js"></script>
+<script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.js"></script>
+<link href="https://cdn.datatables.net/1.10.20/css/jquery.dataTables.min.css" rel="stylesheet" />
+<script src="https://cdn.datatables.net/1.10.20/js/jquery.dataTables.min.js"></script>
+
+<section class="content-header">
+    <h1>
+        Instiute Master
+        <small>Create Institute Detail</small>
+    </h1>
+    <ol class="breadcrumb">
+        <li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
+        <li><a href="#">Forms</a></li>
+        <li class="active">General Elements</li>
+    </ol>
+</section>
+
+
+<section class="content">
+    <div class="row">
+
+        <div class="col-md-12">
+            <!-- general form elements -->
+            <div class="box box-primary">
+                <div class="box-header with-border">
+                    <h3 class="box-title">Create Institute Details</h3>
+                    <a class="btn btn-primary pull-right" onclick="GetAcademicList()">
+                        <i class="fa fa-list-ul"></i>
+                        List
+                    </a>
                 </div>
+                <!-- /.box-header -->
+                <!-- form start -->
+                <form method="post" data-ajax="true" data-ajax-method="post"  enctype="multipart/form-data"
+                      asp-action="Create" asp-controller="InstituteMaster" data-ajax-success="Success">
+                    <div class="box-body">
+                        <div class="col-md-12">
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label asp-for="Name">Institute Name</label>
+                                    <input asp-for="Name" class="form-control">
+                                    <span asp-validation-for="Name" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label asp-for="Code">Institute Code</label>
+                                    <input asp-for="Code" class="form-control">
+                                    <span asp-validation-for="Code" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label asp-for="Address">Address</label>
+                                    <input asp-for="Address" class="form-control">
+                                    <span asp-validation-for="Address" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-12">
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label asp-for="Email">Email</label>
+                                    <input asp-for="Email" class="form-control">
+                                    <span asp-validation-for="Email" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label asp-for="Phone">Phone</label>
+                                    <input asp-for="Phone" class="form-control">
+                                    <span asp-validation-for="Phone" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label asp-for="Mobile">Mobile</label>
+                                    <input asp-for="Mobile" class="form-control">
+                                    <span asp-validation-for="Mobile" class="text-danger"></span>
+                                </div>
+                            </div>
+                     
+                            
+           
+                        </div>
+                        <div class="col-md-12">
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label asp-for="Fax">Fax</label>
+                                    <input asp-for="Fax" class="form-control">
+                                    <span asp-validation-for="Fax" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label asp-for="AdminContactPerson">Contact Person</label>
+                                    <input asp-for="AdminContactPerson" class="form-control">
+                                    <span asp-validation-for="AdminContactPerson" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label asp-for="InstituteLogo">Institute Logo</label>
+                                    <input asp-for="InstituteLogo" type="file" class="form-control">
+                                    <span asp-validation-for="InstituteLogo" class="text-danger"></span>
+                                </div>
+                            </div>
+                        
+                        </div>
+                        <div class="col-md-12">
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label asp-for="Rythum">Rythum</label>
+                                    <input asp-for="Rythum" class="form-control">
+                                    <span asp-validation-for="Rythum" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-12">
+                            <img />
+                        </div>
+                    </div>
+                    <!-- /.box-body -->
+
+                    <div class="box-footer">
+                        <button type="submit" class="btn btn-primary">Submit</button>
+                    </div>
+                </form>
             </div>
         </div>
+
+        <div class="modalCustom fade" id="selectAcademic" role="dialog">
+            <div class="modalCustom-dialog lg">
+                <!-- Modal content-->
+                <div class="modalCustom-content">
+                    <div class="modalCustom-header">
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                        <h4 class="modal-title" style="text-align:center">Select Academic List</h4>
+                    </div><!--modal-header end-->
+
+                    <div class="modalCustom-body">
+                        <fieldset class="fieldset marB0">
+                            <div class="table-outer" style="min-height: 250px;" id="divAcademicList">
+
+                            </div>
+                        </fieldset>
+                    </div><!--modal-body end-->
+                </div>
+                <!--modal-content end-->
+            </div><!--modal-dialog end-->
+        </div>
+
     </div>
 </section>
 

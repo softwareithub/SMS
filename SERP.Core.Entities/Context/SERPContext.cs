@@ -19,6 +19,7 @@ namespace SERP.Core.Entities.Context
         }
 
         DbSet<AcademicMaster> AcademicMasters { get; set; }
+        DbSet<InstituteMaster> InstituteMaster { get; set; }
 
     }
 }
