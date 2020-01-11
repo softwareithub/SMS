@@ -1,0 +1,124 @@
+﻿@{
+    ViewData["Title"] = "Index";
+    Layout = null;
+
+}
+@model SERP.Core.Entities.Entity.Core.Master.AcademicMaster
+
+<script src="~/lib/jquery-validation/dist/jquery.validate.js"></script>
+<script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.js"></script>
+<link href="https://cdn.datatables.net/1.10.20/css/jquery.dataTables.min.css" rel="stylesheet" />
+<script src="https://cdn.datatables.net/1.10.20/js/jquery.dataTables.min.js"></script>
+
+<section class="content-header">
+    <h1>
+        Employee Information
+        <small>Create Employee Detail</small>
+    </h1>
+    <ol class="breadcrumb">
+        <li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
+        <li><a href="#">Forms</a></li>
+        <li class="active">General Elements</li>
+    </ol>
+</section>
+
+
+<section class="content">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="col-md-10">
+                <a class="btn btn-primary pull-right" onclick="GetRecordList()">
+                    <i class="fa fa-list-ul"></i>
+                    List
+                </a>
+            </div>
+            <div class="col-md-2">
+                <a class="btn btn-primary pull-left" onclick="NewRecord()">
+                    <i class="fa fa-plus-square"></i>
+                </a>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <!-- general form elements -->
+
+            <div class="col-md-12">
+                <!-- Custom Tabs -->
+                <div class="nav-tabs-custom">
+                    <ul class="nav nav-tabs">
+                        <li class="active"><a href="#tab_1" data-toggle="tab" aria-expanded="false">Basic Information</a></li>
+                        <li><a onclick="GetQualification()" data-toggle="tab" aria-expanded="false">Qualification Info</a></li>
+                        <li><a href="#tab_3" onclick="GetSalary()" data-toggle="tab" aria-expanded="true">Employee Salary</a></li>
+
+
+                    </ul>
+                    <div class="tab-content">
+                        <div class="tab-pane" id="tab_1">
+
+                        </div>
+                        <!-- /.tab-pane -->
+                        <div class="tab-pane" id="tab_2">
+
+                        </div>
+                        <!-- /.tab-pane -->
+                        <div class="tab-pane active" id="tab_3">
+
+                        </div>
+                        <div class="tab-pane active" id="tab_4">
+
+                        </div>
+                        <!-- /.tab-pane -->
+                    </div>
+                    <!-- /.tab-content -->
+                </div>
+                <!-- nav-tabs-custom -->
+            </div>
+        </div>
+
+        @await Html.PartialAsync("~/Views/Shared/_CommanModalPartial.cshtml")
+
+    </div>
+</section>
+
+<script>
+    $(document).ready(function () {
+        GetBasicInfo(0);
+    });
+    function GetBasicInfo(id) {
+        $.get("Employee/BasicInfo", { id: id }, function (responseData) {
+            debugger;
+            $("#tab_1").html(responseData);
+            $("#tab_1").addClass('active');
+        });
+    }
+    function GetQualification() {
+        $.get("Employee/CreatePreviousQual", function (responseData) {
+            debugger;
+            $("#tab_1").removeClass('active');
+            $("#tab_2").html(responseData);
+            $("#tab_2").addClass('active');
+        });
+    }
+    function GetSalary() {
+        debugger
+        if (sessionStorage.getItem("employeeId") != null) {
+            $.get("Employee/EmployeeSalary", { id: sessionStorage.getItem("employeeId") }, function (responseData) {
+                debugger;
+                $("#tab_1").removeClass('active');
+                $("#tab_2").removeClass('active');
+                $("#tab_3").html(responseData);
+                $("#tab_3").addClass('active');
+            });
+        }
+        else {
+            alertify.set('notifier', 'position', 'top-right');
+            alertify.error("No Employee are selected ! Please select Employee")
+        }
+    }
+    function GetRecordList() {
+        GetCustomRecord("/Employee/GetEmployeeList");
+        setTimeout(function () {
+            $("#modalTitle").text("Employee List")
+        }, 300);
+    }
+</script>
+

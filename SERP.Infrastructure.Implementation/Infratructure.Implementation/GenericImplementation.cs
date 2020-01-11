@@ -115,7 +115,7 @@ namespace SERP.Infrastructure.Implementation.Infratructure.Implementation
                     baseContext.UpdateRange(items);
                     await baseContext.SaveChangesAsync();
                 }
-                return ResponseStatus.AddedSuccessfully;
+                return ResponseStatus.UpdatedSuccessFully;
             }
             catch (Exception ex)
             {
@@ -133,7 +133,7 @@ namespace SERP.Infrastructure.Implementation.Infratructure.Implementation
                     baseContext.UpdateRange(items);
                     await baseContext.SaveChangesAsync();
                 }
-                return ResponseStatus.AddedSuccessfully;
+                return ResponseStatus.DeletedSuccessfully;
             }
             catch (Exception ex)
             {
@@ -145,6 +145,12 @@ namespace SERP.Infrastructure.Implementation.Infratructure.Implementation
         public Task<IList<T>> GetAll(params Expression<Func<T, object>>[] navigationProperties)
         {
             throw new NotImplementedException();
+        }
+
+        public async Task<bool> CreateNewContext()
+        {
+            baseContext = new SERPContext();
+            return await Task.Run(() => true);
         }
 
        

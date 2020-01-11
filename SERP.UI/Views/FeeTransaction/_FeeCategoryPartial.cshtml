@@ -1,0 +1,113 @@
+﻿@model SERP.Core.Entities.Entity.Core.Transaction.FeeCategory
+
+
+<script src="~/lib/jquery-validation/dist/jquery.validate.js"></script>
+<script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.js"></script>
+<link href="https://cdn.datatables.net/1.10.20/css/jquery.dataTables.min.css" rel="stylesheet" />
+<script src="https://cdn.datatables.net/1.10.20/js/jquery.dataTables.min.js"></script>
+
+<section class="content-header">
+    <h1>
+        Fee Category Master
+        <small>Create Fee Detail</small>
+    </h1>
+    <ol class="breadcrumb">
+        <li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
+        <li><a href="#">Forms</a></li>
+        <li class="active">General Elements</li>
+    </ol>
+</section>
+
+
+<section class="content">
+    <div class="row">
+
+        <div class="col-md-12">
+            <!-- general form elements -->
+            <div class="box box-primary">
+                <div class="box-header with-border">
+                    <h3 class="box-title">Create Fee Category Master</h3>
+
+
+                    <div class="col-md-12">
+                        <div class="col-md-10">
+                            <a class="btn btn-primary pull-right" onclick="GetRecordList()">
+                                <i class="fa fa-list-ul"></i>
+                            </a>
+                        </div>
+                        <div class="col-md-2">
+                            <a class="btn btn-primary pull-left" onclick="NewRecord()">
+                                <i class="fa fa-plus-square"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <!-- /.box-header -->
+                <!-- form start -->
+                <form method="post" data-ajax="true" data-ajax-method="post"
+                      asp-action="CreateFeeCategory" asp-controller="FeeCategory" data-ajax-success="Success">
+                    <div class="box-body">
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <input type="hidden" asp-for="Id" />
+                                <input type="hidden" asp-for="CreatedBy" />
+                                <input type="hidden" asp-for="CreatedDate" />
+                                <label asp-for="Name">
+                                    Select Category Name
+                                    <i class="fa fa-info-circle" data-toggle="popover" data-placement="top"
+                                       data-content="Category name is used in student Fee allocation"></i>
+                                </label>
+                                <input asp-for="Name" class="form-control" />
+                                <span asp-validation-for="Name" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label asp-for="Code">Category code
+                                        <i class="fa fa-info-circle"  data-toggle="popover" data-placement="top"
+                                           data-content="Category code is used in Fee Reciept"></i>
+                                </label>
+                                <input asp-for="Code" class="form-control">
+                                <span asp-validation-for="Code" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                    </div>
+                    <!-- /.box-body -->
+
+                    <div class="box-footer">
+                        <div class="col-md-8">
+                            @Html.SERPButton("btn btn-primary pull-right btnSubmit", Model == null ? 0 : Model.Id)
+                            <button class="buttonload" style="display:none">
+                                <i class="fa fa-refresh fa-spin"></i>Loading
+                            </button>
+                        </div>
+                        <div class="col-md-4">
+                            <button type="reset" class="btn btn-danger pull-left">Cancel</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        @await Html.PartialAsync("~/Views/Shared/_CommanModalPartial.cshtml")
+
+    </div>
+</section>
+
+<script type="text/javascript">
+    function GetRecordList() {
+        GetCustomRecord("/FeeCategory/GetFeeCategoryList");
+        setTimeout(function () {
+            $("#modalTitle").text("Fee Category List")
+        }, 300);
+    }
+    function NewRecord() {
+        var url = "CasteMaster/CasteMaster";
+        NewCustomRecord(url);
+    }
+    $(document).ready(function(){
+        $('[data-toggle="popover"]').popover();   
+        GetRecordList();
+});
+</script>

@@ -1,0 +1,62 @@
+﻿@model IEnumerable<SERP.Core.Entities.Entity.Core.HRModule.DesignationModel>
+
+
+<section class="content">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="row">
+                <div class="col-md-12">
+
+
+                    <table id="tblDataList" class="table table-striped table-bordered responsive" style="width:100%">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Code</th>
+                                <th>Action</th>
+
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var data in Model)
+                            {
+                                <tr>
+                                    <td>
+                                        @data.Name
+                                    </td>
+                                    <td>
+                                        @data.Code
+                                    </td>
+                                    <td>
+                                        <a class="btn btn-outline-success pull-right" data-loading-text="<i class='fa fa-circle-o-notch fa-spin'  style='color:#DD4B39'></i>" onclick="UpdateRecord(@data.Id, this)">
+                                            <i class="fa fa-edit" style="color:#3C8DBC"></i>
+
+                                        </a>
+
+                                        <a class="btn btn-outline-danger pull-right" data-loading-text="<i class='fa fa-circle-o-notch fa-spin'  style='color:#DD4B39'></i>" onclick="DeleteRecord(@data.Id, this)">
+                                            <i class="fa fa-trash" style="color:#DD4B39"></i>
+
+                                        </a>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<script type="text/javascript">
+    function DeleteRecord(id, event) {
+        var geturl = "/Designation/GetDesignation";
+        var deleteUrl = "/Designation/DeleteRecord";
+        CustomDeleteRecord(id, geturl, deleteUrl, event);
+    }
+    function UpdateRecord(id, event) {
+        var updateUrl = "/Designation/Index";
+        UpdateCustomRecord(id, updateUrl, event);
+    }
+</script>
+

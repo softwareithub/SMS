@@ -1,0 +1,82 @@
+﻿@{
+    ViewData["Title"] = "Index";
+    Layout = null;
+
+}
+
+<div class="col-md-12">
+    <a class="btn btn-primary add-row pull-right" value="Add Subject">
+        <i class="fa fa-plus-circle">Add Subject</i>
+    </a>
+    <div class="col-md-12">
+        <table class="table-responsive table-bordered table-hover" style="width:100%">
+            <thead>
+                <tr>
+                    <th>Subject Code</th>
+                    <th>Subject Name</th>
+                    <th>Subject Description</th>
+                    <th>Select</th>
+                </tr>
+            </thead>
+            <tbody id="tblsubject">
+            </tbody>
+        </table>
+    </div>
+    <div class="col-md-12">
+        <input type="button" class="btn btn-primary pull-right" value="Submit" onclick="SaveSubject()" />
+    </div>
+</div>
+
+
+<script>
+    var ids = new Array();
+    $(document).ready(function () {
+        $(".add-row").click(function () {
+            var markup = "<tr>";
+
+            markup += '<td><input type="text" id="subjectCode" name="subjectCode" placeholder="Subject Code" class="form-control"></td>';
+            markup += '<td><input type="text" id="subjectName" name="subjectName" placeholder="Subject Name" class="form-control"></td>';
+            markup += '<td><input type="text" id="subjectDescription" name="subjectDescription" placeholder="Subject Description" class="form-control"></td>';
+            markup += '<td><input type="button"  class="btn btn-danger delete-row" value="Delete">';
+            markup += "</tr>"
+
+            $("table tbody").append(markup);
+        });
+
+        // Find and remove selected table rows
+        $(".delete-row").on("click", function () {
+            alert("Delete row element");
+        });
+        $(document).on("click", ".delete-row", function () {
+            $(this).parent().parent().remove();
+        });
+
+        $(document).on("click", ".delete-updaterow", function () {
+            debugger
+            ids.push($(this).attr("data-id"));
+            $(this).parent().parent().remove();
+        });
+    });
+    function SaveSubject() {
+        debugger;
+        var subjectcodes = $('input[name=subjectCode]').map(function () {
+            return this.value;
+        }).get();
+        var subjectNames = $('input[name=subjectName]').map(function () {
+            return this.value;
+        }).get();
+        var subjectDescriptions = $('input[name=subjectDescription]').map(function () {
+            return this.value;
+        }).get();
+        debugger;
+        $.post("/SubjectMaster/PostAddSubject", {
+            subjectCodes: subjectcodes, subjectNames: subjectNames,
+            subjectDescriptions: subjectDescriptions, ids:ids
+        }, function (data) {
+            alert(data);
+        });
+    }
+</script>
+
+
+

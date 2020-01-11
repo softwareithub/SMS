@@ -1,0 +1,24 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="nunit" Version="3.12.0" />
+    <PackageReference Include="NUnit3TestAdapter" Version="3.15.1" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.2.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\SERP.Core.Entities\SERP.Core.Entities.csproj" />
+    <ProjectReference Include="..\SERP.Core.Model\SERP.Core.Model.csproj" />
+    <ProjectReference Include="..\SERP.Infrastructure.Implementation\SERP.Infrastructure.Implementation.csproj" />
+    <ProjectReference Include="..\SERP.Infrastructure.Repository\SERP.Infrastructure.Repository.csproj" />
+    <ProjectReference Include="..\SERP.UI\SERP.UI.csproj" />
+    <ProjectReference Include="..\SERP.Utilities\SERP.Utilities.csproj" />
+  </ItemGroup>
+
+</Project>

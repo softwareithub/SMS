@@ -1,0 +1,84 @@
+﻿@model IEnumerable<SERP.Core.Model.TransactionViewModel.ClassFeeAllocationVm>
+
+<section class="content">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="row">
+                <div class="col-md-12">
+                    <table id="tblDataList" class="table-responsive-md table-striped table-bordered" style="width:100%">
+                        <thead>
+                            <tr>
+                                <th>Category Name</th>
+                                <th>Category Code</th>
+                                <th>
+                                    Class Name
+                                </th>
+                                <th>
+                                    Amount
+                                </th>
+                                <th>
+                                    Payment Type
+                                </th>
+
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var groupdata in Model.GroupBy(x => new { x.Type, x.CategoryName }))
+                            {
+                                <table style="height:100%;width:100%" class="table table-responsive">
+                                    <thead>
+                                    <th>
+                                        Perticual Name
+                                    </th>
+                                    <th>
+                                        Course Name
+                                    </th>
+                                    <th>
+                                        Amount
+                                    </th>
+                                    <th>
+                                        Payment Type
+                                    </th>
+                                    </thead>
+                                    @foreach (var data in groupdata)
+                                    {
+
+                                        <tbody>
+                                            <tr>
+                                                <td>
+                                                    @data.CategoryName
+                                                </td>
+                                                <td>
+                                                    @data.ClassName
+                                                </td>
+                                                <td>
+                                                    @data.Amount
+                                                </td>
+                                                <td> @data.PaymentType</td>
+                                            </tr>
+                                        </tbody>
+
+                                    }
+                                </table>
+                            }
+                        </tbody>
+
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script type="text/javascript">
+    function DeleteRecord(id, event) {
+        var geturl = "FeeCategory/GetFeeCategoryList";
+        var deleteUrl = "FeeCategory/DeleteFeeCategory";
+        CustomDeleteRecord(id, geturl, deleteUrl, event);
+    }
+    function UpdateRecord(id, event) {
+        debugger;
+        var updateUrl = "FeeCategory/Index";
+        UpdateCustomRecord(id, updateUrl, event);
+    }
+</script>

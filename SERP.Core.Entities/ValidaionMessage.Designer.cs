@@ -61,6 +61,24 @@ namespace SERP.Core.Entities {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Academic End Date is required.
+        /// </summary>
+        public static string AcademicEndDate {
+            get {
+                return ResourceManager.GetString("AcademicEndDate", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Academic Start Date is required.
+        /// </summary>
+        public static string AcademicStartDate {
+            get {
+                return ResourceManager.GetString("AcademicStartDate", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Academic name is required..
         /// </summary>
         public static string AcademinName {

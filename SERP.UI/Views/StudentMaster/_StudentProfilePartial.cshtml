@@ -1,0 +1,280 @@
+﻿@model SERP.Core.Model.MasterViewModel.StudentPartialInfoViewModel
+
+<div class="row">
+    <div class="col-md-3">
+
+        <!-- Profile Image -->
+        <div class="box box-primary">
+            <div class="box-body box-profile">
+                @if (string.IsNullOrEmpty(Model.StudentPhoto))
+                {
+                    <img class="profile-user-img img-responsive img-circle" src="~/Images/UserLogo.jpg" alt="User profile picture">
+                }
+                else
+                {
+                    <img class="profile-user-img img-responsive img-circle" src="@Model.StudentPhoto" alt="User profile picture">
+                }
+
+
+                <h3 class="profile-username text-center">@Model.StudentName</h3>
+
+                <p class="text-muted text-center">@Model.RollCode</p>
+
+                <ul class="list-group list-group-unbordered">
+                    <li class="list-group-item">
+                        <b>Class Name</b> <a class="pull-right">@Model.CourseName</a>
+                    </li>
+                    <li class="list-group-item">
+                        <b>Batch Name</b> <a class="pull-right">@Model.BatchName</a>
+                    </li>
+                    <li class="list-group-item">
+                        <b>Registration Number</b> <a class="pull-right">@Model.Registration</a>
+                    </li>
+                </ul>
+
+            </div>
+            <!-- /.box-body -->
+        </div>
+    </div>
+    <!-- /.col -->
+    <div class="col-md-9">
+        <div class="nav-tabs-custom">
+            <ul class="nav nav-tabs">
+                <li class="active"><a href="#myInfo" data-toggle="tab">My Info</a></li>
+                <li><a href="#parentInfo" data-toggle="tab">Parent Info</a></li>
+                <li><a href="#EducationInfo" data-toggle="tab">Educational Info</a></li>
+            </ul>
+            <div class="tab-content">
+                <div class="active tab-pane" id="myInfo">
+                    <table class="table table-responsive table-bordered table-hover" style="width:100% ; border:dashed;">
+                        <thead>
+                            <tr>
+                                <th scope="col">Info Name</th>
+                                <th>Info Description</th>
+                            </tr>
+                        </thead>
+                        <tbody class="thead-dark">
+                            <tr>
+                                <td>
+                                    @Html.SerpBoldLabel("Student Name")
+                                </td>
+                                <td style="text-align:left">
+                                    @Html.SerpBoldLabel(@Model.StudentName)
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    @Html.SerpBoldLabel("Student Phone")
+                                </td>
+                                <td>
+                                    @Html.SerpBoldLabel(@Model.StudentPhone)
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    @Html.SerpBoldLabel("Student Registration")
+                                </td>
+                                <td>
+                                    @Html.SerpBoldLabel(@Model.Registration)
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    @Html.SerpBoldLabel("Student Roll Code")
+                                </td>
+                                <td>
+                                    @Html.SerpBoldLabel(@Model.RollCode);
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    @Html.SerpBoldLabel("Date Of Birth")
+
+                                </td>
+                                <td>
+                                    @Html.SerpBoldLabel(@Model.DateOfBirth.ToShortDateString())
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    @Html.SerpBoldLabel("Joining Date")
+
+                                </td>
+                                <td>
+                                    @Html.SerpBoldLabel(@Model.JoiningDate.ToShortDateString())
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    @Html.SerpBoldLabel("Gender")
+
+                                </td>
+                                <td>
+                                    @Html.SerpBoldLabel(@Model.Gender)
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    @Html.SerpBoldLabel("Blood Group")
+
+                                </td>
+                                <td>
+                                    @Html.SerpBoldLabel(@Model.BloodGroup)
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    @Html.SerpBoldLabel("Religion Name")
+
+                                </td>
+                                <td>
+                                    @Html.SerpBoldLabel(@Model.Religion)
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    @Html.SerpBoldLabel("Category Name")
+
+                                </td>
+                                <td>
+                                    @Html.SerpBoldLabel(@Model.Category)
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <!-- /.tab-pane -->
+                <div class="tab-pane" id="parentInfo">
+                    <table class="table table-responsive table-bordered table-hover" style="width:100% ; border:dashed;">
+                        <tbody class="thead-dark">
+                            <tr>
+                                <td>
+                                    @Html.SerpBoldLabel("Father Name")
+                                </td>
+                                <td style="text-align:left">
+                                    @Html.SerpBoldLabel(@Model.FatherName)
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    @Html.SerpBoldLabel("Father Phone")
+                                </td>
+                                <td>
+                                    @Html.SerpBoldLabel(@Model.FatherPhone)
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    @Html.SerpBoldLabel("Father Email")
+                                </td>
+                                <td>
+                                    @Html.SerpBoldLabel(@Model.FatherEmail)
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    @Html.SerpBoldLabel("Mother Name")
+                                </td>
+                                <td>
+                                    @Html.SerpBoldLabel(@Model.MotherName);
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    @Html.SerpBoldLabel("Mother Phone")
+
+                                </td>
+                                <td>
+                                    @Html.SerpBoldLabel(@Model.MotherPhone)
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    @Html.SerpBoldLabel("Permanent Address")
+
+                                </td>
+                                <td>
+                                    @Html.SerpBoldLabel(@Model.P_Address)
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    @Html.SerpBoldLabel("Crosspondence Address")
+
+                                </td>
+                                <td>
+                                    @Html.SerpBoldLabel(@Model.C_Address)
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <td>
+                                    @Html.SerpBoldLabel("Parent Image")
+
+                                </td>
+                                <td>
+                                   <img src="@Model.ParentPhoto" style="height:125px;width:125px;" />
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <!-- /.tab-pane -->
+                <div class="tab-pane" id="EducationInfo">
+                    <table class="table table-responsive table-bordered table-hover" style="width:100% ; border:dashed;">
+                        <tbody class="thead-dark">
+                            <tr>
+                                <td>
+                                    @Html.SerpBoldLabel("Course Name")
+                                </td>
+                                <td style="text-align:left">
+                                    @Html.SerpBoldLabel(@Model.CourseName)
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    @Html.SerpBoldLabel("Batch Name")
+                                </td>
+                                <td>
+                                    @Html.SerpBoldLabel(@Model.BatchName)
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    @Html.SerpBoldLabel("Registration Number")
+                                </td>
+                                <td>
+                                    @Html.SerpBoldLabel(@Model.Registration)
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    @Html.SerpBoldLabel("Roll Code")
+                                </td>
+                                <td>
+                                    @Html.SerpBoldLabel(@Model.RollCode);
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    @Html.SerpBoldLabel("Joining Date")
+
+                                </td>
+                                <td>
+                                    @Html.SerpBoldLabel(@Model.JoiningDate.ToShortDateString())
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <!-- /.tab-pane -->
+            </div>
+            <!-- /.tab-content -->
+        </div>
+        <!-- /.nav-tabs-custom -->
+    </div>
+    <!-- /.col -->
+</div>
+
+
+

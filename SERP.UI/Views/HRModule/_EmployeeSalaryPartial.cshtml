@@ -1,0 +1,94 @@
+﻿@{
+    ViewData["Title"] = "Index";
+    Layout = null;
+
+}
+@model IEnumerable<SERP.Core.Model.TransactionViewModel.EmployeeSalaryVm>
+
+<script src="~/lib/jquery-validation/dist/jquery.validate.js"></script>
+<script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.js"></script>
+<link href="https://cdn.datatables.net/1.10.20/css/jquery.dataTables.min.css" rel="stylesheet" />
+<script src="https://cdn.datatables.net/1.10.20/js/jquery.dataTables.min.js"></script>
+<div class="overlay divHidding" id="divFormData">
+    <i class="fa fa-refresh fa-spin">
+
+    </i>
+</div>
+<form method="post" data-ajax="true" data-ajax-method="post"
+      asp-action="CreateEmployeeSalary" asp-controller="Employee" data-ajax-success="EmployeeSuccess"
+      data-ajax-begin="CustomFormSubmitBegin" data-ajax-complete="CustomFormSubmitComplete" enctype="multipart/form-data">
+    <div class="box-body">
+        <input type="hidden" id="empId" asp-for="@Model.First().EmployeeId" />
+        @foreach (var data in Model)
+        {
+            var addDeduct = data.AdditionDeduction == "A" ? "Addition" : "Deduction";
+            var htmlHelper = string.Empty;
+            if (data.AdditionDeduction != "A")
+            {
+                htmlHelper = $"<span style='color:red'>{@addDeduct}</span>";
+            }
+            else
+            {
+                htmlHelper = $"<span style='color:green'>{@addDeduct}</span>";
+            }
+            <div class="col-md-4">
+                <div class="form-group">
+                    <input type="hidden" asp-for="@data.EmployeeSalaryId" />
+
+                    <input type="hidden" asp-for="@data.SalaryHead" />
+                    <label asp-for="@data.HeadName">@data.HeadName (@Html.Raw(htmlHelper))</label>
+                    <input asp-for="@data.Amount" class="form-control">
+                    <span asp-validation-for="@data.Amount" class="text-danger"></span>
+                </div>
+            </div>
+        }
+
+
+    </div>
+    <!-- /.box-body -->
+
+    <div class="box-footer">
+        <div class="col-md-8">
+            @Html.SERPButton("btn btn-primary pull-right btnSubmit", Model == null ? 0 : Model.First().EmployeeId)
+            <button class="buttonload" style="display:none">
+                <i class="fa fa-refresh fa-spin"></i>Loading
+            </button>
+        </div>
+        <div class="col-md-4">
+            <button type="reset" class="btn btn-danger pull-left">Cancel</button>
+        </div>
+
+    </div>
+</form>
+
+<script>
+    $(document).ready(function () {
+        $("#empId").val(sessionStorage.getItem("employeeId"));
+    })
+    function EmployeeSuccess(response) {
+        alertify.success(response.resultStatus);
+        setTimeout(function () {
+            GetBasicInfo(response.basicInfoId)
+        }, 300);
+
+    }
+
+    function previewImage(input, type) {
+        if (input.files && input.files[0]) {
+            var reader = new FileReader();
+            reader.onload = function (e) {
+                if (type === 's') {
+                    $('#stdImage').attr('src', e.target.result);
+                }
+                else {
+                    $('#parentImage').attr('src', e.target.result);
+                }
+            }
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+
+    $("#imgInp").change(function () {
+        readURL(this);
+    });
+</script>

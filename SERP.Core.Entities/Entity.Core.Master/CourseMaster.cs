@@ -22,5 +22,9 @@ namespace SERP.Core.Entities.Entity.Core.Master
         [Required(ErrorMessage = "Minimum attendence is required")]
         [Display(Name = "Minimum Attendece Percentage", Prompt = "Enter Minimum Attendence Percentage")]
         public decimal MinimumAttendencePercentage { get; set; }
+        [NotMapped]
+        public bool IsMapped { get; set; }
+
+
     }
 }

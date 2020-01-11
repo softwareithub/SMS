@@ -1,0 +1,224 @@
+﻿@{
+    ViewData["Title"] = "Index";
+    Layout = null;
+
+}
+@model SERP.Core.Entities.Entity.Core.HRModule.EmployeeBasicInfoModel
+
+<script src="~/lib/jquery-validation/dist/jquery.validate.js"></script>
+<script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.js"></script>
+<link href="https://cdn.datatables.net/1.10.20/css/jquery.dataTables.min.css" rel="stylesheet" />
+<script src="https://cdn.datatables.net/1.10.20/js/jquery.dataTables.min.js"></script>
+<form method="post" data-ajax="true" data-ajax-method="post"
+      asp-action="CreateBasicInfo" asp-controller="Employee" data-ajax-success="EmployeeSuccess"
+      data-ajax-begin="CustomFormSubmitBegin" data-ajax-complete="CustomFormSubmitComplete" enctype="multipart/form-data">
+    <div class="box-body">
+        <div class="col-md-4">
+            <div class="form-group">
+                <input type="hidden" asp-for="Id" />
+                <input type="hidden" asp-for="CreatedBy" />
+                <input type="hidden" asp-for="CreatedDate" />
+                <label asp-for="Name">Employee  Name</label>
+                <input asp-for="Name" class="form-control">
+                <span asp-validation-for="Name" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="form-group">
+                <label asp-for="EmpCode">Employee Code</label>
+                <input asp-for="EmpCode" class="form-control">
+                <span asp-validation-for="EmpCode" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="form-group">
+                <label asp-for="JoiningDate">Joining Date</label>
+                <input asp-for="JoiningDate" class="form-control">
+                <span asp-validation-for="JoiningDate" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="form-group">
+                <label asp-for="FatherName">Father Name</label>
+                <input asp-for="FatherName" class="form-control">
+                <span asp-validation-for="FatherName" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="form-group">
+                <label asp-for="MotherName">Mother Name</label>
+                <input asp-for="MotherName" class="form-control">
+                <span asp-validation-for="MotherName" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="form-group">
+                <label asp-for="Phone">Phone</label>
+                <input asp-for="Phone" class="form-control">
+                <span asp-validation-for="Phone" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="form-group">
+                <label asp-for="Email">Email</label>
+                <input asp-for="Email" class="form-control">
+                <span asp-validation-for="Email" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="form-group">
+                <label asp-for="EmergencyPhone">Emergency Phone</label>
+                <input asp-for="EmergencyPhone" class="form-control">
+                <span asp-validation-for="EmergencyPhone" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="form-group">
+                <label asp-for="C_Address">Crosspondence Address</label>
+                <input asp-for="C_Address" class="form-control">
+                <span asp-validation-for="C_Address" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="form-group">
+                <label asp-for="p_Address">Permanent Address</label>
+                <input asp-for="p_Address" class="form-control">
+                <span asp-validation-for="p_Address" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="form-group">
+                <label asp-for="BloodGroup">Blood Group</label>
+                <select asp-for="BloodGroup" class="form-control">
+                    <option value="">Select</option>
+                    <option value="A+">A+</option>
+                    <option value="A-">A-</option>
+                    <option value="A+">B+</option>
+                    <option value="A-">B-</option>
+                    <option value="A+">AB+</option>
+                    <option value="A-">AB-</option>
+                    <option value="A+">O+</option>
+                    <option value="A-">O-</option>
+                </select>
+                <span asp-validation-for="BloodGroup" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="form-group">
+                <label asp-for="Gender">Gender</label>
+                <select asp-for="Gender" class="form-control">
+                    <option value="Sel">Select</option>
+                    <option value="Male">Male</option>
+                    <option value="Female">Fe-Male</option>
+                </select>
+                <span asp-validation-for="Gender" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="form-group">
+                <label asp-for="ConvictedForCrime">Is Convicted in Crime</label>
+                <select asp-for="ConvictedForCrime" class="form-control">
+                    <option value="O">No</option>
+                    <option value="1">Yes</option>
+
+                </select>
+                <span asp-validation-for="ConvictedForCrime" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="form-group">
+                <label asp-for="DepartmentId">Department</label>
+                <select asp-for="DepartmentId" class="form-control" asp-items="@(new SelectList(ViewBag.Departments,"Id","Name","Select Department"))">
+                </select>
+                <span asp-validation-for="DepartmentId" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="form-group">
+                <label asp-for="DesignationId">Designation</label>
+                <select asp-for="DesignationId" class="form-control" asp-items="@(new SelectList(ViewBag.Designations,"Id","Name","Select Department"))">
+                    
+                </select>
+                <span asp-validation-for="DepartmentId" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="form-group">
+                <label asp-for="BankId">Bank</label>
+                <select asp-for="BankId" class="form-control" asp-items="@(new SelectList(ViewBag.BankInfo,"Id","Name","Select Department"))">
+                </select>
+                <span asp-validation-for="BankId" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="form-group">
+                <label asp-for="AccountNumber">Account Number</label>
+                <input asp-for="AccountNumber" class="form-control" />
+                <span asp-validation-for="AccountNumber" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="form-group">
+                <label asp-for="Photo">Upload Image</label>
+                <input type="file" asp-for="Photo" class="form-control" onchange="previewImage(this,'p')" />
+                <span asp-validation-for="Photo" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="col-md-4">
+            @if (Model != null)
+            {
+                @Html.SerpImageHelper(Model.Photo, 120, 120, "photoId");
+            }
+            else
+            {
+                @Html.SerpImageHelper(null, 125, 125, "parentImage")
+            }
+
+        </div>
+    </div>
+    <!-- /.box-body -->
+
+    <div class="box-footer">
+        <div class="col-md-8">
+            @Html.SERPButton("btn btn-primary pull-right btnSubmit", Model == null ? 0 : Model.Id)
+            <button class="buttonload" style="display:none">
+                <i class="fa fa-refresh fa-spin"></i>Loading
+            </button>
+        </div>
+        <div class="col-md-4">
+            <button type="reset" class="btn btn-danger pull-left">Cancel</button>
+        </div>
+
+    </div>
+</form>
+
+<script>
+    function EmployeeSuccess(response) {
+        alertify.success(response.resultStatus);
+        setTimeout(function () {
+            sessionStorage.setItem("employeeId", response.basicInfoId);
+            GetBasicInfo(response.basicInfoId)
+        }, 300);
+
+    }
+
+    function previewImage(input, type) {
+        if (input.files && input.files[0]) {
+            var reader = new FileReader();
+
+            reader.onload = function (e) {
+                if (type === 's') {
+                    $('#stdImage').attr('src', e.target.result);
+                }
+                else {
+                    $('#parentImage').attr('src', e.target.result);
+                }
+            }
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+
+    $("#imgInp").change(function () {
+        readURL(this);
+    });
+</script>

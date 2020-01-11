@@ -1,0 +1,79 @@
+﻿@{
+    ViewData["Title"] = "Index";
+    Layout = null;
+
+}
+<div class="col-md-12">
+    <div class="col-md-3">
+        <input type="text" id="degreeName" placeholder="Degree Name" class="form-control">
+    </div>
+    <div class="col-md-3">
+        <input type="text" id="instituteName" placeholder="Institute Name" class="form-control">
+    </div>
+    <div class="col-md-2">
+        <input type="text" id="location" placeholder="Location" class="form-control">
+    </div>
+    <div class="col-md-2">
+        <input type="text" id="FromToYear" placeholder="FromToYear" class="form-control">
+    </div>
+    <a class="btn btn-primary pull-left  add-row">
+        <i class="fa fa-plus-square"></i>
+    </a>
+</div>
+<br />
+<br />
+
+
+
+<table class="table table-bordered" style="border:solid;border-collapse:collapse">
+    <thead>
+        <tr>
+            <th>Select</th>
+            <th>Degree Name</th>
+            <th>Institute Name</th>
+            <th>Board Name</th>
+            <th>From To Year</th>
+        </tr>
+    </thead>
+    <tbody id="tblQual">
+    </tbody>
+</table>
+<button type="button" class="btn btn-danger pull-right delete-row">Delete Row</button>
+<button type="button" onclick="SaveQualification()" class="btn btn-primary pull-right">Submit</button>
+
+
+
+
+<script>
+    $(document).ready(function () {
+        $(".add-row").click(function () {
+            var degreeName = $("#degreeName").val();
+            var instituteName = $("#instituteName").val();
+            var location = $("#location").val();
+            var years = $("#FromToYear").val();
+            var markup = "<tr>";
+            markup += "<td> <input type='checkbox' name='record'></td>";
+            markup += "<td> " + degreeName + "</td >";
+            markup += "<td> " + instituteName + "</td >";
+            markup += "<td> " + location + "</td >";
+            markup += "<td> " + years + "</td ></tr>";
+            $("#tblQual").append(markup);
+        });
+
+        // Find and remove selected table rows
+        $(".delete-row").click(function () {
+            $("#tblQual").find('input[name="record"]').each(function () {
+                if ($(this).is(":checked")) {
+                    $(this).parents("tr").remove();
+                }
+            });
+        });
+    });
+
+    function SaveQualification() {
+        var degress = [];
+        $("#degreeName").each(function () {
+            degress.push($(this).val());
+        });
+    }
+</script>
