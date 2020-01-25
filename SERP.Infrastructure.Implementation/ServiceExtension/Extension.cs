@@ -10,6 +10,8 @@ namespace SERP.Infrastructure.Implementation.ServiceExtension
         {
             serviceCollection.AddTransient(typeof(IGenericRepository<,>), typeof(GenericImplementation<,>));
             serviceCollection.AddTransient<ISubjectMasterRepo, SubjectImplementation>();
+            serviceCollection.AddTransient<ITimeSheetRepo, TimeSheetImplementation>();
+            serviceCollection.AddTransient<IFeeDetailRepo, FeeDetailImplementation>();
         }
     }
 }

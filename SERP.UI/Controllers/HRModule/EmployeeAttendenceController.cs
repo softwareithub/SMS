@@ -67,31 +67,53 @@ namespace SERP.UI.Controllers.HRModule
             }
             else
             {
-                var employeeIds = Request.Form["empId"];
-                var AttendType = Request.Form["AttendType"];
-
-                List<DateTime> allDates = new List<DateTime>();
-                //Get All the date between two dates 
-                for (DateTime date = model.AttendenceDate; date <= model.ToAttendenceDate; date = date.AddDays(1))
-                    allDates.Add(date);
-
-                var models = await _employeeAttendenceRepo.GetList(x => x.IsActive == 1 && x.IsDeleted == 0);
-
-               var employees= models.Where(item => allDates.Contains(item.AttendenceDate) && 
-                (Array.ConvertAll<string, int>(employeeIds, new Converter<string, int>(Convert.ToInt32))).ToList().Contains(item.EmployeeId));
-
-                employees.ToList().ForEach(x => {
-                    x.IsActive = 0;
-                    x.IsDeleted = 1;
-                    x.UpdatedBy = 1;
-                    x.UpdatedDate = DateTime.Now.Date;
-                });
-
-                var deleteResult= await _employeeAttendenceRepo.Delete(employees.ToArray());
-      
+                return await CreateLongVacationLeave(model);
             }
-            return null;
-         
+        }
+
+        private async Task<IActionResult> CreateLongVacationLeave(EmployeeAttendenceVm model)
+        {
+            var employeeIds = Request.Form["empId"];
+            var AttendType = Request.Form["AttendType"];
+
+            List<DateTime> allDates = new List<DateTime>();
+            for (DateTime date = model.AttendenceDate; date <= model.ToAttendenceDate; date = date.AddDays(1))
+                allDates.Add(date);
+
+            var models = await _employeeAttendenceRepo.GetList(x => x.IsActive == 1 && x.IsDeleted == 0);
+
+            var employees = models.Where(item => allDates.Contains(item.AttendenceDate) &&
+              (Array.ConvertAll<string, int>(employeeIds, new Converter<string, int>(Convert.ToInt32))).ToList().Contains(item.EmployeeId));
+
+            employees.ToList().ForEach(x =>
+            {
+                x.IsActive = 0;
+                x.IsDeleted = 1;
+                x.UpdatedBy = 1;
+                x.UpdatedDate = DateTime.Now.Date;
+            });
+
+            var deleteResult = await _employeeAttendenceRepo.Delete(employees.ToArray());
+            await _employeeAttendenceRepo.CreateNewContext();
+
+            List<EmployeeAttendenceModel> empAttendenceModels = new List<EmployeeAttendenceModel>();
+
+            allDates.ForEach(date =>
+            {
+                for (int i = 0; i < employeeIds.Count(); i++)
+                {
+                    EmployeeAttendenceModel attmodel = new EmployeeAttendenceModel()
+                    {
+                        AttendenceDate = date,
+                        AttendenceType = model.LongLeaveType,
+                        EmployeeId = Convert.ToInt32(employeeIds[i]),
+                    };
+                    empAttendenceModels.Add(attmodel);
+                }
+            });
+
+            var result = await _employeeAttendenceRepo.Add(empAttendenceModels.ToArray());
+            return Json(ResponseData.Instance.GenericResponse(result));
         }
 
         private async Task<IActionResult> CreateShortAttendence(EmployeeAttendenceVm model)

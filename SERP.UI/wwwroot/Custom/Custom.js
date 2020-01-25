@@ -67,6 +67,7 @@ function GetCustomRecord(getUrl) {
                 fixedHeader: true,
                 select: true,
                 responsive: true
+
             });
         }, 300)
     }).done(function () {

@@ -1,0 +1,67 @@
+﻿@model IEnumerable<SERP.Core.Model.FeeDetails.StudentFeeDetailVm>
+    <section class="content">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="row">
+                    <div class="col-md-12">
+                        <table id="tblDataList" class="table-responsive-md table-striped table-bordered" style="width:100%">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Payment Type</th>
+                                    <th>Amount</th>
+                                    <th>Discount Type</th>
+                                    <th>Discount Value</th>
+                                    <th>Payable AMount</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var data in Model)
+                                {
+                                    <tr>
+                                        <td>
+                                            @data.CategoryName
+                                        </td>
+                                        <td>
+                                            @data.FeePaymentType
+                                        </td>
+                                        <td>
+                                            @data.Amount
+                                        </td>
+                                        <td>
+                                            @if (data.DependentOnParticular == 1)
+                                            {
+                                                @data.PertDiscountType
+                                            }
+                                            else
+                                            {
+                                                @data.DiscountType
+                                            }
+
+                                        </td>
+                                        <td>
+                                            @if (data.DependentOnParticular == 1)
+                                            {
+                                                @data.PertDiscountValue
+                                            }
+                                            else
+                                            {
+                                                @data.DiscountValue
+                                            }
+
+                                        </td>
+                                        <td>
+                                           @data.NetAmount
+                                        </td>
+
+                                 
+                                    </tr>
+                                }
+                            </tbody>
+
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>

@@ -1,35 +1,37 @@
-﻿@model IEnumerable<SERP.Core.Entities.Entity.Core.Transaction.FeeDetailClassWise>
-    <script src="~/Custom/JqueryCustomValidation.js"></script>
-    <section class="content">
-        <form method="post" data-ajax="true" data-ajax-method="post"
-              asp-action="AllocateStudentFee" asp-controller="FeeAllocationClassWise" data-ajax-success="Success">
-            <div class="row">
-                <div class="col-md-12">
-                    <div class="row">
-                        <div class="col-md-12">
-                            <table id="tblDataList" class="table-responsive-md table-striped table-bordered" style="width:100%">
-                                <thead>
-                                    <tr>
-                                        <th>Name</th>
-                                        <th>Fee Amount</th>
-                                        <th>
-                                            Fee Payment Type
-                                        </th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach (var data in Model)
+﻿@model SERP.Core.Model.TransactionViewModel.FeeDetailModel
+<script src="~/Custom/JqueryCustomValidation.js"></script>
+<section class="content">
+    <form method="post" data-ajax="true" data-ajax-method="post"
+          asp-action="AllocateStudentFee" asp-controller="FeeAllocationClassWise" data-ajax-success="Success">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="row">
+                    <div class="col-md-12">
+                        <table id="tblDataList" class="table table-hover" style="width:100%">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Fee Amount</th>
+                                    <th>
+                                        Fee Payment Type
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @{
+                                    int k = 0;
+                                    foreach (var data in Model.FeeDetailModels)
                                     {
                                         <tr>
                                             <td>
-                                                <input type="hidden" name="CategoryId" value="@data.CategoryId" />
+                                                <input type="hidden" asp-for="FeeDetailModels[k].CategoryId" />
                                                 @data.CategoryName
                                             </td>
                                             <td>
-                                                <input type="text" name="feeAmount" class="form-control currencyTextBox" />
+                                                <input type="text" asp-for="FeeDetailModels[k].Amount" class="form-control currencyTextBox" value="@data.Amount" />
                                             </td>
                                             <td>
-                                                <select class="form-control" name="feeType">
+                                                <select class="form-control" asp-for="FeeDetailModels[k].FeePaymentType">
                                                     <option value="OT">One Time</option>
                                                     <option value="YL">Yearly</option>
                                                     <option value="HY">Half Yearly</option>
@@ -38,24 +40,27 @@
                                                 </select>
                                             </td>
                                         </tr>
+                                        k++;
                                     }
-                                </tbody>
+                                }
 
-                            </table>
-                        </div>
-                    </div>
-                </div>
+                            </tbody>
 
-                <div class="col-md-12">
-                    <div class="col-md-10">
-                        <input type="submit" class="btn btn-primary pull-right" value="Submit" />
+                        </table>
                     </div>
-                    <div class="col-md-2">
-                        <input type="reset" class="btn btn-danger pull-left" value="Cancel" />
-                    </div>
-                    
                 </div>
             </div>
-            </form>
-    </section>
+
+            <div class="col-md-12">
+                <div class="col-md-10">
+                    <input type="submit" class="btn btn-primary pull-right" value="Submit" />
+                </div>
+                <div class="col-md-2">
+                    <input type="reset" class="btn btn-danger pull-left" value="Cancel" />
+                </div>
+
+            </div>
+        </div>
+    </form>
+</section>
 

@@ -3,80 +3,96 @@
     Layout = null;
 
 }
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+@model IEnumerable<SERP.Core.Model.TransactionViewModel.SubjectVm>
+<section class="content">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="row">
+                <div class="col-md-12">
+                    @foreach (var item in Model.GroupBy(x => x.CourseName))
+                    {
+                        <div class="box box-info">
+                            <div class="box-header with-border">
+                                <h3 class="box-title">@item.Key</h3>
 
-<div class="col-md-12">
-    <a class="btn btn-primary add-row pull-right" value="Add Subject">
-        <i class="fa fa-plus-circle">Add Subject</i>
-    </a>
-    <div class="col-md-12">
-        <table class="table-responsive table-bordered table-hover" style="width:100%">
-            <thead>
-                <tr>
-                    <th>Subject Code</th>
-                    <th>Subject Name</th>
-                    <th>Subject Description</th>
-                    <th>Select</th>
-                </tr>
-            </thead>
-            <tbody id="tblsubject">
-            </tbody>
-        </table>
+                                <div class="box-tools pull-right">
+                                    <button type="button" class="btn btn-box-tool" data-toggle="collapse" href="#@item.Key">
+                                        <i class="fa fa-minus"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <!-- /.box-header -->
+                            <div class="box-body" style="" id="@item.Key">
+                                <div class="table-responsive">
+                                    <table class="table no-margin">
+                                        <thead>
+                                            <tr>
+                                                <th>Subject Name</th>
+                                                <th>Subject Code</th>
+                                                <th>Subject Description</th>
+                                                <th>Is Elective</th>
+                                                <th>Action</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @foreach (var data in item)
+                                            {
+                                                <tr>
+                                                    <td>
+                                                        @data.SubjectName
+                                                    </td>
+                                                    <td>
+                                                        @data.SubjectCode
+                                                    </td>
+                                                    <td>
+                                                        @data.SubjectDescription
+                                                    </td>
+                                                    <td>
+                                                        @{
+                                                            var isElective = data.IsElective == 0 ? "Yes" : "No";
+                                                        }
+                                                        @isElective
+                                                    </td>
+                                                    <td>
+                                                        <a class="btn btn-outline-success pull-right" data-loading-text="<i class='fa fa-circle-o-notch fa-spin'  style='color:#DD4B39'></i>" onclick="UpdateRecord(@data.SubjectId, this)">
+                                                            <i class="fa fa-edit" style="color:#3C8DBC"></i>
+                                                        </a>
+                                                        <a class="btn btn-outline-danger pull-right" data-loading-text="<i class='fa fa-circle-o-notch fa-spin'  style='color:#DD4B39'></i>" onclick="DeleteRecord(@data.SubjectId, this)">
+                                                            <i class="fa fa-trash" style="color:#DD4B39"></i>
+                                                        </a>
+                                                    </td>
+                                                </tr>
+                                            }
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
     </div>
-    <div class="col-md-12">
-        <input type="button" class="btn btn-primary pull-right" value="Submit" onclick="SaveSubject()" />
-    </div>
-</div>
+</section>
 
-
-<script>
-    var ids = new Array();
-    $(document).ready(function () {
-        $(".add-row").click(function () {
-            var markup = "<tr>";
-
-            markup += '<td><input type="text" id="subjectCode" name="subjectCode" placeholder="Subject Code" class="form-control"></td>';
-            markup += '<td><input type="text" id="subjectName" name="subjectName" placeholder="Subject Name" class="form-control"></td>';
-            markup += '<td><input type="text" id="subjectDescription" name="subjectDescription" placeholder="Subject Description" class="form-control"></td>';
-            markup += '<td><input type="button"  class="btn btn-danger delete-row" value="Delete">';
-            markup += "</tr>"
-
-            $("table tbody").append(markup);
-        });
-
-        // Find and remove selected table rows
-        $(".delete-row").on("click", function () {
-            alert("Delete row element");
-        });
-        $(document).on("click", ".delete-row", function () {
-            $(this).parent().parent().remove();
-        });
-
-        $(document).on("click", ".delete-updaterow", function () {
-            debugger
-            ids.push($(this).attr("data-id"));
-            $(this).parent().parent().remove();
-        });
-    });
-    function SaveSubject() {
+<script type="text/javascript">
+    function DeleteRecord(id, event) {
+        var geturl = "SubjectMaster/GetSubjectDatList";
+        var deleteUrl = "SubjectMaster/DeleteSubject";
+        CustomDeleteRecord(id, geturl, deleteUrl, event);
+    }
+    function UpdateRecord(id, event) {
         debugger;
-        var subjectcodes = $('input[name=subjectCode]').map(function () {
-            return this.value;
-        }).get();
-        var subjectNames = $('input[name=subjectName]').map(function () {
-            return this.value;
-        }).get();
-        var subjectDescriptions = $('input[name=subjectDescription]').map(function () {
-            return this.value;
-        }).get();
+        var updateUrl = "SubjectMaster/Index";
+        UpdateCustomRecord(id, updateUrl, event);
+    }
+    function toggleCollapse(id) {
         debugger;
-        $.post("/SubjectMaster/PostAddSubject", {
-            subjectCodes: subjectcodes, subjectNames: subjectNames,
-            subjectDescriptions: subjectDescriptions, ids:ids
-        }, function (data) {
-            alert(data);
-        });
+        $(id).collapse("toggle");
     }
 </script>
+
 
 
 

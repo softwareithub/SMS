@@ -5,7 +5,9 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using SERP.Core.Entities.Entity.Core.Master;
 using SERP.Core.Entities.Entity.Core.Transaction;
+using SERP.Core.Model.TransactionViewModel;
 using SERP.Infrastructure.Repository.Infrastructure.Repo;
+using SERP.Utilities.ResponseMessage;
 using SERP.Utilities.ResponseUtilities;
 
 namespace SERP.UI.Controllers.Transaction.SubjectTransaction
@@ -23,10 +25,11 @@ namespace SERP.UI.Controllers.Transaction.SubjectTransaction
             _ICourseRepo = courseRepo;
             _ISubjectRepo = subjectRepo;
         }
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(int id)
         {
             ViewBag.CourseList = await _ICourseRepo.GetList(x => x.IsActive == 1 && x.IsDeleted == 0);
-            return await Task.Run(() => PartialView("~/Views/SubjectMaster/_AddSubjectMasterIndexPartial.cshtml"));
+            var result = await _ISubjectRepo.GetSingle(x => x.Id == id);
+            return PartialView("~/Views/SubjectMaster/_AddSubjectMasterIndexPartial.cshtml", result);
         }
 
         public async Task<IActionResult> AddSubjectPartial(int classId, int batchId)
@@ -37,52 +40,57 @@ namespace SERP.UI.Controllers.Transaction.SubjectTransaction
         }
 
         [HttpPost]
-        public async Task<IActionResult> PostAddSubject(string[] subjectCodes, string[] subjectNames, string[] subjectDescriptions, int[] ids)
+        public async Task<IActionResult> PostAddSubject(SubjectMaster model)
         {
-            int courseId = Convert.ToInt32(TempData["CourseId"]);
-            int batchId = Convert.ToInt32(TempData["BatchId"]);
-
             //Delete Records
-            if (ids.Count() > 0)
+            if (model.Id > 0)
             {
-                await _ISubjectRepo.DeleteMultipleSubject(ids.ToList());
+                model.UpdatedBy = 1;
+                model.UpdatedDate = DateTime.Now.Date;
+                var result = await _ISubjectRepo.Update(model);
+                return Json(ResponseData.Instance.GenericResponse(result));
             }
-
-            //To Insert multiple records
-            for (int i = 0; i < subjectCodes.Count(); i++)
+            else
             {
-                var model = new SubjectMaster()
-                {
-                    BatchId = batchId,
-                    CourseId = courseId,
-                    SubjectCode = subjectCodes[i],
-                    SubjectName = subjectNames[i],
-                    SubjectDescription = string.IsNullOrEmpty(subjectDescriptions[i]) ? string.Empty : subjectDescriptions[i],
-                    CreatedBy = 1,
-                    CreatedDate = DateTime.Now.Date
-                };
-
                 var result = await _ISubjectRepo.CreateEntity(model);
+                return Json(ResponseData.Instance.GenericResponse(result));
             }
-
-            return Json("Subject Added Successfully");
         }
 
-        public async Task<IActionResult> GetSubjectDatList(int courseId, int batchId)
+        public async Task<IActionResult> GetSubjectDatList()
         {
-            var result = await _ISubjectRepo.GetList(x => x.IsActive == 1 && x.IsDeleted == 0 && x.CourseId == courseId && x.BatchId == batchId);
-            return Json(result);
+            var subjectModel = await _ISubjectRepo.GetList(x => x.IsActive == 1 && x.IsDeleted == 0);
+            var courseModel = await _ICourseRepo.GetList(x => x.IsActive == 1 && x.IsDeleted == 0);
+
+            var result = (from SM in subjectModel
+                          join CM in courseModel
+                          on SM.CourseId equals CM.Id
+                          where CM.IsDeleted == 0 && CM.IsActive == 1
+                          && SM.IsActive == 1 && SM.IsDeleted == 0
+                          select new SubjectVm
+                          {
+                              SubjectId = SM.Id,
+                              CourseName = CM.Name,
+                              SubjectCode = SM.SubjectCode,
+                              SubjectName = SM.SubjectName,
+                              SubjectDescription = SM.SubjectDescription,
+                              IsElective = SM.IsElective
+                          }).ToList();
+
+            return PartialView("~/Views/SubjectMaster/SubjectMasterPartial.cshtml", result);
         }
 
         #region PrivateFields
-        private async Task<ResponseStatus> DeleteSubject(int[] ids)
+        public async Task<IActionResult> DeleteSubject(int id)
         {
-            for (int i = 0; i < ids.Count(); i++)
-            {
-                var subjectModel = await _ISubjectRepo.GetSingle(x => x.Id == ids[i]);
-            }
-
-            return ResponseStatus.AddedSuccessfully;
+            var subjectModel = await _ISubjectRepo.GetSingle(x => x.Id == id);
+            subjectModel.IsActive = 0;
+            subjectModel.IsDeleted = 1;
+            subjectModel.UpdatedBy = 1;
+            subjectModel.UpdatedDate = DateTime.Now.Date;
+            await _ISubjectRepo.CreateNewContext();
+            var result = await _ISubjectRepo.Delete(subjectModel);
+            return Json(ResponseData.Instance.GenericResponse(result));
         }
         #endregion
 

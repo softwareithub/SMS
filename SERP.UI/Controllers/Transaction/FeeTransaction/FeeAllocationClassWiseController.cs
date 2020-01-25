@@ -2,12 +2,14 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using SERP.Core.Entities.Entity.Core.Master;
 using SERP.Core.Entities.Entity.Core.Transaction;
 using SERP.Core.Model.TransactionViewModel;
 using SERP.Infrastructure.Repository.Infrastructure.Repo;
 using SERP.Utilities.ResponseMessage;
+using SERP.Utilities.ResponseUtilities;
 
 namespace SERP.UI.Controllers.Transaction.FeeTransaction
 {
@@ -41,60 +43,58 @@ namespace SERP.UI.Controllers.Transaction.FeeTransaction
 
         public async Task<IActionResult> GetFeeParticularPartial(string courseIds)
         {
+            FeeDetailModel model = new FeeDetailModel();
             List<FeeDetailClassWise> models = new List<FeeDetailClassWise>();
+            var courseIdints = (courseIds.Split(',')).Select(x => Int32.Parse(x)).ToList();
             var result = await _feeCategoryRepo.GetList(x => x.IsActive == 1 && x.IsDeleted == 0);
+            var feeAmount = await _feeClassWiseDetailRepo.GetList(x => x.IsActive == 1 && x.IsDeleted == 0 && courseIdints.Contains(x.ClassId));
             result.ToList().ForEach(item =>
             {
                 var model = new FeeDetailClassWise()
                 {
                     CategoryId = item.Id,
                     CategoryName = item.Name,
-                    Amount = decimal.Parse("0.0"),
-                    FeePaymentType = "MT"
+                    Amount = feeAmount.Count() > 0 ? feeAmount.First(x => x.CategoryId == item.Id).Amount : decimal.Parse("0.0"),
+                    FeePaymentType = feeAmount.Count() > 0 ? feeAmount.First(x => x.CategoryId == item.Id).FeePaymentType : string.Empty,
                 };
                 models.Add(model);
             });
 
-            TempData["CourseId"] = courseIds;
-            return await Task.Run(() => PartialView("~/Views/FeeTransaction/FeeParticualrPartial.cshtml", models));
+            HttpContext.Session.SetString("CourseId", courseIds);
+            model.FeeDetailModels = models;
+            return await Task.Run(() => PartialView("~/Views/FeeTransaction/FeeParticualrPartial.cshtml", model));
         }
 
-        public async Task<IActionResult> AllocateStudentFee()
+        public async Task<IActionResult> AllocateStudentFee(FeeDetailModel modelData)
         {
-            var categoryIds = Request.Form["CategoryId"];
-            var feeAmounts = Request.Form["feeAmount"];
-            var feeType = Request.Form["feeType"];
-            var courseIds = TempData["CourseId"].ToString().Split(',');
-            List<FeeDetailClassWise> models = new List<FeeDetailClassWise>();
-            for (int k = 0; k < courseIds.Count(); k++)
-            {
-                int courseId = Convert.ToInt32(courseIds[k]);
-                for (int i = 0; i < categoryIds.Count(); i++)
-                {
-                    FeeDetailClassWise model = new FeeDetailClassWise()
-                    {
-                        Amount = Convert.ToDecimal(feeAmounts[i]),
-                        CategoryId = Convert.ToInt32(categoryIds[i]),
-                        FeePaymentType = feeType[i].ToString(),
-                        IsActive = 1,
-                        IsDeleted = 0,
-                        CreatedDate = DateTime.Now.Date,
-                        CreatedBy = 1,
-                        ClassId = courseId
-                    };
-                    models.Add(model);
-                }
-            }
+            var courseIds = (HttpContext.Session.GetString("CourseId").ToString().Split(',')).Select(x => Int32.Parse(x)).ToList();
+            ResponseStatus result =ResponseStatus.AddedSuccessfully ;
             var maxFeeType = await _feeClassWiseDetailRepo.GetList(x => x.IsActive == 1 && x.IsDeleted == 0);
             int feeTypeId = maxFeeType.Count() != 0 ? maxFeeType.Max(x => x.Type) + 1 : 1;
 
-            models.ToList().ForEach(x =>
-            {
-                x.Type = feeTypeId;
-            });
             await _feeClassWiseDetailRepo.CreateNewContext();
-            var result = await _feeClassWiseDetailRepo.Add(models.ToArray());
 
+            var deletePreviousFee = await _feeClassWiseDetailRepo.GetList(x => x.IsActive == 1 && x.IsDeleted == 0 && courseIds.Contains(x.ClassId));
+            deletePreviousFee.ToList().ForEach(x => {
+                x.IsActive = 0;
+                x.IsDeleted = 1;
+            });
+
+            await _feeClassWiseDetailRepo.CreateNewContext();
+
+            var deleteresult = await _feeClassWiseDetailRepo.Update(deletePreviousFee.ToArray());
+
+            for (int i=0; i< courseIds.Count(); i++)
+            {
+                modelData.FeeDetailModels.ToList().ForEach(x =>
+                {
+                    x.Type = feeTypeId;
+                    x.ClassId =Convert.ToInt32(courseIds[i]);
+                    x.Id = 0;
+                });
+                await _feeClassWiseDetailRepo.CreateNewContext();
+                result = await _feeClassWiseDetailRepo.Add(modelData.FeeDetailModels.ToArray());
+            }
             return Json(ResponseData.Instance.GenericResponse(result));
         }
 

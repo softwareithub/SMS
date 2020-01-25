@@ -57,6 +57,10 @@
                     <div class="col-md-8">
                         <input type="button" class="btn btn-primary pull-right" onclick="GetParticular()" value="Get Fee Particular" />
                     </div>
+                    <div class="col-md-12">
+                        <div id="_divFeeData">
+                        </div>
+                    </div>
 
                     <div class="col-md-12">
                         <div id="_divAssignFeeDetails">
@@ -64,10 +68,7 @@
                         </div>
                     </div>
 
-                    <div class="col-md-12">
-                        <div id="_divFeeData">
-                        </div>
-                    </div>
+
                 </div>
 
                 <div class="box-footer">
@@ -94,20 +95,9 @@
                 $("#_divAssignFeeDetails").html(responseData);
                 if (responseData.length > 0) { hasValue = 1; }
             }).done(function () {
-                debugger
-                if (hasValue==1) {
-                    alertify.confirm("CLass already mapped with fee Do you want to override ?", function () {
-                        $.get("/FeeAllocationClassWise/GetFeeParticularPartial", { courseIds: classIds.toString() }, function (responseData) {
-                            $("#_divFeeData").html(responseData);
-                        });
-                    });
-                }
-                else {
-                    $.get("/FeeAllocationClassWise/GetFeeParticularPartial", { courseIds: classIds.toString() }, function (responseData) {
-                        $("#_divFeeData").html(responseData);
-                    });
-                }
-
+                $.get("/FeeAllocationClassWise/GetFeeParticularPartial", { courseIds: classIds.toString() }, function (responseData) {
+                    $("#_divFeeData").html(responseData);
+                });
             });
         }
         else {

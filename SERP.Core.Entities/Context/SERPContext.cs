@@ -6,6 +6,7 @@ using SERP.Core.Entities.TransactionLog;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using SERP.Core.Entities.StudentTransaction;
 
 namespace SERP.Core.Entities.Context
 {
@@ -45,6 +46,9 @@ namespace SERP.Core.Entities.Context
         public DbSet<EmployeeProfessionalInfoModel> EmployeeProfessionalInfoModels { get; set; }
         public DbSet<EmployeeSalaryModel> EmployeeSalaryModels { get; set; }
         public DbSet<EmployeeAttendenceModel> EmployeeAttendenceModels { get; set; }
+        public DbSet<TimeTableMasterModel> TimeTableMasterModels { get; set; }
+        public DbSet<TimeTableAssignSubjTeacherModel> TimeTableAssignSubjTeacherModels { get; set; }
+        public DbSet<StudentAttendenceModel> StudentAttendenceModels { get; set; }
 
     }
 }
