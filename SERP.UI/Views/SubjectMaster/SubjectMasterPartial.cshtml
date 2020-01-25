@@ -1,0 +1,98 @@
+﻿@{
+    ViewData["Title"] = "Index";
+    Layout = null;
+
+}
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+@model IEnumerable<SERP.Core.Model.TransactionViewModel.SubjectVm>
+<section class="content">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="row">
+                <div class="col-md-12">
+                    @foreach (var item in Model.GroupBy(x => x.CourseName))
+                    {
+                        <div class="box box-info">
+                            <div class="box-header with-border">
+                                <h3 class="box-title">@item.Key</h3>
+
+                                <div class="box-tools pull-right">
+                                    <button type="button" class="btn btn-box-tool" data-toggle="collapse" href="#@item.Key">
+                                        <i class="fa fa-minus"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <!-- /.box-header -->
+                            <div class="box-body" style="" id="@item.Key">
+                                <div class="table-responsive">
+                                    <table class="table no-margin">
+                                        <thead>
+                                            <tr>
+                                                <th>Subject Name</th>
+                                                <th>Subject Code</th>
+                                                <th>Subject Description</th>
+                                                <th>Is Elective</th>
+                                                <th>Action</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @foreach (var data in item)
+                                            {
+                                                <tr>
+                                                    <td>
+                                                        @data.SubjectName
+                                                    </td>
+                                                    <td>
+                                                        @data.SubjectCode
+                                                    </td>
+                                                    <td>
+                                                        @data.SubjectDescription
+                                                    </td>
+                                                    <td>
+                                                        @{
+                                                            var isElective = data.IsElective == 0 ? "Yes" : "No";
+                                                        }
+                                                        @isElective
+                                                    </td>
+                                                    <td>
+                                                        <a class="btn btn-outline-success pull-right" data-loading-text="<i class='fa fa-circle-o-notch fa-spin'  style='color:#DD4B39'></i>" onclick="UpdateRecord(@data.SubjectId, this)">
+                                                            <i class="fa fa-edit" style="color:#3C8DBC"></i>
+                                                        </a>
+                                                        <a class="btn btn-outline-danger pull-right" data-loading-text="<i class='fa fa-circle-o-notch fa-spin'  style='color:#DD4B39'></i>" onclick="DeleteRecord(@data.SubjectId, this)">
+                                                            <i class="fa fa-trash" style="color:#DD4B39"></i>
+                                                        </a>
+                                                    </td>
+                                                </tr>
+                                            }
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script type="text/javascript">
+    function DeleteRecord(id, event) {
+        var geturl = "SubjectMaster/GetSubjectDatList";
+        var deleteUrl = "SubjectMaster/DeleteSubject";
+        CustomDeleteRecord(id, geturl, deleteUrl, event);
+    }
+    function UpdateRecord(id, event) {
+        debugger;
+        var updateUrl = "SubjectMaster/Index";
+        UpdateCustomRecord(id, updateUrl, event);
+    }
+    function toggleCollapse(id) {
+        debugger;
+        $(id).collapse("toggle");
+    }
+</script>
+
+
+
+

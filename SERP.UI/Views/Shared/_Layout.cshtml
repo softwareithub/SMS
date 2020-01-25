@@ -35,11 +35,13 @@ scratch. This page gets rid of all links and provides the needed markup only.
     <link href="~/bootstrap/CustomModal.css" rel="stylesheet" />
     <link href="~/AlertifyJs/build/css/alertify.css" rel="stylesheet" />
     <script src="~/AlertifyJs/build/alertify.js"></script>
-
+    <link href="//netdna.bootstrapcdn.com/bootstrap/3.1.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
 
 
     <link rel="stylesheet"
           href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600,700,300italic,400italic,600italic">
+    <script src="~/bootstrap/Select2.js"></script>
+
 </head>
 
 <body class="hold-transition skin-blue sidebar-mini">
@@ -51,25 +53,18 @@ scratch. This page gets rid of all links and provides the needed markup only.
         @await Html.PartialAsync("~/Views/Shared/MenuSubMenu/_SideMenuPartial.cshtml")
 
         <!-- Content Wrapper. Contains page content -->
-        <div class="content-wrapper" id="divSERP">
+        <div class="content-wrapper">
 
-            <div id="loading" style="display:none" class="modalLoader">
-                <img src="~/Images/spinner.gif" />
-            </div>
-            <!-- Content Header (Page header) -->
-            @RenderBody()
-
-            <!-- Main content -->
             <section class="content container-fluid">
-
-                <!--------------------------
-                | Your Page Content Here |
-                -------------------------->
+             
+                <div id="loading"  class="modalLoader divHidding">
+                    <img src="~/Images/spinner.gif" />
+                </div>
+                <div id="divSERP" >
+                    @RenderBody()
+                </div>
 
             </section>
-
-            
-            <!-- /.content -->
         </div>
         <!-- /.content-wrapper -->
         <!-- Main Footer -->
@@ -174,3 +169,4 @@ scratch. This page gets rid of all links and provides the needed markup only.
          user experience. -->
 </body>
 </html>
+

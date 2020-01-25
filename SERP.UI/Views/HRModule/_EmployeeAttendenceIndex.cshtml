@@ -1,0 +1,161 @@
+﻿@{
+    ViewData["Title"] = "Index";
+    Layout = null;
+
+}
+@model SERP.Core.Model.TransactionViewModel.EmployeeAttendenceVm
+
+<script src="~/lib/jquery-validation/dist/jquery.validate.js"></script>
+<script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.js"></script>
+<link href="https://cdn.datatables.net/1.10.20/css/jquery.dataTables.min.css" rel="stylesheet" />
+<script src="https://cdn.datatables.net/1.10.20/js/jquery.dataTables.min.js"></script>
+
+<section class="content-header">
+    <h1>
+        Employee Attendence
+        <small>Create Employee Attendence</small>
+    </h1>
+    <ol class="breadcrumb">
+        <li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
+        <li><a href="#">Forms</a></li>
+        <li class="active">General Elements</li>
+    </ol>
+</section>
+
+
+<section class="content">
+    <div class="row">
+
+        <div class="col-md-12">
+            <!-- general form elements -->
+            <div class="box box-primary">
+                <div class="box-header with-border">
+                    <h3 class="box-title">Create Employee Attendence</h3>
+                    <div class="col-md-12">
+                        <div class="col-md-10">
+                        </div>
+                        <div class="col-md-2">
+                            <a class="btn btn-primary pull-left" onclick="NewRecord()">
+                                <i class="fa fa-plus-square"></i>
+                            </a>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="overlay divHidding" id="divFormData">
+                    <i class="fa fa-refresh fa-spin">
+
+                    </i>
+                </div>
+                <form method="post" data-ajax="true" data-ajax-method="post"
+                      asp-action="CreateEmployeeAttendence" asp-controller="EmployeeAttendence" data-ajax-success="Success"
+                      data-ajax-begin="CustomFormSubmitBegin" data-ajax-complete="CustomFormSubmitComplete">
+                    <div class="box-body">
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label asp-for="AttendenceDate">Attendence Date</label>
+                                <input asp-for="AttendenceDate" class="form-control">
+                                <span asp-validation-for="AttendenceDate" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label asp-for="DepartmentId">Select Department</label>
+                                <select asp-for="DepartmentId" class="form-control"  onchange="GetEmployeeList(this)" asp-items="@(new SelectList(ViewBag.Departments,"Id","Name","Select Department"))">
+                                    <option value="">Select Department</option>
+                                </select>
+                                <span asp-validation-for="DepartmentId" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="col-md-4" id="toAttendence" style="display:none">
+                            <div class="form-group">
+                                <label asp-for="ToAttendenceDate">To Attendence Date</label>
+                                <input asp-for="ToAttendenceDate" class="form-control">
+                                <span asp-validation-for="ToAttendenceDate" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label>Long Vacation</label>
+                                <select class="form-control" onchange="SelectLeaveType(this)">
+                                    <option value="0">Select</option>
+                                    <option value="Y">Long Vacation</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-4" id="leaveType" style="display:none">
+                            <div class="form-group">
+                                <label>Leave Type</label>
+                                <select class="form-control" asp-for="LongLeaveType">
+                                    <option value="S">Select</option>
+                                    <option value="P">Present</option>
+                                    <option value="HL">Holiday</option>
+                                    <option value="A">Absent</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="col-md-12" id="_divEmployeeList">
+
+                        </div>
+                    </div>
+                    <!-- /.box-body -->
+
+                    <div class="box-footer">
+                        <div class="col-md-8">
+                            @Html.SERPButton("btn btn-primary pull-right btnSubmit", Model == null ? 0 :Model.EmployeeId)
+                            <button class="buttonload" style="display:none">
+                                <i class="fa fa-refresh fa-spin"></i>Loading
+                            </button>
+                        </div>
+                        <div class="col-md-4">
+                            <button type="reset" class="btn btn-danger pull-left">Cancel</button>
+                        </div>
+
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        @await Html.PartialAsync("~/Views/Shared/_CommanModalPartial.cshtml")
+
+    </div>
+</section>
+
+<script>
+    function SelectLeaveType(id) {
+        if ($(id).val() == "Y") {
+            $("#leaveType").removeAttr("style");
+            $("#toAttendence").removeAttr("style");
+        }
+        else {
+            $("#leaveType").attr("style", "display:none");
+            $("#toAttendence").attr("style", "display:none");
+        }
+    }
+    function GetAcademicList() {
+        GetCustomRecord("AcademicMaster/GetAcademicList");
+        setTimeout(function () {
+            $("#modalTitle").text("Academic Master List")
+        }, 300);
+    }
+    function NewRecord() {
+        var url = "EmployeeAttendence/Index";
+        NewCustomRecord(url);
+    }
+    function GetEmployeeList(e) {
+        debugger
+        var dateValue = $("#AttendenceDate").val();
+        if (dateValue.length == 0) {
+            alertify.error("Please select Date");
+            $("#AttendenceDate").attr("style", "fore-color:red");
+        }
+        else {
+            $.get("/EmployeeAttendence/GetEmployeeList", { id: $(e).val(), attDate: dateValue }, function (response) {
+                $("#_divEmployeeList").html(response);
+            })
+        }
+    }
+</script>
+

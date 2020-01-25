@@ -1,0 +1,124 @@
+﻿@model SERP.Core.Entities.Entity.Core.Transaction.FeeDetailClassWise
+<script src="~/lib/jquery-validation/dist/jquery.validate.js"></script>
+<script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.js"></script>
+<link href="https://cdn.datatables.net/1.10.20/css/jquery.dataTables.min.css" rel="stylesheet" />
+<script src="https://cdn.datatables.net/1.10.20/js/jquery.dataTables.min.js"></script>
+<link href="~/Multiselect/example-styles.css" rel="stylesheet" />
+@*<link href="~/Multiselect/demo-styles.css" rel="stylesheet" />*@
+<script src="~/Multiselect/jquery.multi-select.js"></script>
+<section class="content-header">
+    <h1>
+        Classwise Fee Allocation
+        <small>Create Fee Detail</small>
+    </h1>
+    <ol class="breadcrumb">
+        <li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
+        <li><a href="#">Forms</a></li>
+        <li class="active">General Elements</li>
+    </ol>
+</section>
+
+
+<section class="content">
+    <div class="row">
+
+        <div class="col-md-12">
+            <!-- general form elements -->
+            <div class="box box-primary">
+                <div class="box-header with-border">
+                    <h3 class="box-title">Create Fee Category Master</h3>
+                </div>
+                <div class="box-body">
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <input type="hidden" asp-for="Id" />
+                            <input type="hidden" asp-for="CreatedBy" />
+                            <input type="hidden" asp-for="CreatedDate" />
+                            <label asp-for="ClassId">
+                                Select Class Name
+                                <i class="fa fa-info-circle" data-toggle="popover" data-placement="top"
+                                   data-content="You can select multiple class for Fee Allocation"></i>
+                            </label>
+                            <select id="modal-example" name="inventors" multiple class="form-control">
+                                @foreach (var data in (IEnumerable<SERP.Core.Entities.Entity.Core.Master.CourseMaster>)ViewBag.CourseList)
+                                {
+                                    var mapped = string.Empty;
+                                    if (data.IsMapped)
+                                    {
+                                        mapped = "<span style='color:red'>(Alredy mapped)</span>";
+                                    }
+                                    <option value="@data.Id">@data.Name @Html.Raw(mapped)</option>
+                                }
+                            </select>
+                            <span asp-validation-for="ClassId" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="col-md-8">
+                        <input type="button" class="btn btn-primary pull-right" onclick="GetParticular()" value="Get Fee Particular" />
+                    </div>
+                    <div class="col-md-12">
+                        <div id="_divFeeData">
+                        </div>
+                    </div>
+
+                    <div class="col-md-12">
+                        <div id="_divAssignFeeDetails">
+
+                        </div>
+                    </div>
+
+
+                </div>
+
+                <div class="box-footer">
+                    <div class="col-md-8">
+
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        @await Html.PartialAsync("~/Views/Shared/_CommanModalPartial.cshtml")
+
+    </div>
+</section>
+
+<script type="text/javascript">
+    function GetParticular() {
+        var hasValue = 0;
+        debugger;
+        var classIds = $("#modal-example").val();
+        if (classIds.length > 0) {
+            $.get("/FeeAllocationClassWise/GetFeeDetail", { courseIds: classIds.toString() }, function (responseData) {
+                $("#_divAssignFeeDetails").html(responseData);
+                if (responseData.length > 0) { hasValue = 1; }
+            }).done(function () {
+                $.get("/FeeAllocationClassWise/GetFeeParticularPartial", { courseIds: classIds.toString() }, function (responseData) {
+                    $("#_divFeeData").html(responseData);
+                });
+            });
+        }
+        else {
+            alertify.error("course/class is not selected, Please select course.")
+        }
+    }
+
+    $(document).ready(function () {
+        $('[data-toggle="popover"]').popover();
+        // GetAssignFeeDetails();
+    });
+
+    $('#modal-example').multiSelect({
+        'modalHTML': '<div class="multi-select-modal">'
+    });
+
+    function GetAssignFeeDetails() {
+        $.get("/FeeAllocationClassWise/GetFeeDetail", function (responseData) {
+            $("#_divAssignFeeDetails").html(responseData);
+        });
+    }
+
+
+</script>

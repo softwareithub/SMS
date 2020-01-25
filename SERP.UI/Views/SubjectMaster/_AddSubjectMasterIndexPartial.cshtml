@@ -1,0 +1,120 @@
+﻿@{
+    ViewData["Title"] = "Index";
+    Layout = null;
+
+}
+@model SERP.Core.Entities.Entity.Core.Transaction.SubjectMaster
+
+<script src="~/lib/jquery-validation/dist/jquery.validate.js"></script>
+<script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.js"></script>
+<link href="https://cdn.datatables.net/1.10.20/css/jquery.dataTables.min.css" rel="stylesheet" />
+<script src="https://cdn.datatables.net/1.10.20/js/jquery.dataTables.min.js"></script>
+
+<section class="content-header">
+    <h1>
+        Subject Master
+        <small>Add Subject To Course And Batch</small>
+    </h1>
+    <ol class="breadcrumb">
+        <li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
+        <li><a href="#">Forms</a></li>
+        <li class="active">General Elements</li>
+    </ol>
+</section>
+
+
+<section class="content">
+    <div class="row">
+
+        <div class="col-md-12">
+            <!-- general form elements -->
+            <div class="box box-primary">
+                <div class="box-header with-border">
+                    <h3 class="box-title">Add Subject To Course And Batch</h3>
+                    <a class="btn btn-primary pull-right" onclick="GetRecordList()">
+                        <i class="fa fa-list-ul"></i>
+                        List
+                    </a>
+                </div>
+                <form method="post" data-ajax="true" data-ajax-method="post"
+                      asp-action="PostAddSubject" asp-controller="SubjectMaster" data-ajax-success="Success">
+                    <div class="box-body">
+
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <input asp-for="Id" type="hidden" />
+                                <input asp-for="CreatedBy" type="hidden" />
+                                <input asp-for="CreatedDate" type="hidden" />
+                                <label asp-for="CourseId">Select Course</label>
+                                <select asp-for="CourseId" class="form-control" asp-items="@(new SelectList(ViewBag.CourseList ,"Id","Name"))" >
+                                    <option value="">Select</option>
+                                </select>
+                                <span asp-validation-for="CourseId" class="text-danger"></span>
+                            </div>
+
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label asp-for="SubjectCode">Subject Code</label>
+                                <input asp-for="SubjectCode" class="form-control" />
+                                <span asp-validation-for="SubjectCode" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label asp-for="SubjectCode">Subject Name</label>
+                                <input asp-for="SubjectName" class="form-control" />
+                                <span asp-validation-for="SubjectName" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label asp-for="SubjectDescription">Subject Description</label>
+                                <input asp-for="SubjectDescription" class="form-control" />
+                                <span asp-validation-for="SubjectDescription" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label asp-for="IsElective">Subject is Elective</label>
+                                <select asp-for="IsElective" class="form-control">
+                                    <option value="0">No</option>
+                                    <option value="1">Yes</option>
+                                </select>
+                                <span asp-validation-for="IsElective" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="box-footer">
+                        <div class="col-md-8">
+                            @Html.SERPButton("btn btn-primary pull-right btnSubmit", Model == null ? 0 : Model.Id)
+                            <button class="buttonload" style="display:none">
+                                <i class="fa fa-refresh fa-spin"></i>Loading
+                            </button>
+                        </div>
+                        <div class="col-md-4">
+                            <button type="reset" class="btn btn-danger pull-left">Cancel</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+        @await Html.PartialAsync("~/Views/Shared/_CommanModalPartial.cshtml")
+    </div>
+</section>
+
+
+<script type="text/javascript">
+    function GetRecordList() {
+        GetCustomRecord("/SubjectMaster/GetSubjectDatList");
+        setTimeout(function () {
+            $("#modalTitle").text("Subject Master List")
+        }, 300);
+    }
+    function NewAcademicMaster() {
+        var url = "SubjectMaster/Index";
+        NewCustomRecord(url);
+    }
+
+</script>

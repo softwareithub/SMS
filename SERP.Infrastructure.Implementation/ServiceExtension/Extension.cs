@@ -9,6 +9,9 @@ namespace SERP.Infrastructure.Implementation.ServiceExtension
         public static void Exentension(this IServiceCollection serviceCollection)
         {
             serviceCollection.AddTransient(typeof(IGenericRepository<,>), typeof(GenericImplementation<,>));
+            serviceCollection.AddTransient<ISubjectMasterRepo, SubjectImplementation>();
+            serviceCollection.AddTransient<ITimeSheetRepo, TimeSheetImplementation>();
+            serviceCollection.AddTransient<IFeeDetailRepo, FeeDetailImplementation>();
         }
     }
 }

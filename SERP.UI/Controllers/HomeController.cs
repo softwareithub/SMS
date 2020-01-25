@@ -6,6 +6,8 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using SERP.UI.Models;
+using System.Net;
+using Newtonsoft.Json;
 
 namespace SERP.UI.Controllers
 {
@@ -18,9 +20,13 @@ namespace SERP.UI.Controllers
             _logger = logger;
         }
 
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
-            return View();
+            //var url = "https://newsapi.org/v2/top-headlines?" + "country=in&" + "apiKey=151490ca09f645a4b25f580af42584e9";
+            //var json = new WebClient().DownloadString(url);
+            //JsonConvert.DeserializeObject<RootObject>(json);
+            var dataModel = new List<RootObject>();
+            return await  Task.Run(()=>View(dataModel)) ;
         }
 
         public IActionResult Privacy()

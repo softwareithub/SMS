@@ -10,5 +10,6 @@ namespace SERP.Utilities.ResponseUtilities
         DeletedSuccessfully,
         AlreadyExists,
         ServerError,
+        UpdatedSuccessFully
     }
 }

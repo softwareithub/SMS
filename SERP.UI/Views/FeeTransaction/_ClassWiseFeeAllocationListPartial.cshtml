@@ -1,0 +1,99 @@
+﻿@model IEnumerable<SERP.Core.Model.TransactionViewModel.ClassFeeAllocationVm>
+
+<style>
+    .row {
+        margin-top: 40px;
+        padding: 0 10px;
+    }
+
+    .clickable {
+        cursor: pointer;
+    }
+
+    .panel-heading span {
+        margin-top: -20px;
+        font-size: 15px;
+    }
+</style>
+<section class="content">
+    <div class="row">
+        @foreach (var groupdata in Model.GroupBy(x => x.ClassName))
+        {
+            <div class="col-md-12">
+                <div class="panel panel-primary">
+                    <div class="panel-heading">
+                        <h3 class="panel-title"> @groupdata.Key</h3>
+                        <span class="pull-right clickable"><i class="glyphicon glyphicon-chevron-up"></i></span>
+                    </div>
+                    <div class="panel-body">
+                        <table style="height:100%;width:100%" class="table table-responsive">
+                            <thead>
+                            <th>
+                                Perticual Name
+                            </th>
+                            <th>
+                                Course Name
+                            </th>
+                            <th>
+                                Amount
+                            </th>
+                            <th>
+                                Payment Type
+                            </th>
+                            </thead>
+                            @foreach (var data in groupdata)
+                            {
+
+                                <tbody>
+                                    <tr>
+                                        <td>
+                                            @data.CategoryName
+                                        </td>
+                                        <td>
+                                            @data.ClassName
+                                        </td>
+                                        <td>
+                                            @data.Amount
+                                        </td>
+                                        <td>
+                                            @data.PaymentType
+                                        </td>
+                                    </tr>
+                                </tbody>
+
+                            }
+                        </table>
+
+                    </div>
+                </div>
+            </div>
+
+        }
+    </div>
+</section>
+
+<script type="text/javascript">
+    function DeleteRecord(id, event) {
+        var geturl = "FeeCategory/GetFeeCategoryList";
+        var deleteUrl = "FeeCategory/DeleteFeeCategory";
+        CustomDeleteRecord(id, geturl, deleteUrl, event);
+    }
+    function UpdateRecord(id, event) {
+        debugger;
+        var updateUrl = "FeeCategory/Index";
+        UpdateCustomRecord(id, updateUrl, event);
+    }
+
+    $(document).on('click', '.panel-heading span.clickable', function (e) {
+        var $this = $(this);
+        if (!$this.hasClass('panel-collapsed')) {
+            $this.parents('.panel').find('.panel-body').slideUp();
+            $this.addClass('panel-collapsed');
+            $this.find('i').removeClass('glyphicon-chevron-up').addClass('glyphicon-chevron-down');
+        } else {
+            $this.parents('.panel').find('.panel-body').slideDown();
+            $this.removeClass('panel-collapsed');
+            $this.find('i').removeClass('glyphicon-chevron-down').addClass('glyphicon-chevron-up');
+        }
+    })
+</script>

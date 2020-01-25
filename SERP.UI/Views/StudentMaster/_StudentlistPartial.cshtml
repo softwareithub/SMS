@@ -1,0 +1,100 @@
+﻿@model IEnumerable<SERP.Core.Model.MasterViewModel.StudentPartialInfoViewModel>
+
+<section class="content">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="row">
+                <div class="col-md-12">
+                    <table id="tblDataList" class="table-responsive table-striped table-bordered" style="width:100%">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Roll Code</th>
+                                <th>
+                                    Registration
+                                </th>
+                                <th>Course Name</th>
+                                <th>Batch Name</th>
+                                <th>
+                                    Action
+                                </th>
+
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var data in Model)
+                            {
+                                <tr>
+                                    <td>
+                                        @data.StudentName
+                                    </td>
+                                    <td>
+                                        @data.RollCode
+                                    </td>
+                                    <td>@data.Registration</td>
+                                    <td>@data.CourseName</td>
+                                    <td>@data.BatchName</td>
+
+                                    <td>
+                                        <a class="btn btn-primary pull-right" onclick="UpdateRecord(@data.Id)">
+                                            <i class="fa fa-edit"></i>
+                                            Edit
+                                        </a>
+                                        <a class="btn btn-danger pull-right" onclick="DeleteRecord(@data.Id)">
+                                            <i class="fa fa-trash"></i>
+                                            Delete
+                                        </a>
+                                        <a class="btn btn-success pull-right" onclick="StudentInfo(@data.Id)">
+                                            <i class="fa fa-eye-slash"></i>
+                                            More Info
+                                        </a>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script type="text/javascript">
+    function DeleteRecord(id) {
+        alertify.confirm("Are you sure want to delete the record ?", function () {
+            $.get("/Religion/DeleteReligion", { id: id }, function (response) {
+                alertify.alert("Record deleted successfully");
+            }).done(function () {
+                $.get("/Religion/GetReligionMaster", function (response) {
+                    $("#divPartialData").html(response);
+                }).done(function () {
+                    $("#tblDataList").DataTable({
+                        fixedHeader: true,
+                        select: true,
+                        responsive: true
+                    });
+                });
+            });
+        }, function () {
+            alertify.warning("you cancel the delete.");
+        });
+    }
+
+    function UpdateRecord(id) {
+        $.get("/StudentMaster/CreateStudent", { id: id }, function (response) {
+            $("#divSERP").html(response);
+            $("#divModalPop").modal('hide');
+
+            $('.modal-backdrop').remove();
+        });
+    }
+
+    function StudentInfo(id) {
+        $.get("/StudentMaster/GetStudentCompleteList", {id:id}, function (response) {
+            $("#divPartialData").html(response);
+             $("#divModalPop").modal('show');
+        });
+
+    }
+</script>

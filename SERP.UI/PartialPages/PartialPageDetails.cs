@@ -8,5 +8,6 @@ namespace SERP.UI.PartialPages
     public static class PartialPageDetails
     {
         public static string InstitutePartialPage = @"";
+        public static string ClassDetailPartial = @"~/Views/CourseMaster/_GetCourseListPartial.cshtml";
     }
 }

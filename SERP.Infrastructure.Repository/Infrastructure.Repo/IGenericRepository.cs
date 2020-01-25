@@ -16,5 +16,6 @@ namespace SERP.Infrastructure.Repository.Infrastructure.Repo
         Task<ResponseStatus> Update(params TEntity[] items);
         Task<ResponseStatus> Delete(params TEntity[] items);
         Task<ResponseStatus> CreateEntity(TEntity model);
+        Task<bool> CreateNewContext();
     }
 }

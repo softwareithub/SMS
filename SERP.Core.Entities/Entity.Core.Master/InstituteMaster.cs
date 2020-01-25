@@ -9,19 +9,19 @@ namespace SERP.Core.Entities.Entity.Core.Master
     [Table("IntituteDetail", Schema = "Master")]
     public class InstituteMaster : Base<int>
     {
-        [Required(ErrorMessage = "Institute name is required.")
-            , RegularExpression("/^[A-Za-z]+$/")]
+        [Required(ErrorMessage = "Institute name is required.")]
+           
         [Display(Name = "Institute Name", Prompt = "Enter Institute Name"),
             MaxLength(100, ErrorMessage = "Institute name is too long."),
-            MinLength(10, ErrorMessage = "Institute name is too short.")]
+            MinLength(3, ErrorMessage = "Institute name is too short.")]
         public string Name { get; set; }
 
         [Display(Name = "Institute Code", Prompt = "Enter Institute Code"),
             MaxLength(20, ErrorMessage = "Institute code is too long."),
-            MinLength(5, ErrorMessage = "Institute Code is too short.")]
+            MinLength(0, ErrorMessage = "Institute Code is too short.")]
         public string Code { get; set; }
 
-        [Display(Name = "Address", Prompt = "Enter Institute Address"), RegularExpression("/^[A-Za-z]+$/"),
+        [Display(Name = "Address", Prompt = "Enter Institute Address"),
             MaxLength(500, ErrorMessage = "Address is too long.")]
         public string Address { get; set; }
 
@@ -44,12 +44,10 @@ namespace SERP.Core.Entities.Entity.Core.Master
         [MaxLength(20, ErrorMessage = "Fax number is too long.")]
         [Display(Name ="Fax",Prompt ="Enter Fax Number")]
         public string Fax { get; set; }
-        [RegularExpression(@"/^[A-Za-z]+$/",ErrorMessage ="Invalid Contact Person name.")]
         [MaxLength(70,ErrorMessage ="Admin contact number is too long.")]
         [Display(Name ="Admin Contact Person",Prompt ="Enter Admin Information.")]
         public string AdminContactPerson { get; set; }
         public string InstituteLogo { get; set; }
-        [RegularExpression(@"/^[A-Za-z]+$/", ErrorMessage = "Invalid School Rythum.")]
         [MaxLength(100, ErrorMessage = "Rythum is too long.")]
         public string Rythum { get; set; }
     }

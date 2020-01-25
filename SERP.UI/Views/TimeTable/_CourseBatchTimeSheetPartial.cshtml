@@ -1,0 +1,87 @@
+﻿@model SERP.Core.Model.TransactionViewModel.TimeSheetVm
+
+<link href="~/bootstrap/CustomCard.css" rel="stylesheet" />
+<link href="~/bootstrap/LedBulbcss.css" rel="stylesheet" />
+<section class="content">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="row">
+                <div class="col-md-12">
+                    <table id="tblDataList" class="table table-hover table-striped table-info" style="width:100%;" border="1">
+                        <thead>
+                            <tr>
+                                <th>Days</th>
+                                @foreach (var period in Model.TimeTableModels)
+                                {
+                                    foreach (var prd in period.PeriodModels)
+                                    {
+                                        <th>
+                                            @prd.Period
+                                        </th>
+                                    }
+                                    break;
+                                }
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @{
+                                int k = 0;
+                                foreach (var days in Model.TimeTableModels)
+                                {
+                                    <tr>
+                                        <td>
+                                            <input type="hidden" asp-for="TimeTableModels[k].DayName" />
+                                            @days.DayName
+                                        </td>
+                                        @foreach (var period in Model.TimeTableModels.Where(x => x.DayName == days.DayName))
+                                        {
+                                            int i = 0;
+                                            @foreach (var prd in period.PeriodModels)
+                                            {
+                                                <td>
+
+                                                    @Html.SerpImageHelper(prd.Photo, 120, 120, "TeacherId")
+                                                    @if (prd.TeacherAttendence == "P")
+                                                    {
+                                                        <div class="led-box">
+                                                            <div class="led-blue"></div>
+                                                            <p>Present</p>
+                                                        </div>
+                                                    }
+                                                    else
+                                                    {
+                                                        <div class="led-box">
+                                                            <div class="led-red"></div>
+                                                            <a onclick="AssignTeacher(@prd.)">Assign</a>
+                                                        </div>
+
+                                                    }
+
+                                                    <h1>@prd.CourseName @prd.BatchName</h1>
+                                                    <p>@prd.FromTime to @prd.ToTime</p>
+                                                    <p>@prd.SubjectName</p>
+                                                    <p>@prd.TeacherAttendence</p>
+                                                    <p>@prd.EmployeeName</p>
+                                                    <p>@prd.Phone</p>
+                                                </td>
+                                                i++;
+                                            }
+
+                                        }
+                                    </tr>
+                                    k++;
+                                }
+                            }
+                        </tbody>
+
+                    </table>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</section>
+<script>
+    function AssignTeacher()
+</script>
+

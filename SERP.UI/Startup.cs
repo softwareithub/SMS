@@ -4,10 +4,12 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using SERP.Infrastructure.Implementation.ServiceExtension;
+using SERP.UI.Helper;
 
 namespace SERP.UI
 {
@@ -25,6 +27,12 @@ namespace SERP.UI
         {
             services.Exentension();
             services.AddControllersWithViews();
+            services.AddHttpContextAccessor();
+
+            services.AddDistributedMemoryCache();
+            services.AddSession(options => {
+                options.IdleTimeout = TimeSpan.FromMinutes(20);
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -43,6 +51,10 @@ namespace SERP.UI
             app.UseRouting();
 
             app.UseAuthorization();
+
+            app.UseSession();
+
+            SERPHttpContextAccessor.Configure(app.ApplicationServices.GetRequiredService<IHttpContextAccessor>());
 
             app.UseEndpoints(endpoints =>
             {
