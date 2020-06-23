@@ -16,5 +16,7 @@ namespace SERP.Infrastructure.Repository.Infrastructure.Repo
         Task<TimeSheetVm> GetTimeSheetDetailsByCourseIdBatchId(int courseId, int batchId);
 
         Task<ResponseStatus> DeactivateTimeSheet(int courseId, int batchId);
+        Task<List<PeriodVm>> GetSubjectTeacher(int teacherId);
+        Task<List<FreeEmployeeModel>> AssignTeacherTemp(TimeSpan fromTime, TimeSpan ToTime);
     }
 }

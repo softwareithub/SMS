@@ -1,0 +1,146 @@
+﻿<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.22/pdfmake.min.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/0.4.1/html2canvas.min.js"></script>
+@model SERP.Core.Model.ExamModel.StudentMarkSheetVm
+
+
+<section class="content">
+    <div class="row"  id="divPrint">
+        <div class="col-md-12">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="col-md-3">
+                        @Html.SerpImageHelper(Model.InstituteModel.InstituteLogo, 125, 125, "instituteLogo");
+                    </div>
+                    <div class="col-md-6">
+                        <h4>@Model.InstituteModel.Name</h4>
+                        <h6>@Model.InstituteModel.Address</h6>
+                        <h6>@Model.InstituteModel.Phone</h6>
+                        <h6>@Model.InstituteModel.Email</h6>
+                    </div>
+                    <div class="col-md-3">
+                        Contact Person :@Model.InstituteModel.AdminContactPerson<br />
+                        Mobile   : @Model.InstituteModel.Mobile<br />
+                        Email Info  : @Model.InstituteModel.Email<br />
+                    </div>
+                </div>
+                <div class="col-md-12">
+                    <br />
+                    <br />
+                    <br />
+                </div>
+                <div class="col-md-4">
+                    Name of Student : @Model.StudentInfoModel.StudentName<br />
+                    Father's Name   :  @Model.StudentInfoModel.FatherName<br />
+                    Mother's Name   :  @Model.StudentInfoModel.MotherName<br />
+                </div>
+                <div class="col-md-4">
+                    Course Name     : @Model.StudentInfoModel.CourseName<br />
+                    Batch Name      : @Model.StudentInfoModel.BatchName<br />
+                    Roll Number     : @Model.StudentInfoModel.RollCode<br />
+                </div>
+                <div class="col-md-4">
+                    Registration Number : @Model.StudentInfoModel.Registration<br />
+                    Father's Phone      : @Model.StudentInfoModel.FatherPhone<br />
+                    Mother's Phone      : @Model.StudentInfoModel.MotherPhone<br />
+                </div>
+                <div class="col-md-12">
+                    <br />
+                    <br />
+                    <br />
+                </div>
+                <div class="col-md-12">
+                    <table width="100%">
+                        <thead>
+                            <tr>
+                                <th style="width: 105px;">&nbsp;Subject Name</th>
+                                <th style="width: 105px;">&nbsp;Max Mark</th>
+                                <th style="width: 105px;">Pass Mark</th>
+                                <th style="width: 106px;">Theory Mark</th>
+                                <th style="width: 106px;">&nbsp;Lab Mark</th>
+                                <th style="width: 106px;">Percentage</th>
+                                <th style="width: 106px;">Grade</th>
+                            </tr>
+                            </thead>
+                        <tbody>
+                            @foreach (var data in Model.MarkAllocationVms.GroupBy(x => x.SubjectName))
+                            {
+                                <tr>
+                                    <td style="width: 105px;">@data.First().SubjectName</td>
+                                    <td style="width: 105px;">@data.First().MaxMarks</td>
+                                    <td style="width: 105px;">@data.First().PassMark</td>
+                                    <td style="width: 106px;">@data.First().AssignedMarks</td>
+                                    <td style="width: 106px;">@data.First().LabMarks</td>
+                                    <td style="width: 106px;">@data.First().Percentage</td>
+                                    <td style="width: 106px;">.@data.First().Grade</td>
+                                </tr>
+                            }
+                        </tbody>
+                        
+                    </table>
+                    <p>&nbsp;</p>
+                    <table style="height: 69px;" width="100%">
+                        <tbody>
+                            <tr>
+                                <td style="width: 180px;">Total Marks</td>
+                                <td style="width: 179px;">Mark Obtained</td>
+                                <td style="width: 179px;">Grade</td>
+                                <td style="width: 179px;">Percentage</td>
+                            </tr>
+                            <tr>
+                                <td style="width: 180px;">
+                                    @Model.MarkAllocationVms.GroupBy(x => x.SubjectName).Sum(x => x.First().MaxMarks);
+                                </td>
+                                <td style="width: 179px;">
+                                    @{
+                                        var totalTheory = Model.MarkAllocationVms.GroupBy(x=>x.SubjectName).Sum(x => x.First().AssignedMarks);
+                                        var totalLab = Model.MarkAllocationVms.GroupBy(x => x.SubjectName).Sum(x => x.First().LabMarks);
+                                        var netMarks = totalTheory + totalLab;
+                                }
+                                    @netMarks
+                                </td>
+                                <td style="width: 179px;">&nbsp;</td>
+                                <td style="width: 179px;">
+                                @{ 
+                                    var netPercentage = (netMarks / @Model.MarkAllocationVms.GroupBy(x => x.SubjectName).Sum(x => x.First().MaxMarks)) * 100;
+                                }
+                                    @netPercentage
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <p>&nbsp;</p>
+                    <p>&nbsp;</p>
+                    <p>&nbsp;</p>
+                    <p>&nbsp;</p>
+                    <p>signature of Principle&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;Signatutre of Class Teacher&nbsp; &nbsp; &nbsp; &nbsp;Parent Signature</p>
+                    <p>&nbsp;&nbsp;</p>
+                    <p>&nbsp;&nbsp;</p>
+                </div>
+
+
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <input type="button" class="btn btn-success" value="Print" onclick="Print()" />
+        </div>
+    </div>
+</section>
+
+<script>
+    function Print() {
+        html2canvas($('#divPrint')[0], {
+            onrendered: function (canvas) {
+                var data = canvas.toDataURL();
+                var docDefinition = {
+                    content: [{
+                        image: data,
+                        width: 500
+                    }]
+                };
+                pdfMake.createPdf(docDefinition).download("Markheet.pdf");
+            }
+        });
+    }
+</script>

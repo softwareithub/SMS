@@ -62,13 +62,13 @@
 
 <script type="text/javascript">
     function DeleteRecord(id, event) {
-        var geturl = "Course/GetCourseList";
-        var deleteUrl = "Course/DeleteCourse";
+        var geturl = "/Course/GetCourseList";
+        var deleteUrl = "/Course/DeleteCourse";
         CustomDeleteRecord(id, geturl, deleteUrl, event);
     }
     function UpdateRecord(id, event) {
         debugger;
-        var updateUrl = "Course/Index";
+        var updateUrl = "/Course/Index";
         UpdateCustomRecord(id, updateUrl, event);
     }
 </script>

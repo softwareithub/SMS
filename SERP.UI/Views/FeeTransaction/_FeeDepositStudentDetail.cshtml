@@ -1,0 +1,153 @@
+﻿@model IEnumerable<SERP.Core.Model.MasterViewModel.StudentPartialInfoViewModel>
+
+<link href="~/Custom/FancyTable.css" rel="stylesheet" />
+<link href="~/CustomCSS/SearchDropDown.css" rel="stylesheet" />
+
+<section class="content">
+    <div class="row">
+
+        <div class="col-md-12">
+            <!-- general form elements -->
+            <div class="box box-primary">
+                <div class="box-header with-border">
+                    <h3 class="box-title">Student Fee Bifurcation</h3>
+                </div>
+                <div class="overlay divHidding" id="divFormData">
+                    <i class="fa fa-refresh fa-spin">
+
+                    </i>
+                </div>
+
+                <div class="box-body">
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label>Course</label>
+                            <select id="FromCourse" class="form-control" asp-items="@(new SelectList(ViewBag.CourseList ,"Id","Name"))" onchange="GetBatchList()">
+                                <option value="">Select</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label>Batch</label>
+                            <select id="FromBatch" class="form-control" onchange="GetStudentList()">
+                                <option value="">Select</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label> Student</label>
+                            <select id="ddlStudent" class="fstdropdown-select form-control" onchange="GetFeeDetails()">
+                                <option value="0">Select</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-12">
+                        <div id="divFeeDetails"></div>
+                    </div>
+                    <div class="col-md-12">
+                        <div id="divFeeDeposit">
+
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        $("#tbldata").DataTable({
+            fixedHeader: true,
+            select: true,
+            responsive: true
+        });
+    })
+    function DeleteRecord(id) {
+        alertify.confirm("Are you sure want to delete the record ?", function () {
+            $.get("/Religion/DeleteReligion", { id: id }, function (response) {
+                alertify.alert("Record deleted successfully");
+            }).done(function () {
+                $.get("/Religion/GetReligionMaster", function (response) {
+                    $("#divPartialData").html(response);
+                }).done(function () {
+                    $("#tblDataList").DataTable({
+                        fixedHeader: true,
+                        select: true,
+                        responsive: true
+                    });
+                });
+            });
+        }, function () {
+            alertify.warning("you cancel the delete.");
+        });
+    }
+
+    function FeeDeposit(id) {
+        $.get("/FeeDeposit/FeeDeposit", { studentId: id }, function (response) {
+            $("#divPartialData").html(response);
+            $("#divModalPop").modal('show');
+        });
+    }
+
+    function PaymentHistory(id) {
+        $.get("/FeeDeposit/GetPaymentHistory", { studentId: id }, function (response) {
+            $("#divPartialData").html(response);
+            $("#divModalPop").modal('show');
+        });
+    }
+
+    function FeeReciept() {
+        $.get("/FeeDeposit/FeeReciept", function (response) {
+            $("#divPartialData").html(response);
+            $("#divModalPop").modal('show');
+        });
+    }
+
+    function GetBatchList() {
+        var courseId = $("#FromCourse option:selected").val();
+        $("#FromBatch").empty();
+        $("#FromBatch").append("<option value='0'>--Select--</option>")
+        $.get("/StudentMaster/GetBatchList", { courseId: courseId }, function (responseData) {
+            $.each(responseData, function (index, value) {
+                $('#FromBatch').append($('<option></option>').text(value.batchName).attr('value', value.id));
+            });
+        });
+    }
+
+    function GetStudentList() {
+        var courseId = $("#FromCourse option:selected").val();
+        var batchId = $("#FromBatch option:selected").val();
+        $("#ddlStudent").empty();
+        $.get("/StudentFeeDetail/GetStudentDetail", { courseId: courseId, batchId: batchId }, function (data) {
+            debugger;
+            for (var i = 0; i < data.length; i++) {
+
+                $("#ddlStudent").append("<option value=" + data[i].id + ">" + data[i].name + "</option>")
+            }
+        }).done(function () {
+            setFstDropdown();
+        });
+    }
+
+    function GetFeeDetails() {
+        var studentId = $("#ddlStudent").val();
+        $.get("/StudentFeeDetail/GetFeeDetail", { studentId: studentId }, function (data) {
+            $("#divFeeDetails").html(data);
+        })
+        FeeDeposit();
+    }
+    //FeeDeposit
+
+    function FeeDeposit() {
+        var studentId = $("#ddlStudent").val();
+        $.get("/FeeDeposit/FeeDeposit", { studentId: studentId }, function (data) {
+            $("#divFeeDeposit").html(data);
+        })
+    }
+
+
+</script>

@@ -61,7 +61,7 @@ namespace SERP.UI.Controllers.StudentTransaction
         public async Task<IActionResult> StudentAttendence(int courseId, int batchId, DateTime attendenceDate, string period)
         {
             HttpContext.Session.SetString("attendenceDate", attendenceDate.ToShortDateString());
-            HttpContext.Session.SetString("period", period);
+            HttpContext.Session.SetString("period", period?? "0");
 
             var studentPromoteModels = await _IStudentPromote.GetList(x => x.IsActive == 1 && x.IsDeleted == 0
              && x.CourseId == courseId && x.BatchId == batchId);

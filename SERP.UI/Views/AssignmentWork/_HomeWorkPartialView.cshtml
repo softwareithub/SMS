@@ -1,0 +1,228 @@
+﻿@{ Layout = null;}
+
+@model SERP.Core.Entities.HomeAssignment.HomeWorkModel
+<script src="~/lib/jquery-validation/dist/jquery.validate.js"></script>
+<script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.js"></script>
+<link href="https://cdn.datatables.net/1.10.20/css/jquery.dataTables.min.css" rel="stylesheet" />
+<script src="https://cdn.datatables.net/1.10.20/js/jquery.dataTables.min.js"></script>
+<script src="~/ckeditor/ckeditor.js"></script>
+<link href="~/ckeditor/colordialog/dialogs/colordialog.css" rel="stylesheet" />
+
+<section class="content-header">
+    <h1>
+        Create Home Work For Student
+        <small>Create Home Work</small>
+    </h1>
+    <ol class="breadcrumb">
+        <li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
+        <li><a href="#">Forms</a></li>
+        <li class="active">General Elements</li>
+    </ol>
+</section>
+
+
+<section class="content">
+    <div class="row">
+
+        <div class="col-md-12">
+            <!-- general form elements -->
+            <div class="box box-primary">
+                <div class="box-header with-border">
+                    <h3 class="box-title">Create Home Work </h3>
+                    <div class="col-md-12">
+                        <div class="col-md-10">
+                            <a class="btn btn-primary pull-right" onclick="GetNewRecordList()">
+                                <i class="fa fa-list-ul"></i>
+                            </a>
+                        </div>
+                        <div class="col-md-2">
+                            <a class="btn btn-primary pull-left" onclick="NewAcademicMaster()">
+                                <i class="fa fa-plus-square"></i>
+                            </a>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="overlay divHidding" id="divFormData">
+                    <i class="fa fa-refresh fa-spin">
+
+                    </i>
+                </div>
+                <form method="post" data-ajax="true" data-ajax-method="post"
+                      asp-action="Create" asp-controller="HomeWork" data-ajax-success="Success"
+                      data-ajax-begin="CustomFormSubmitBegin" data-ajax-complete="CustomFormSubmitComplete" enctype="multipart/form-data">
+                    <div class="box-body">
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <input type="hidden" asp-for="Id" />
+                                <input type="hidden" asp-for="CreatedBy" />
+                                <input type="hidden" asp-for="CreatedDate" />
+                                <label asp-for="Name">Home Work Name</label>
+                                <input asp-for="Name" class="form-control">
+                                <span asp-validation-for="Name" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label asp-for="CourseId">Select Course</label>
+                                <select id="CourseId" asp-for="CourseId" class="form-control" asp-items="@(new SelectList(ViewBag.CourseList ,"Id","Name"))" onchange="GetBatchList()">
+                                    <option value="">Select</option>
+                                </select>
+                                <span asp-validation-for="CourseId" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label asp-for="BatchId">Select Batch</label>
+                                <select id="BatchId" asp-for="BatchId" class="form-control">
+                                    <option value="">Select</option>
+                                </select>
+                                <span asp-validation-for="BatchId" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label asp-for="SubjectId">Select Subject</label>
+                                <select asp-for="SubjectId" class="form-control" onchange="GetTeacher()">
+                                    <option value="">Select</option>
+                                </select>
+                                <span asp-validation-for="SubjectId" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label asp-for="EmployeeId">Select Teacher</label>
+                                <select asp-for="EmployeeId" class="form-control">
+                                    <option value="">Select</option>
+                                </select>
+                                <span asp-validation-for="SubjectId" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label asp-for="HomeWorkDate">Home Work Date</label>
+                                <input asp-for="HomeWorkDate" class="form-control">
+                                <span asp-validation-for="HomeWorkDate" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label asp-for="HomeWorkSubmissionDate">Submission Date</label>
+                                <input asp-for="HomeWorkSubmissionDate" class="form-control">
+                                <span asp-validation-for="HomeWorkSubmissionDate" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label asp-for="PDFPath">Upload PDF </label>
+                                <input asp-for="PDFPath" type="file" onchange="PreviewImage()" class="form-control">
+                                <span asp-validation-for="PDFPath" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="col-md-12">
+                            <textarea asp-for="HomeWork" class="form-control ckeditor"></textarea>
+                        </div>
+                        <div class="col-md-12">
+                            @if (Model?.PDFPath != null)
+                            {
+                                <iframe id="viewer" src="@Model.PDFPath" frameborder="0" scrolling="no" width="700" height="600"></iframe>
+                            }
+                            else
+                            {
+                                <iframe id="viewer" frameborder="0" scrolling="no" width="700" height="600"></iframe>
+                            }
+
+                        </div>
+                    </div>
+                    <!-- /.box-body -->
+
+                    <div class="box-footer">
+                        <div class="col-md-8">
+                            @Html.SERPButton("btn btn-primary pull-right btnSubmit", Model == null ? 0 : Model.Id)
+                            <button class="buttonload" style="display:none">
+                                <i class="fa fa-refresh fa-spin"></i>Loading
+                            </button>
+                        </div>
+                        <div class="col-md-4">
+                            <button type="reset" class="btn btn-danger pull-left">Cancel</button>
+                        </div>
+
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        @await Html.PartialAsync("~/Views/Shared/_CommanModalPartial.cshtml")
+    </div>
+</section>
+
+<script>
+    $(document).ready(function () {
+        CKEDITOR.replace("HomeWork");
+        GetBatchList();
+        GetTeachers();
+    })
+
+    function GetNewRecordList() {
+        GetCustomRecord("/HomeWork/GetList");
+        setTimeout(function () {
+            $("#modalTitle").text("Home Work Details")
+        }, 300);
+    }
+
+    function NewAcademicMaster() {
+        var url = "/HomeWork/Index";
+        NewCustomRecord(url);
+    }
+
+    function GetBatchList() {
+        debugger;
+        var batchId = '@Model?.BatchId';
+        var courseId = $("#CourseId").val();
+        $("#BatchId").empty();
+        $("#BatchId").append('<option value="">Select</option>');
+        $.get("/CommanDataForJson/BatchJson", { courseId: courseId }, function (responseData) {
+            for (var i = 0; i < responseData.length; i++) {
+                var html = '<option value=' + responseData[i].id + '>' + responseData[i].batchName + '</option>';
+                $("#BatchId").append(html);
+            }
+            $("#BatchId").val(parseInt(batchId));
+        }).done(GetSubjectList());
+    }
+
+    function GetSubjectList() {
+        debugger;
+        var courseId = $("#CourseId").val();
+        var subjectId = '@Model?.SubjectId';
+        $("#SubjectId").empty()
+        $("#SubjectId").append('<option value="">Select</option>');
+        $.get("/CommanDataForJson/SubjectJson", { courseId: courseId }, function (responseData) {
+            for (var i = 0; i < responseData.length; i++) {
+                debugger;
+                var html = '<option value=' + responseData[i].id + '>' + responseData[i].subjectName + '</option>'
+                $("#SubjectId").append(html);
+            }
+            $("#SubjectId").val(parseInt(subjectId))
+        })
+    }
+
+    function PreviewImage() {
+        pdffile = document.getElementById("PDFPath").files[0];
+        pdffile_url = URL.createObjectURL(pdffile);
+        $('#viewer').attr('src', pdffile_url);
+    }
+
+    function GetTeachers() {
+        $("#EmployeeId").empty();
+        $("#EmployeeId").append("<option value='0'>Seelct</option>");
+        $.get("/HomeWork/GetTeachers", function (responseData) {
+            for (var i = 0; i < responseData.length; i++) {
+                debugger;
+                $("#EmployeeId").append("<option value=" + responseData[i].id+">" + responseData[i].name + "</option>")
+            }
+        })
+    }
+
+</script>
+

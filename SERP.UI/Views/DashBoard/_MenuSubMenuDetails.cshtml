@@ -1,0 +1,62 @@
+﻿
+@model IEnumerable<SERP.Core.Model.UserManagement.MenuSubMenuVm>
+@foreach (var data in Model.GroupBy(x => x.ModuleName))
+{
+    <div class="col-md-6">
+        <div class="box collapsed-box">
+            <div class="box-header with-border">
+                <h3 class="box-title">@data.Key</h3>
+
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse">
+                        <i class="fa fa-plus"></i>
+                    </button>
+                    <div class="btn-group">
+                        <button type="button" class="btn btn-box-tool dropdown-toggle" data-toggle="dropdown">
+                            <i class="fa fa-database"></i>
+                        </button>
+                        <ul class="dropdown-menu" role="menu">
+                            <li><a href="#">What is this ?</a></li>
+                            <li><a href="#">About @data.Key Management </a></li>
+                            <li class="divider"></li>
+                            <li><a href="#">Know more.</a></li>
+                        </ul>
+                    </div>
+                    <button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
+                </div>
+            </div>
+            <div class="box-body" style="">
+                <div class="row">
+                    @foreach (var item in data)
+                    {
+
+                        <div class="col-lg-3 col-xs-6 col-md-3">
+                            <div class="small-box bg-yellow">
+                                <div class="inner">
+                                    <h3> <i class="@item.SubModuleClass"></i></h3>
+                                </div>
+
+                                <a onclick="GetMenuDescription('@item.SubModuleName')" class="small-box-footer">@item.SubModuleName <i class="fa fa-arrow-circle-right"></i></a>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+            <div class="box-footer" style="">
+            </div>
+        </div>
+    </div>
+
+}
+@await Html.PartialAsync("~/Views/Shared/_CommanModalPartial.cshtml")
+
+<script>
+    function GetMenuDescription(subModuleName) {
+        $("#modalTitle").text("How to Use " + subModuleName + "?");
+        $.get("/DashBoardMaster/GetMenuDescription", function (data) {
+            $("#divPartialData").html(data);
+            $("#divModalPop").modal('show');
+        })
+        
+    }
+</script>

@@ -41,10 +41,12 @@ namespace SERP.UI
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
+                app.UseStatusCodePages();
             }
             else
             {
                 app.UseExceptionHandler("/Home/Error");
+                app.UseStatusCodePages();
             }
             app.UseStaticFiles();
 
@@ -60,7 +62,7 @@ namespace SERP.UI
             {
                 endpoints.MapControllerRoute(
                     name: "default",
-                    pattern: "{controller=Home}/{action=Index}/{id?}");
+                    pattern: "{controller=Authenticate}/{action=Login}/{id?}");
             });
         }
     }

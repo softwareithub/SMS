@@ -9,5 +9,7 @@ namespace SERP.Infrastructure.Repository.Infrastructure.Repo
     public interface IFeeDetailRepo
     {
         Task<List<StudentFeeDetailVm>> GetFeeDetailRepo(int studentId);
+
+        Task<List<FeeDepositVm>> GetPaymentHistory(int studentId);
     }
 }

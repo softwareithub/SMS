@@ -17,15 +17,32 @@ namespace SERP.Utilities.BlobUtility
             {
                 try
                 {
-                    if (file.Length > 0)
+                    if(file!=null)
                     {
-                        var upload = Path.Combine(_hostingEnvironment.WebRootPath, "Images//");
-                        using (FileStream fs = new FileStream(Path.Combine(upload, file.FileName), FileMode.Create))
+                        if (file.Length > 0)
                         {
-                            await file.CopyToAsync(fs);
+                            if(file.ContentType== "video/mp4")
+                            {
+                                var upload = Path.Combine(@"D:/VMVideo/", "Tutorial//");
+                                using (FileStream fs = new FileStream(Path.Combine(upload, file.FileName), FileMode.Create))
+                                {
+                                    await file.CopyToAsync(fs);
+                                }
+                                imageStoragePaths.Add("D:/VMVideo/Tutorial/" + file.FileName);
+                            }
+                            else
+                            {
+                                var upload = Path.Combine(_hostingEnvironment.WebRootPath, "Images//");
+                                using (FileStream fs = new FileStream(Path.Combine(upload, file.FileName), FileMode.Create))
+                                {
+                                    await file.CopyToAsync(fs);
+                                }
+                                imageStoragePaths.Add("Images//" + file.FileName);
+                            }
+
                         }
-                        imageStoragePaths.Add("Images//" + file.FileName);
                     }
+
                 }
                 catch (Exception ex)
                 {

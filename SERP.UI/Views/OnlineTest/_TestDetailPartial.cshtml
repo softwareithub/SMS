@@ -1,0 +1,86 @@
+﻿@model IEnumerable<SERP.Core.Entities.OnlineTest.TestMaster>
+
+<section class="content">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="row">
+                <div class="col-md-12">
+                    <table id="tblDataList" class="table-responsive-md table-striped table-bordered" style="width:100%">
+                        <thead>
+                            <tr>
+                                <th>Test Name</th>
+                                <th>Regulation</th>
+                                <th>Test Time Limit</th>
+                                <th>No.Of Question</th>
+                                <th>
+                                    Action
+                                </th>
+
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var data in Model)
+                            {
+                                <tr>
+                                    <td>
+                                        @data.TestName
+                                    </td>
+                                    <td>
+                                        @Html.Raw(data.Regulation)
+                                    </td>
+                                    <td>
+                                        @data.TestTimeLimit
+                                    </td>
+                                    <td>
+                                        @data.NoOfQuestion
+                                    </td>
+                                    <td>
+                                        <a class="btn btn-outline-success pull-right" data-loading-text="<i class='fa fa-circle-o-notch fa-spin'  style='color:#DD4B39'></i>" onclick="EditBatch(@data.Id, this)">
+                                            <i class="fa fa-edit" style="color:#3C8DBC"></i>
+                                        </a>
+                                        <a class="btn btn-outline-danger pull-right" data-loading-text="<i class='fa fa-circle-o-notch fa-spin'  style='color:#DD4B39'></i>" onclick="DeleteBatch(@data.Id, this)">
+                                            <i class="fa fa-trash" style="color:#DD4B39"></i>
+
+                                        </a>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script type="text/javascript">
+    function DeleteBatch(id) {
+        alertify.confirm("Are you sure want to delete the record ?", function () {
+            $.get("/TestMaster/DeleteTest", { id: id }, function (response) {
+                alertify.alert("Record deleted successfully");
+            }).done(function () {
+                $.get("/TestMaster/GetTestDetails", function (response) {
+                    $("#divPartialData").html(response);
+                }).done(function () {
+                    $("#tblDataList").DataTable({
+                        fixedHeader: true,
+                        select: true,
+                        responsive: true
+                    });
+                });
+            });
+        }, function () {
+            alertify.warning("you cancel the delete.");
+        });
+    }
+
+    function EditBatch(id) {
+        $.get("/TestMaster/Index", { id: id }, function (response) {
+            $("#divSERP").html(response);
+            $("#divModalPop").modal('hide');
+
+            $('.modal-backdrop').remove();
+        });
+    }
+</script>

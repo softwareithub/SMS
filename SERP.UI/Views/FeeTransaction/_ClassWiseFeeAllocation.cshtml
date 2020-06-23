@@ -39,7 +39,7 @@
                                 <i class="fa fa-info-circle" data-toggle="popover" data-placement="top"
                                    data-content="You can select multiple class for Fee Allocation"></i>
                             </label>
-                            <select id="modal-example" name="inventors" multiple class="form-control">
+                            <select id="modal-example" class="form-control" onchange="GetParticular()">
                                 @foreach (var data in (IEnumerable<SERP.Core.Entities.Entity.Core.Master.CourseMaster>)ViewBag.CourseList)
                                 {
                                     var mapped = string.Empty;
@@ -54,9 +54,6 @@
                         </div>
                     </div>
 
-                    <div class="col-md-8">
-                        <input type="button" class="btn btn-primary pull-right" onclick="GetParticular()" value="Get Fee Particular" />
-                    </div>
                     <div class="col-md-12">
                         <div id="_divFeeData">
                         </div>

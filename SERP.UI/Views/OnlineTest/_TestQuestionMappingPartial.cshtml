@@ -1,0 +1,181 @@
+﻿@{
+    ViewData["Title"] = "Index";
+    Layout = null;
+
+}
+@model IEnumerable<SERP.Core.Model.ExamModel.TestQuestionModel>
+<script src="~/lib/jquery-validation/dist/jquery.validate.js"></script>
+<script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.js"></script>
+<link href="https://cdn.datatables.net/1.10.20/css/jquery.dataTables.min.css" rel="stylesheet" />
+<script src="https://cdn.datatables.net/1.10.20/js/jquery.dataTables.min.js"></script>
+<script src="~/ckeditor/ckeditor.js"></script>
+<section class="content-header">
+    <h1>
+        Test Question Bank
+        <small>Mapped Question To Test</small>
+    </h1>
+    <ol class="breadcrumb">
+        <li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
+        <li><a href="#">Forms</a></li>
+        <li class="active">General Elements</li>
+    </ol>
+</section>
+
+
+<section class="content">
+    <div class="row">
+
+        <div class="col-md-12">
+            <!-- general form elements -->
+            <div class="box box-primary">
+                <div class="box-header with-border">
+                    <h3 class="box-title">Mapped Test Question</h3>
+                    <div class="col-md-12">
+                        <div class="col-md-10">
+                            <a class="btn btn-primary pull-right" onclick="GetNewRecordList()">
+                                <i class="fa fa-list-ul"></i>
+                            </a>
+                        </div>
+                        <div class="col-md-2">
+                            <a class="btn btn-primary pull-left" onclick="NewAcademicMaster()">
+                                <i class="fa fa-plus-square"></i>
+                            </a>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="overlay divHidding" id="divFormData">
+                    <i class="fa fa-refresh fa-spin">
+
+                    </i>
+                </div>
+                <form method="post" data-ajax="true" data-ajax-method="post"
+                      asp-action="CreateQuestion" asp-controller="TestQuestionMapping" data-ajax-success="Success"
+                      data-ajax-begin="CustomFormSubmitBegin" data-ajax-complete="CustomFormSubmitComplete">
+                    <div class="box-body">
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label >Select Test</label>
+                                <select class="form-control" name="TestId"  asp-items="@(new SelectList(ViewBag.TestDetail ,"Id","TestName"))" onchange="GetQuestionDetails()">
+                                    <option value="0">Select</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-12">
+                            <table class="table table-responsive" id="tblQuestionDetail">
+                                <thead>
+                                    <tr>
+                                        <th>
+                                            Select 
+                                        </th>
+                                        <th>
+                                            Course
+                                        </th>
+                                        <th>
+                                            Subject
+                                        </th>
+                                        <th>
+                                            Question
+                                        </th>
+                                        <th>
+                                            Marks
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach(var data in Model)
+                                    {
+                                        <tr>
+                                            <td>
+                                                <input type="checkbox" name="QuestionId" value="@data.QuestionId" />
+                                            </td>
+                                            <td>
+                                                @data.CourseName
+                                            </td>
+                                            <td>
+                                                @data.SubjectName
+                                            </td>
+                                            <td>
+                                                <label>@Html.Raw(data.Question) </label>
+                                            </td>
+                                            <td>
+                                                <input type="number" name="questionMark" value="@data.QuestionPoint" class="form-control"/>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    
+
+                    <div class="box-footer">
+                        <div class="col-md-8">
+                            @Html.SERPButton("btn btn-primary pull-right btnSubmit", Model == null ? 0 : Model.First().TestId)
+                            <button class="buttonload" style="display:none">
+                                <i class="fa fa-refresh fa-spin"></i>Loading
+                            </button>
+                        </div>
+                        <div class="col-md-4">
+                            <button type="reset" class="btn btn-danger pull-left">Cancel</button>
+                        </div>
+
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        @await Html.PartialAsync("~/Views/Shared/_CommanModalPartial.cshtml")
+
+    </div>
+</section>
+
+<script>
+
+    function GetNewRecordList() {
+        GetCustomRecord("/OnlineTest/GetList");
+        setTimeout(function () {
+            $("#modalTitle").text("Question Details")
+        }, 300);
+    }
+    function NewAcademicMaster() {
+        var url = "/OnlineTest/Index";
+        NewCustomRecord(url);
+    }
+
+    $(document).ready(function () {
+        CKEDITOR.replace("QuestionModel_Question");
+    })
+
+    function CheckThis(eData) {
+        debugger;
+        $('input:checkbox').removeAttr('checked');
+
+    }
+        function GetSubjectList() {
+        debugger;
+        var courseId = $("#CourseId").val();
+        $("#SubjectId").empty()
+        $("#SubjectId").append('<option value="0">Select</option>');
+        $.get("/CommanDataForJson/SubjectJson", { courseId: courseId }, function (responseData) {
+            for (var i = 0; i < responseData.length; i++) {
+                debugger;
+                var html = '<option value=' + responseData[i].id + '>' + responseData[i].subjectName + '</option>'
+                $("#SubjectId").append(html);
+            }
+        })
+    }
+    function IsMultipleChoise() {
+        var isValue = $("#ddlMultiple").val();
+        if (isValue == 1) {
+            $("#divMultipleChoice").removeAttr('style');
+        }
+        else {
+            $("#divMultipleChoice").attr('style',"display:none");
+        }
+    }
+    $(document).ready(function () {
+        $("#tblQuestionDetail").DataTable();
+    });
+</script>
+

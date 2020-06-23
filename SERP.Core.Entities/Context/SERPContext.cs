@@ -7,16 +7,22 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using SERP.Core.Entities.StudentTransaction;
+using SERP.Core.Entities.Entity.Core.ExamDetail;
+using SERP.Core.Entities.HomeAssignment;
+using SERP.Core.Entities.LibraryManagement;
+using SERP.Core.Entities.UserManagement;
+using SERP.Core.Entities.LessionMaster;
+using SERP.Core.Entities.OnlineTest;
+using SERP.Core.Entities.OnlineVideo;
 
 namespace SERP.Core.Entities.Context
 {
-    //test
-    //test2
+
     public class SERPContext : DbContext
     {
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseSqlServer("Server= DESKTOP-SF1G3N8\\VIPRAIT; Database= SERP; User Id=sa;Password = vi@pra91");
+            optionsBuilder.UseSqlServer("Server= DESKTOP-SF1G3N8\\VIPRAIT; Database= SERDevelopment; User Id=sa;Password = vi@pra91");
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -24,6 +30,8 @@ namespace SERP.Core.Entities.Context
             modelBuilder.Entity<ReligionMaster>().Property(r => r.IsActive).HasDefaultValue(1);
         }
 
+
+        #region
         public DbSet<AcademicMaster> AcademicMasters { get; set; }
         public DbSet<InstituteMaster> InstituteMaster { get; set; }
         public DbSet<CourseMaster> CourseMaster { get; set; }
@@ -49,6 +57,34 @@ namespace SERP.Core.Entities.Context
         public DbSet<TimeTableMasterModel> TimeTableMasterModels { get; set; }
         public DbSet<TimeTableAssignSubjTeacherModel> TimeTableAssignSubjTeacherModels { get; set; }
         public DbSet<StudentAttendenceModel> StudentAttendenceModels { get; set; }
+        public DbSet<FeeDeposit> FeeDeposits { get; set; }
+        public DbSet<StudentFeeDepositParticular> StudentFeeDepositParticulars { get; set; }
+        public DbSet<Exam> ExamMasters { get; set; }
+        public DbSet<ExamSheet> ExamSheets { get; set; }
+        public DbSet<AssignmentModel> Assignments { get; set; }
+        public DbSet<GradeMaster> GradeMasters { get; set; }
+        public DbSet<StudentMarkAllocation> StudentMarkAllocations { get; set; }
+        public DbSet<BookMasterModel> BookMasterModels { get; set; }
+        public DbSet<Authenticate> AuthenticateModels { get; set; }
+        public DbSet<LessonMaster> LessonMasters { get; set; }
+        public DbSet<LessonTopicMapping> LessonTopicMappings { get; set; }
+        public DbSet<ModuleMaster> ModuleMasters { get; set; }
+        public DbSet<SubModuleMaster> SubModules { get; set; }
+        public DbSet<UserAccessRight> UserRights { get; set; }
+        public DbSet<GuardianMaster> GurdianMasters { get; set; }
+        public DbSet<SMSTemplateModel> SMSTemplateModels { get; set; }
+        public DbSet<SMSBulk> SMSBulks { get; set; }
+        public DbSet<HomeWorkModel> HomeWorkModels { get; set; }
+        public DbSet<StudentHomeWork> StudentHomeWorks { get; set; }
+        public DbSet<StudyMaterial> StudyMaterials { get; set; }
+        public DbSet<AcademicCalender> AcademicCalenders { get; set; }
+        public DbSet<ExamUpdate> ExamUpdates { get; set; }
+        public DbSet<QuestionModel> QuestionModels { get; set; }
+        public DbSet<OptionMaster> OptionMasters { get; set; }
+        public DbSet<TestMaster> TestMasters { get; set; }
+        public DbSet<TestQuestionMapping> TestQuestionMappings { get; set; }
+        public DbSet<OnlineVideoFeeDetail> OnlineVideoFeeDetails { get; set; }
+        #endregion
 
     }
 }

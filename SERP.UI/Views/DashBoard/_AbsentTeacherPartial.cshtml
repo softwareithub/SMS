@@ -1,0 +1,54 @@
+﻿@model IEnumerable<SERP.Core.Model.DashBoardModel.TeacherAbsentModel>
+    <div class="box box-danger">
+        <div class="box-header with-border">
+            <h3 class="box-title">Absent Teacher For The Day</h3>
+
+            <div class="box-tools pull-right">
+                <span class="label label-danger">@Model.Count() "Employee Absent Today"</span>
+                <button type="button" class="btn btn-box-tool" data-widget="collapse">
+                    <i class="fa fa-minus"></i>
+                </button>
+                <button type="button" class="btn btn-box-tool" data-widget="remove">
+                    <i class="fa fa-times"></i>
+                </button>
+            </div>
+        </div>
+        <!-- /.box-header -->
+        <div class="box-body no-padding">
+            <ul class="users-list clearfix">
+                @foreach (var data in Model)
+                {
+                    <li>
+                        @Html.SerpImageHelper(data.Photo, 30, 30, "imageId")
+                        <a class="users-list-name" href="#">@data.EmployeeName (@data.EmployeeCode)</a>
+                        <span class="users-list-date">@data.CourseName (@data.BatchName)</span>
+                        <span class="users-list-date">@data.PeriodName (@data.FromTime - @data.ToTime)</span>
+                        @*<a onclick="AssignTeacher(@prd.TimeTableId,'@prd.FromTime','@prd.ToTime')">Assign</a>*@
+                    </li>
+                }
+
+            </ul>
+        </div>
+        @await Html.PartialAsync("~/Views/Shared/_CommanModalPartial.cshtml")
+    </div>
+
+
+<script>
+    function AssignTeacher(id, fromTime, toTime) {
+        $("#loading").removeAttr('style');
+        $.get("/TimeTable/AssignEmployee", { timeTableId: id, fromTime: fromTime, toTime: toTime }, function (response) {
+            $("#divPartialData").html(response);
+            $("#divModalPop").modal('show');
+            $("#modalTitle").html("Assign Employee For this class.")
+            setTimeout(function () {
+                $("#tblDataList").DataTable({
+                    fixedHeader: true,
+                    select: true,
+                    responsive: true
+                });
+            }, 300)
+        }).done(function () {
+            $("#loading").attr('style', 'display:none');
+        });
+    }
+</script>

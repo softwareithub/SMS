@@ -2,70 +2,144 @@
     ViewData["Title"] = "Home Page";
 
 }
+@using System.Globalization;
 
-<style>
-    .flip-card {
-        background-color: transparent;
-        width: 300px;
-        height: 200px;
-        border: 1px solid #f1f1f1;
-        perspective: 1000px; /* Remove this if you don't want the 3D effect */
-    }
+<script src="https://www.gstatic.com/charts/loader.js"></script>
 
-    /* This container is needed to position the front and back side */
-    .flip-card-inner {
-        position: relative;
-        width: 100%;
-        height: 100%;
-        text-align: center;
-        transition: transform 0.8s;
-        transform-style: preserve-3d;
-    }
+<div class="row">
+    @await Html.PartialAsync("~/Views/DashBoard/_DashBoardInfoHeaderPartial.cshtml")
+    <div class="row">
+        <div class="col-md-12">
+            <div id="divModuleDetails">
 
-    /* Do an horizontal flip when you move the mouse over the flip box container */
-    .flip-card:hover .flip-card-inner {
-        transform: rotateY(180deg);
-    }
-
-    /* Position the front and back side */
-    .flip-card-front, .flip-card-back {
-        position: absolute;
-        width: 100%;
-        height: 100%;
-        backface-visibility: hidden;
-    }
-
-    /* Style the front side (fallback if image is missing) */
-    .flip-card-front {
-        background-color: #bbb;
-        color: black;
-    }
-
-    /* Style the back side */
-    .flip-card-back {
-        background-color: dodgerblue;
-        color: white;
-        transform: rotateY(180deg);
-    }
-</style>
-    <section class="content">
-        <div class="row">
-            <div class="col-md-12">
-                <div class="col-md-4">
-                    <div class="flip-card">
-                        <div class="flip-card-inner">
-                            <div class="flip-card-front">
-                                <img src="~/Images/MenuImage/StudentPng.png" alt="Avatar" style="width:180px;height:200px;">
-                            </div>
-                            <div class="flip-card-back">
-                                
-                                    <h1>Student Create</h1>
-                                    <p>Create Student Admission</p>
-                             
-                            </div>
-                        </div>
-                    </div>
-                </div>
             </div>
         </div>
-    </section>
+        <div class="col-md-12">
+            <div class="col-md-6">
+
+                <div class="box box-info">
+                    <div class="box-header with-border">
+                        <h3 class="box-title">Class Wise Strength</h3>
+
+                        <div class="box-tools pull-right">
+                            <button type="button" class="btn btn-box-tool" data-widget="collapse">
+                                <i class="fa fa-minus"></i>
+                            </button>
+                            <button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
+                        </div>
+                    </div>
+                    <div class="box-body">
+                        @await Html.PartialAsync("~/Views/DashBoard/_CourseBatchCountPartial.cshtml")
+                    </div>
+
+                </div>
+
+
+            </div>
+            <div class="col-md-6">
+                <div class="box box-info">
+                    <div class="box-header with-border">
+                        <h3 class="box-title">Today Strength </h3>
+
+                        <div class="box-tools pull-right">
+                            <button type="button" class="btn btn-box-tool" data-widget="collapse">
+                                <i class="fa fa-minus"></i>
+                            </button>
+                            <button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
+                        </div>
+                    </div>
+                    <div class="box-body">
+
+                        @await Html.PartialAsync("~/Views/DashBoard/StudentAttendenceRepo.cshtml")
+                    </div>
+
+                </div>
+
+            </div>
+            <div class="col-md-6">
+                <div class="box box-info">
+                    <div class="box-header with-border">
+                        <h3 class="box-title">Student Strength Month Wise</h3>
+
+                        <div class="box-tools pull-right">
+                            <button type="button" class="btn btn-box-tool" data-widget="collapse">
+                                <i class="fa fa-minus"></i>
+                            </button>
+                            <button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
+                        </div>
+                    </div>
+                    <div class="box-body">
+                        <div class="col-md-12">
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label class="form-control-label">Year</label>
+                                    <select class="form-control" id="ddlYear">
+                                        <option value="0">Select</option>
+                                        <option value="2020">2020</option>
+                                        <option value="2021">2021</option>
+                                        <option value="2022">2022</option>
+                                    </select>
+                                </div>
+
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label class="form-control-label">Month</label>
+                                    <select class="form-control" id="ddlMonth" onchange="GetStudentDetailsMonthWise()">
+                                        <option>Select</option>
+                                        @for (int i = 0; i < 12; i++)
+                                        {
+                                            string monthName = CultureInfo.CurrentUICulture.DateTimeFormat.MonthNames[i];
+                                            <option value="@i">@monthName</option>
+                                        }
+
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label class="form-control-label">Day</label>
+                                    <select class="form-control" id="ddlDay">
+                                        <option>Select</option>
+                                        @for (int i = 0; i < 12; i++)
+                                        {
+                                            string monthName = CultureInfo.CurrentUICulture.DateTimeFormat.MonthNames[i];
+                                            <option value="@i">@monthName</option>
+                                        }
+
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        @await Html.PartialAsync("~/Views/DashBoard/_ClassWiseAttendence.cshtml")
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="col-md-6">
+                <!-- USERS LIST -->
+                @await Component.InvokeAsync("AbsentTeacher", DateTime.Now.Date)
+                <!--/.box -->
+            </div>
+
+            <div class="col-md-6">
+                <!-- USERS LIST -->
+                @await Component.InvokeAsync("NewPortal", DateTime.Now.Date)
+                <!--/.box -->
+            </div>
+            <div class="col-md-12">
+                <a href="https://gps-coordinates.org/my-location.php?lat=28.4803455&lng=77.5275351" target="_blank">(28.4803455,77.5275351)</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function () {
+        $.get("/DashBoardMaster/MenuSubMenuDetails", function (response) {
+            $("#divModuleDetails").html(response)
+        })
+    })
+</script>

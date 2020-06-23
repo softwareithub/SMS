@@ -1,0 +1,53 @@
+﻿
+<section class="content">
+    <div class="row">
+
+        <div class="col-md-12">
+            
+            <div id="ClassWiseStudentStrength"></div>
+        </div>
+    </div>
+</section>
+<script>
+
+
+    var StudentClassWisedata;
+    var StudentClassWisechart;
+    $(document).ready(function () {
+        google.charts.load('current', { 'packages': ['bar'] });
+        google.charts.setOnLoadCallback(drawStudentClassWise);
+    });
+   
+
+    function drawStudentClassWise() {
+
+        StudentClassWisedata = new google.visualization.DataTable();
+        StudentClassWisedata.addColumn('string', 'ClassBatch');
+        StudentClassWisedata.addColumn('number', 'Present');
+        StudentClassWisedata.addColumn('number', 'Absent');
+
+        $.get("/DashBoardMaster/StudentAttendeceReportMonthDayWise", { year: 0, month: 0, day: 0 }, function (responseData) {
+            for (var i = 0; i < responseData.length; i++) {
+                debugger;
+                StudentClassWisedata.addRow([responseData[i].courseBatchName, responseData[i].presentCount, responseData[i].absentCount]);
+            }
+        })
+
+        var options = {
+            bars: 'vertical',
+            vAxis: { format: 'decimal' },
+            height: 400,
+            colors: ['#1b9e77', '#d95f02', '#7570b3']
+        };
+
+        var StudentClassWisechart = new google.charts.Bar(document.getElementById('ClassWiseStudentStrength'));
+
+        StudentClassWisechart.draw(StudentClassWisedata, google.charts.Bar.convertOptions(options));
+    }
+
+    function GetStudentDetailsMonthWise() {
+        var year = $("#ddlYear").val();
+        var month = $("#ddlMonth").val();
+        var day = $("#ddlDay").val();
+    }
+</script>

@@ -1,0 +1,124 @@
+﻿@model IEnumerable<SERP.Core.Model.AssignmentHomeModel.AssignmentModel>
+
+    <section class="content">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="row">
+                    <div class="col-md-12">
+                        <table id="tblDataList" class="table-responsive-md table-striped table-bordered" style="width:100%">
+                            <thead>
+                                <tr>
+                                    <th>Course Name</th>
+                                    <th>Batch Name</th>
+                                    <th>Subject Name</th>
+
+                                    <th>Assignment Name</th>
+                                    <th>Publish Date</th>
+                                    <th>Submission Date</th>
+                                    <th>Assignment</th>
+                                    <th>PDF</th>
+                                    <th>
+                                        Action
+                                    </th>
+
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var data in Model)
+                                {
+                                    <tr>
+                                        <td>
+                                            @data.CourseName
+                                        </td>
+                                        <td>
+                                            @data.BatchName
+                                        </td>
+                                        <td>
+                                            @data.SubjectName
+                                        </td>
+                                        <td>
+                                            @data.AssignmentName
+                                        </td>
+                                        <td>
+                                            @data.PublishDate
+                                        </td>
+                                        <td>
+                                            @data.SubmissionDate
+                                        </td>
+                                        <td>
+                                            <a onclick="showAssign(@data.AssignmentId)">
+                                                <i class="fa fa-table"></i>
+                                            </a>
+                                        </td>
+                                        <td>
+                                          
+                                            <a  onclick="ShowPDF('@data.PDFPath')" >
+                                                <i class="fa fa-file-pdf-o"></i>
+                                            </a>
+                                            <a href="@data.PDFPath" target="_blank">Show</a>
+
+                                        </td>
+                                        <td>
+                                            <a class="btn btn-outline-success pull-right"
+                                               data-loading-text="<i class='fa fa-circle-o-notch fa-spin'  style='color:#DD4B39'></i>" 
+                                               onclick="UpdateRecord(@data.AssignmentId, this)">
+                                                <i class="fa fa-edit" style="color:#3C8DBC"></i>
+                                            </a>
+                                            <a class="btn btn-outline-danger pull-right" 
+                                               data-loading-text="<i class='fa fa-circle-o-notch fa-spin'  style='color:#DD4B39'></i>"
+                                               onclick="DeleteRecord(@data.AssignmentId, this)">
+                                                <i class="fa fa-trash" style="color:#DD4B39"></i>
+
+                                            </a>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div>
+            <iframe id="pdfFrame" style="height:100%; width:100%"></iframe>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="panel-primary">
+                    <div class="panel-heading">Assignment Details</div>
+                    <div class="panel-body">
+                        <div id="assignment">
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </section>
+<script>
+    function ShowPDF(pdfSrc) {
+        $("#pdfFrame").attr('src', pdfSrc);
+    }
+    function showAssign(id) {
+        debugger;
+        $.get("/AssignmentMaster/GetAssignDetails", { id: id }, function (responseData) {
+            debugger;
+            var response = jQuery.parseHTML(responseData);
+            $("#assignment").html(response);
+        })
+    }
+
+    function DeleteRecord(id, event) {
+        var geturl = "/SubjectMaster/GetSubjectDatList";
+        var deleteUrl = "/SubjectMaster/DeleteSubject";
+        CustomDeleteRecord(id, geturl, deleteUrl, event);
+    }
+    function UpdateRecord(id, event) {
+        debugger;
+        var updateUrl = "/AssignmentMaster/Index";
+        UpdateCustomRecord(id, updateUrl, event);
+    }
+</script>
+

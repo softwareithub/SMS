@@ -46,7 +46,7 @@
                 <div class="nav-tabs-custom">
                     <ul class="nav nav-tabs">
                         <li class="active"><a href="#tab_1" data-toggle="tab" aria-expanded="false">Basic Information</a></li>
-                        <li><a onclick="GetQualification()" data-toggle="tab" aria-expanded="false">Qualification Info</a></li>
+                        @*<li><a onclick="GetQualification()" data-toggle="tab" aria-expanded="false">Qualification Info</a></li>*@
                         <li><a href="#tab_3" onclick="GetSalary()" data-toggle="tab" aria-expanded="true">Employee Salary</a></li>
 
 
@@ -84,7 +84,7 @@
         GetBasicInfo(0);
     });
     function GetBasicInfo(id) {
-        $.get("Employee/BasicInfo", { id: id }, function (responseData) {
+        $.get("/Employee/BasicInfo", { id: id }, function (responseData) {
             debugger;
             $("#tab_1").html(responseData);
             $("#tab_1").addClass('active');
@@ -101,7 +101,7 @@
     function GetSalary() {
         debugger
         if (sessionStorage.getItem("employeeId") != null) {
-            $.get("Employee/EmployeeSalary", { id: sessionStorage.getItem("employeeId") }, function (responseData) {
+            $.get("/Employee/EmployeeSalary", { id: sessionStorage.getItem("employeeId") }, function (responseData) {
                 debugger;
                 $("#tab_1").removeClass('active');
                 $("#tab_2").removeClass('active');

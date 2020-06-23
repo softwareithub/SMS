@@ -49,10 +49,14 @@ namespace Helpers
             using (SqlCommand cmd = new SqlCommand(commandText, conn))
             {
                 cmd.CommandType = commandType;
-                if (parameters.Length > 0)
+                if(parameters!= null)
                 {
-                    cmd.Parameters.AddRange(parameters);
+                    if (parameters.Length > 0)
+                    {
+                        cmd.Parameters.AddRange(parameters);
+                    }
                 }
+
                 conn.Open();
                 // When using CommandBehavior.CloseConnection, the connection will be closed when the 
                 // IDataReader is closed.

@@ -1,0 +1,136 @@
+﻿<script src="~/lib/jquery-validation/dist/jquery.validate.js"></script>
+<script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.js"></script>
+<link href="https://cdn.datatables.net/1.10.20/css/jquery.dataTables.min.css" rel="stylesheet" />
+<script src="https://cdn.datatables.net/1.10.20/js/jquery.dataTables.min.js"></script>
+
+<section class="content-header">
+    <h1>
+        Student Mark Allocation
+        <small>Create Student Mark Allocation</small>
+    </h1>
+    <ol class="breadcrumb">
+        <li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
+        <li><a href="#">Forms</a></li>
+        <li class="active">General Elements</li>
+    </ol>
+</section>
+
+
+<section class="content">
+    <div class="row">
+
+        <div class="col-md-12">
+            <!-- general form elements -->
+            <div class="box box-primary">
+                <div class="box-header with-border">
+                    <h3 class="box-title">Create Student Mark Allocation</h3>
+
+                </div>
+                <!-- /.box-header -->
+                <!-- form start -->
+
+                <div class="box-body">
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label>Exam </label>
+                            <select id="ExamId" class="form-control" asp-items="@(new SelectList(ViewBag.ExamList ,"Id","ExamName"))" onchange="GetBatchList()">
+                                <option value="">Select</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label>Course Name</label>
+                            <select id="CourseId" class="form-control" asp-items="@(new SelectList(ViewBag.CourseList ,"Id","Name"))" onchange="GetBatchList()">
+                                <option value="">Select</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label>Batch Name</label>
+                            <select id="BatchId" class="form-control" onchange="GetStudentList()">
+                                <option value="">Select</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label>Subject</label>
+                            <select id="subbjectId" class="form-control">
+                                <option value="">Select</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-12">
+                        <div class="col-md-8">
+                            <button class="btn btn-primary pull-right" onclick="AllocateMarks()">Allocate Marks</button>
+                        </div>
+                        <div class="col-md-4">
+                            <button type="reset" class="btn btn-danger pull-left">Cancel</button>
+                        </div>
+                    </div>
+
+                    <div class="col-md-12">
+
+                        <form method="post" data-ajax="true" data-ajax-method="post"
+                              asp-action="AllocateStudentMark" asp-controller="StudentMarkAllocation" data-ajax-success="Success"
+                              data-ajax-begin="CustomFormSubmitBegin" data-ajax-complete="CustomFormSubmitComplete">
+                            <div class="col-md-12">
+                                <div id="AttendenceDiv">
+                                </div>
+                                <input type="submit" id="btnMarkAllocation" style="display:none" class="btn btn-success" value="AllocateMarks" />
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <!-- /.box-body -->
+
+            <div class="box-footer">
+
+
+            </div>
+
+        </div>
+    </div>
+    @await Html.PartialAsync("~/Views/Shared/_CommanModalPartial.cshtml")
+
+
+</section>
+
+<script type="text/javascript">
+    function GetBatchList() {
+        $('#BatchId').empty();
+        var courseId = $("#CourseId option:selected").val();
+        $.get("/StudentMaster/GetBatchList", { courseId: courseId }, function (responseData) {
+            $('#BatchId').append($('<option></option>').text("Select").attr('value', 0));
+            $.each(responseData, function (index, value) {
+                $('#BatchId').append($('<option></option>').text(value.batchName).attr('value', value.id));
+            });
+        });
+        GetSubject();
+    }
+    function GetSubject() {
+        var courseId = $("#CourseId").val();
+        $("#subbjectId").empty();
+        $("#subbjectId").append("<option value=''>Select</option>")
+        $.get("/StudentMarkAllocation/GetSubjectDetail", { courseId: courseId }, function (responseData) {
+            for (var i = 0; i < responseData.length; i++) {
+                var html = '<option value=' + responseData[i].id + '>' + responseData[i].subjectName + '</option>';
+                $("#subbjectId").append(html);
+            }
+        });
+    }
+
+    function AllocateMarks() {
+        var courseId = $("#CourseId").val();
+        var batchId = $('#BatchId').val();
+        var examId = $("#ExamId").val();
+        var subjectId = $("#subbjectId").val();
+        $.get("/StudentMarkAllocation/GetStudentList", { courseId: courseId, batchId: batchId, examId: examId, subjectId: subjectId },
+            function (responseData) {
+                $("#AttendenceDiv").html(responseData);
+            }).done($("#btnMarkAllocation").removeAttr('style'));
+    }
+</script>

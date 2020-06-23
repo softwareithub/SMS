@@ -1,0 +1,118 @@
+﻿@model SERP.Core.Entities.OnlineTest.TestMaster
+
+<script src="~/lib/jquery-validation/dist/jquery.validate.js"></script>
+<script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.js"></script>
+<link href="https://cdn.datatables.net/1.10.20/css/jquery.dataTables.min.css" rel="stylesheet" />
+<script src="https://cdn.datatables.net/1.10.20/js/jquery.dataTables.min.js"></script>
+<script src="~/ckeditor/ckeditor.js"></script>
+<section class="content-header">
+    <h1>
+        Test Paper
+        <small>Create Test Paper</small>
+    </h1>
+    <ol class="breadcrumb">
+        <li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
+        <li><a href="#">Forms</a></li>
+        <li class="active">General Elements</li>
+    </ol>
+</section>
+
+
+<section class="content">
+    <div class="row">
+
+        <div class="col-md-12">
+            <!-- general form elements -->
+            <div class="box box-primary">
+                <div class="box-header with-border">
+                    <h3 class="box-title">Create Test Paper</h3>
+                    <div class="col-md-12">
+                        <div class="col-md-10">
+                            <a class="btn btn-primary pull-right" onclick="GetBatchDetail()">
+                                <i class="fa fa-list-ul"></i>
+                                List
+                            </a>
+                        </div>
+                        <div class="col-md-2">
+                            <a class="btn btn-primary pull-left" onclick="NewAcademicMaster()">
+                                <i class="fa fa-plus-square"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <!-- /.box-header -->
+                <!-- form start -->
+                <form method="post" data-ajax="true" data-ajax-method="post"
+                      asp-action="CreateTest" asp-controller="TestMaster" data-ajax-success="Success"
+                      data-ajax-begin="CustomFormSubmitBegin" data-ajax-complete="CustomFormSubmitComplete">
+                    <div class="box-body">
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <input type="hidden" asp-for="Id" />
+                                <input type="hidden" asp-for="CreatedBy" />
+                                <input type="hidden" asp-for="CreatedDate" />
+                                <label asp-for="TestName">Test Name</label>
+                                <input type="text" asp-for="TestName" class="form-control" />
+                                <span asp-validation-for="TestName" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label asp-for="TestTimeLimit">Time Limit</label>
+                                
+                                <select class="form-control" asp-for="TestTimeLimit">
+                                    <option value="0">Select</option>
+                                    <option value="20min">20 min</option>
+                                    <option value="40min">40 min</option>
+                                    <option value="1Hr">1 Hour</option>
+                                    <option value="90min">90Min</option>
+                                    <option value="150Min">150Min</option>
+                                    <option value="3 Hour">3 Hour</option>
+                                </select>
+                                <span asp-validation-for="TestTimeLimit" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label asp-for="Regulation">Rule And Regulation</label>
+                                <textarea type="text" asp-for="Regulation" class="form-control ckeditor"></textarea>
+                                <span asp-validation-for="Regulation" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- /.box-body -->
+
+                    <div class="box-footer">
+                        <div class="col-md-8">
+                            @Html.SERPButton("btn btn-primary pull-right btnSubmit", Model == null ? 0 : Model.Id)
+                            <button class="buttonload" style="display:none">
+                                <i class="fa fa-refresh fa-spin"></i>Loading
+                            </button>
+                        </div>
+                        <div class="col-md-4">
+                            <button type="reset" class="btn btn-danger pull-left">Cancel</button>
+                        </div>
+
+                    </div>
+                </form>
+            </div>
+        </div>
+        @await Html.PartialAsync("~/Views/Shared/_CommanModalPartial.cshtml")
+
+    </div>
+</section>
+
+<script type="text/javascript">
+    function GetBatchDetail() {
+        var url = "/TestMaster/GetTestDetails";
+        GetCustomRecord(url);
+        setTimeout(function () {
+            $("#modalTitle").text("Test Master List")
+        }, 300);
+    }
+
+    $(document).ready(function () {
+        CKEDITOR.replace("Regulation");
+    })
+</script>

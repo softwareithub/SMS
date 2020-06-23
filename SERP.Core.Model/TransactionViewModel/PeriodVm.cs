@@ -19,5 +19,6 @@ namespace SERP.Core.Model.TransactionViewModel
         public TimeSpan ToTime { get; set; }
         public string CourseName { get; set; }
         public string BatchName { get; set; }
+        public int TimeTableId { get; set; }
     }
 }

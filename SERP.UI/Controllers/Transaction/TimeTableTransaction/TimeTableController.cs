@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -43,6 +44,8 @@ namespace SERP.UI.Controllers.Transaction.TimeTableTransaction
 
         public async Task<IActionResult> Index()
         {
+            Assembly a = Assembly.Load("SERP.Core.Entities");
+            Type t = a.GetType(a.GetExportedTypes()[1].Name);
             ViewBag.CourseList = await _ICourseMaster.GetList(x => x.IsActive == 1 && x.IsDeleted == 0);
             ViewBag.BatchList = await _IBatchMaster.GetList(x => x.IsDeleted == 0 && x.IsActive == 1);
             return PartialView("~/Views/TimeTable/_TimeTableIndexPartial.cshtml");
@@ -117,6 +120,21 @@ namespace SERP.UI.Controllers.Transaction.TimeTableTransaction
         {
             var result = await _timeSheetRepo.GetTimeSheetDetailsByCourseIdBatchId(courseId, batchId);
             return PartialView("~/Views/TimeTable/_CourseBatchTimeSheetPartial.cshtml", result);
+        }
+
+        public async Task<IActionResult> GetTimeSheetDetails()
+        {
+            ViewBag.CourseList = await _ICourseMaster.GetList(x => x.IsActive == 1 && x.IsDeleted == 0);
+            return PartialView("~/Views/TimeTable/TimeSheetDetailPartial.cshtml");
+        }
+
+        public async Task<IActionResult> AssignEmployee(int timeTableId, string fromTime, string toTime)
+        {
+            HttpContext.Session.SetInt32("TimeTableId", timeTableId);
+            TimeSpan.TryParse(fromTime, out TimeSpan outFromTime);
+            TimeSpan.TryParse(toTime, out TimeSpan outToTime);
+            var response = await _timeSheetRepo.AssignTeacherTemp(outFromTime, outToTime);
+            return PartialView("~/Views/TimeTable/_AssignEmployee.cshtml",response);
         }
 
         #region PribateFields

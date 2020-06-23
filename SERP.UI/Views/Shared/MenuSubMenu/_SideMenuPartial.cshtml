@@ -1,7 +1,7 @@
 ﻿@{
     Layout = null;
 }
-
+@model IEnumerable<SERP.Core.Model.UserManagement.MenuSubMenuVm>
 <script src="~/lib/jquery-validation/dist/jquery.validate.js"></script>
 <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.js"></script>
 
@@ -13,19 +13,20 @@
         <!-- Sidebar user panel (optional) -->
         <div class="user-panel">
             <div class="pull-left image">
-                <img src="~/Images/UserLogo.jpg" class="img-circle" alt="User Image">
+                <img src="~/Images/Director.jpeg" class="img-circle" alt="User Image">
             </div>
             <div class="pull-left info">
-                <p>SERP Admin</p>
+                <p>Haribansh Ranjan</p>
                 <!-- Status -->
                 <a href="#"><i class="fa fa-circle text-success"></i> Online</a>
             </div>
         </div>
 
+
         <!-- search form (Optional) -->
         <form action="#" method="get" class="sidebar-form">
             <div class="input-group">
-                <input type="text" name="q" class="form-control" placeholder="Search...">
+                <input type="text" name="q" onkeypress="MasterSearch()" class="form-control" placeholder="Search...">
                 <span class="input-group-btn">
                     <button type="submit" name="search" id="search-btn" class="btn btn-flat">
                         <i class="fa fa-search"></i>
@@ -33,75 +34,38 @@
                 </span>
             </div>
         </form>
-        <!-- /.search form -->
-        <!-- Sidebar Menu -->
-        <ul class="sidebar-menu" data-widget="tree">
-            <li class="treeview">
-                <a href="#">
-                    <i class="fa fa-gears"></i> <span>Setting</span>
-                    <span class="pull-right-container">
-                        <i class="fa fa-angle-left pull-right"></i>
-                    </span>
-                </a>
-                <ul class="treeview-menu">
-                    <li class="active">
-                        <a data-ajax="true" data-ajax-mode="replace"
-                           asp-action="Index" asp-controller="InstituteMaster"
-                           data-ajax-update="#divSERP" data-ajax-loading="#loading"
-                           data-ajax-begin="AjaxOnBegin" data-ajax-complete="AjaxComplete"
-                           class="nav-link">
-                            <i class="fa fa-university"></i>
-                            <span>
-                                Institute Detail
-                            </span>
-                        </a>
-                    </li>
-                    <li>
-                        <a data-ajax="true" data-ajax-mode="replace"
-                           asp-action="Index" asp-controller="AcademicMaster"
-                           data-ajax-update="#divSERP" data-ajax-loading="#loading"
-                           data-ajax-begin="AjaxOnBegin" data-ajax-complete="AjaxComplete">
-                            <i class="fa fa-bank"></i>
-                            <span>Academic Detail</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a data-ajax="true" data-ajax-mode="replace"
-                           asp-action="Index" asp-controller="TimeTable"
-                           data-ajax-update="#divSERP" data-ajax-loading="#loading"
-                           data-ajax-begin="AjaxOnBegin" data-ajax-complete="AjaxComplete">
-                            <i class="fa fa-bank"></i>
-                            <span>Time Table</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a data-ajax="true" data-ajax-mode="replace"
-                           asp-action="GetTimeSheet" asp-controller="TimeTable"
-                           data-ajax-update="#divSERP" data-ajax-loading="#loading"
-                           data-ajax-begin="AjaxOnBegin" data-ajax-complete="AjaxComplete">
-                            <i class="fa fa-bank"></i>
-                            <span>Time Table Detail</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a data-ajax="true" data-ajax-mode="replace"
-                           asp-action="Index" asp-controller="Attendence"
-                           data-ajax-update="#divSERP" data-ajax-loading="#loading"
-                           data-ajax-begin="AjaxOnBegin" data-ajax-complete="AjaxComplete">
-                            <i class="fa fa-bank"></i>
-                            <span>Student Attendence</span>
-                        </a>
-                    </li>
+        @foreach (var data in Model.GroupBy(x => x.ModuleName))
+        {
+            <ul class="sidebar-menu" data-widget="tree">
+                <li class="treeview">
+                    <a href="#">
+                        <i class="@data.First().ModuleClassName"></i> <span>@data.Key</span>
+                    </a>
+                    <ul class="treeview-menu">
+                        @foreach (var item in data)
+                        {
+                            <li class="active">
+                                <a data-ajax="true" data-ajax-mode="replace"
+                                   asp-action="@item.ActionName" asp-controller="@item.ControllerName"
+                                   data-ajax-update="#divSERP" 
+                                   data-ajax-begin="AjaxOnBegin" data-ajax-complete="AjaxComplete"
+                                   class="nav-link">
+                                    <i class="@item.SubModuleClass"></i>
+                                    <span>
+                                        @item.SubModuleName
+                                    </span>
+                                </a>
+                            </li>
+                        }
 
-                    <li><a href="#">Employee Import</a></li>
-                    <li><a href="#">Applicant List</a></li>
-                    <li><a href="#">Employee Application</a></li>
-                    <li><a href="#">Cast & Religion</a></li>
-                </ul>
-            </li>
-        </ul>
+                    </ul>
+                </li>
+            </ul>
+        }
 
-        <ul class="sidebar-menu" data-widget="tree">
+
+
+        @*<ul class="sidebar-menu" data-widget="tree">
             <li class="treeview">
                 <a href="#">
                     <i class="fa fa-link"></i> <span>Academic Detail</span>
@@ -151,6 +115,25 @@
                             <span>Subject Master</span>
                         </a>
                     </li>
+
+                    <li>
+                        <a data-ajax="true" data-ajax-mode="replace"
+                           asp-action="Index" asp-controller="Exam"
+                           data-ajax-update="#divSERP"
+                           data-ajax-begin="AjaxOnBegin" data-ajax-complete="AjaxComplete">
+                            <i class="fa fa-bank"></i>
+                            <span>Exam Master</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a data-ajax="true" data-ajax-mode="replace"
+                           asp-action="Index" asp-controller="ExamSheet"
+                           data-ajax-update="#divSERP"
+                           data-ajax-begin="AjaxOnBegin" data-ajax-complete="AjaxComplete">
+                            <i class="fa fa-bank"></i>
+                            <span>Exam TimeSheet</span>
+                        </a>
+                    </li>
                 </ul>
             </li>
         </ul>
@@ -195,6 +178,15 @@
                            data-ajax-begin="AjaxOnBegin" data-ajax-complete="AjaxComplete">
                             <i class="fa fa-bank"></i>
                             <span>Fee Detail</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a data-ajax="true" data-ajax-mode="replace"
+                           asp-action="Index" asp-controller="FeeDeposit"
+                           data-ajax-update="#divSERP" data-ajax-loading="#loading"
+                           data-ajax-begin="AjaxOnBegin" data-ajax-complete="AjaxComplete">
+                            <i class="fa fa-bank"></i>
+                            <span>Fee Deposit</span>
                         </a>
                     </li>
                     <li><a href="#">Assign Subjects</a></li>
@@ -322,9 +314,19 @@
                     <li><a href="#">Student ID Card</a></li>
                 </ul>
             </li>
-        </ul>
+        </ul>*@
+
+
         <!-- /.sidebar-menu -->
     </section>
     <!-- /.sidebar -->
 </aside>
+
+@await Html.PartialAsync("~/Views/Shared/_CommanModalPartial.cshtml")
+<script type="text/javascript">
+    function MasterSearch() {
+        $("#divModalPop").modal('show');
+        $("#modalTitle").text("Advance Search")
+    }
+</script>
 

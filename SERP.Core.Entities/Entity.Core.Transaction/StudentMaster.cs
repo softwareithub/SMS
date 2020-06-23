@@ -22,7 +22,6 @@ namespace SERP.Core.Entities.Entity.Core.Transaction
         public DateTime JoiningDate { get; set; }
         [Required(ErrorMessage = "Please select Course")]
         public int CourseId { get; set; }
-        [Required(ErrorMessage = "Please select Batch")]
         public int BatchId { get; set; }
         [Display(Name = "Roll Code", Prompt = "Enter Roll Code")]
         [Required(ErrorMessage = "Roll Code is required")]
@@ -47,16 +46,14 @@ namespace SERP.Core.Entities.Entity.Core.Transaction
         public DateTime DateOfBirth { get; set; }
         public string Gender { get; set; }
         public string BloodGroup { get; set; }
-        [Required(ErrorMessage = "Please select Religion.")]
-        public int Religion { get; set; }
-        [Required(ErrorMessage = "Please select Category")]
-        public int FeeCategoryId { get; set; }
+        public int? Religion { get; set; } = 0;
+        public int? FeeCategoryId { get; set; } = 0;
 
         [Display(Name = "Father Email", Prompt = "Enter Father Email")]
         [DataType(DataType.EmailAddress)]
         public string FatherEmail { get; set; }
         [Display(Name = "Student Email", Prompt = "Enter Student Email")]
-        [Required(ErrorMessage = "Student email is required.")]
+        
         [DataType(DataType.EmailAddress)]
         public string StudentEmail { get; set; }
         [Display(Name = "Father Phone", Prompt = "Enter Father Phone")]

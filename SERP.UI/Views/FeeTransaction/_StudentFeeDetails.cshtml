@@ -1,24 +1,32 @@
-﻿@model IEnumerable<SERP.Core.Model.FeeDetails.StudentFeeDetailVm>
-    <section class="content">
-        <div class="row">
-            <div class="col-md-12">
-                <div class="row">
-                    <div class="col-md-12">
-                        <table id="tblDataList" class="table-responsive-md table-striped table-bordered" style="width:100%">
-                            <thead>
-                                <tr>
-                                    <th>Name</th>
-                                    <th>Payment Type</th>
-                                    <th>Amount</th>
-                                    <th>Discount Type</th>
-                                    <th>Discount Value</th>
-                                    <th>Payable AMount</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach (var data in Model)
+﻿<link href="https://cdn.datatables.net/1.10.20/css/jquery.dataTables.min.css" rel="stylesheet" />
+<script src="https://cdn.datatables.net/1.10.20/js/jquery.dataTables.min.js"></script>
+
+@model IEnumerable<SERP.Core.Model.FeeDetails.StudentFeeDetailVm>
+<section class="content">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="row">
+                <div class="col-md-12 table100 ver5 m-b-110">
+                    <table id="tblDataList" class="table table-responsive table-hover" >
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Payment Type</th>
+                                <th>Amount</th>
+                                <th>Yearly Amount</th>
+                                <th>Discount Type</th>
+                                <th>Discount Value</th>
+                                <th>Payable Amount</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @{
+                                decimal netAmount = decimal.Parse("0.0");
+                                decimal netDiscount = decimal.Parse("0.0");
+                                decimal netPayableAmount = decimal.Parse("0.0");
+                                foreach (var data in Model)
                                 {
-                                    <tr>
+                                    <tr >
                                         <td>
                                             @data.CategoryName
                                         </td>
@@ -29,13 +37,18 @@
                                             @data.Amount
                                         </td>
                                         <td>
+                                            @data.YearlyAmount
+                                        </td>
+                                        <td>
                                             @if (data.DependentOnParticular == 1)
                                             {
-                                                @data.PertDiscountType
+                                                var discountType = data.PertDiscountType?.ToUpper().Trim() == "AM" ? "Amount" : "Percentage";
+                                                @discountType
                                             }
                                             else
                                             {
-                                                @data.DiscountType
+                                                var discountType = data.PertDiscountType?.ToUpper().Trim() == "AM" ? "Amount" : "Percentage";
+                                                @discountType
                                             }
 
                                         </td>
@@ -51,17 +64,50 @@
 
                                         </td>
                                         <td>
-                                           @data.NetAmount
+                                            @{
+                                                netAmount += data.YearlyAmount;
+                                                netPayableAmount += data.NetAmount;
+                                                netDiscount = netAmount - netPayableAmount;
+                                            }
+                                            @data.NetAmount
                                         </td>
 
-                                 
+
                                     </tr>
                                 }
-                            </tbody>
+                                <tr >
+                                    <td colspan="6" style="text-align:right">
+                                        Net  Amount :
+                                    </td>
+                                    <td>
+                                        @netAmount
+                                    </td>
+                                </tr>
+                                <tr >
+                                    <td colspan="6" style="text-align:right">
+                                        Net Discount Amount :
+                                    </td>
+                                    <td>
+                                        @netDiscount
+                                    </td>
+                                </tr>
+                                <tr >
+                                    <td colspan="6" style="text-align:right">
+                                        Net Payable Amount :
+                                    </td>
+                                    <td>
+                                        @netPayableAmount
+                                    </td>
+                                </tr>
+                            }
 
-                        </table>
-                    </div>
+                        </tbody>
+
+                    </table>
                 </div>
             </div>
         </div>
-    </section>
+    </div>
+</section>
+
+<script src="~/Jquery/BundleJsFancyTable.js"></script>

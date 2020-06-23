@@ -43,11 +43,11 @@
                             </a>
                         </div>
                     </div>
-               
+
                 </div>
                 <div class="overlay divHidding" id="divFormData">
                     <i class="fa fa-refresh fa-spin">
-                     
+
                     </i>
                 </div>
                 <form method="post" data-ajax="true" data-ajax-method="post"
@@ -94,7 +94,7 @@
                         <div class="col-md-4">
                             <button type="reset" class="btn btn-danger pull-left">Cancel</button>
                         </div>
-                    
+
                     </div>
                 </form>
             </div>
@@ -105,16 +105,17 @@
     </div>
 </section>
 
+
 <script>
 
     function GetAcademicList() {
-        GetCustomRecord("AcademicMaster/GetAcademicList");
+        GetCustomRecord("/AcademicMaster/GetAcademicList");
         setTimeout(function () {
             $("#modalTitle").text("Academic Master List")
         }, 300);
     }
     function NewAcademicMaster() {
-        var url = "AcademicMaster/Index";
+        var url = "/AcademicMaster/Index";
         NewCustomRecord(url);
     }
 </script>

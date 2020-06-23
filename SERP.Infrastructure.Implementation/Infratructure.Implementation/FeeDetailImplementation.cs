@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using SERP.Core.Entities.Context;
 using SERP.Core.Model.FeeDetails;
 using SERP.Infrastructure.Repository.Infrastructure.Repo;
+using SERP.Utilities.SERPHelper;
 using SERP.Utilities.SqlHelper;
 using System;
 using System.Collections.Generic;
@@ -47,12 +48,44 @@ namespace SERP.Infrastructure.Implementation.Infratructure.Implementation
                 model.DiscountValue = result.DefaultIfNull<decimal>("DiscountValue");
                 model.PertDiscountType = result.DefaultIfNull<string>("ParticularDiscountType");
                 model.PertDiscountValue = result.DefaultIfNull<decimal>("ParticularDiscountValue");
+                model.CategoryId = result.DefaultIfNull<int>("CategoryId");
 
                 models.Add(model);
 
             }
             return models;
 
+        }
+
+        public async Task<List<FeeDepositVm>> GetPaymentHistory(int studentId)
+        {
+            List<FeeDepositVm> models = new List<FeeDepositVm>();
+
+            var commandText = "TransactionSch.usp_StudentFeeDepositDetails";
+            SqlParameter[] sqlParams = {
+                new SqlParameter("@in_studentId",studentId){SqlDbType= System.Data.SqlDbType.Int, Direction= System.Data.ParameterDirection.Input }
+            };
+            var result = await SqlHelperExtension.ExecuteReader(_connectionString, commandText, System.Data.CommandType.StoredProcedure, sqlParams);
+
+            while(result.Read())
+            {
+                FeeDepositVm model = new FeeDepositVm();
+                model.Id = result.DefaultIfNull<int>("Id");
+                model.PayableAmount = result.DefaultIfNull<decimal>("payableAmount");
+                model.DiscountAmount = result.DefaultIfNull<decimal>("DiscountAmount");
+                model.FineAmount = result.DefaultIfNull<decimal>("FineAmount");
+                model.FineReason = result.DefaultIfNull<string>("ReasonFine");
+                model.AmountPaid = result.DefaultIfNull<decimal>("AmountPaid");
+                model.DueAmount = result.DefaultIfNull<decimal>("DueAmount");
+                model.DepositDate = result.DefaultIfNull<DateTime>("DateOfDeposit");
+                model.CategoryName= result.DefaultIfNull<string>("Name");
+                model.PaymentType = result.DefaultIfNull<string>("PaymentType");
+                model.PaymentFor = PaymentFor.GetPaymentFor(result.DefaultIfNull<string>("PaymentFor"), model.PaymentType);
+
+                models.Add(model);
+            }
+
+            return models;
         }
     }
 }

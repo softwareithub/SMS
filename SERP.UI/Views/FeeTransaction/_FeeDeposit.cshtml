@@ -1,0 +1,258 @@
+﻿
+<link href="~/Multiselect/example-styles.css" rel="stylesheet" />
+<script src="~/Multiselect/jquery.multi-select.js"></script>
+@model IEnumerable<SERP.Core.Model.FeeDetails.StudentFeeDetailVm>
+<form method="post" data-ajax="true" data-ajax-method="post"
+      asp-action="FeeSubmit" asp-controller="FeeDeposit" data-ajax-success="Success"
+      data-ajax-begin="CustomFormSubmitBegin" data-ajax-complete="CustomFormSubmitComplete">
+
+    <section class="content">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="row">
+                    <div class="col-md-12 table100 ver5 m-b-110">
+                        <table id="tblDataList" data-vertable="ver5" style="width:100%">
+                            <thead>
+                                <tr class="row100 head">
+                                    <th>Name</th>
+                                    <th>Payment Type</th>
+                                    <th>Amount</th>
+                                    @if (Model?.First()?.DependentOnParticular == 1)
+                                    {
+                                        <th>Discount</th>
+                                    }
+
+                                    <th>Pay Amount</th>
+                                    <th>Select</th>
+                                    <th>Value</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @{
+                                    foreach (var data in Model)
+                                    {
+                                        var catyId = data.CategoryName.Replace(" ", string.Empty);
+                                        <tr class="row100">
+                                            <td>
+                                                <input type="hidden" name="CategoryId" value="@data.CategoryId" />
+                                                @data.CategoryName
+                                            </td>
+                                            <td>
+                                                @data.FeePaymentType
+                                            </td>
+                                            <td>
+                                                @data.Amount
+                                            </td>
+                                            @if (Model.First().DependentOnParticular == 1)
+                                            {
+                                                <td>
+                                                    @if (data.DependentOnParticular == 1)
+                                                    {
+                                                        var discountType = data.PertDiscountType.ToUpper().Trim() == "AM" ? "Amount" : "Percentage";
+                                                        if (discountType == "Percentage")
+                                                        {
+                                                            @data.PertDiscountValue <p>%</p>
+                                                        }
+                                                        else
+                                                        {
+                                                            @data.PertDiscountValue
+                                                        }
+
+                                                    }
+
+                                                </td>
+                                            }
+
+                                            <td>
+                                                @data.NetAmount
+                                            </td>
+                                            <td>
+                                                @if (data.FeePaymentType == "Yearly")
+                                                {
+                                                    <span>Yearly</span>
+                                                }
+                                                else if (data.FeePaymentType == "Half Yearly")
+                                                {
+                                                    <select class="form-control modal-example" name="@data.CategoryId" onchange="GetMonthlyAmount(this,'@data.NetAmount','@catyId')" name="inventors" multiple>
+                                                        <option value="FH">1st Half</option>
+                                                        <option value="FH">2nd Half</option>
+                                                    </select>
+                                                }
+                                                else if (data.FeePaymentType == "Quaterly")
+                                                {
+                                                    <select name="@data.CategoryId" class="form-control modal-example" onchange="GetMonthlyAmount(this,'@data.NetAmount','@catyId')" name="inventors" multiple>
+                                                        <option value="1stQTR">1st Quater</option>
+                                                        <option value="2ndQTR">2nd Quarter</option>
+                                                        <option value="3rdQTR">3rd Quater</option>
+                                                        <option value="4thQTR">4th Quarter</option>
+                                                    </select>
+                                                }
+                                                else if (data.FeePaymentType == "Monthly")
+                                                {
+
+                                                    <select name="@data.CategoryId" onchange="GetMonthlyAmount(this,'@data.NetAmount','@catyId')" class="form-control modal-example" name="inventors" multiple>
+                                                        @for (int i = 1; i < 13; i++)
+                                                        {
+                                                            <option value="@i">
+                                                                @{var monthName = new DateTime(2010, i, 1)
+                                                                                                                        .ToString("MMM", System.Globalization.CultureInfo.InvariantCulture);}
+                                                                @monthName
+                                                            </option>
+                                                        }
+                                                    </select>
+
+                                                }
+                                                else
+                                                {
+                                                    <span>One Time</span>
+                                                }
+                                            </td>
+                                            <td>
+                                                <input type="hidden" name="particularAmount" value="@data.NetAmount" />
+                                                <label class="netAmount" id="@catyId">@data.NetAmount</label>
+                                            </td>
+                                        </tr>
+                                    }
+                                    @if (Model.First().DependentOnParticular != 1)
+                                    {
+                                        var discountType = Model.First().DiscountType.Trim().ToLower() == "per" ? "%" : " Amount";
+                                        <tr class="row100">
+                                            <td colspan="5">
+                                                Overall Discount
+                                            </td>
+                                            <td colspan="2">
+                                                <label id="overAllDiscount" name="overAllDiscount">@Model.First().DiscountValue</label>  @discountType
+                                                <input type="hidden" id="discountType" value="@discountType" />
+                                            </td>
+                                        </tr>
+                                    }
+                                    <tr class="row100">
+                                        <td colspan="5">
+                                            Previous Due Amount
+                                        </td>
+                                        <td colspan="2">
+                                            <label id="prevDueAmount" name="prevDueAmount">@ViewBag.PreviousDueAmount</label>
+                                        </td>
+                                    </tr>
+                                    <tr class="row100">
+                                        <td colspan="5">
+                                            Net Amount
+                                        </td>
+                                        <td colspan="2">
+                                            <label id="netSumAmount" name="netSumAnount"></label>
+                                        </td>
+                                    </tr>
+                                    <tr class="row100">
+                                        <td colspan="5">
+                                            Extra Discount Amount
+                                        </td>
+                                        <td colspan="2">
+                                            <input type="number" name="extraDiscount" class="form-control netAmount discount" value="0" onkeyup="SetNetAmount()" />
+                                        </td>
+                                    </tr>
+                                    <tr class="row100">
+                                        <td colspan="5">
+                                            Fine
+                                        </td>
+                                        <td colspan="2">
+                                            <input type="number" name="fineAmount" class="form-control netAmount" value="0" onkeyup="SetNetAmount()" />
+                                        </td>
+                                    </tr>
+                                    <tr class="row100">
+                                        <td colspan="5">
+                                            Reason Of Fine
+                                        </td>
+                                        <td colspan="2">
+                                            <input type="text" name="Reason" class="form-control" />
+                                        </td>
+                                    </tr>
+                                    <tr class="row100">
+                                        <td colspan="5">
+                                            Amount Paid
+                                        </td>
+                                        <td colspan="2">
+                                            <input type="text" name="txtAmountPaid" id="AmountPaid" onkeyup="GetDueAmount()" class="form-control" />
+                                        </td>
+                                    </tr>
+                                    <tr class="row100">
+                                        <td colspan="5">
+                                            Net Due Amount
+                                        </td>
+                                        <td colspan="2">
+                                            <input type="text" name="txtDueAmount" id="DueAmount" class="form-control" />
+                                        </td>
+                                    </tr>
+                                    <tr class="row100">
+                                        <td colspan="7">
+                                            <input type="submit" class="btn btn-primary pull-right" value="Save" />
+                                        </td>
+                                    </tr>
+                                }
+
+                            </tbody>
+
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+</form>
+
+<script>
+    $(document).ready(function () {
+        $('[data-toggle="popover"]').popover();
+        SetNetAmount();
+    });
+
+    $('.modal-example').multiSelect({
+        'modalHTML': '<div class="multi-select-modal">'
+    });
+
+    function GetMonthlyAmount(id, data, catname) {
+        var count = parseInt($(id).val().length);
+        var amount = parseFloat(data) * count;
+        var catId = "#" + catname;
+        $(catId).text(amount);
+        SetNetAmount();
+    }
+
+    function SetNetAmount() {
+        var netSumAmount = 0;
+        $('.netAmount').each(function () {
+            if (this.tagName == "LABEL") {
+                netSumAmount += Number($(this).text());
+            }
+            else if (this.tagName == "INPUT") {
+                if ($(this).hasClass("discount")) {
+                    netSumAmount -= Number($(this).val());
+                }
+                else {
+                    netSumAmount += Number($(this).val());
+                }
+            }
+
+        });
+        var overAllDiscount = Number($("#overAllDiscount").text());
+        var discountType = $("#discountType").val().trim().toLowerCase();
+        debugger;
+        if (discountType == "%") {
+            debugger;
+            netSumAmount = netSumAmount - ((netSumAmount * overAllDiscount) / 100);
+        } else {
+            netSumAmount = netSumAmount - overAllDiscount;
+        }
+        netSumAmount += Number($("#prevDueAmount").text());
+        $("#netSumAmount").text(netSumAmount);
+        $("#netSumAmount").val(netSumAmount);
+
+    }
+
+    function GetDueAmount() {
+        var netAmount = Number($("#netSumAmount").text());
+        var amountPaid = Number($("#AmountPaid").val())
+        $("#DueAmount").val(netAmount - amountPaid);
+    }
+</script>
+<script src="~/Jquery/BundleJsFancyTable.js"></script>

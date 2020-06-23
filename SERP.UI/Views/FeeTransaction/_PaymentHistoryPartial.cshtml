@@ -1,0 +1,76 @@
+﻿@model IEnumerable<SERP.Core.Model.FeeDetails.FeeDepositVm>
+
+<link href="~/Custom/FancyTable.css" rel="stylesheet" />
+<link href="~/Multiselect/example-styles.css" rel="stylesheet" />
+<script src="~/Multiselect/jquery.multi-select.js"></script>
+
+
+
+<section class="content">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="row">
+                <div class="col-md-12 table100 ver5 m-b-110">
+                    <table id="tblDataList" data-vertable="ver5" style="width:100%">
+                        <thead>
+                            <tr class="row100 head">
+                                <th>Payable Amount</th>
+                                <th>Discount</th>
+                                <th>Fine Amolunt</th>
+                                <th>Reason</th>
+                                <th>Paid Amount</th>
+                                <th>Due Amount</th>
+                                <th>Deposit Date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var data in Model.GroupBy(x => x.Id))
+                            {
+                                <tr class="row100">
+                                    <td>
+                                        @data.First().PayableAmount
+                                    </td>
+                                    <td>
+                                        @data.First().DiscountAmount
+                                    </td>
+                                    <td>
+                                        @data.First().FineAmount
+                                    </td>
+                                    <td>
+                                        @data.First().FineReason
+                                    </td>
+                                    <td>
+                                        @data.First().AmountPaid
+                                    </td>
+                                    <td>
+                                        @data.First().DueAmount
+                                    </td>
+                                    <td>
+                                        @data.First().DepositDate
+                                    </td>
+                                </tr>
+                                @foreach (var item in data)
+                                {
+                                    <tr class="row100">
+                                        <td colspan="6" style="text-align:center">
+                                            @item.CategoryName
+                                        </td>
+                                        <td>
+                                            @item.PaymentFor
+                                        </td>
+                                    </tr>
+                                }
+                            }
+                        </tbody>
+
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+
+
+<script src="~/Jquery/BundleJsFancyTable.js"></script>

@@ -18,13 +18,13 @@ namespace SERP.Core.Entities.Entity.Core.HRModule
         public string p_Address { get; set; }
         public string Photo { get; set; }
         public string EmergencyPhone { get; set; }
-        public int ConvictedForCrime { get; set; }
+        public int? ConvictedForCrime { get; set; }
         public string Gender { get; set; }
         public string BloodGroup { get; set; }
-        public int DepartmentId { get; set; }
-        public int DesignationId { get; set; }
-        public DateTime JoiningDate { get; set; }
-        public int BankId { get; set; }
+        public int? DepartmentId { get; set; }
+        public int? DesignationId { get; set; }
+        public DateTime? JoiningDate { get; set; }
+        public int? BankId { get; set; }
         public string AccountNumber { get; set; }
     }
 }

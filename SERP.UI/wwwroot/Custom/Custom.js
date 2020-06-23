@@ -2,10 +2,10 @@
     alertify.set('notifier', 'position', 'top-right');
     alertify.success(response);
 }
-function Error(response) {
-    alertify.set('notifier', 'position', 'top-right');
-    alertify.error(response);
-}
+//function Error(response) {
+//    alertify.set('notifier', 'position', 'top-right');
+//    alertify.error(response);
+//}
 
 function CustomDelete(id, url) {
     alertify.set('notifier', 'position', 'top-right');
@@ -58,20 +58,24 @@ function UpdateCustomRecord(id, updateUrl, event) {
 }
 
 function GetCustomRecord(getUrl) {
+    var table;
     $("#loading").removeAttr('style');
     $.get(getUrl, function (response) {
         $("#divPartialData").html(response);
         $("#divModalPop").modal('show');
         setTimeout(function () {
-            $("#tblDataList").DataTable({
+          table=  $("#tblDataList").DataTable({
                 fixedHeader: true,
                 select: true,
                 responsive: true
-
             });
         }, 300)
     }).done(function () {
         $("#loading").attr('style', 'display:none');
+        setTimeout(function () {
+            table.columns.adjust().responsive.recalc();
+        }, 500)
+        
     });
 }
 
@@ -85,18 +89,22 @@ function NewCustomRecord(url) {
 
 function AjaxOnBegin() {
     debugger;
-    $("#divSERP").addClass('divHidding');
-    $("#loading").removeClass('divHidding');
+    $("#divSERP").addClass('loading');
+    $("#loading").removeClass('loading');
 }
 function AjaxComplete() {
-    $("#divSERP").removeClass('divHidding');
-    $("#loading").addClass('divHidding');
+    $("#divSERP").removeClass('loading');
+    $("#loading").addClass('loading');
 }
 
 function CustomFormSubmitBegin() {
-    $('#divFormData').removeClass('divHidding');
+    $('#divFormData').removeClass('loading');
 }
 
 function CustomFormSubmitComplete() {
-    $('#divFormData').addClass('divHidding');
+    $('#divFormData').addClass('loading');
+}
+
+function GetInfo() {
+    alert("Information")
 }

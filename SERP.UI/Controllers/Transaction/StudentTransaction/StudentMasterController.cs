@@ -139,7 +139,7 @@ namespace SERP.UI.Controllers.Transaction.StudentTransaction
             ViewBag.AcademicList = await _IAcademicRepo.GetList(x => x.IsActive == 1 && x.IsDeleted == 0);
         }
 
-        private async Task<List<StudentPartialInfoViewModel>> GetStudentVm()
+        public async Task<List<StudentPartialInfoViewModel>> GetStudentVm()
         {
             var studentPromotes = await _IStudentPromote.GetList(x => x.IsActive == 1 && x.IsDeleted == 0);
             await _IStudentPromote.CreateNewContext();
@@ -163,11 +163,7 @@ namespace SERP.UI.Controllers.Transaction.StudentTransaction
                                     on sp.CourseId equals Cl.Id
                                     join bl in sectionList
                                     on sp.BatchId equals bl.Id
-                                    join rl in religionList
-                                    on sl.Religion equals rl.Id
-                                    join ct in categoryList
-                                    on sl.FeeCategoryId equals ct.Id
-
+                                  
                                     select new StudentPartialInfoViewModel
                                     {
                                         Id = sl.Id,
@@ -178,7 +174,7 @@ namespace SERP.UI.Controllers.Transaction.StudentTransaction
                                         StudentName = sl.Name,
                                         DateOfBirth = sl.DateOfBirth,
                                         JoiningDate = sl.JoiningDate,
-                                        Category = ct.Name,
+                                        Category = "",
                                         FatherEmail = sl.FatherEmail,
                                         StudentEmail = sl.StudentEmail,
                                         FatherPhone = sl.FatherPhone,
@@ -188,7 +184,7 @@ namespace SERP.UI.Controllers.Transaction.StudentTransaction
                                         MotherName = sl.MotherName,
                                         P_Address = sl.P_Address,
                                         C_Address = sl.C_Address,
-                                        Religion = rl.Name,
+                                        Religion = "",
                                         ParentPhoto = sl.ParentsPhoto
                                     }).ToList();
             return studentViewModel;
@@ -203,7 +199,7 @@ namespace SERP.UI.Controllers.Transaction.StudentTransaction
 
             var students = await _IStudentMaster.GetList(x => x.IsActive == 1 && x.IsDeleted == 0);
 
-            var studentId = students.Max(x=>x.Id)+1;
+            var studentId = students.Max(x=>x.Id);
 
             StudentPromote studentPromote = new StudentPromote()
             {

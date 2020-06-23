@@ -27,6 +27,8 @@ namespace SERP.Core.Model.FeeDetails
         public string DiscountType { get; set; }
         public string FeePaymentType { get; set; }
         public decimal NetAmount { get; set; }
+        public bool IsRemove { get; set; } = false;
+        public decimal YearlyAmount { get; set; }
     }
 
 }

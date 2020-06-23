@@ -34,13 +34,15 @@
                                             @foreach (var period in Model.TimeTableModels.Where(x => x.DayName == days.DayName))
                                             {
                                                 int i = 0;
+                                                var totalDyas = Model.TimeTableModels.Count();
+                                                <input type="hidden" id="totalDays" value="@totalDyas" />
                                                 @foreach (var prd in period.PeriodModels)
                                                 {
                                                     <td>
 
                                                         <input type="hidden" asp-for="TimeTableModels[k].PeriodModels[i].Period" />
                                                         <label>Assign Employee</label>
-                                                        <select asp-for="TimeTableModels[k].PeriodModels[i].EmployeeId" asp-items="@(new SelectList(ViewBag.EmployeeList, "Id", "Name"))" class="form-control">
+                                                        <select asp-for="TimeTableModels[k].PeriodModels[i].EmployeeId" asp-items="@(new SelectList(ViewBag.EmployeeList, "Id", "Name"))" class="form-control" onchange="AssignChildEmployee(@k, @i, this)">
                                                         </select>
                                                         <label>Assign Subject</label>
                                                         <select asp-for="TimeTableModels[k].PeriodModels[i].SubjectId" asp-items="@(new SelectList(ViewBag.SubjectList, "Id", "SubjectName"))" class="form-control">
@@ -70,4 +72,16 @@
         </div>
     </section>
 </form>
+
+<script>
+    //function AssignChildEmployee(k, i, event) {
+    //    debugger;
+    //    var totalCount = $("#totalDays").val();
+    //    for (var i = 0; i < totalCount; i++) {
+    //        k = k + i;
+    //        var employeeId = "TimeTableModels_" + k + "__PeriodModels_0__EmployeeId"
+    //        $("#" + employeeId).val(event.Value);
+    //    }
+    //}
+</script>
 

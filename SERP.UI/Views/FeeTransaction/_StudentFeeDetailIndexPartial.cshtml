@@ -1,7 +1,9 @@
-﻿<section class="content-header">
+﻿<link href="~/Custom/FancyTable.css" rel="stylesheet" />
+<link href="~/CustomCSS/SearchDropDown.css" rel="stylesheet" />
+<section class="content-header">
     <h1>
-        Academic Master
-        <small>Create Academic Detail</small>
+        Student Fee Detail
+        <small>Student Fee Bifurcation</small>
     </h1>
     <ol class="breadcrumb">
         <li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
@@ -18,7 +20,7 @@
             <!-- general form elements -->
             <div class="box box-primary">
                 <div class="box-header with-border">
-                    <h3 class="box-title">Create Academic Master</h3>
+                    <h3 class="box-title">Student Fee Bifurcation</h3>
                 </div>
                 <div class="overlay divHidding" id="divFormData">
                     <i class="fa fa-refresh fa-spin">
@@ -29,43 +31,44 @@
                 <div class="box-body">
                     <div class="col-md-3">
                         <div class="form-group">
-                            <label>Student Name</label>
-                            <input id="studentName" class="form-control">
+                            <label>Course</label>
+                            <select  id="FromCourse" class="form-control" asp-items="@(new SelectList(ViewBag.CourseList ,"Id","Name"))" onchange="GetBatchList()">
+                                <option value="">Select</option>
+                            </select>
                         </div>
                     </div>
                     <div class="col-md-3">
                         <div class="form-group">
-                            <label>Student Phone</label>
-                            <input id="phone" class="form-control">
+                            <label>Batch</label>
+                            <select id="FromBatch" class="form-control" onchange="GetStudentList()">
+                                <option value="">Select</option>
+                            </select>
                         </div>
                     </div>
                     <div class="col-md-3">
                         <div class="form-group">
-                            <label> Roll Code</label>
-                            <input id="rollCode" class="form-control">
-                        </div>
-                    </div>
-                    <div class="col-md-3">
-                        <div class="form-group">
-                            <label>Registration Number</label>
-                            <input id="registration" class="form-control">
+                            <label> Student</label>
+                            <select id="ddlStudent" class="fstdropdown-select form-control" onchange="GetFeeDetails()" >
+                                <option value="0">Select</option>
+                            </select>
                         </div>
                     </div>
                     <div class="col-md-12">
-                        <div class="form-group">
+                      <div id="divFeeDetails"></div>
+                    </div>
+                    <div class="col-md-12">
+                        <div id="divFeeHistory">
 
-                            <input type="button" class="btn btn-primary pull-right" onclick="SearchData()" value="Search" />
                         </div>
                     </div>
 
                 </div>
             </div>
         </div>
-
-        @await Html.PartialAsync("~/Views/Shared/_CommanModalPartial.cshtml")
-
     </div>
 </section>
+
+
 <script>
     function SearchData() {
         debugger;
@@ -83,6 +86,49 @@
             setTimeout(function () {
                 $("#modalTitle").text("Student Information")
             }, 300);
+        })
+    }
+
+    function GetBatchList() {
+        var courseId = $("#FromCourse option:selected").val();
+        $("#FromBatch").empty();
+        $("#FromBatch").append("<option value='0'>--Select--</option>")
+        $.get("/StudentMaster/GetBatchList", { courseId: courseId }, function (responseData) {
+            $.each(responseData, function (index, value) {
+                $('#FromBatch').append($('<option></option>').text(value.batchName).attr('value', value.id));
+            });
+        });
+    }
+
+    function GetStudentList() {
+        var courseId = $("#FromCourse option:selected").val();
+        var batchId = $("#FromBatch option:selected").val();
+        $("#ddlStudent").empty();
+        $.get("/StudentFeeDetail/GetStudentDetail", { courseId: courseId, batchId: batchId }, function (data) {
+            debugger;
+            for (var i = 0; i < data.length; i++) {
+                
+                $("#ddlStudent").append("<option value="+data[i].id+">"+data[i].name+"</option>")
+            }
+        }).done(function () {
+            setFstDropdown();
+        });
+    }
+
+    function GetFeeDetails() {
+        var studentId = $("#ddlStudent").val();
+        $.get("/StudentFeeDetail/GetFeeDetail", { studentId: studentId }, function (data) {
+            $("#divFeeDetails").html('');
+            $("#divFeeDetails").html(data);
+        })
+        GetFeehistory();
+    }
+
+    function GetFeehistory() {
+        var studentId = $("#ddlStudent").val();
+        $.get("/FeeDeposit/GetPaymentHistory", { studentId: studentId }, function (data) {
+            $("#divFeeHistory").html('');
+            $("#divFeeHistory").html(data);
         })
     }
 </script>

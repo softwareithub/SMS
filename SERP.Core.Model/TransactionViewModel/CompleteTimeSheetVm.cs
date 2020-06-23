@@ -19,5 +19,9 @@ namespace SERP.Core.Model.TransactionViewModel
         public string SubjectName { get; set; }
         public string TimeTableDay { get; set; }
         public string TeacherAttendence { get; set; }
+        public int CourseId { get; set; }
+        public int BatchId { get; set; }
+        public int TeacherId { get; set; }
+        public int TimeTableId { get; set; }
     }
 }

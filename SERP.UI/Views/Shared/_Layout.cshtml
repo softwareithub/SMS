@@ -7,7 +7,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>SERP| School ERP </title>
+    <title>Lakshya Education Portal </title>
     <!-- Tell the browser to be responsive to screen width -->
     <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
     <link href="~/bootstrap/bootstrap.min.css" rel="stylesheet" />
@@ -15,11 +15,13 @@ scratch. This page gets rid of all links and provides the needed markup only.
     <link href="~/FontAwesome/font-awesome.min.css" rel="stylesheet" />
     <!-- Ionicons -->
     <link href="~/Iconic/ionicons.min.css" rel="stylesheet" />
-
+    <link rel="icon" href="~/Images/logoImage.jpg" type="image/gif">
     <!-- Theme style -->
 
     <link href="~/bootstrap/AdminLTE.min.css" rel="stylesheet" />
+
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+
     <link href="~/bootstrap/skin-blue.min.css" rel="stylesheet" />
     <script src="~/lib/jquery-validation/dist/jquery.validate.js"></script>
     <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.js"></script>
@@ -36,31 +38,45 @@ scratch. This page gets rid of all links and provides the needed markup only.
     <link href="~/AlertifyJs/build/css/alertify.css" rel="stylesheet" />
     <script src="~/AlertifyJs/build/alertify.js"></script>
     <link href="//netdna.bootstrapcdn.com/bootstrap/3.1.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
-
+    <link href="~/Iconic/ionicons.min.css" rel="stylesheet" />
 
     <link rel="stylesheet"
           href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600,700,300italic,400italic,600italic">
-    <script src="~/bootstrap/Select2.js"></script>
+    @*<script src="~/bootstrap/Select2.js"></script>*@
+    <style>
+        .loading {
+            position: relative;
+        }
+
+            .loading:before {
+                content: "";
+                display: block;
+                position: absolute;
+                z-index: 9;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(255, 2555, 255,0.6) url(../images/loading.gif) no-repeat center 35vh;
+                background-size: 85px;
+            }
+    </style>
+
 
 </head>
 
 <body class="hold-transition skin-blue sidebar-mini">
     <div class="wrapper">
-
         <!-- Main Header -->
         @await Html.PartialAsync("~/Views/Shared/MenuSubMenu/_HeaderMenuPartial.cshtml")
         <!-- Left side column. contains the logo and sidebar -->
-        @await Html.PartialAsync("~/Views/Shared/MenuSubMenu/_SideMenuPartial.cshtml")
-
+        @await Component.InvokeAsync("SideMenu", new { controllerName = string.Empty, actionName = string.Empty })
         <!-- Content Wrapper. Contains page content -->
         <div class="content-wrapper">
 
             <section class="content container-fluid">
-             
-                <div id="loading"  class="modalLoader divHidding">
-                    <img src="~/Images/spinner.gif" />
-                </div>
-                <div id="divSERP" >
+
+                <div id="divSERP">
                     @RenderBody()
                 </div>
 
@@ -71,10 +87,10 @@ scratch. This page gets rid of all links and provides the needed markup only.
         <footer class="main-footer">
             <!-- To the right -->
             <div class="pull-right hidden-xs">
-                Anything you want
+                Let's make Education digitalised.
             </div>
             <!-- Default to the left -->
-            <strong>Copyright &copy; 2016 <a href="#">Company</a>.</strong> All rights reserved.
+            <strong>Copyright &copy; 2020 <a href="#">VIPRA SERP</a>.</strong> All rights reserved.
         </footer>
 
         <!-- Control Sidebar -->
@@ -163,6 +179,8 @@ scratch. This page gets rid of all links and provides the needed markup only.
     <script src="~/Jquery/bootstrap.min.js"></script>
     <!-- AdminLTE App -->
     <script src="~/Jquery/adminlte.min.js"></script>
+    <script src="~/Jquery/SearchDropDown.js"></script>
+
 
     <!-- Optionally, you can add Slimscroll and FastClick plugins.
          Both of these plugins are recommended to enhance the

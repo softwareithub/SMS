@@ -1,7 +1,7 @@
 ﻿@model SERP.Core.Model.TransactionViewModel.TimeSheetVm
 
-<link href="~/bootstrap/CustomCard.css" rel="stylesheet" />
-<link href="~/bootstrap/LedBulbcss.css" rel="stylesheet" />
+<link href="https://cdn.datatables.net/1.10.20/css/jquery.dataTables.min.css" rel="stylesheet" />
+<script src="https://cdn.datatables.net/1.10.20/js/jquery.dataTables.min.js"></script>
 <section class="content">
     <div class="row">
         <div class="col-md-12">
@@ -52,7 +52,7 @@
                                                     {
                                                         <div class="led-box">
                                                             <div class="led-red"></div>
-                                                            <a onclick="AssignTeacher(@prd.)">Assign</a>
+                                                            <a onclick="AssignTeacher(@prd.TimeTableId,'@prd.FromTime','@prd.ToTime')">Assign</a>
                                                         </div>
 
                                                     }
@@ -79,9 +79,26 @@
 
             </div>
         </div>
+        @await Html.PartialAsync("~/Views/Shared/_CommanModalPartial.cshtml")
     </div>
 </section>
 <script>
-    function AssignTeacher()
+    function AssignTeacher(id, fromTime, toTime) {
+        $("#loading").removeAttr('style');
+        $.get("/TimeTable/AssignEmployee", { timeTableId: id, fromTime: fromTime, toTime: toTime }, function (response) {
+            $("#divPartialData").html(response);
+            $("#divModalPop").modal('show');
+            $("#modalTitle").html("Assign Employee For this class.")
+            setTimeout(function () {
+                $("#tblDataList").DataTable({
+                    fixedHeader: true,
+                    select: true,
+                    responsive: true
+                });
+            }, 300)
+        }).done(function () {
+            $("#loading").attr('style', 'display:none');
+        });
+    }
 </script>
 

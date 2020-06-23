@@ -1,0 +1,252 @@
+﻿
+@{
+    Layout = null;
+}
+@model SERP.Core.Entities.UserManagement.Authenticate
+<link href="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+<script src="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<link href="~/bootstrap/skin-blue.min.css" rel="stylesheet" />
+<script src="~/lib/jquery-validation/dist/jquery.validate.js"></script>
+<script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.js"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/jquery-ajax-unobtrusive@3.2.6/dist/jquery.unobtrusive-ajax.min.js"
+        integrity="sha256-PAC000yuHt78nszJ2RO0OiDMu/uLzPLRlYTk8J3AO10="
+        crossorigin="anonymous"></script>
+<link href="~/AlertifyJs/build/css/themes/bootstrap.css" rel="stylesheet" />
+<link href="~/bootstrap/loader.css" rel="stylesheet" />
+<script src="~/Custom/Custom.js"></script>
+
+
+<link href="~/bootstrap/CustomModal.css" rel="stylesheet" />
+<link href="~/AlertifyJs/build/css/alertify.css" rel="stylesheet" />
+<script src="~/AlertifyJs/build/alertify.js"></script>
+<style>
+    body {
+        background-image: url("../Images/ERPBanner.jpg");
+        background-repeat: no-repeat;
+        background-size: cover;
+    }
+
+    .login-container {
+        margin-top: 5%;
+        margin-bottom: 5%;
+    }
+
+    .login-form-1 {
+        padding: 5%;
+        box-shadow: 0 5px 8px 0 rgba(0, 0, 0, 0.2), 0 9px 26px 0 rgba(0, 0, 0, 0.19);
+    }
+
+        .login-form-1 h3 {
+            text-align: center;
+            color: #333;
+        }
+
+    .login-form-2 {
+        padding: 5%;
+        box-shadow: 0 5px 8px 0 rgba(0, 0, 0, 0.2), 0 9px 26px 0 rgba(0, 0, 0, 0.19);
+    }
+
+        .login-form-2 h3 {
+            text-align: center;
+            color: #fff;
+        }
+
+    .login-container form {
+        padding: 10%;
+    }
+
+    .btnSubmit {
+        width: 50%;
+        border-radius: 1rem;
+        padding: 1.5%;
+        border: none;
+        cursor: pointer;
+    }
+
+    .login-form-1 .btnSubmit {
+        font-weight: 600;
+        color: #0062cc;
+        background-color: #fff;
+    }
+
+    .login-form-2 .btnSubmit {
+        font-weight: 600;
+        color: #fff;
+        background-color: #0062cc;
+    }
+
+    .login-form-2 .ForgetPwd {
+        color: #fff;
+        font-weight: 600;
+        text-decoration: none;
+    }
+
+    .login-form-1 .ForgetPwd {
+        color: #0062cc;
+        font-weight: 600;
+        text-decoration: none;
+    }
+
+    p {
+        color: white;
+        text-align: center;
+    }
+
+    .divLogin {
+    }
+    .center {
+        display: block;
+        margin-left: auto;
+        margin-right: auto;
+        width: 50%;
+    }
+</style>
+
+
+
+<div class="container login-container ">
+    <div class="row">
+        <div class="col-md-6 login-form-1 " id="divOnlineTest">
+            <img src="~/Images/logoImage.jpg" style="height:150px;width:150px;" class="center" />
+            <h3>Welcome to the Lakshya Education Portal</h3>
+            <span>
+                Innovate Teaching, Promote Skill Building, and Achieve Greater Learning Outcomes!
+            </span>
+            <br />
+            <br />
+            <h4>
+                Let's start for your dream career & stay determined until you achieve it.
+            </h4>
+        </div>
+
+        <div class="col-md-6 login-form-1" id="divOnlineTestRegister" style="display:none">
+
+            <h3>Register Student LMS !</h3>
+            <b>Why Register?</b>
+            <span>After Register to online Test Series, you will unlock the mystery to crack the Goverment Exam.</span>
+            <span>
+                Unlimited Study Material
+                Test Pack gives you access to unlimited tests and eBooks to enhance your learning.
+                Content by Experts
+                Latest Pattern content prepared by India's Best Subject Experts, Faculties & Exam Toppers.
+                Video Solutions
+                Get detailed video solutions of mocks by Faculties of Vipra Online Tutorial.
+                24×7 Doubts Clearing
+                Get instant solutions to your problems with our online doubt clearing groups [Telegram, Mails].
+                Get Monthly Current Affairs eBook to add new dimensions to your exam preparations.
+                Features of Test Pack
+                Full Length Mocks based on the latest pattern
+                Detailed Solutions of all Questions
+                Video Solutions
+                Topic-Wise & Section Wise Practice Tests
+                Previous Years’ Papers & all Memory-Based Mocks of upcoming exams.
+                Latest pattern e-Books
+                English & Hindi Medium
+                Validity: 12 Months
+
+            </span>
+            <br />
+            <br />
+            <h4>
+                Let's start for your dream career & stay determined until you achieve it.
+            </h4>
+        </div>
+        <div class="col-md-6 login-form-2" id="divOnlineLogin">
+            <h3 style="color:#007BFF">Please Login Start your session</h3>
+            <form asp-action="Login" asp-controller="Authenticate" method="post">
+                <div class="form-group has-feedback">
+                    <input asp-for="UserName" class="form-control" placeholder="User Name">
+                </div>
+                <div class="form-group has-feedback">
+                    <input type="password" asp-for="Password" class="form-control" placeholder="Password">
+                </div>
+                <div class="row">
+                    <!-- /.col -->
+                    <div class="col-md-12">
+                        <button type="submit" class="btn btn-primary btn-block btn-flat pull-right">Sign In</button>
+                    </div>
+                    <!-- /.col -->
+                </div>
+            </form>
+        </div>
+
+        <div class="col-md-6 login-form-2" id="divOnlineRegister" style="display:none">
+            <h3>Online Test Series</h3>
+            <p>Please Register to unlock the mystery.</p>
+            <form asp-action="Authenticate" asp-controller="Authenticatet">
+                <div class="form-group">
+                    <input type="text" id="txtCandidateName" class="form-control" placeholder="Candidate Name*" value="" />
+                </div>
+                <div class="form-group">
+                    <input type="text" id="txtCandidatePhone" class="form-control" placeholder="Candidate Phone*" value="" />
+                </div>
+                <div class="form-group">
+                    <input type="text" id="txtCandidateEmail" class="form-control" placeholder="Candidate Email *" value="" />
+                </div>
+                <div class="form-group">
+                    <select class="form-control" id="ddlSubject">
+                        <option class="hidden" selected disabled>Please select your Dream Course</option>
+                        <option value="SSC">SSC</option>
+                        <option value="Railway">Railway</option>
+                        <option value="State Police">State Police</option>
+                        <option value="Bank">Bank</option>
+                        <option value="Insurance">Insurance</option>
+                        <option value="TeachingClass">TeachingClass</option>
+                        <option value="Foundation">Class 6  to 10(CBSE/BSEB)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <input type="button" onclick="SendMail()" class="btnSubmit" value="Register" />
+                </div>
+
+                <div class="form-group">
+                    <p>
+                        Once you enter the required detail.You will get the Login Credential detail on you mail
+                        This mail will send to you once your credential are verified by our Team.
+                        Thanks From Vipra Infotech Admin Team.
+                    </p>
+                </div>
+
+                <div class="form-group">
+                    <a style="color:white" onclick="BackToLogin()" class="ForgetPwd" value="Login">Back To Login</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+
+
+<script src="~/jquery/dist/jquery.min.js"></script>
+<script>
+    function Register() {
+        $("#divOnlineTestRegister").removeAttr("style");
+        $("#divOnlineRegister").removeAttr("style");
+        $("#divOnlineTest").attr("style", "display:none");
+        $("#divOnlineLogin").attr("style", "display:none");
+    }
+    function BackToLogin() {
+        $("#divOnlineTestRegister").attr("style", "display:none");
+        $("#divOnlineRegister").attr("style", "display:none");;
+        $("#divOnlineTest").removeAttr("style");
+        $("#divOnlineLogin").removeAttr("style");
+    }
+
+    function SendMail() {
+        $.get("/OnlineTestPaper/SendMail", function (data) {
+            alert(data);
+        });
+    }
+
+</script>
+<script>
+        $(document).ready(function () {
+            var data = '@ViewBag.message';
+            if (data.length > 0) {
+                alertify.error(data);
+            }
+        })
+</script>

@@ -1,0 +1,45 @@
+﻿@model SERP.UI.Models.RootObject
+<div class="box box-success">
+    <div class="box-header ui-sortable-handle" style="cursor: move;">
+        <i class="fa fa-comments-o"></i>
+
+        <h3 class="box-title">New And Information</h3>
+
+        <div class="box-tools pull-right" data-toggle="tooltip" title="" data-original-title="Status">
+            <div class="btn-group" data-toggle="btn-toggle">
+                <button type="button" class="btn btn-default btn-sm active">
+                    <i class="fa fa-square text-green"></i>
+                </button>
+                <button type="button" class="btn btn-default btn-sm"><i class="fa fa-square text-red"></i></button>
+            </div>
+        </div>
+    </div>
+    <div class="slimScrollDiv" style="overflow-y:scroll; width: auto; height: 250px;">
+        <div class="box-body chat" id="chat-box" style="overflow-y:scroll; width: auto; height: 250px;">
+            @foreach (var data in Model.articles)
+            {
+                <div class="item">
+                    <img src="@data.urlToImage" alt="user image" class="online">
+
+                    <p class="message">
+                        <a href="#" class="name">
+                            <small class="text-muted pull-right"><i class="fa fa-clock-o"></i>@data.publishedAt</small>
+                            @data.source.name ( - @data.author)
+                        </a>
+                        @data.description
+                    </p>
+                    <div class="attachment">
+                        @data.content
+
+                        <div class="pull-right">
+                            <a type="button" href="@data.url" target="_blank" class="btn btn-primary btn-sm btn-flat">Read More..</a>
+                        </div>
+                    </div>
+                    <!-- /.attachment -->
+                </div>
+            }
+
+
+        </div><div class="slimScrollBar" style="background: rgb(0, 0, 0); width: 7px; position: absolute; top: 0px; opacity: 0.4; display: none; border-radius: 7px; z-index: 99; right: 1px; height: 184.911px;"></div><div class="slimScrollRail" style="width: 7px; height: 100%; position: absolute; top: 0px; display: none; border-radius: 7px; background: rgb(51, 51, 51); opacity: 0.2; z-index: 90; right: 1px;"></div>
+    </div>
+</div>

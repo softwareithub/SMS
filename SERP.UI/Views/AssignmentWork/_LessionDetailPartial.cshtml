@@ -1,0 +1,114 @@
+﻿@model IEnumerable<SERP.Core.Model.AssignmentHomeModel.LessonPlanningModel>
+<script src="~/lib/jquery-validation/dist/jquery.validate.js"></script>
+<script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.js"></script>
+<link href="https://cdn.datatables.net/1.10.20/css/jquery.dataTables.min.css" rel="stylesheet" />
+<script src="https://cdn.datatables.net/1.10.20/js/jquery.dataTables.min.js"></script>
+
+
+<section class="content">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="row">
+                <div class="col-md-12">
+                    <table class="table-responsive-md table-striped table-bordered" id="tblDate" style="width:100%">
+                        <thead>
+                            <tr>
+                                <th>Subject Name</th>
+                                <th>Lesson Name</th>
+                                <th>Start Date</th>
+                                <th>End Date</th>
+                                <th>Class Test Date</th>
+                                <th>
+                                    Action
+                                </th>
+
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var data in Model)
+                            {
+                                <tr>
+                                    <td>
+                                        @data.SubjectName
+                                    </td>
+                                    <td>
+                                        @data.LessonMasterModel.LessonName
+                                    </td>
+                                    <td>
+                                        @{
+                                            var startDate = Convert.ToDateTime(data.LessonMasterModel.StartDate).ToShortDateString();
+                                        }
+                                        @startDate
+                                    </td>
+                                    <td>
+                                        @{
+                                            var endDate = Convert.ToDateTime(data.LessonMasterModel.EndDate).ToShortDateString();
+                                        }
+                                        @endDate
+                                    </td>
+                                    <td>
+                                        @{
+                                            var classTestDate = Convert.ToDateTime(data.LessonMasterModel.ClassTestDate).ToShortDateString();
+                                        }
+                                        @classTestDate
+                                    </td>
+
+                                    <td>
+                                        <a class="btn btn-outline-danger pull-right"
+                                           data-loading-text="<i class='fa fa-circle-o-notch fa-spin'  style='color:#DD4B39'></i>"
+                                           onclick="AddTopic(@data.LessonId,this)">
+                                            <i class="fa fa-info" style="color:#DD4B39"></i>
+                                        </a>
+                                        <a class="btn btn-outline-danger pull-right"
+                                           data-loading-text="<i class='fa fa-circle-o-notch fa-spin'  style='color:#DD4B39'></i>"
+                                           onclick="AddTopic(@data.LessonId,this)">
+                                            <i class="fa fa-plus" style="color:#DD4B39"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="divModalPop" role="dialog">
+            <div class="modal-dialog modal-dialog-centered  modal-lg" style="width:90%">
+                <!-- Modal content-->
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" onclick="" data-dismiss="modal">&times;</button>
+                        <h4 class="modal-title" style="text-align:center" id="modalTitle">Lesson Topic Description</h4>
+                    </div><!--modal-header end-->
+
+                    <div class="modal-body">
+                        <fieldset class="fieldset marB0">
+                            <div class="table-outer" style="min-height: 250px;" id="divPartialData">
+
+
+                            </div>
+                        </fieldset>
+                    </div><!--modal-body end-->
+                </div>
+                <!--modal-content end-->
+            </div><!--modal-dialog end-->
+        </div>
+    </div>
+
+</section>
+<script>
+    $(document).ready(function () {
+        setTimeout(function () {
+            $("#tblDate").DataTable();
+        }, 200)
+    })
+    function AddTopic(id, event) {
+        $.get("/LessonTopic/CreateLessonTopic", { id: id }, function (responseData) {
+            $("#divPartialData").html(responseData);
+            $("#divModalPop").modal('show');
+        })
+    }
+</script>
+

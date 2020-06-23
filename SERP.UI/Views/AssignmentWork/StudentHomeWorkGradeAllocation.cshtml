@@ -1,0 +1,98 @@
+﻿@model IEnumerable<SERP.Core.Model.AssignmentHomeModel.HomeWorkAllocationModel>
+
+    <style>
+        tbody {
+            display: block;
+            height: 50px;
+            overflow: auto;
+        }
+
+            thead, tbody tr {
+                display: table;
+                width: 100%;
+                table-layout: fixed; /* even columns width , fix width of table too*/
+            }
+
+        thead {
+            width: calc( 100% - 1em ) /* scrollbar is average 1em/16px width, remove it from thead width */
+        }
+    </style>
+<section class="content">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="row">
+                <div class="col-md-12">
+                    <table id="tblDataList" class="table table-striped table-bordered responsive" style="width:100%">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Roll</th>
+                                <th>Photo</th>
+                                <th>Date</th>
+                                <th>Grade</th>
+                                <th>Remark/Complain</th>
+                            </tr>
+                        </thead>
+                        <tbody style="overflow-y:visible;overflow:scroll;height:600px;">
+                            @foreach (var data in Model)
+                            {
+                            <tr>
+                                <td>
+                                    <input type="hidden" name="studentId" value="@data.StudentId" />
+                                    @data.StudentName
+                                </td>
+                                <td>
+                                    @data.RollCode
+                                </td>
+                                <td>
+                                    @Html.SerpImageHelper(data.ImagePath, 75, 75, "StudentImage")
+                                </td>
+                                <td>
+                                    <input type="date" class="form-control" name="submissionDate" value="@data.SubMissionDate" />
+                                </td>
+                                <td>
+                                    <input type="text" class="form-control" name="grade" value="@data.Grade" />
+                                </td>
+                                <td>
+                                    <input type="text" class="form-control" name="complain" value="@data.FeedBack" />
+                                </td>
+                            </tr>
+                            }
+                        </tbody>
+
+                    </table>
+                </div>
+
+                <div class="col-md-12">
+                   <input type="button" class="btn btn-success" value="Submit" onclick="SaveStudentGrade()" />
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<script type="text/javascript">
+    function SaveStudentGrade() {
+        debugger;
+        var submissionDate = $("input[name='submissionDate']").map(function () {
+            return $(this).val()
+        }).get().join(",");
+        var grades = $("input[name='grade']").map(function () {
+            return $(this).val()
+        }).get().join(",");
+        var complains = $("input[name='complain']").map(function () {
+            return $(this).val();
+        }).get().join(",");
+        var studentIds = $("input[name='studentId']").map(function () {
+            return $(this).val();
+        }).get().join(",");
+
+        $.post("/StudentHomeWork/PostStudentMark", {
+            submissionDate: submissionDate, grades: grades,
+            complains: complains, studentIds: studentIds
+        }, function (response) {
+                alertify.success(response);
+        });
+
+    }
+</script>
+

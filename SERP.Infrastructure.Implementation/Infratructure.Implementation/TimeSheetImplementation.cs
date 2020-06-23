@@ -108,9 +108,13 @@ namespace SERP.Infrastructure.Implementation.Infratructure.Implementation
             List<TimeTableVm> modelTimeTables = new List<TimeTableVm>();
            
             List<CompleteTimeSheetVm> completeTimeSheetVms = new List<CompleteTimeSheetVm>();
+            
+            var connection = baseContext.Database.GetDbConnection();
 
-           var connection = baseContext.Database.GetDbConnection();
-            SqlParameter[] objectParams = { };
+            SqlParameter[] objectParams = { 
+            new SqlParameter("@courseId",courseId){SqlDbType= System.Data.SqlDbType.Int, Direction= System.Data.ParameterDirection.Input },
+            new SqlParameter("@batchId",batchId){SqlDbType= System.Data.SqlDbType.Int, Direction= System.Data.ParameterDirection.Input },
+            };
 
             var result = await SqlHelperExtension.ExecuteReader(connection.ConnectionString, SqlConstant.GetTimeSheet, System.Data.CommandType.Text, objectParams);
 
@@ -131,10 +135,11 @@ namespace SERP.Infrastructure.Implementation.Infratructure.Implementation
                 model.SubjectName = result.DefaultIfNull<string>("SubjectName");
                 model.TimeTableDay = result.DefaultIfNull<string>("TimeTableDay");
                 model.TeacherAttendence = result.DefaultIfNull<string>("TeacherAttendence");
+                model.TeacherId = result.DefaultIfNull<int>("TeacherId");
+                model.TimeTableId = result.DefaultIfNull<int>("Id");
                 completeTimeSheetVms.Add(model);
             }
-
-            foreach(var data in completeTimeSheetVms.GroupBy(x=>x.TimeTableDay))
+            foreach (var data in completeTimeSheetVms.GroupBy(x=>x.TimeTableDay))
             {
                 List<PeriodVm> periodVms = new List<PeriodVm>();
 
@@ -154,6 +159,7 @@ namespace SERP.Infrastructure.Implementation.Infratructure.Implementation
                     periodVm.SubjectName = item.SubjectName;
                     periodVm.TeacherAttendence = item.TeacherAttendence;
                     periodVm.EmployeeName = item.EmployeeName;
+                    periodVm.TimeTableId = item.TimeTableId;
 
                     periodVms.Add(periodVm);
                 }
@@ -162,6 +168,52 @@ namespace SERP.Infrastructure.Implementation.Infratructure.Implementation
             }
             modelTimeSheet.TimeTableModels = modelTimeTables;
             return modelTimeSheet;
+        }
+
+        public async Task<List<PeriodVm>> GetSubjectTeacher(int subjectId)
+        {
+            List<PeriodVm> periods = new List<PeriodVm>();
+            var connection = baseContext.Database.GetDbConnection();
+            SqlParameter[] objectParams = {
+            new SqlParameter("@subjectId",subjectId){SqlDbType= System.Data.SqlDbType.Int, Direction=System.Data.ParameterDirection.Input }
+            };
+
+            var result = await SqlHelperExtension.ExecuteReader(connection.ConnectionString, SqlConstant.GetTeacherBySubjectId,
+                System.Data.CommandType.StoredProcedure, objectParams);
+            while(result.Read())
+            {
+                PeriodVm model = new PeriodVm();
+                model.EmployeeName = result.DefaultIfNull<string>("Name");
+                model.EmployeeId = result.DefaultIfNull<int>("Id");
+
+                periods.Add(model);
+            }
+            return periods;
+        }
+
+        public async Task<List<FreeEmployeeModel>> AssignTeacherTemp(TimeSpan fromTime, TimeSpan ToTime)
+        {
+            List<FreeEmployeeModel> freeEmployeeList = new List<FreeEmployeeModel>();
+
+            var connection = baseContext.Database.GetDbConnection();
+
+            SqlParameter[] objectParams = {
+            new SqlParameter("@fromTime",fromTime){SqlDbType= System.Data.SqlDbType.Time, Direction= System.Data.ParameterDirection.Input },
+            new SqlParameter("@toTIme",ToTime){SqlDbType= System.Data.SqlDbType.Time, Direction= System.Data.ParameterDirection.Input },
+            };
+
+            var result = await SqlHelperExtension.ExecuteReader(connection.ConnectionString, SqlConstant.GetFreeTeacher, System.Data.CommandType.Text, objectParams);
+
+            while (result.Read())
+            {
+                FreeEmployeeModel model = new FreeEmployeeModel();
+                model.EmployeeName = result.DefaultIfNull<string>("EmployeeName");
+                model.Photo = result.DefaultIfNull<string>("Photo");
+                model.EmployeeId = result.DefaultIfNull<int>("TeacherId");
+                freeEmployeeList.Add(model);
+            }
+            
+            return freeEmployeeList;
         }
     }
 }
