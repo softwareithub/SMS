@@ -54,14 +54,14 @@
                         <div class="col-md-4">
                             <div class="form-group">
                                 <label asp-for="AttendenceDate">Attendence Date</label>
-                                <input asp-for="AttendenceDate" class="form-control">
+                                <input asp-for="AttendenceDate" class="form-control" onchange="GetEmployeeList()">
                                 <span asp-validation-for="AttendenceDate" class="text-danger"></span>
                             </div>
                         </div>
                         <div class="col-md-4">
                             <div class="form-group">
                                 <label asp-for="DepartmentId">Select Department</label>
-                                <select asp-for="DepartmentId" class="form-control"  onchange="GetEmployeeList(this)" asp-items="@(new SelectList(ViewBag.Departments,"Id","Name","Select Department"))">
+                                <select asp-for="DepartmentId" class="form-control"  onchange="GetEmployeeList()" asp-items="@(new SelectList(ViewBag.Departments,"Id","Name","Select Department"))">
                                     <option value="">Select Department</option>
                                 </select>
                                 <span asp-validation-for="DepartmentId" class="text-danger"></span>
@@ -124,6 +124,7 @@
 </section>
 
 <script>
+   
     function SelectLeaveType(id) {
         if ($(id).val() == "Y") {
             $("#leaveType").removeAttr("style");
@@ -134,25 +135,20 @@
             $("#toAttendence").attr("style", "display:none");
         }
     }
-    function GetAcademicList() {
-        GetCustomRecord("AcademicMaster/GetAcademicList");
-        setTimeout(function () {
-            $("#modalTitle").text("Academic Master List")
-        }, 300);
-    }
     function NewRecord() {
         var url = "EmployeeAttendence/Index";
         NewCustomRecord(url);
     }
-    function GetEmployeeList(e) {
+    function GetEmployeeList() {
         debugger
+        var departmentId = $("#DepartmentId").val();
         var dateValue = $("#AttendenceDate").val();
         if (dateValue.length == 0) {
             alertify.error("Please select Date");
             $("#AttendenceDate").attr("style", "fore-color:red");
         }
         else {
-            $.get("/EmployeeAttendence/GetEmployeeList", { id: $(e).val(), attDate: dateValue }, function (response) {
+            $.get("/EmployeeAttendence/GetEmployeeList", { id: departmentId, attDate: dateValue }, function (response) {
                 $("#_divEmployeeList").html(response);
             })
         }

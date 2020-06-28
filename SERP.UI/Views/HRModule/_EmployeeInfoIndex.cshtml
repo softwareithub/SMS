@@ -1,10 +1,10 @@
-﻿@{
+﻿@model SERP.Core.Model.HRModel.EmployeeInfoVm
+
+@{
     ViewData["Title"] = "Index";
     Layout = null;
 
 }
-@model SERP.Core.Entities.Entity.Core.Master.AcademicMaster
-
 <script src="~/lib/jquery-validation/dist/jquery.validate.js"></script>
 <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.js"></script>
 <link href="https://cdn.datatables.net/1.10.20/css/jquery.dataTables.min.css" rel="stylesheet" />
@@ -12,113 +12,252 @@
 
 <section class="content-header">
     <h1>
-        Employee Information
+        Employee Master
         <small>Create Employee Detail</small>
     </h1>
-    <ol class="breadcrumb">
-        <li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
-        <li><a href="#">Forms</a></li>
-        <li class="active">General Elements</li>
-    </ol>
 </section>
 
 
 <section class="content">
     <div class="row">
-        <div class="col-md-12">
-            <div class="col-md-10">
-                <a class="btn btn-primary pull-right" onclick="GetRecordList()">
-                    <i class="fa fa-list-ul"></i>
-                    List
-                </a>
-            </div>
-            <div class="col-md-2">
-                <a class="btn btn-primary pull-left" onclick="NewRecord()">
-                    <i class="fa fa-plus-square"></i>
-                </a>
-            </div>
-        </div>
+
         <div class="col-md-12">
             <!-- general form elements -->
-
-            <div class="col-md-12">
-                <!-- Custom Tabs -->
-                <div class="nav-tabs-custom">
-                    <ul class="nav nav-tabs">
-                        <li class="active"><a href="#tab_1" data-toggle="tab" aria-expanded="false">Basic Information</a></li>
-                        @*<li><a onclick="GetQualification()" data-toggle="tab" aria-expanded="false">Qualification Info</a></li>*@
-                        <li><a href="#tab_3" onclick="GetSalary()" data-toggle="tab" aria-expanded="true">Employee Salary</a></li>
-
-
-                    </ul>
-                    <div class="tab-content">
-                        <div class="tab-pane" id="tab_1">
-
+            <div class="box box-primary">
+                <div class="box-header with-border">
+                    <h3 class="box-title">Create Employee Details Master</h3>
+                    <div class="col-md-12">
+                        <div class="col-md-10">
+                            <a class="btn btn-primary pull-right" onclick="GetAcademicList()">
+                                <i class="fa fa-list-ul"></i>
+                            </a>
                         </div>
-                        <!-- /.tab-pane -->
-                        <div class="tab-pane" id="tab_2">
-
+                        <div class="col-md-2">
+                            <a class="btn btn-primary pull-left" onclick="NewAcademicMaster()">
+                                <i class="fa fa-plus-square"></i>
+                            </a>
                         </div>
-                        <!-- /.tab-pane -->
-                        <div class="tab-pane active" id="tab_3">
-
-                        </div>
-                        <div class="tab-pane active" id="tab_4">
-
-                        </div>
-                        <!-- /.tab-pane -->
                     </div>
-                    <!-- /.tab-content -->
+
                 </div>
-                <!-- nav-tabs-custom -->
+                <div class="overlay divHidding" id="divFormData">
+                    <i class="fa fa-refresh fa-spin">
+
+                    </i>
+                </div>
+                <form method="post" data-ajax="true" data-ajax-method="post"
+                      asp-action="Create" asp-controller="Employee" data-ajax-success="Success"
+                      data-ajax-begin="CustomFormSubmitBegin" data-ajax-complete="CustomFormSubmitComplete" enctype="multipart/form-data">
+                    <div class="box-body">
+
+                        <div class="form-group col-md-4">
+                            <input type="hidden" asp-for="EmployeeBasicInfoModel.Id" />
+                            <input type="hidden" asp-for="EmployeeBasicInfoModel.CreatedBy" />
+                            <input type="hidden" asp-for="EmployeeBasicInfoModel.CreatedDate" />
+                            <label asp-for="EmployeeBasicInfoModel.Name">Employee Name</label>
+                            <input asp-for="EmployeeBasicInfoModel.Name" class="form-control">
+                            <span asp-validation-for="EmployeeBasicInfoModel.Name" class="text-danger"></span>
+                        </div>
+                        <div class="form-group col-md-4">
+                            <label asp-for="EmployeeBasicInfoModel.EmpCode">Employee Code</label>
+                            <input asp-for="EmployeeBasicInfoModel.EmpCode" class="form-control">
+                            <span asp-validation-for="EmployeeBasicInfoModel.EmpCode" class="text-danger"></span>
+                        </div>
+                        <div class="form-group col-md-4">
+                            <label asp-for="EmployeeBasicInfoModel.FatherName">Father Name</label>
+                            <input asp-for="EmployeeBasicInfoModel.FatherName" class="form-control">
+                            <span asp-validation-for="EmployeeBasicInfoModel.FatherName" class="text-danger"></span>
+                        </div>
+                        <div class="form-group col-md-4">
+                            <label asp-for="EmployeeBasicInfoModel.MotherName">Mother Name</label>
+                            <input asp-for="EmployeeBasicInfoModel.MotherName" class="form-control">
+                            <span asp-validation-for="EmployeeBasicInfoModel.MotherName" class="text-danger"></span>
+                        </div>
+                        <div class="form-group col-md-4">
+                            <label asp-for="EmployeeBasicInfoModel.Phone">Phone</label>
+                            <input asp-for="EmployeeBasicInfoModel.Phone" class="form-control">
+                            <span asp-validation-for="EmployeeBasicInfoModel.Phone" class="text-danger"></span>
+                        </div>
+                        <div class="form-group col-md-4">
+                            <label asp-for="EmployeeBasicInfoModel.Email">Email</label>
+                            <input asp-for="EmployeeBasicInfoModel.Email" class="form-control">
+                            <span asp-validation-for="EmployeeBasicInfoModel.Email" class="text-danger"></span>
+                        </div>
+                        <div class="form-group col-md-4">
+                            <label asp-for="EmployeeBasicInfoModel.C_Address">Crosspondence Address</label>
+                            <input asp-for="EmployeeBasicInfoModel.C_Address" class="form-control">
+                            <span asp-validation-for="EmployeeBasicInfoModel.C_Address" class="text-danger"></span>
+                        </div>
+                        <div class="form-group col-md-4">
+                            <label asp-for="EmployeeBasicInfoModel.p_Address">Permanent Address</label>
+                            <input asp-for="EmployeeBasicInfoModel.p_Address" class="form-control">
+                            <span asp-validation-for="EmployeeBasicInfoModel.p_Address" class="text-danger"></span>
+                        </div>
+                        <div class="form-group col-md-4">
+                            <label asp-for="EmployeeBasicInfoModel.Gender">Gender</label>
+                            <select asp-for="EmployeeBasicInfoModel.Gender" class="form-control">
+                                <option value="Sel">Select</option>
+                                <option value="Male">Male</option>
+                                <option value="Female">Fe-Male</option>
+                            </select>
+                            <span asp-validation-for="EmployeeBasicInfoModel.Gender" class="text-danger"></span>
+                        </div>
+                        <div class="form-group col-md-4">
+                            <label asp-for="EmployeeBasicInfoModel.BloodGroup">Blood Group</label>
+                            <select asp-for="EmployeeBasicInfoModel.BloodGroup" class="form-control">
+                                <option value="">Select</option>
+                                <option value="A+">A+</option>
+                                <option value="A-">A-</option>
+                                <option value="A+">B+</option>
+                                <option value="A-">B-</option>
+                                <option value="A+">AB+</option>
+                                <option value="A-">AB-</option>
+                                <option value="A+">O+</option>
+                                <option value="A-">O-</option>
+                            </select>
+                            <span asp-validation-for="EmployeeBasicInfoModel.BloodGroup" class="text-danger"></span>
+                        </div>
+                        <div class="form-group col-md-4">
+                            <label asp-for="EmployeeBasicInfoModel.DepartmentId">
+                                Department
+                                <a data-ajax="true" data-ajax-mode="replace"
+                                   asp-action="Index" asp-controller="Department"
+                                   data-ajax-update="#divSERP"
+                                   data-ajax-begin="AjaxOnBegin" data-ajax-complete="AjaxComplete"
+                                   class="nav-link">
+                                    <span>
+                                        Create
+                                    </span>
+                                </a>
+                            </label>
+                            <select asp-for="EmployeeBasicInfoModel.DepartmentId" class="form-control" asp-items="@(new SelectList(ViewBag.DepartmentDetails ,"Id","Name"))" onchange="GetBatchList()">
+                                <option value="">Select</option>
+                            </select>
+                            <span asp-validation-for="EmployeeBasicInfoModel.DepartmentId" class="text-danger"></span>
+                        </div>
+                        <div class="form-group col-md-4">
+                            <label asp-for="EmployeeBasicInfoModel.DesignationId">Designation</label>
+                            <select asp-for="EmployeeBasicInfoModel.DesignationId" class="form-control" asp-items="@(new SelectList(ViewBag.Designation ,"Id","Name"))" onchange="GetBatchList()">
+                                <option value="">Select</option>
+                            </select>
+                            <span asp-validation-for="EmployeeBasicInfoModel.DesignationId" class="text-danger"></span>
+                        </div>
+                        <div class="form-group col-md-4">
+                            <label asp-for="EmployeeBasicInfoModel.JoiningDate">Joining Date</label>
+                            <input asp-for="EmployeeBasicInfoModel.JoiningDate" class="form-control">
+                            <span asp-validation-for="EmployeeBasicInfoModel.JoiningDate" class="text-danger"></span>
+                        </div>
+                        <div class="form-group col-md-4">
+                            <label asp-for="EmployeeBasicInfoModel.BankId">Bank</label>
+                            <select asp-for="EmployeeBasicInfoModel.BankId" class="form-control" asp-items="@(new SelectList(ViewBag.BankDetails ,"Id","Name"))" onchange="GetBatchList()">
+                                <option value="">Select</option>
+                            </select>
+                            <span asp-validation-for="EmployeeBasicInfoModel.BankId" class="text-danger"></span>
+                        </div>
+                        <div class="form-group col-md-4">
+                            <label asp-for="EmployeeBasicInfoModel.AccountNumber">Account Number</label>
+                            <input asp-for="EmployeeBasicInfoModel.AccountNumber" class="form-control">
+                            <span asp-validation-for="EmployeeBasicInfoModel.AccountNumber" class="text-danger"></span>
+                        </div>
+                        <div class="form-group col-md-4">
+                            <label asp-for="EmployeeBasicInfoModel.ConvictedForCrime">Convicted To Crime</label>
+                            <select asp-for="EmployeeBasicInfoModel.ConvictedForCrime" class="form-control">
+                                <option>--Select--</option>
+                                <option value="0">No</option>
+                                <option value="1">Yes</option>
+                            </select>
+                            <span asp-validation-for="EmployeeBasicInfoModel.ConvictedForCrime" class="text-danger"></span>
+                        </div>
+                        <div class="form-group col-md-4">
+                            <label asp-for="EmployeeBasicInfoModel.Photo">Upload Image</label>
+                            <input type="file" asp-for="EmployeeBasicInfoModel.Photo" name="employeePhoto" class="form-control" />
+                            <span asp-validation-for="EmployeeBasicInfoModel.ConvictedForCrime" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="box">
+                        <div class="box-header with-border">
+                            <h3 class="box-title">Employee Salary Allocation</h3>
+                            <div class="box-tools pull-right">
+                            </div>
+                        </div>
+                        <div class="box-body">
+                            @for (int i = 0; i < Model.EmployeeSalaryModels.Count(); i++)
+                            {
+                                var AdditionDeduction = string.Empty;
+                                <input type="hidden" asp-for="@Model.EmployeeSalaryModels[i].HeadId" />
+                                if (Model.EmployeeSalaryModels[i].AdditionDeduction.Trim() == "A")
+                                {
+                                    AdditionDeduction = "Addition";
+                                    <div class="form-group col-md-4">
+                                        <label asp-for="EmployeeSalaryModels[i].HeadName"><span style="color:aqua">@Model.EmployeeSalaryModels[i].HeadName (@AdditionDeduction)</span></label>
+                                        <input asp-for="EmployeeSalaryModels[i].Amount" class="form-control">
+                                        <span asp-validation-for="EmployeeSalaryModels[i].HeadName" class="text-danger"></span>
+                                    </div>
+                                }
+                                else
+                                {
+                                    <input type="hidden" asp-for="@Model.EmployeeSalaryModels[i].HeadId" />
+                                    AdditionDeduction = "Deduction";
+                                    <div class="form-group col-md-4">
+                                        <label asp-for="EmployeeSalaryModels[i].HeadName"><span style="color:coral">@Model.EmployeeSalaryModels[i].HeadName (@AdditionDeduction)</span></label>
+                                        <input asp-for="EmployeeSalaryModels[i].Amount" class="form-control">
+                                        <span asp-validation-for="EmployeeSalaryModels[i].HeadName" class="text-danger"></span>
+                                    </div>
+                                }
+
+                            }
+                        </div>
+                    </div>
+                    <div class="box-footer">
+                        <div class="col-md-8">
+                            @Html.SERPButton("btn btn-primary pull-right btnSubmit", Model.EmployeeBasicInfoModel == null ? 0 : Model.EmployeeBasicInfoModel.Id)
+                            <button class="buttonload" style="display:none">
+                                <i class="fa fa-refresh fa-spin"></i>Loading
+                            </button>
+                        </div>
+                        <div class="col-md-4">
+                            <button type="reset" class="btn btn-danger pull-left">Cancel</button>
+                        </div>
+
+                    </div>
+                </form>
             </div>
         </div>
 
         @await Html.PartialAsync("~/Views/Shared/_CommanModalPartial.cshtml")
 
+        <div id="employeeSalaryModal" class="modal fade" role="dialog">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                        <h4 class="modal-title">Employee Salary Details</h4>
+                    </div>
+                    <div class="modal-body">
+                        <div id="divSalaryDetails"></div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </section>
 
+
 <script>
-    $(document).ready(function () {
-        GetBasicInfo(0);
-    });
-    function GetBasicInfo(id) {
-        $.get("/Employee/BasicInfo", { id: id }, function (responseData) {
-            debugger;
-            $("#tab_1").html(responseData);
-            $("#tab_1").addClass('active');
-        });
-    }
-    function GetQualification() {
-        $.get("Employee/CreatePreviousQual", function (responseData) {
-            debugger;
-            $("#tab_1").removeClass('active');
-            $("#tab_2").html(responseData);
-            $("#tab_2").addClass('active');
-        });
-    }
-    function GetSalary() {
-        debugger
-        if (sessionStorage.getItem("employeeId") != null) {
-            $.get("/Employee/EmployeeSalary", { id: sessionStorage.getItem("employeeId") }, function (responseData) {
-                debugger;
-                $("#tab_1").removeClass('active');
-                $("#tab_2").removeClass('active');
-                $("#tab_3").html(responseData);
-                $("#tab_3").addClass('active');
-            });
-        }
-        else {
-            alertify.set('notifier', 'position', 'top-right');
-            alertify.error("No Employee are selected ! Please select Employee")
-        }
-    }
-    function GetRecordList() {
+
+    function GetAcademicList() {
         GetCustomRecord("/Employee/GetEmployeeList");
         setTimeout(function () {
-            $("#modalTitle").text("Employee List")
+            $("#modalTitle").text("Employee Details")
         }, 300);
+    }
+    function NewAcademicMaster() {
+        var url = "/Employee/Index";
+        NewCustomRecord(url);
     }
 </script>
 

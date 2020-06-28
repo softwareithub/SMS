@@ -60,7 +60,7 @@
             }
         },
         glossary:{
-            title:'AlertifyJS',
+            title:'SERP',
             ok: 'OK',
             cancel: 'Cancel',
             acccpt: 'Accept',

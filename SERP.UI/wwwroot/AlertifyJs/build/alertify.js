@@ -65,7 +65,7 @@
             }
         },
         glossary:{
-            title:'AlertifyJS',
+            title:'SERP Says',
             ok: 'OK',
             cancel: 'Cancel',
             acccpt: 'Accept',

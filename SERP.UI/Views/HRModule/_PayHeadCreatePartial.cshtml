@@ -114,13 +114,13 @@
 <script>
 
     function GetRecordList() {
-        GetCustomRecord("PayHead/GetPayHeadDetail");
+        GetCustomRecord("/PayHead/GetPayHeadDetail");
         setTimeout(function () {
             $("#modalTitle").text("PayHead List")
         }, 300);
     }
     function NewRecord() {
-        var url = "PayHead/Index";
+        var url = "/PayHead/Index";
         NewCustomRecord(url);
     }
 </script>

@@ -54,6 +54,7 @@ namespace SERP.UI.Controllers.Transaction.FeeTransaction
         public async Task<IActionResult> GetFeeDetail(int studentId)
         {
             var result = await _feeDetailRepo.GetFeeDetailRepo(studentId);
+            
 
             result.ForEach(x =>
             {
@@ -89,10 +90,10 @@ namespace SERP.UI.Controllers.Transaction.FeeTransaction
                 }
                 else
                 {
-                    if (x.DiscountType.ToLower().Trim() == "per")
+                    if (x.DiscountType?.ToLower()?.Trim() == "per")
                         x.NetAmount = x.YearlyAmount - ((x.YearlyAmount * x.DiscountValue) / 100);
                     else
-                        x.NetAmount = x.YearlyAmount - x.DiscountValue;
+                        x.NetAmount = x.YearlyAmount;
                 }
             });
             return PartialView("~/Views/FeeTransaction/_StudentFeeDetails.cshtml", result);

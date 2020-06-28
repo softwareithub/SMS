@@ -1,0 +1,46 @@
+﻿@model IEnumerable<SERP.Core.Model.MasterViewModel.StudentPartialInfoViewModel>
+<style>
+
+    .card {
+        box-shadow: 0 8px 8px 10px rgba(87, 84, 84, 0.4);
+        max-width: 100%;
+        padding: 10px;
+        margin: auto;
+        text-align: center;
+    }
+
+    img {
+        width: 70%;
+        border: 1px solid black;
+        border-radius: 50%;
+    }
+
+    .designation {
+        font-size: 18px;
+    }
+</style>
+
+
+
+<h1 style="text-align:center">Identity Card</h1>
+@foreach (var data in Model)
+{
+    <div class="card">
+        <img src="@data.StudentPhoto" alt="image" />
+        <h1>@data.StudentName</h1>
+        <div class="designation">
+            Class Name :   @data.CourseName<br />
+            Batch Name :   @data.BatchName<br />
+            Roll Code  :   @data.RollCode<br />
+        </div>
+        <p>Contact:@data.FatherPhone</p>
+        <div class="social">
+            <a href="#"><i class="fa fa-facebook"></i></a>
+            <a href="#"><i class="fa fa-instagram"></i></a>
+            <a href="#"><i class="fa fa-linkedin"></i></a>
+            <a href="#"><i class="fa fa-twitter"></i></a>
+        </div>
+    </div>
+}
+
+

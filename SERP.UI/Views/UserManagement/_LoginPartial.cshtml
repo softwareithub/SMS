@@ -109,8 +109,9 @@
 <div class="container login-container ">
     <div class="row">
         <div class="col-md-6 login-form-1 " id="divOnlineTest">
-            <img src="~/Images/logoImage.jpg" style="height:150px;width:150px;" class="center" />
-            <h3>Welcome to the Lakshya Education Portal</h3>
+            <img src="@ViewBag.Logo" style="height:150px;width:150px;" class="center" />
+            <h3>Welcome to the @ViewBag.Name</h3>
+            <span>@ViewBag.Rythum</span>
             <span>
                 Innovate Teaching, Promote Skill Building, and Achieve Greater Learning Outcomes!
             </span>
@@ -123,9 +124,9 @@
 
         <div class="col-md-6 login-form-1" id="divOnlineTestRegister" style="display:none">
 
-            <h3>Register Student LMS !</h3>
+            <h3>Register  @ViewBag.Name !</h3>
             <b>Why Register?</b>
-            <span>After Register to online Test Series, you will unlock the mystery to crack the Goverment Exam.</span>
+            <span>After Register to @ViewBag.Name, you will unlock the mystery .</span>
             <span>
                 Unlimited Study Material
                 Test Pack gives you access to unlimited tests and eBooks to enhance your learning.
@@ -164,8 +165,11 @@
                 </div>
                 <div class="row">
                     <!-- /.col -->
-                    <div class="col-md-12">
+                    <div class="col-md-6">
                         <button type="submit" class="btn btn-primary btn-block btn-flat pull-right">Sign In</button>
+                    </div>
+                    <div class="col-md-6">
+                        <button type="button" class="btn btn-primary btn-block btn-flat pull-right" onclick="Register()">Register</button>
                     </div>
                     <!-- /.col -->
                 </div>
@@ -173,7 +177,7 @@
         </div>
 
         <div class="col-md-6 login-form-2" id="divOnlineRegister" style="display:none">
-            <h3>Online Test Series</h3>
+            <h3>@ViewBag.Name</h3>
             <p>Please Register to unlock the mystery.</p>
             <form asp-action="Authenticate" asp-controller="Authenticatet">
                 <div class="form-group">
@@ -210,7 +214,7 @@
                 </div>
 
                 <div class="form-group">
-                    <a style="color:white" onclick="BackToLogin()" class="ForgetPwd" value="Login">Back To Login</a>
+                    <a  onclick="BackToLogin()" class="ForgetPwd btn btnSubmit" value="Login">Back To Login</a>
                 </div>
             </form>
         </div>

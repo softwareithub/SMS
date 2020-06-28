@@ -1,4 +1,6 @@
-﻿<!DOCTYPE html>
+﻿@using Microsoft.AspNetCore.Http
+@inject IHttpContextAccessor HttpContextAccessor
+<!DOCTYPE html>
 <!--
 This is a starter template page. Use this page to start your new project from
 scratch. This page gets rid of all links and provides the needed markup only.
@@ -7,7 +9,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>Lakshya Education Portal </title>
+    <title>@HttpContextAccessor.HttpContext.Session.GetString("InstituteName") </title>
     <!-- Tell the browser to be responsive to screen width -->
     <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
     <link href="~/bootstrap/bootstrap.min.css" rel="stylesheet" />
@@ -15,7 +17,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
     <link href="~/FontAwesome/font-awesome.min.css" rel="stylesheet" />
     <!-- Ionicons -->
     <link href="~/Iconic/ionicons.min.css" rel="stylesheet" />
-    <link rel="icon" href="~/Images/logoImage.jpg" type="image/gif">
+    <link rel="icon" href="@HttpContextAccessor.HttpContext.Session.GetString("InstituteLogo")" type="image/gif">
     <!-- Theme style -->
 
     <link href="~/bootstrap/AdminLTE.min.css" rel="stylesheet" />

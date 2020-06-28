@@ -24,6 +24,11 @@
                                 decimal netAmount = decimal.Parse("0.0");
                                 decimal netDiscount = decimal.Parse("0.0");
                                 decimal netPayableAmount = decimal.Parse("0.0");
+                                decimal netDiscountIfnotPerticular = decimal.Parse("0.0");
+                                if(Model.First().DependentOnParticular==0)
+                                {
+                                    netDiscountIfnotPerticular = Model.First().DiscountValue;
+                                }
                                 foreach (var data in Model)
                                 {
                                     <tr >
@@ -47,7 +52,7 @@
                                             }
                                             else
                                             {
-                                                var discountType = data.PertDiscountType?.ToUpper().Trim() == "AM" ? "Amount" : "Percentage";
+                                                var discountType = data.DiscountType?.ToUpper().Trim() == "AM" ? "Amount" : "Percentage";
                                                 @discountType
                                             }
 
@@ -59,7 +64,8 @@
                                             }
                                             else
                                             {
-                                                @data.DiscountValue
+                                                var discount=decimal.Parse("0");
+                                                   @discount
                                             }
 
                                         </td>
@@ -88,7 +94,15 @@
                                         Net Discount Amount :
                                     </td>
                                     <td>
-                                        @netDiscount
+                                        @if (netDiscountIfnotPerticular > 0)
+                                        {
+                                            @netDiscountIfnotPerticular
+                                        }
+                                        else
+                                        {
+                                            @netDiscount
+                                        }
+
                                     </td>
                                 </tr>
                                 <tr >
@@ -96,7 +110,16 @@
                                         Net Payable Amount :
                                     </td>
                                     <td>
-                                        @netPayableAmount
+                                        @if (netDiscountIfnotPerticular > 0)
+                                        {
+                                            netPayableAmount = netPayableAmount - netDiscountIfnotPerticular;
+                                            @netPayableAmount
+                                        }
+                                        else
+                                        {
+                                            @netPayableAmount
+                                        }
+
                                     </td>
                                 </tr>
                             }

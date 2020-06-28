@@ -10,8 +10,8 @@
         <div class="row">
             <div class="col-md-12">
                 <div class="row">
-                    <div class="col-md-12 table100 ver5 m-b-110">
-                        <table id="tblDataList" data-vertable="ver5" style="width:100%">
+                    <div class="col-md-12">
+                        <table id="tblDataList" class="table table-hover table-responsive" style="width:100%">
                             <thead>
                                 <tr class="row100 head">
                                     <th>Name</th>
@@ -32,7 +32,7 @@
                                     foreach (var data in Model)
                                     {
                                         var catyId = data.CategoryName.Replace(" ", string.Empty);
-                                        <tr class="row100">
+                                        <tr>
                                             <td>
                                                 <input type="hidden" name="CategoryId" value="@data.CategoryId" />
                                                 @data.CategoryName
@@ -73,50 +73,157 @@
                                                 }
                                                 else if (data.FeePaymentType == "Half Yearly")
                                                 {
-                                                    <select class="form-control modal-example" name="@data.CategoryId" onchange="GetMonthlyAmount(this,'@data.NetAmount','@catyId')" name="inventors" multiple>
-                                                        <option value="FH">1st Half</option>
-                                                        <option value="FH">2nd Half</option>
+                                                    <select class="form-control modal-example" name="@data.CategoryId" onchange="GetMonthlyAmount(this,'@data.NetAmount','@catyId')" multiple>
+                                                        @if (!string.IsNullOrEmpty(data.PaymentDoneFor) && data.PaymentDoneFor.Contains("FH"))
+                                                        {
+                                                            var hlf = data.PaymentDoneFor.Split(",");
+                                                            if (hlf.Count() > 0)
+                                                            {
+                                                                if (hlf.Count() == 1)
+                                                                {
+                                                                    <option value="FH" disabled>1st Half</option>
+                                                                    <option value="FH">2nd Half</option>
+                                                                }
+                                                                else if (hlf.Count() == 2 || hlf.Count() > 2)
+                                                                {
+                                                                    <option value="FH" disabled>1st Half</option>
+                                                                    <option value="FH" disabled>2nd Half</option>
+                                                                }
+                                                                else
+                                                                {
+                                                                    <option value="FH">1st Half</option>
+                                                                    <option value="FH">2nd Half</option>
+                                                                }
+                                                            }
+                                                            else
+                                                            {
+                                                                <option value="FH">1st Half</option>
+                                                                <option value="FH">2nd Half</option>
+                                                            }
+
+                                                        }
+                                                        else
+                                                        {
+                                                            <option value="FH">1st Half</option>
+                                                            <option value="FH">2nd Half</option>
+                                                        }
                                                     </select>
                                                 }
                                                 else if (data.FeePaymentType == "Quaterly")
                                                 {
-                                                    <select name="@data.CategoryId" class="form-control modal-example" onchange="GetMonthlyAmount(this,'@data.NetAmount','@catyId')" name="inventors" multiple>
-                                                        <option value="1stQTR">1st Quater</option>
-                                                        <option value="2ndQTR">2nd Quarter</option>
-                                                        <option value="3rdQTR">3rd Quater</option>
-                                                        <option value="4thQTR">4th Quarter</option>
+                                                    <select name="@data.CategoryId" id="ddlQuaterly" class="form-control modal-example" onchange="GetMonthlyAmount(this,'@data.NetAmount','@catyId')" multiple>
+                                                        @if (!string.IsNullOrEmpty(data.PaymentDoneFor) && data.PaymentDoneFor.Contains("QTR"))
+                                                        {
+                                                            var qtr = data.PaymentDoneFor.Split(",");
+                                                            if (qtr.Count() > 0)
+                                                            {
+                                                                for (int i = 0; i < qtr.Count(); i++)
+                                                                {
+                                                                    if (qtr[i] == "1stQTR")
+                                                                    {
+                                                                        <option value="1stQTR" disabled="disabled" style="background-color:#ff6a00">1st Quater</option>
+                                                                        goto Found;
+                                                                    }
+
+                                                                    if (qtr[i] == "2ndQTR")
+                                                                    {
+                                                                        <option value="2ndQTR" disabled="disabled" style="color:#ff6a00">2nd Quarter</option>
+                                                                        goto Found;
+                                                                    }
+
+                                                                    if (qtr[i] == "3rdQTR")
+                                                                    {
+                                                                        <option value="3rdQTR" disabled style="color:#ff6a00">3rd Quater</option>
+                                                                        goto Found;
+                                                                    }
+
+                                                                    if (qtr[i] == "4thQTR")
+                                                                    {
+                                                                        <option value="4thQTR" disabled style="color:#ff6a00">4th Quarter</option>
+                                                                        goto Found;
+                                                                    }
+
+
+                                                                Found: continue;
+                                                                }
+                                                            }
+                                                            else
+                                                            {
+                                                                <option value="1stQTR">1st Quater</option>
+                                                                <option value="2ndQTR">2nd Quarter</option>
+                                                                <option value="3rdQTR">3rd Quater</option>
+                                                                <option value="4thQTR">4th Quarter</option>
+                                                            }
+
+
+                                                        }
+
+
                                                     </select>
                                                 }
                                                 else if (data.FeePaymentType == "Monthly")
                                                 {
 
-                                                    <select name="@data.CategoryId" onchange="GetMonthlyAmount(this,'@data.NetAmount','@catyId')" class="form-control modal-example" name="inventors" multiple>
+                                                    <select name="@data.CategoryId" onchange="GetMonthlyAmount(this,'@data.NetAmount','@catyId')" class="form-control modal-example" multiple>
                                                         @for (int i = 1; i < 13; i++)
                                                         {
-                                                            <option value="@i">
-                                                                @{var monthName = new DateTime(2010, i, 1)
-                                                                                                                        .ToString("MMM", System.Globalization.CultureInfo.InvariantCulture);}
-                                                                @monthName
-                                                            </option>
+                                                            var paymonth = 0;
+                                                            if (!string.IsNullOrEmpty(data.PaymentDoneFor) && data.PaymentDoneFor.Contains(i.ToString()))
+                                                            {
+                                                                paymonth = Convert.ToInt32(data.PaymentDoneFor.Split(",").Where(x => x == i.ToString()).First());
+                                                            }
+                                                            if (paymonth == i)
+                                                            {
+                                                                <option value="@i" disabled="disabled">
+                                                                    @{var monthName = new DateTime(2010, i, 1).ToString("MMM", System.Globalization.CultureInfo.InvariantCulture);}
+                                                                    @monthName
+                                                                </option>
+                                                            }
+                                                            else
+                                                            {
+                                                                <option value="@i">
+                                                                    @{var monthName = new DateTime(2010, i, 1).ToString("MMM", System.Globalization.CultureInfo.InvariantCulture);}
+                                                                    @monthName
+                                                                </option>
+                                                            }
+
                                                         }
                                                     </select>
 
                                                 }
                                                 else
                                                 {
-                                                    <span>One Time</span>
+                                                    @if (!string.IsNullOrEmpty(data.PaymentDoneFor) && data.PaymentDoneFor.Contains("1"))
+                                                    {
+                                                        <select class="form-control modal-example" name="@data.CategoryId" onchange="GetMonthlyAmount(this,'@data.NetAmount','@catyId')" multiple>
+                                                            <option value="1" disabled>One Time</option>
+                                                        </select>
+                                                    }
+                                                    else
+                                                    {
+                                                        <select class="form-control modal-example" name="@data.CategoryId" onchange="GetMonthlyAmount(this,'@data.NetAmount','@catyId')" multiple>
+                                                            <option value="1">One Time</option>
+                                                        </select>
+                                                    }
+
+
                                                 }
                                             </td>
                                             <td>
                                                 <input type="hidden" name="particularAmount" value="@data.NetAmount" />
-                                                <label class="netAmount" id="@catyId">@data.NetAmount</label>
+                                                <label class="netAmount" id="@catyId">
+                                                    @{
+                                                        var amount = decimal.Parse("0.0");
+                                                    }
+                                                    @amount
+                                                </label>
                                             </td>
                                         </tr>
                                     }
-                                    @if (Model.First().DependentOnParticular != 1)
+                                    @if (Model.First().DependentOnParticular != 0)
                                     {
                                         var discountType = Model.First().DiscountType.Trim().ToLower() == "per" ? "%" : " Amount";
-                                        <tr class="row100">
+                                        <tr>
                                             <td colspan="5">
                                                 Overall Discount
                                             </td>
@@ -126,7 +233,7 @@
                                             </td>
                                         </tr>
                                     }
-                                    <tr class="row100">
+                                    <tr>
                                         <td colspan="5">
                                             Previous Due Amount
                                         </td>
@@ -134,7 +241,7 @@
                                             <label id="prevDueAmount" name="prevDueAmount">@ViewBag.PreviousDueAmount</label>
                                         </td>
                                     </tr>
-                                    <tr class="row100">
+                                    <tr>
                                         <td colspan="5">
                                             Net Amount
                                         </td>
@@ -142,7 +249,7 @@
                                             <label id="netSumAmount" name="netSumAnount"></label>
                                         </td>
                                     </tr>
-                                    <tr class="row100">
+                                    <tr>
                                         <td colspan="5">
                                             Extra Discount Amount
                                         </td>
@@ -150,7 +257,7 @@
                                             <input type="number" name="extraDiscount" class="form-control netAmount discount" value="0" onkeyup="SetNetAmount()" />
                                         </td>
                                     </tr>
-                                    <tr class="row100">
+                                    <tr>
                                         <td colspan="5">
                                             Fine
                                         </td>
@@ -158,7 +265,7 @@
                                             <input type="number" name="fineAmount" class="form-control netAmount" value="0" onkeyup="SetNetAmount()" />
                                         </td>
                                     </tr>
-                                    <tr class="row100">
+                                    <tr>
                                         <td colspan="5">
                                             Reason Of Fine
                                         </td>
@@ -166,7 +273,7 @@
                                             <input type="text" name="Reason" class="form-control" />
                                         </td>
                                     </tr>
-                                    <tr class="row100">
+                                    <tr>
                                         <td colspan="5">
                                             Amount Paid
                                         </td>
@@ -174,7 +281,7 @@
                                             <input type="text" name="txtAmountPaid" id="AmountPaid" onkeyup="GetDueAmount()" class="form-control" />
                                         </td>
                                     </tr>
-                                    <tr class="row100">
+                                    <tr>
                                         <td colspan="5">
                                             Net Due Amount
                                         </td>
@@ -182,7 +289,7 @@
                                             <input type="text" name="txtDueAmount" id="DueAmount" class="form-control" />
                                         </td>
                                     </tr>
-                                    <tr class="row100">
+                                    <tr>
                                         <td colspan="7">
                                             <input type="submit" class="btn btn-primary pull-right" value="Save" />
                                         </td>
@@ -202,15 +309,18 @@
 
 <script>
     $(document).ready(function () {
+        ValidateQuaterly();
         $('[data-toggle="popover"]').popover();
         SetNetAmount();
+        $('.modal-example').multiSelect({
+            'modalHTML': '<div class="multi-select-modal">'
+        });
     });
 
-    $('.modal-example').multiSelect({
-        'modalHTML': '<div class="multi-select-modal">'
-    });
+
 
     function GetMonthlyAmount(id, data, catname) {
+        debugger;
         var count = parseInt($(id).val().length);
         var amount = parseFloat(data) * count;
         var catId = "#" + catname;
@@ -219,6 +329,7 @@
     }
 
     function SetNetAmount() {
+        debugger;
         var netSumAmount = 0;
         $('.netAmount').each(function () {
             if (this.tagName == "LABEL") {
@@ -235,14 +346,17 @@
 
         });
         var overAllDiscount = Number($("#overAllDiscount").text());
-        var discountType = $("#discountType").val().trim().toLowerCase();
-        debugger;
-        if (discountType == "%") {
-            debugger;
-            netSumAmount = netSumAmount - ((netSumAmount * overAllDiscount) / 100);
-        } else {
-            netSumAmount = netSumAmount - overAllDiscount;
+        if ($("#discountType").length > 0) {
+
+            var discountType = $("#discountType").val().trim().toLowerCase();
+            if (discountType == "%") {
+
+                netSumAmount = netSumAmount - ((netSumAmount * overAllDiscount) / 100);
+            } else {
+                netSumAmount = netSumAmount - overAllDiscount;
+            }
         }
+
         netSumAmount += Number($("#prevDueAmount").text());
         $("#netSumAmount").text(netSumAmount);
         $("#netSumAmount").val(netSumAmount);
@@ -254,5 +368,21 @@
         var amountPaid = Number($("#AmountPaid").val())
         $("#DueAmount").val(netAmount - amountPaid);
     }
+
+    function ValidateQuaterly() {
+        debugger;
+        if ($("#ddlQuaterly option[value='1stQTR']").length == 0) {
+            $("#ddlQuaterly").append(' <option value="1stQTR">1st Quater</option>');
+        }
+        if ($("#ddlQuaterly option[value='2ndQTR']").length == 0) {
+            $("#ddlQuaterly").append(' <option value="2ndQTR">2nd Quater</option>');
+        }
+        if ($("#ddlQuaterly option[value='3rdQTR']").length == 0) {
+            $("#ddlQuaterly").append(' <option value="3rdQTR">3rd Quater</option>');
+        }
+        if ($("#ddlQuaterly option[value='4thQTR']").length == 0) {
+            $("#ddlQuaterly").append(' <option value="4thQTR">4th Quater</option>');
+        }
+    }
 </script>
-<script src="~/Jquery/BundleJsFancyTable.js"></script>
+

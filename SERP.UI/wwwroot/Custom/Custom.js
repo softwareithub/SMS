@@ -41,7 +41,7 @@ function CustomDeleteRecord(id, getUrl, deleteUrl, event) {
             });
         });
     }, function () {
-        alertify.warning("you cancel the delete.");
+        alertify.warning("You cancel the delete.");
     });
 }
 

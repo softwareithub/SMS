@@ -1,0 +1,93 @@
+﻿@model IEnumerable<SERP.Core.Entities.Entity.Core.HRModule.EmployeeBasicInfoModel>
+
+
+    <section class="content">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="row">
+                    <div class="col-md-12">
+
+
+                        <table id="tblDataList" class="table table-striped table-bordered responsive" style="width:100%">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Employee Code</th>
+                                    <th>Phone</th>
+                                    <th>Email</th>
+                                    <th>Joining Date</th>
+                                    <th>Photo</th>
+                                    <th>
+                                        Action
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var data in Model)
+                                {
+                                    <tr>
+                                        <td>
+                                            @data.Name
+                                        </td>
+                                        <td>
+                                            @data.EmpCode
+                                        </td>
+                                        <td>
+                                            @data.Phone
+                                        </td>
+
+                                        <td>
+                                            @data.Email
+                                        </td>
+                                        <td>
+                                            @data.JoiningDate
+                                        </td>
+                                        <td>
+                                            @data.Photo
+                                        </td>
+
+                                        <td>
+                                            <a class="btn btn-outline-success pull-right" data-loading-text="<i class='fa fa-circle-o-notch fa-spin'  style='color:#DD4B39'></i>" onclick="GetMoreInfo(@data.Id, this)">
+                                                <i class="fa fa-eye-slash" aria-hidden="true"></i>
+                                            </a>
+
+                                            <a class="btn btn-outline-success pull-right" data-loading-text="<i class='fa fa-circle-o-notch fa-spin'  style='color:#DD4B39'></i>" onclick="UpdateRecord(@data.Id, this)">
+                                                <i class="fa fa-edit" style="color:#3C8DBC"></i>
+                                            </a>
+
+                                            <a class="btn btn-outline-danger pull-right" data-loading-text="<i class='fa fa-circle-o-notch fa-spin'  style='color:#DD4B39'></i>" onclick="DeleteRecord(@data.Id, this)">
+                                                <i class="fa fa-trash" style="color:#DD4B39"></i>
+
+                                            </a>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+       
+        
+    </section>
+<script type="text/javascript">
+    function DeleteRecord(id, event) {
+        var geturl = "/Employee/GetEmployeeList";
+        var deleteUrl = "/Employee/DeleteRecord";
+        CustomDeleteRecord(id, geturl, deleteUrl, event);
+    }
+    function UpdateRecord(id, event) {
+        var updateUrl = "/Employee/Index";
+        UpdateCustomRecord(id, updateUrl, event);
+    }
+    function GetMoreInfo(id) {
+        $.get("/Employee/GetEmployeeSalaryInfo", { empId: id }, function (responseData) {
+            $("#divSalaryDetails").html(responseData);
+            $("#employeeSalaryModal").modal('show');
+        });
+        
+    }
+</script>
+

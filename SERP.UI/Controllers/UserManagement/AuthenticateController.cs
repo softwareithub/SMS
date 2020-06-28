@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using SERP.Core.Entities.Entity.Core.Master;
 using SERP.Core.Entities.UserManagement;
 using SERP.Core.Model.UserManagement;
 using SERP.Infrastructure.Repository.Infrastructure.Repo;
@@ -18,22 +19,31 @@ namespace SERP.UI.Controllers.UserManagement
         private readonly IGenericRepository<ModuleMaster, int> _IModuleRepo;
         private readonly IGenericRepository<SubModuleMaster, int> _ISubModuleRepo;
         private readonly IGenericRepository<UserAccessRight, int> _IUserAccessRight;
+        private readonly IGenericRepository<InstituteMaster, int> _IInstituteRepo;
         public AuthenticateController(IGenericRepository<Authenticate, int> authenticateRepo,
             IGenericRepository<ModuleMaster, int>  moduleRepo,
             IGenericRepository<SubModuleMaster, int> subModuleRepo,
-            IGenericRepository<UserAccessRight, int> userAcccessRight
+            IGenericRepository<UserAccessRight, int> userAcccessRight,
+            IGenericRepository<InstituteMaster, int> instituteRepo
             )
         {
             _IAuthenticateRepo = authenticateRepo;
             _IModuleRepo = moduleRepo;
             _ISubModuleRepo = subModuleRepo;
             _IUserAccessRight = userAcccessRight;
+            _IInstituteRepo = instituteRepo;
         }
 
         [AllowAnonymous]
         public async Task<IActionResult> Login(string message, string returnUrl)
         {
             ViewBag.message = message;
+            var instituteModel = await _IInstituteRepo.GetSingle(x => x.IsActive == 1);
+            ViewBag.Logo = instituteModel.InstituteLogo;
+            ViewBag.Name = instituteModel.Name;
+            ViewBag.Rythum = instituteModel.Rythum;
+            HttpContext.Session.SetString("InstituteName", instituteModel.Name);
+            HttpContext.Session.SetString("InstituteLogo", instituteModel.InstituteLogo);
             return await Task.Run(()=>View("~/Views/UserManagement/_LoginPartial.cshtml"));
         }
 
@@ -84,6 +94,7 @@ namespace SERP.UI.Controllers.UserManagement
             HttpContext.Session.SetString("UserName", model.UserName);
 
             HttpContext.Session.SetObject("menuSubMenu",await GetMenuSubMenu(model.EmployeeId));
+            HttpContext.Session.SetInt32("EmployeeId", model.EmployeeId);
 
             return RedirectToAction("Index", "Home");
         }

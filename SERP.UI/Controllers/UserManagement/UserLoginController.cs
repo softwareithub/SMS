@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using SERP.Core.Entities.Entity.Core.HRModule;
+using SERP.Core.Entities.Entity.Core.Master;
 using SERP.Core.Entities.Entity.Core.Transaction;
 using SERP.Core.Entities.UserManagement;
 using SERP.Core.Model.UserManagement;
@@ -17,6 +18,7 @@ namespace SERP.UI.Controllers.UserManagement
         private readonly IGenericRepository<EmployeeBasicInfoModel, int> _IEmployeeRepo;
         private readonly IGenericRepository<Authenticate, int> _IAuthenticate;
         private readonly IGenericRepository<StudentMaster, int> _IStudentRepo;
+       
 
         public UserLoginController(IGenericRepository<EmployeeBasicInfoModel, int> employeeRepo,
             IGenericRepository<Authenticate, int> authenticateRepo, IGenericRepository<StudentMaster, int> studentRepo)
@@ -24,6 +26,7 @@ namespace SERP.UI.Controllers.UserManagement
             _IEmployeeRepo = employeeRepo;
             _IAuthenticate = authenticateRepo;
             _IStudentRepo = studentRepo;
+         
         }
         public async Task<IActionResult> Index(int id)
         {

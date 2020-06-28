@@ -32,7 +32,11 @@ namespace SERP.UI.Controllers.Master
         {
             model.IsActive = 1;
             model.IsDeleted = 0;
-            model.InstituteLogo =model.InstituteLogo?? await UploadImage(InstituteLogo);
+            if(model.InstituteLogo!=InstituteLogo.FileName)
+            {
+                model.InstituteLogo = await UploadImage(InstituteLogo);
+            }
+           
             if (model.Id == 0)
             {
                 model.CreatedBy = 1;
@@ -63,7 +67,7 @@ namespace SERP.UI.Controllers.Master
                     {
                         await formFile.CopyToAsync(fs);
                     }
-                    return "Images//" + formFile.FileName;
+                    return "/Images//" + formFile.FileName;
                 }
             }
             catch (Exception ex)

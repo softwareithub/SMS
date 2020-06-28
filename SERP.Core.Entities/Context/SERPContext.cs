@@ -22,7 +22,7 @@ namespace SERP.Core.Entities.Context
     {
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseSqlServer("Server= DESKTOP-SF1G3N8\\VIPRAIT; Database= SERDevelopment; User Id=sa;Password = vi@pra91");
+            optionsBuilder.UseSqlServer("Server= DESKTOP-SF1G3N8\\VIPRAIT; Database= VinobaEducationPortal; User Id=sa;Password = vi@pra91");
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -84,6 +84,10 @@ namespace SERP.Core.Entities.Context
         public DbSet<TestMaster> TestMasters { get; set; }
         public DbSet<TestQuestionMapping> TestQuestionMappings { get; set; }
         public DbSet<OnlineVideoFeeDetail> OnlineVideoFeeDetails { get; set; }
+
+        public DbSet<LeaveMaster> LeaveMasters { get; set; }
+        public DbSet<LeaveAllotment> LeaveAllotments { get; set; }
+        public DbSet<LeaveTransactionModel> LeaveTransactionModels { get; set; }
         #endregion
 
     }

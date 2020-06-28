@@ -1,0 +1,102 @@
+﻿@model IEnumerable<SERP.Core.Model.HRModel.EmployeeSalaryDetailModel>
+
+
+<section class="content">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="row">
+                <div class="col-md-12">
+                    <a> Employee Info :@ViewBag.EmployeeName </a>
+                    <table id="tblDataList" class="table table-striped table-bordered responsive" style="width:100%">
+                        <thead>
+                            <tr>
+                                <th>Head Name</th>
+                                <th>Amount</th>
+                                <th>Is Dependent</th>
+                                <th>Addition/Deduction</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @{
+                                decimal netPay = decimal.Parse("0");
+                                decimal netDeduction = decimal.Parse("0");
+                                foreach (var data in Model)
+                                {
+                                    if (data.AdditionDeduction.Trim() == "A")
+                                    {
+                                        netPay = netPay + data.Amount;
+                                    }
+                                    else
+                                    {
+                                        netDeduction = netDeduction + data.Amount;
+                                    }
+                                    <tr>
+                                        <td>
+                                            <a>@data.HeadName</a>
+                                        </td>
+                                        <td>
+                                            <a>@data.Amount</a>
+                                        </td>
+                                        <td>
+                                            @if (data.IsDependentOnDay == 1)
+                                            {
+                                                <span>Dependent on Day</span>
+                                            }
+                                            else
+                                            {
+                                                <span>Not Dependent on Day</span>
+                                            }
+                                        </td>
+
+                                        <td>
+                                            @if (data.AdditionDeduction.Trim() == "A")
+                                            {
+                                                <a>
+                                                    <span style="color:indianred">Addtion</span>
+                                                </a>
+                                            }
+                                            else
+                                            {
+                                                <a>
+                                                    <span style="color:brown">Deduction</span>
+                                                </a>
+                                            }
+                                        </td>
+                                    </tr>
+
+                                }
+                                <tr>
+                                    <td colspan="3">
+                                        Net Payable Amount
+                                    </td>
+                                    <td>
+                                        @netPay
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td colspan="3">
+                                        Net Deduction
+                                    </td>
+                                    <td>
+                                        @netDeduction
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td colspan="3">
+                                        Per Month Salary
+                                    </td>
+                                    <td>
+                                        @Model.Sum(x => x.Amount);
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+

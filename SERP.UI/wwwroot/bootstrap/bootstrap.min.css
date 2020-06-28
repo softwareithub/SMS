@@ -57,8 +57,8 @@ dfn {
 }
 
 h1 {
-    font-size: 2em;
-    margin: .67em 0
+    font-weight: 700;
+    font-family: 'Open Sans', Verdana, sans-serif;
 }
 
 mark {
@@ -1451,11 +1451,14 @@ hr {
     cursor: pointer
 }
 
-.h1, .h2, .h3, .h4, .h5, .h6, h1, h2, h3, h4, h5, h6 {
-    font-family: inherit;
-    font-weight: 500;
-    line-height: 1.1;
-    color: inherit
+h1, h2, h3, h4, h5, h6{
+    font-weight: 700;
+    font-family: 'Open Sans', Verdana, sans-serif;
+    display: block;
+    margin-block-start: 1.33em;
+    margin-block-end: 1.33em;
+    margin-inline-start: 0px;
+    margin-inline-end: 0px;
 }
 
     .h1 .small, .h1 small, .h2 .small, .h2 small, .h3 .small, .h3 small, .h4 .small, .h4 small, .h5 .small, .h5 small, .h6 .small, .h6 small, h1 .small, h1 small, h2 .small, h2 small, h3 .small, h3 small, h4 .small, h4 small, h5 .small, h5 small, h6 .small, h6 small {
@@ -6338,22 +6341,31 @@ button.close {
     }
 
 .modal-header {
-    padding: 15px;
-    border-bottom: 1px solid #e5e5e5
+    padding: 5px 0 10px 0;
+    border-bottom: 1px solid #e8e8e8;
 }
 
     .modal-header .close {
-        margin-top: -2px
-    }
+      cursor:pointer;
+    position: absolute;
+    top: 0;
+    left: -25px;
+    text-shadow: none;
+    color: #ffffff;
+    font-size: 32px;
+    line-height: 20px;
+    opacity: 1;
+    font-weight: 400;
+}
+
 
 .modal-title {
     margin: 0;
-    line-height: 1.42857143
+    line-height: 1.428571429;
 }
 
 .modal-body {
-    position: relative;
-    padding: 15px
+    padding: 15px 0;
 }
 
 .modal-footer {

@@ -206,9 +206,9 @@ namespace SERP.UI.Controllers.ExamMaster
            
             gradeMasters.ToList().ForEach(item =>
             {
-                if (ToInt32(item.Percentage) >= marks)
+                if (ToInt32(item.FromPercentage) >= marks && marks<= ToInt32(item.ToPercentage))
                 {
-                    grade = item.Grade;
+                    grade = item.GradeName;
                 }
             });
             return grade;

@@ -2,8 +2,8 @@
 @model IEnumerable<SERP.Core.Model.UserManagement.MenuSubMenuVm>
 @foreach (var data in Model.GroupBy(x => x.ModuleName))
 {
-    <div class="col-md-6">
-        <div class="box collapsed-box">
+    <div class="col-md-12">
+        <div class="box">
             <div class="box-header with-border">
                 <h3 class="box-title">@data.Key</h3>
 
@@ -22,21 +22,32 @@
                             <li><a href="#">Know more.</a></li>
                         </ul>
                     </div>
-                    <button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
+                    
                 </div>
             </div>
             <div class="box-body" style="">
                 <div class="row">
                     @foreach (var item in data)
                     {
-
-                        <div class="col-lg-3 col-xs-6 col-md-3">
-                            <div class="small-box bg-yellow">
+                        var bgColor = "bg-blue-gradient";
+                        <div class="col-lg-3 col-xs-6">
+                            <!-- small box -->
+                            <div class="small-box @bgColor">
                                 <div class="inner">
-                                    <h3> <i class="@item.SubModuleClass"></i></h3>
-                                </div>
+                                    <h3><i class="fa fa-star"></i></h3>
 
-                                <a onclick="GetMenuDescription('@item.SubModuleName')" class="small-box-footer">@item.SubModuleName <i class="fa fa-arrow-circle-right"></i></a>
+                                    <p>@item.SubModuleName</p>
+                                </div>
+                                <div class="icon">
+                                    <i class="@item.SubModuleClass"></i>
+                                </div>
+                                <a data-ajax="true" data-ajax-mode="replace"
+                                   asp-action="@item.ActionName" asp-controller="@item.ControllerName"
+                                   data-ajax-update="#divSERP"
+                                   data-ajax-begin="AjaxOnBegin" data-ajax-complete="AjaxComplete"
+                                   class="small-box-footer">
+                                    More info <i class="fa fa-arrow-circle-right"></i>
+                                </a>
                             </div>
                         </div>
                     }
@@ -57,6 +68,6 @@
             $("#divPartialData").html(data);
             $("#divModalPop").modal('show');
         })
-        
+
     }
 </script>

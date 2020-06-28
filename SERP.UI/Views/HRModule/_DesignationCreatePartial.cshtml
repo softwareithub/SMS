@@ -99,13 +99,13 @@
 <script>
 
     function GetRecordList() {
-        GetCustomRecord("Designation/GetDesignation");
+        GetCustomRecord("/Designation/GetDesignation");
         setTimeout(function () {
             $("#modalTitle").text("Designation List")
         }, 300);
     }
     function NewAcademicMaster() {
-        var url = "Designation/Index";
+        var url = "/Designation/Index";
         NewCustomRecord(url);
     }
 </script>

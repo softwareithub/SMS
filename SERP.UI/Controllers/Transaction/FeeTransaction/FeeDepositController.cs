@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using SERP.Core.Entities.Entity.Core.Master;
 using SERP.Core.Entities.Entity.Core.Transaction;
+using SERP.Core.Model.FeeDetails;
 using SERP.Core.Model.MasterViewModel;
 using SERP.Infrastructure.Repository.Infrastructure.Repo;
 using SERP.UI.Helper;
@@ -53,7 +54,7 @@ namespace SERP.UI.Controllers.Transaction.FeeTransaction
         }
         public async Task<IActionResult> Index()
         {
-           
+
             ViewBag.CourseList = await _ICourseMaster.GetList(x => x.IsActive == 1 && x.IsDeleted == 0);
             return PartialView("~/Views/FeeTransaction/_FeeDepositStudentDetail.cshtml");
         }
@@ -99,32 +100,52 @@ namespace SERP.UI.Controllers.Transaction.FeeTransaction
                 else
                 {
                     x.NetAmount = x.Amount;
-                    //if (x.DiscountType.ToLower().Trim() == "per")
-                    //    x.NetAmount = x.Amount - ((x.Amount * x.DiscountValue) / 100);
-                    //else
-                    //    x.NetAmount = x.Amount - x.DiscountValue;
+                    if (x.DiscountType?.ToLower()?.Trim() == "per")
+                        x.NetAmount = x.Amount - ((x.Amount * x.DiscountValue) / 100);
+                    else
+                        x.NetAmount = x.Amount;
                 }
             });
 
-            var studentFeeDposited = (await _feeDepositRepo.GetList(x => x.StudentId == studentId && x.IsActive == 1 && x.IsDeleted == 0)).OrderByDescending(x=>x.Id).FirstOrDefault();
-            if(studentFeeDposited!=null)
+            List<FeePerticularModel> perticularPaymentDone = new List<FeePerticularModel>();
+
+            var studentFeeDposited = (await _feeDepositRepo.GetList(x => x.StudentId == studentId && x.IsActive == 1 && x.IsDeleted == 0));
+            if (studentFeeDposited != null && studentFeeDposited.Count() > 0)
             {
-                var feeDepositPartialurs = await _feeDepositParticularRepo.GetList(x => x.StudentFeeDepositId == studentFeeDposited.StudentId && x.IsDeleted == 0 && x.IsActive == 1);
+                int feeDepositId = studentFeeDposited.OrderByDescending(x => x.Id).FirstOrDefault().Id;
 
-                ViewBag.PreviousDueAmount = studentFeeDposited?.DueAmount;
+                var feeDepositPartialurs = await _feeDepositParticularRepo.GetList(x => x.StudentFeeDepositId == feeDepositId && x.IsDeleted == 0 && x.IsActive == 1);
 
-                result.ForEach(x =>
-                {
-                    feeDepositPartialurs.ToList().ForEach(item =>
-                    {
-                        if (x.CategoryId == item.ParticularId && item.PaymentFor == null)
-                        {
-                            x.IsRemove = true;
-                        }
-                    });
-                });
+                await _feeDepositParticularRepo.CreateNewContext();
+
+                ViewBag.PreviousDueAmount = studentFeeDposited?.OrderByDescending(x => x.Id).FirstOrDefault().DueAmount;
+
+                perticularPaymentDone = (from SFD in studentFeeDposited
+                                         join FDP in await _feeDepositParticularRepo.GetList(x => x.IsActive == 1)
+                                         on SFD.Id equals FDP.StudentFeeDepositId
+                                         where SFD.StudentId == studentId
+                                         select new FeePerticularModel
+                                         {
+                                             PaymentFor = FDP.PaymentFor,
+                                             PerticularId = FDP.ParticularId
+
+                                         }).ToList();
             }
-            return PartialView("~/Views/FeeTransaction/_FeeDeposit.cshtml", result.Where(x=>x.IsRemove==false).ToList());
+
+            result.ForEach(item =>
+            {
+                List<string> paymentDoneFor = new List<string>();
+                perticularPaymentDone.ForEach(data =>
+                {
+                    if (item.CategoryId == data.PerticularId)
+                    {
+                        paymentDoneFor.Add(data.PaymentFor);
+                    }
+                });
+                item.PaymentDoneFor = string.Join(",", paymentDoneFor.ToArray());
+            });
+
+            return PartialView("~/Views/FeeTransaction/_FeeDeposit.cshtml", result.Where(x => x.IsRemove == false).ToList());
         }
 
         [HttpPost]
@@ -161,7 +182,7 @@ namespace SERP.UI.Controllers.Transaction.FeeTransaction
             model.AmountPaid = Convert.ToDecimal(Request.Form["txtAmountPaid"].ToString().EmptyToDefault<decimal>());
             model.DueAmount = Convert.ToDecimal(Request.Form["txtDueAmount"].ToString().EmptyToDefault<decimal>());
             model.DateOfDeposit = DateTime.Now.Date;
-            model.PayableAmount = model.DueAmount + model.AmountPaid;
+            model.PayableAmount = (model.DueAmount + model.AmountPaid) + (model.DiscountAmount - model.FineAmount);
 
             var paymentResult = await _feeDepositRepo.CreateEntity(model);
             await _feeDepositRepo.CreateNewContext();
@@ -177,7 +198,7 @@ namespace SERP.UI.Controllers.Transaction.FeeTransaction
 
         public async Task<IActionResult> FeeReciept()
         {
-            return await Task.Run(() =>PartialView("~/Views/FeeTransaction/_FeeRecieptPartial.cshtml"));
+            return await Task.Run(() => PartialView("~/Views/FeeTransaction/_FeeRecieptPartial.cshtml"));
         }
         public async Task<List<StudentPartialInfoViewModel>> GetStudentVm()
         {

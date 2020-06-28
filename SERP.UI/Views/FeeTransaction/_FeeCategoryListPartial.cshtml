@@ -48,13 +48,13 @@
 
 <script type="text/javascript">
     function DeleteRecord(id, event) {
-        var geturl = "FeeCategory/GetFeeCategoryList";
-        var deleteUrl = "FeeCategory/DeleteFeeCategory";
+        var geturl = "/FeeCategory/GetFeeCategoryList";
+        var deleteUrl = "/FeeCategory/DeleteFeeCategory";
         CustomDeleteRecord(id, geturl, deleteUrl, event);
     }
     function UpdateRecord(id, event) {
         debugger;
-        var updateUrl = "FeeCategory/Index";
+        var updateUrl = "/FeeCategory/Index";
         UpdateCustomRecord(id, updateUrl, event);
     }
 </script>
