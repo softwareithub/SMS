@@ -207,18 +207,18 @@
         NewCustomRecord(url);
     }
     function CheckThis(eData) {
-        debugger;
+        
         $('input:checkbox').removeAttr('checked');
 
     }
     function GetSubjectList() {
-        debugger;
+        
         var courseId = $("#CourseId").val();
         $("#SubjectId").empty()
         $("#SubjectId").append('<option value="0">Select</option>');
         $.get("/CommanDataForJson/SubjectJson", { courseId: courseId }, function (responseData) {
             for (var i = 0; i < responseData.length; i++) {
-                debugger;
+                
                 var html = '<option value=' + responseData[i].id + '>' + responseData[i].subjectName + '</option>'
                 $("#SubjectId").append(html);
             }
@@ -266,7 +266,7 @@
         $("#ddlNotification").empty();
         $.get("/OnlineTest/GetSMSEmailTemplate", { notificationType: notificationType }, function (data) {
             for (var i = 0; i < data.length; i++) {
-                debugger;
+                
                 $("#ddlNotification").append("<option value=" + data[i].id+">" + data[i].templateName+"</option>")
             }
         });

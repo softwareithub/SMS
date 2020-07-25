@@ -26,7 +26,7 @@
     });
 
     function drawStudentAttendenceChart() {
-        debugger;
+        
         // Create our data table.
         studentdata = new google.visualization.DataTable();
         studentdata.addColumn('string', 'AttendenceType');
@@ -34,7 +34,7 @@
 
         $.get("/DashBoardMaster/StudentAttendeceReport", function (response) {
             for (var i = 0; i < response.length; i++) {
-                debugger;
+                
                 studentdata.addRow([response[i].name, response[i].y]);
             }
             var options = {

@@ -55,7 +55,7 @@
 
 <script>
     function GetBatchList() {
-        debugger;
+        
         var courseId = $("#CourseId option:selected").val();
         $.get("/StudentMaster/GetBatchList", { courseId: courseId }, function (responseData) {
             $.each(responseData, function (index, value) {

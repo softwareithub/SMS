@@ -149,7 +149,7 @@
         $.get("/FeeDiscount/GetParticularList", { id: id }, function (responseData) {
             $("#_tblParticularDiscount").empty();
             $.each(responseData, function (index, value) {
-                debugger;
+                
                 var markup = '';
                 if (value.particularId > 0) {
                     markup += '<tr><td data-id=' + value.id + '>' + value.categoryName + '>';

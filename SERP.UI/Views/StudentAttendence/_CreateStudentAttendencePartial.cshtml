@@ -85,7 +85,7 @@
 
 <script type="text/javascript">
     function GetBatchList() {
-        debugger;
+        
         $('#BatchId').empty();
         var courseId = $("#CourseId option:selected").val();
         $.get("/StudentMaster/GetBatchList", { courseId: courseId }, function (responseData) {
@@ -109,7 +109,7 @@
                     $('#period').append($('<option></option>').text(value).attr('value', value));
                 })
             }).done(function () {
-                debugger;
+                
                 if (responseCount > 0) {
                     $("#divPeriod").removeAttr("style");
                 }

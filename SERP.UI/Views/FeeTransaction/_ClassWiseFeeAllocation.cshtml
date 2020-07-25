@@ -85,7 +85,7 @@
 <script type="text/javascript">
     function GetParticular() {
         var hasValue = 0;
-        debugger;
+        
         var classIds = $("#modal-example").val();
         if (classIds.length > 0) {
             $.get("/FeeAllocationClassWise/GetFeeDetail", { courseIds: classIds.toString() }, function (responseData) {
