@@ -21,6 +21,7 @@ namespace SERP.UI.Controllers.DashBoard
         }
         public async Task<IActionResult> GetStudentCourseBatchStrenght()
         {
+          
             var result = await _IDashBoardRepo.BatchCourseCount();
             return Json(result);
         }

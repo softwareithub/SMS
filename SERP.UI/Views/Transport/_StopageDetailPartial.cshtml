@@ -1,0 +1,60 @@
+﻿@model IEnumerable<SERP.Core.Entities.Transport.StopageModel>
+
+    <section class="content">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="row">
+                    <div class="col-md-12">
+
+
+                        <table id="tblDataList" class="table table-striped table-bordered responsive" style="width:100%">
+                            <thead>
+                                <tr>
+                                    <th>Stopage Name</th>
+                                    <th>Address</th>
+                                    <th>Latitude</th>
+                                    <th>Longitude</th>
+                                    <th>Action</th>
+
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var data in Model)
+                                {
+                                    <tr>
+                                        <td>
+                                            @data.StopageName
+                                        </td>
+                                        <td>
+                                            @data.PLaceAddress
+                                        </td>
+                                        <td>
+                                            @data.Latituide
+                                        </td>
+                                        <td>
+                                            @data.Longitude
+                                        </td>
+
+                                        <td>
+                                            <a class="btn btn-outline-danger pull-right" data-loading-text="<i class='fa fa-circle-o-notch fa-spin'  style='color:#DD4B39'></i>" onclick="DeleteRecord(@data.Id, this)">
+                                                <i class="fa fa-trash" style="color:#DD4B39"></i>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <script type="text/javascript">
+        function DeleteRecord(id, event) {
+            var geturl = "/Stopage/GetStopageDetails";
+            var deleteUrl = "/Stopage/Delete";
+            CustomDeleteRecord(id, geturl, deleteUrl, event);
+        }
+
+    </script>

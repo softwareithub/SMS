@@ -45,12 +45,13 @@
                                                         <select asp-for="TimeTableModels[k].PeriodModels[i].EmployeeId" asp-items="@(new SelectList(ViewBag.EmployeeList, "Id", "Name"))" class="form-control" onchange="AssignChildEmployee(@k, @i, this)">
                                                         </select>
                                                         <label>Assign Subject</label>
-                                                        <select asp-for="TimeTableModels[k].PeriodModels[i].SubjectId" asp-items="@(new SelectList(ViewBag.SubjectList, "Id", "SubjectName"))" class="form-control">
+                                                        <select asp-for="TimeTableModels[k].PeriodModels[i].SubjectId" asp-items="@(new SelectList(ViewBag.SubjectList, "Id", "SubjectName"))" onchange="AssignChildSubject(@k, @i, this)" class="form-control">
+                                                            
                                                         </select>
                                                         <label>From Time</label>
-                                                        <input asp-for="TimeTableModels[k].PeriodModels[i].FromTime" type="time" class="form-control" />
+                                                        <input asp-for="TimeTableModels[k].PeriodModels[i].FromTime" type="time" class="form-control" onblur="AssignChildFromTime(@k, @i, this)" />
                                                         <label>To Time</label>
-                                                        <input asp-for="TimeTableModels[k].PeriodModels[i].ToTime" type="time" class="form-control" />
+                                                        <input asp-for="TimeTableModels[k].PeriodModels[i].ToTime" type="time" class="form-control" onblur="AssignChildToTime(@k, @i, this)" />
                                                     </td>
                                                     i++;
                                                 }
@@ -74,14 +75,36 @@
 </form>
 
 <script>
-    //function AssignChildEmployee(k, i, event) {
-    //    debugger;
-    //    var totalCount = $("#totalDays").val();
-    //    for (var i = 0; i < totalCount; i++) {
-    //        k = k + i;
-    //        var employeeId = "TimeTableModels_" + k + "__PeriodModels_0__EmployeeId"
-    //        $("#" + employeeId).val(event.Value);
-    //    }
-    //}
+    function AssignChildEmployee(k, i, event) {
+        debugger;
+        var totalCount = $("#totalDays").val();
+        for (var j = k+1; j < totalCount; j++) {
+            var employeeId = "TimeTableModels_" + j + "__PeriodModels_"+i+"__EmployeeId"
+            $("#" + employeeId).val(event.value);
+        }
+    }
+
+    function AssignChildSubject(k, i, event) {
+        var totalCount = $("#totalDays").val();
+        for (var j = k + 1; j < totalCount; j++) {
+            var subjectId = "TimeTableModels_" + j + "__PeriodModels_"+i+"__SubjectId"
+            $("#" + subjectId).val(event.value);
+        }
+    }
+    function AssignChildFromTime(k, i, event) {
+        var totalCount = $("#totalDays").val();
+        for (var j = k + 1; j < totalCount; j++) {
+            var fromTime = "TimeTableModels_" + j + "__PeriodModels_"+i+"__FromTime"
+            $("#" + fromTime).val(event.value);
+        }
+    }
+    function AssignChildToTime(k, i, event) {
+        var totalCount = $("#totalDays").val();
+        for (var j = k + 1; j < totalCount; j++) {
+
+            var toTime = "TimeTableModels_" + j + "__PeriodModels_"+i+"__ToTime"
+            $("#" + toTime).val(event.value);
+        }
+    }
 </script>
 

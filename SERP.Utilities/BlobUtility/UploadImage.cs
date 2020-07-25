@@ -37,7 +37,7 @@ namespace SERP.Utilities.BlobUtility
                                 {
                                     await file.CopyToAsync(fs);
                                 }
-                                imageStoragePaths.Add("Images//" + file.FileName);
+                                imageStoragePaths.Add("/Images/" + file.FileName);
                             }
 
                         }

@@ -1,0 +1,70 @@
+﻿@model IEnumerable<SERP.Core.Entities.LibraryManagement.BookItemModel>
+
+
+<section class="content">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="row">
+                <form method="post" data-ajax="true" data-ajax-method="post"
+                      asp-action="UpsertBookItems" asp-controller="BookMaster" data-ajax-success="Success"
+                      data-ajax-begin="CustomFormSubmitBegin" data-ajax-complete="CustomFormSubmitComplete">
+                    <div class="col-md-12">
+                        <table id="tblDataListBookItem" class="table table-striped table-bordered responsive" style="width:100%">
+                            <thead>
+                                <tr>
+                                    <th>Volume Name</th>
+                                    <th>ISBN Number</th>
+                                    <th>BIN Shelf</th>
+                                    <th>QR Code</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var data in Model)
+                                {
+                                    <tr>
+                                        <td>
+                                            <input type="hidden" name="bookItemId" value="@data.Id" />
+                                            @data.BookBarCode
+                                        </td>
+                                        <td>
+                                            <input type="text" name="ISBN" class="form-control" value="@data.ISBNNumber" />
+                                        </td>
+                                        <td>
+                                            <input type="text" name="BIN" class="form-control" value="@data.BINShelf" />
+                                        </td>
+                                        <td>
+                                            @{
+                                                var qrUrl = "http://localhost:7001/BarCode/" + data.BarCode;
+                                            }
+                                            <img src="@qrUrl" style="height:50px;width:50px" />
+                                        </td>
+
+                                    </tr>
+                                }
+                            </tbody>
+
+                        </table>
+                    </div>
+                    <div class="col-md-12">
+                        <div class="col-md-8">
+                            <input type="submit" class="btn btn-success pull-right" value="Submit" />
+                        </div>
+                        <div class="col-md-4">
+                            <input type="reset" class="btn btn-success pull-right" value="Cancel" />
+                        </div>
+
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
+<script type="text/javascript">
+    $(document).ready(function () {
+        $("#tblDataListBookItem").DataTable({
+            fixedHeader: true,
+            select: true,
+            responsive: true
+        });
+    })
+</script>

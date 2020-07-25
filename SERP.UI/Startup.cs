@@ -9,6 +9,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using SERP.Infrastructure.Implementation.ServiceExtension;
+using SERP.UI.Extension;
 using SERP.UI.Helper;
 
 namespace SERP.UI
@@ -48,6 +49,8 @@ namespace SERP.UI
                 app.UseExceptionHandler("/Home/Error");
                 app.UseStatusCodePages();
             }
+
+            //app.ConfigureGlobalExpceptionHandler();
             app.UseStaticFiles();
 
             app.UseRouting();

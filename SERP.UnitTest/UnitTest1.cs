@@ -1,3 +1,4 @@
+using BarCodeGenerator;
 using NUnit.Framework;
 using System.Threading.Tasks;
 using UploadVideoYouTube;
@@ -12,9 +13,10 @@ namespace SERP.UnitTest
         }
 
         [Test]
-        public async Task Test1()
+        public void Test1()
         {
-            await  new UploadVideo().UploadVideoToYouTube();
+            BarCodeHelper barCodeHelper = new BarCodeHelper();
+            var barCode=barCodeHelper.ReadQRCode();
             Assert.Pass();
         }
     }

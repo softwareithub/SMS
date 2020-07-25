@@ -1,0 +1,83 @@
+﻿<section class="content-header">
+    <h1>
+        Exam Time Sheet
+        <small>Create Exam Time Sheet</small>
+    </h1>
+    <ol class="breadcrumb">
+        <li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
+        <li><a href="#">Forms</a></li>
+        <li class="active">General Elements</li>
+    </ol>
+</section>
+
+
+<section class="content">
+    <div class="row">
+
+        <div class="col-md-12">
+            <!-- general form elements -->
+            <div class="box box-primary">
+                <div class="box-header with-border">
+                    <h3 class="box-title">Create Exam TimeSheet</h3>
+                    <div class="col-md-12">
+                        <div class="col-md-10">
+                            <a class="btn btn-primary pull-right" onclick="GetNewRecordList()">
+                                <i class="fa fa-list-ul"></i>
+                            </a>
+                        </div>
+                        <div class="col-md-2">
+                            <a class="btn btn-primary pull-left" onclick="NewAcademicMaster()">
+                                <i class="fa fa-plus-square"></i>
+                            </a>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="overlay divHidding" id="divFormData">
+                    <i class="fa fa-refresh fa-spin">
+
+                    </i>
+                </div>
+  
+                    <div class="box-body">
+                        <div class="col-md-12">
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label>Exam Name</label>
+                                    <select id="ExamId" onchange="GetExamList()" class="form-control" asp-items="@(new SelectList(ViewBag.ExamList ,"Id","ExamName"))">
+                                        <option value="">Select</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label>Class Name</label>
+                                    <select id="CourseId" onchange="GetExamList()" class="form-control" asp-items="@(new SelectList(ViewBag.CourseList ,"Id","Name"))">
+                                        <option value="">Select</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-12">
+                            <div id="divExamDateSheet">
+
+                            </div>
+                        </div>
+                    </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+<script>
+    function GetExamList() {
+        var examId = $("#ExamId").val();
+        var courseId = $("#CourseId").val();
+        $.get("/ExamDateSheet/GetTimeSheet", { examId: examId, courseId: courseId }, function (data) {
+            $("#divExamDateSheet").html(data);
+        });
+    }
+</script>

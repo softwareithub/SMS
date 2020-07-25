@@ -7,10 +7,10 @@
 
 <section class="content-header">
     <h1>
-        Exam Master
-        <small>Create Exam Master</small>
+        Book Master
+        <small>Create Book Master</small>
     </h1>
-    @await Component.InvokeAsync("Header", new { controllerName = "BookMaster", actionName = "CreateBook", name = "BookMaster" })
+
 </section>
 
 <section class="content">
@@ -20,7 +20,7 @@
             <!-- general form elements -->
             <div class="box box-primary">
                 <div class="box-header with-border">
-                    <h3 class="box-title">Create Exam Master</h3>
+                    <h3 class="box-title">Create Book Master</h3>
                     <div class="col-md-12">
                         <div class="col-md-10">
                             <a class="btn btn-primary pull-right" onclick="GetNewRecordList()">
@@ -41,21 +41,118 @@
                     </i>
                 </div>
                 <form method="post" data-ajax="true" data-ajax-method="post"
-                      asp-action="CreateExam" asp-controller="Exam" data-ajax-success="Success"
-                      data-ajax-begin="CustomFormSubmitBegin" data-ajax-complete="CustomFormSubmitComplete">
+                      asp-action="UpsertBook" asp-controller="BookMaster" data-ajax-success="Success"
+                      data-ajax-begin="CustomFormSubmitBegin"enctype="multipart/form-data" data-ajax-complete="CustomFormSubmitComplete">
                     <div class="box-body">
                         <div class="col-md-4">
                             <div class="form-group">
                                 <input type="hidden" asp-for="Id" />
                                 <input type="hidden" asp-for="CreatedBy" />
                                 <input type="hidden" asp-for="CreatedDate" />
-                                <label asp-for="BookName">Exam Name</label>
-                                <input asp-for="BookName" class="form-control">
-                                <span asp-validation-for="BookName" class="text-danger"></span>
+                                <label asp-for="TitleName">Title</label>
+                                <input asp-for="TitleName" class="form-control">
+                                <span asp-validation-for="TitleName" class="text-danger"></span>
                             </div>
                         </div>
-                        
-                        
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label asp-for="AuthorName">Author</label>
+                                <input asp-for="AuthorName" class="form-control">
+                                <span asp-validation-for="AuthorName" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label asp-for="CategoryId">Category</label>
+                                <select id="CategoryId" asp-for="CategoryId" class="form-control" asp-items="@(new SelectList(ViewBag.CategorList ,"Id","Name"))">
+                                    <option value="">Select</option>
+                                </select>
+                                <span asp-validation-for="CategoryId" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label asp-for="CourseId">Class</label>
+                                <select id="CourseId" asp-for="CourseId" class="form-control" asp-items="@(new SelectList(ViewBag.CourseList ,"Id","Name"))" onchange="GetSubjectList()">
+                                    <option value="">Select</option>
+                                </select>
+                                <span asp-validation-for="CourseId" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label asp-for="SubjectId">Subject</label>
+                                <select asp-for="SubjectId" class="form-control">
+                                    <option value="">Select</option>
+                                </select>
+                                <span asp-validation-for="SubjectId" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label asp-for="PublisherName">Publisher</label>
+                                <input asp-for="PublisherName" class="form-control">
+                                <span asp-validation-for="PublisherName" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label asp-for="Language">Book Language</label>
+                                <select asp-for="Language" class="form-control">
+                                    <option value="English">English</option>
+                                    <option value="Hindi">Hindi</option>
+                                    <option value="French">French</option>
+                                    <option value="Urdu">Urdu</option>
+                                    <option value="Punjabi">Punjabi</option>
+                                    <option value="Gujrati">Gujrati</option>
+                                </select>
+                                <span asp-validation-for="Language" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label asp-for="Edition">Book Edition</label>
+                                <input asp-for="Edition" class="form-control">
+                                <span asp-validation-for="Edition" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label asp-for="CostPrice">Book Price</label>
+                                <input asp-for="CostPrice" class="form-control">
+                                <span asp-validation-for="CostPrice" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label asp-for="PurchaseDate">Purchase Date</label>
+                                <input asp-for="PurchaseDate" class="form-control">
+                                <span asp-validation-for="PurchaseDate" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label asp-for="ImagePath">Upload Cover Image</label>
+                                <input type="hidden" asp-for="ImagePath" />
+                                <input type="file" asp-for="ImagePath" class="form-control">
+                                <span asp-validation-for="ImagePath" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label asp-for="TotalBookCount">Total Book Count</label>
+                                <input asp-for="TotalBookCount" class="form-control">
+                                <span asp-validation-for="TotalBookCount" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label asp-for="Description">Book Description</label>
+                                <textarea asp-for="Description" class="form-control"></textarea>
+                                <span asp-validation-for="Description" class="text-danger"></span>
+                            </div>
+                        </div>
+
                     </div>
                     <!-- /.box-body -->
 
@@ -77,19 +174,64 @@
 
         @await Html.PartialAsync("~/Views/Shared/_CommanModalPartial.cshtml")
 
+
+        <div class="modal fade" id="ModalBookItemDetail" role="dialog" style="overflow:auto">
+            <div class="modal-dialog modal-dialog-centered  modal-md" style="width:90%">
+
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                        <h4 class="modal-title">
+                            <a id="modalTitle">Book Details</a>
+                        </h4>
+                    </div><!--modal-header end-->
+
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <fieldset class="fieldset marB0">
+                                    <div class="table-outer" style="min-height: 250px;overflow:auto;" id="bookItemDiv">
+
+
+                                    </div>
+                                </fieldset>
+                            </div>
+                        </div>
+
+                    </div><!--modal-body end-->
+                </div>
+                <!--modal-content end-->
+            </div><!--modal-dialog end-->
+        </div>
+
     </div>
 </section>
 
 <script>
 
     function GetNewRecordList() {
-        GetCustomRecord("Exam/GetExamList");
+        GetCustomRecord("/BookMaster/GetBookDetail");
         setTimeout(function () {
-            $("#modalTitle").text("Exam Master List")
+            $("#modalTitle").text("Book Details")
         }, 300);
     }
     function NewAcademicMaster() {
-        var url = "AcademicMaster/Index";
+        var url = "/BookMaster/CreateBook";
         NewCustomRecord(url);
+    }
+     function GetSubjectList() {
+        debugger;
+        var courseId = $("#CourseId").val();
+        var subjectId = '@Model?.SubjectId';
+        $("#SubjectId").empty()
+        $("#SubjectId").append('<option value="">Select</option>');
+        $.get("/CommanDataForJson/SubjectJson", { courseId: courseId }, function (responseData) {
+            for (var i = 0; i < responseData.length; i++) {
+                debugger;
+                var html = '<option value=' + responseData[i].id + '>' + responseData[i].subjectName + '</option>'
+                $("#SubjectId").append(html);
+            }
+            $("#SubjectId").val(parseInt(subjectId))
+        })
     }
 </script>

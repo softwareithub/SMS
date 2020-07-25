@@ -1,4 +1,4 @@
-﻿@model IEnumerable<SERP.UI.Models.QuestionVm>
+﻿@model IEnumerable<SERP.Core.Entities.Entity.Core.ExamDetail.QuestionModel>
 
 
 <section class="content">
@@ -12,7 +12,6 @@
                         <thead>
                             <tr>
                                 <th>Question</th>
-                                <th>Option</th>
                                 <th>Action</th>
 
                             </tr>
@@ -22,31 +21,16 @@
                             {
                                 <tr>
                                     <td>
-                                        @Html.Raw(data.QuestionModel.Question)
+                                        @Html.Raw(data.Question)
                                     </td>
+                                    
                                     <td>
-                                        <ul>
-                                            @foreach (var opt in data.OptionMasters)
-                                            {
-                                                if (opt.IsCorrectAnswere == 1)
-                                                {
-                                                    <li style="color:green">@opt.OptionData</li>
-                                                }
-                                                else
-                                                {
-                                                    <li >@opt.OptionData</li>
-                                                }
-                                            }
-                                        </ul>
-
-                                    </td>
-                                    <td>
-                                        <a class="btn btn-outline-success pull-right" data-loading-text="<i class='fa fa-circle-o-notch fa-spin'  style='color:#DD4B39'></i>" onclick="UpdateRecord(@data.QuestionModel.Id, this)">
+                                        <a class="btn btn-outline-success pull-right" data-loading-text="<i class='fa fa-circle-o-notch fa-spin'  style='color:#DD4B39'></i>" onclick="UpdateRecord(@data.Id, this)">
                                             <i class="fa fa-edit" style="color:#3C8DBC"></i>
 
                                         </a>
 
-                                        <a class="btn btn-outline-danger pull-right" data-loading-text="<i class='fa fa-circle-o-notch fa-spin'  style='color:#DD4B39'></i>" onclick="DeleteRecord(@data.QuestionModel.Id, this)">
+                                        <a class="btn btn-outline-danger pull-right" data-loading-text="<i class='fa fa-circle-o-notch fa-spin'  style='color:#DD4B39'></i>" onclick="DeleteRecord(@data.Id, this)">
                                             <i class="fa fa-trash" style="color:#DD4B39"></i>
                                         </a>
                                     </td>
@@ -69,6 +53,18 @@
     function UpdateRecord(id, event) {
         var updateUrl = "/OnlineTest/Index";
         UpdateCustomRecord(id, updateUrl, event);
+    }
+
+</script>
+<script type="text/javascript"
+        src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+<script type="text/javascript">
+    if (window.MathJax) {
+        MathJax.Hub.Queue(
+            ["resetEquationNumbers", MathJax.InputJax.TeX],
+            ["Typeset", MathJax.Hub]
+        );
     }
 </script>
 

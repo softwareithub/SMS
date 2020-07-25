@@ -2,6 +2,138 @@
 
 <link href="https://cdn.datatables.net/1.10.20/css/jquery.dataTables.min.css" rel="stylesheet" />
 <script src="https://cdn.datatables.net/1.10.20/js/jquery.dataTables.min.js"></script>
+<style>
+    .container {
+	background-size: cover;
+  background: rgb(226,226,226); /* Old browsers */
+  background: -moz-linear-gradient(top,  rgba(226,226,226,1) 0%, rgba(219,219,219,1) 50%, rgba(209,209,209,1) 51%, rgba(254,254,254,1) 100%); /* FF3.6+ */
+  background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(226,226,226,1)), color-stop(50%,rgba(219,219,219,1)), color-stop(51%,rgba(209,209,209,1)), color-stop(100%,rgba(254,254,254,1))); /* Chrome,Safari4+ */
+  background: -webkit-linear-gradient(top,  rgba(226,226,226,1) 0%,rgba(219,219,219,1) 50%,rgba(209,209,209,1) 51%,rgba(254,254,254,1) 100%); /* Chrome10+,Safari5.1+ */
+  background: -o-linear-gradient(top,  rgba(226,226,226,1) 0%,rgba(219,219,219,1) 50%,rgba(209,209,209,1) 51%,rgba(254,254,254,1) 100%); /* Opera 11.10+ */
+  background: -ms-linear-gradient(top,  rgba(226,226,226,1) 0%,rgba(219,219,219,1) 50%,rgba(209,209,209,1) 51%,rgba(254,254,254,1) 100%); /* IE10+ */
+  background: linear-gradient(to bottom,  rgba(226,226,226,1) 0%,rgba(219,219,219,1) 50%,rgba(209,209,209,1) 51%,rgba(254,254,254,1) 100%); /* W3C */
+  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#e2e2e2', endColorstr='#fefefe',GradientType=0 ); /* IE6-9 */
+  padding: 20px;
+}
+
+.led-box {
+  height: 30px;
+  width: 25%;
+  margin: 10px 0;
+  float: left;
+}
+
+.led-box p {
+  font-size: 12px;
+  text-align: center;
+  margin: 1em;
+}
+
+.led-red {
+  margin: 0 auto;
+  width: 24px;
+  height: 24px;
+  background-color: #F00;
+  border-radius: 50%;
+  box-shadow: rgba(0, 0, 0, 0.2) 0 -1px 7px 1px, inset #441313 0 -1px 9px, rgba(255, 0, 0, 0.5) 0 2px 12px;
+  -webkit-animation: blinkRed 0.5s infinite;
+  -moz-animation: blinkRed 0.5s infinite;
+  -ms-animation: blinkRed 0.5s infinite;
+  -o-animation: blinkRed 0.5s infinite;
+  animation: blinkRed 0.5s infinite;
+}
+
+@@-webkit-keyframes blinkRed {
+    from { background-color: #F00; }
+    50% { background-color: #A00; box-shadow: rgba(0, 0, 0, 0.2) 0 -1px 7px 1px, inset #441313 0 -1px 9px, rgba(255, 0, 0, 0.5) 0 2px 0;}
+    to { background-color: #F00; }
+}
+@@-moz-keyframes blinkRed {
+    from { background-color: #F00; }
+    50% { background-color: #A00; box-shadow: rgba(0, 0, 0, 0.2) 0 -1px 7px 1px, inset #441313 0 -1px 9px, rgba(255, 0, 0, 0.5) 0 2px 0;}
+    to { background-color: #F00; }
+}
+@@-ms-keyframes blinkRed {
+    from { background-color: #F00; }
+    50% { background-color: #A00; box-shadow: rgba(0, 0, 0, 0.2) 0 -1px 7px 1px, inset #441313 0 -1px 9px, rgba(255, 0, 0, 0.5) 0 2px 0;}
+    to { background-color: #F00; }
+}
+@@-o-keyframes blinkRed {
+    from { background-color: #F00; }
+    50% { background-color: #A00; box-shadow: rgba(0, 0, 0, 0.2) 0 -1px 7px 1px, inset #441313 0 -1px 9px, rgba(255, 0, 0, 0.5) 0 2px 0;}
+    to { background-color: #F00; }
+}
+@@keyframes blinkRed {
+    from { background-color: #F00; }
+    50% { background-color: #A00; box-shadow: rgba(0, 0, 0, 0.2) 0 -1px 7px 1px, inset #441313 0 -1px 9px, rgba(255, 0, 0, 0.5) 0 2px 0;}
+    to { background-color: #F00; }
+}
+
+.led-yellow {
+  margin: 0 auto;
+  width: 24px;
+  height: 24px;
+  background-color: #FF0;
+  border-radius: 50%;
+  box-shadow: rgba(0, 0, 0, 0.2) 0 -1px 7px 1px, inset #808002 0 -1px 9px, #FF0 0 2px 12px;
+  -webkit-animation: blinkYellow 1s infinite;
+  -moz-animation: blinkYellow 1s infinite;
+  -ms-animation: blinkYellow 1s infinite;
+  -o-animation: blinkYellow 1s infinite;
+  animation: blinkYellow 1s infinite;
+}
+
+@@-webkit-keyframes blinkYellow {
+    from { background-color: #FF0; }
+    50% { background-color: #AA0; box-shadow: rgba(0, 0, 0, 0.2) 0 -1px 7px 1px, inset #808002 0 -1px 9px, #FF0 0 2px 0; }
+    to { background-color: #FF0; }
+}
+@@-moz-keyframes blinkYellow {
+    from { background-color: #FF0; }
+    50% { background-color: #AA0; box-shadow: rgba(0, 0, 0, 0.2) 0 -1px 7px 1px, inset #808002 0 -1px 9px, #FF0 0 2px 0; }
+    to { background-color: #FF0; }
+}
+@@-ms-keyframes blinkYellow {
+    from { background-color: #FF0; }
+    50% { background-color: #AA0; box-shadow: rgba(0, 0, 0, 0.2) 0 -1px 7px 1px, inset #808002 0 -1px 9px, #FF0 0 2px 0; }
+    to { background-color: #FF0; }
+}
+@@-o-keyframes blinkYellow {
+    from { background-color: #FF0; }
+    50% { background-color: #AA0; box-shadow: rgba(0, 0, 0, 0.2) 0 -1px 7px 1px, inset #808002 0 -1px 9px, #FF0 0 2px 0; }
+    to { background-color: #FF0; }
+}
+@@keyframes blinkYellow {
+    from { background-color: #FF0; }
+    50% { background-color: #AA0; box-shadow: rgba(0, 0, 0, 0.2) 0 -1px 7px 1px, inset #808002 0 -1px 9px, #FF0 0 2px 0; }
+    to { background-color: #FF0; }
+}
+
+.led-green {
+  margin: 0 auto;
+  width: 24px;
+  height: 24px;
+  background-color: #ABFF00;
+  border-radius: 50%;
+  box-shadow: rgba(0, 0, 0, 0.2) 0 -1px 7px 1px, inset #304701 0 -1px 9px, #89FF00 0 2px 12px;
+}
+
+.led-blue {
+  margin: 0 auto;
+  width: 24px;
+  height: 24px;
+  background-color: #24E0FF;
+  border-radius: 50%;
+  box-shadow: rgba(0, 0, 0, 0.2) 0 -1px 7px 1px, inset #006 0 -1px 9px, #3F8CFF 0 2px 14px;
+}
+</style>
+
+<script>
+    $(function () {
+        var $winHeight = $(window).height()
+        $('.container').height($winHeight);
+    });
+</script>
 <section class="content">
     <div class="row">
         <div class="col-md-12">
@@ -39,30 +171,70 @@
                                             @foreach (var prd in period.PeriodModels)
                                             {
                                                 <td>
+                                                    <table>
+                                                        <tr>
+                                                            <td>
+                                                                <p>@prd.CourseName @prd.BatchName</p>
+                                                            </td>
+                                                            <td>
+                                                                @Html.SerpImageHelper(prd.Photo, 50, 50, "TeacherId")
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>
+                                                                From To Time
+                                                            </td>
+                                                            <td>
+                                                                <p>@prd.FromTime to @prd.ToTime</p>
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>
+                                                                Teacher Name
+                                                            </td>
+                                                            <td>
+                                                                <p>@prd.EmployeeName</p>
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>
+                                                                Subject Name
+                                                            </td>
+                                                            <td>
+                                                                <p>@prd.SubjectName</p>
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>
+                                                                Employee Phone
+                                                            </td>
+                                                            <td>
+                                                                <p>@prd.Phone</p>
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>
 
-                                                    @Html.SerpImageHelper(prd.Photo, 120, 120, "TeacherId")
-                                                    @if (prd.TeacherAttendence == "P")
-                                                    {
-                                                        <div class="led-box">
-                                                            <div class="led-blue"></div>
-                                                            <p>Present</p>
-                                                        </div>
-                                                    }
-                                                    else
-                                                    {
-                                                        <div class="led-box">
-                                                            <div class="led-red"></div>
-                                                            <a onclick="AssignTeacher(@prd.TimeTableId,'@prd.FromTime','@prd.ToTime')">Assign</a>
-                                                        </div>
+                                                            </td>
+                                                            <td>
+                                                                @if (prd.TeacherAttendence == "P")
+                                                                {
+                                                                    <div class="led-box">
+                                                                        <div class="led-blue"></div>
+                                                                        <p>Present</p>
+                                                                    </div>
+                                                                }
+                                                                else
+                                                                {
+                                                                    <div class="led-box">
+                                                                        <div class="led-red"></div>
+                                                                        <a onclick="AssignTeacher(@prd.TimeTableId,'@prd.FromTime','@prd.ToTime')">Assign</a>
+                                                                    </div>
 
-                                                    }
-
-                                                    <h1>@prd.CourseName @prd.BatchName</h1>
-                                                    <p>@prd.FromTime to @prd.ToTime</p>
-                                                    <p>@prd.SubjectName</p>
-                                                    <p>@prd.TeacherAttendence</p>
-                                                    <p>@prd.EmployeeName</p>
-                                                    <p>@prd.Phone</p>
+                                                                }
+                                                            </td>
+                                                        </tr>
+                                                    </table>
                                                 </td>
                                                 i++;
                                             }

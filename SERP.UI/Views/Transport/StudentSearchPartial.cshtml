@@ -1,0 +1,64 @@
+﻿@model IEnumerable<SERP.Core.Entities.Entity.Core.Transaction.StudentMaster>
+
+<div class="col-md-12">
+    <table class="table table-responsive table-hover">
+        <thead>
+            <tr>
+                <th>
+                    Select
+                </th>
+                <th>
+                    Student Name
+                </th>
+                <th>
+                    Roll Code
+                </th>
+                <th>
+                    Registration
+                </th>
+                <th>
+                    Father Name
+                </th>
+                <th>
+                    Mother Name
+                </th>
+                <th>
+                    Address
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var data in Model)
+            {
+                <tr>
+                    <td>
+                        <input type="checkbox" class="csStudent" value="@data.Id" data-studentName="@data.Name" data-FName="@data.FatherName" data-rolCode="@data.RollCode" data-regist="@data.RegistrationNumber" data-address="@data.C_Address" data-id="@data.Id" />
+                    </td>
+                    <td>
+                        @data.Name
+                    </td>
+                    <td>
+                        @data.RollCode
+                    </td>
+                    <td>
+                        @data.RegistrationNumber
+                    </td>
+                    <td>
+                        @data.FatherName
+                    </td>
+                    <td>
+                        @data.MotherName
+                    </td>
+                    <td>
+                        @data.C_Address
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+<div class="col-md-12">
+    <button type="button" onclick="AddStudentToRoute()" class="btn btn-primary pull-right">
+        <span class="glyphicon glyphicon-open-file"></span> Save
+    </button>
+</div>

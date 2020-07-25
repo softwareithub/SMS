@@ -8,8 +8,8 @@ namespace SERP.Core.Entities.Entity.Core.HRModule
     [Table("EmployeeProfessionalInfo", Schema ="HR")]
     public class EmployeeProfessionalInfoModel: Base<int>
     {
-        public int EmployeeId { get; set; }
-        public int DepartmentId { get; set; }
-        public int DesignationId { get; set; }
+        public int EmployeeId { get; set; } = default;
+        public int DepartmentId { get; set; } = default;
+        public int DesignationId { get; set; } = default;
     }
 }

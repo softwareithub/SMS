@@ -1,0 +1,288 @@
+﻿@model IEnumerable<SERP.Core.Entities.Entity.Core.HRModule.EmployeeSalarySlip>
+
+<style>
+    .empDetail {
+        width: 100%;
+        text-align: left;
+        border: 2px solid black;
+        border-collapse: collapse;
+        table-layout: fixed;
+    }
+
+    .head {
+        margin: 10px;
+        margin-bottom: 50px;
+        width: 100%;
+    }
+
+    .companyName {
+        text-align: center;
+        font-size: 25px;
+        font-weight: bold;
+    }
+
+    .salaryMonth {
+        text-align: center;
+    }
+
+    .table-border-bottom {
+        border-bottom: 1px solid;
+    }
+
+    .table-border-right {
+        border-right: 1px solid;
+    }
+
+    .myBackground {
+        padding-top: 10px;
+        text-align: left;
+        border: 1px solid black;
+        height: 40px;
+    }
+
+    .myAlign {
+        text-align: center;
+        border-right: 1px solid black;
+    }
+
+    .myTotalBackground {
+        padding-top: 10px;
+        text-align: left;
+        background-color: #EBF1DE;
+        border-spacing: 0px;
+    }
+
+    .align-4 {
+        width: 25%;
+        float: left;
+    }
+
+    .tail {
+        margin-top: 35px;
+    }
+
+    .align-2 {
+        margin-top: 25px;
+        width: 50%;
+        float: left;
+    }
+
+    .border-center {
+        text-align: center;
+    }
+
+        .border-center th, .border-center td {
+            border: 1px solid black;
+        }
+
+    th, td {
+        padding-left: 6px;
+    }
+
+    table th, table td {
+        padding: 0px !important;
+</style>
+
+@{
+    var netPayAmount = decimal.Parse("0.0");
+    var netDeductionAmount = decimal.Parse("0.0");
+}
+<div class="salary-slip">
+    <table class="empDetail">
+        <tr height="100px" style='background-color: #c2d69b'>
+            <td colspan='2'>
+                <img height="90px" src=@Model.First().InstituteMaster.InstituteLogo />
+            </td>
+            <td colspan='6'>
+                <span class="companyName">@Model.First().InstituteMaster.Name</span>
+                <p style="text-align:right">@Model.First().InstituteMaster.Address</p>
+                <p style="text-align:right"> Email :@Model.First().InstituteMaster.Email</p>
+                <p style="text-align:right"> Phone :@Model.First().InstituteMaster.Phone</p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                Name
+            </td>
+            <td>
+                @Model.First().EmployeeName
+            </td>
+            <td></td>
+            <td>
+                Employee Code
+            </td>
+            <td>
+                @Model.First().EmpCode
+            </td>
+            <td></td>
+            <td>
+                Department
+            </td>
+            <td>
+                @Model.First().Department
+            </td>
+        </tr>
+        <tr>
+            <td>
+                Designation
+            </td>
+            <td>
+                @Model.First().Designation
+            </td>
+            <td></td>
+            <td>
+                Bank Name
+            </td>
+            <td>
+                @Model.First().InstituteMaster.Fax
+            </td>
+            <td></td>
+            <td>
+                Payslip no.
+            </td>
+            <td>
+                XXXXXXXXXX
+            </td>
+        </tr>
+        <tr>
+            <td>
+                Cost Centre
+            </td>
+            <td>
+                XXXXXXXXXXX
+            </td>
+            <td></td>
+            <td>
+                Bank Branch
+            </td>
+            <td>
+                XXXXXXXXXX
+            </td>
+            <td></td>
+            <td>
+                Pay Period
+            </td>
+            <td>
+                XXXXXXXXXXX
+            </td>
+        </tr>
+
+        <tr class="myBackground">
+            <td colspan="2">
+                Payments
+            </td>
+            <td>
+                Particular
+            </td>
+            <td class="table-border-right">
+                Amount (Rs.)
+            </td>
+            <td colspan="2">
+                Deductions
+            </td>
+            <td>
+                Particular
+            </td>
+            <td>
+                Amount (Rs.)
+            </td>
+        </tr>
+        <tr>
+            <td colspan="4">
+                <table>
+                    @foreach (var data in Model)
+                    {
+                        if (data.AdditionDeduction == "A")
+                        {
+                            <tr>
+                                <td colspan="2">
+                                    @data.HeadName
+                                </td>
+                                <td></td>
+                                <td class="myAlign">
+                                    @{
+                                        decimal payAmount = Math.Round(data.PayAmount, 2);
+                                        netPayAmount = netPayAmount + payAmount;
+                                    }
+                                    @payAmount
+                                </td>
+                            </tr>
+                        }
+
+                    }
+
+                </table>
+            </td>
+
+            <td colspan="4">
+                <table>
+                    @foreach (var data in Model)
+                    {
+                        if (data.AdditionDeduction == "D")
+                        {
+                            <tr>
+                                <td colspan="2">
+                                    @data.HeadName
+                                </td>
+                                <td></td>
+                                <td class="myAlign">
+                                    @{
+                                        decimal deductionAmount = Math.Round(data.PayAmount, 2);
+                                        netDeductionAmount = netDeductionAmount + deductionAmount;
+                                    }
+                                    @deductionAmount
+                                </td>
+                            </tr>
+                        }
+                    }
+
+                </table>
+            </td>
+
+
+        </tr>
+        <tr class="myBackground">
+            <td colspan="3">
+                Total Payments
+            </td>
+            <td class="myAlign">
+                @netPayAmount
+            </td>
+            <td colspan="3">
+                Total Deductions
+            </td>
+            <td class="myAlign">
+                @netDeductionAmount
+            </td>
+        </tr>
+        <tbody class="border-center">
+            <tr>
+                <td colspan="7" style="text-align:right">
+                    Paybale Amount ::&nbsp;&nbsp;&nbsp;
+                </td>
+                <td>
+                    @netPayAmount
+                </td>
+            </tr>
+            <tr>
+                <td colspan="7" style="text-align:right">
+                   Deduction Amount ::&nbsp;&nbsp;&nbsp;
+                </td>
+                <td>
+                    @netDeductionAmount
+                </td>
+            </tr>
+            <tr>
+                <td colspan="7" style="text-align:right">
+                    Net Salary Amount ::&nbsp;&nbsp;&nbsp;
+                </td>
+                <td>
+                    @{
+                        var netSalaryAmount = netPayAmount + netDeductionAmount;
+                    }
+                    @netSalaryAmount
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>

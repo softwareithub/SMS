@@ -86,5 +86,41 @@ namespace SERP.Core.Entities {
                 return ResourceManager.GetString("AcademinName", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Fine Amount is required..
+        /// </summary>
+        public static string LibraryFineAmount {
+            get {
+                return ResourceManager.GetString("LibraryFineAmount", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Issue Days is required..
+        /// </summary>
+        public static string LibrarySettingIssueDays {
+            get {
+                return ResourceManager.GetString("LibrarySettingIssueDays", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Issue Time is required..
+        /// </summary>
+        public static string LibrarySettingIssueTimes {
+            get {
+                return ResourceManager.GetString("LibrarySettingIssueTimes", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to User Type is required..
+        /// </summary>
+        public static string LibrarySettingUserType {
+            get {
+                return ResourceManager.GetString("LibrarySettingUserType", resourceCulture);
+            }
+        }
     }
 }

@@ -8,8 +8,8 @@ namespace SERP.Core.Entities.Entity.Core.HRModule
     [Table("EmployeeSalaryAllocation",Schema ="HR")]
     public class EmployeeSalaryModel: Base<int>
     {
-        public int EmployeeId { get; set; }
-        public int HeadId { get; set; }
-        public decimal Amount { get; set; } 
+        public int EmployeeId { get; set; } = default;
+        public int HeadId { get; set; } = default;
+        public decimal Amount { get; set; } = default;
     }
 }

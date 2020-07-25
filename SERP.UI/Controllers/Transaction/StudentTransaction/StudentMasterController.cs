@@ -81,8 +81,18 @@ namespace SERP.UI.Controllers.Transaction.StudentTransaction
             }
             else
             {
-                model.StudentPhoto = string.IsNullOrEmpty(model.StudentPhoto) ? imagePaths[0] : model.StudentPhoto;
-                model.ParentsPhoto = string.IsNullOrEmpty(model.ParentsPhoto) ? imagePaths[1] : model.ParentsPhoto;
+                if (imagePaths.Count() == 1)
+                {
+                    model.StudentPhoto = string.IsNullOrEmpty(model.StudentPhoto) ? imagePaths[0] : model?.StudentPhoto;
+                    model.ParentsPhoto = string.Empty;
+                }
+                else if(imagePaths.Count()==2)
+                {
+                    model.StudentPhoto = string.IsNullOrEmpty(model.StudentPhoto) ? imagePaths[0] : model?.StudentPhoto;
+                    model.ParentsPhoto = string.IsNullOrEmpty(model.ParentsPhoto) ? imagePaths[1] : model?.ParentsPhoto;
+                }
+            
+               
             }
 
 
@@ -156,9 +166,7 @@ namespace SERP.UI.Controllers.Transaction.StudentTransaction
 
             var studentViewModel = (from sp in studentPromotes
                                     from sl in studentList
-                                    where (sp.StudentId == sl.Id
-                                     && sp.CourseId == sl.CourseId
-                                     && sp.BatchId == sl.BatchId)
+                                    where (sp.StudentId == sl.Id)
                                     join Cl in courseList
                                     on sp.CourseId equals Cl.Id
                                     join bl in sectionList
@@ -188,6 +196,24 @@ namespace SERP.UI.Controllers.Transaction.StudentTransaction
                                         ParentPhoto = sl.ParentsPhoto
                                     }).ToList();
             return studentViewModel;
+        }
+
+        public async Task<IActionResult> ValidateStudentRegistratioNumber(string registration)
+        {
+            if(!string.IsNullOrEmpty(registration))
+            {
+                var studentModel = await _IStudentMaster.GetList(x => x.IsActive == 1 && x.RegistrationNumber.Trim().ToLower() == registration.Trim().ToLower());
+                if (studentModel.Count() == 0)
+                {
+                    return Json("0");
+                }
+                else
+                {
+                    return Json("1");
+                }
+            }
+            return Json("0");
+
         }
 
         private async Task<IActionResult> CreateStudentEntity(StudentMaster model)

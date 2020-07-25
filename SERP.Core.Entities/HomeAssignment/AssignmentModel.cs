@@ -16,9 +16,9 @@ namespace SERP.Core.Entities.HomeAssignment
         public int SubjectId { get; set; }
         [Required(ErrorMessage = "Please select Batch")]
         public int BatchId { get; set; }
-        public int TeacherId { get; set; }
-        public string AssignmentName { get; set; }
-        public string Assignment { get; set; }
+        public int TeacherId { get; set; } = default;
+        public string AssignmentName { get; set; } = string.Empty;
+        public string Assignment { get; set; } = string.Empty;
         [DataType(DataType.Date)]
         [Required(ErrorMessage ="AssignmentDate is required")]
         public DateTime AssignmentPublishDate { get; set; }
@@ -26,6 +26,6 @@ namespace SERP.Core.Entities.HomeAssignment
         [Required(ErrorMessage = "Submission Date is required")]
         public DateTime SubmissionDate { get; set; }
 
-        public string PDFPath { get; set; }
+        public string PDFPath { get; set; } = string.Empty;
     }
 }

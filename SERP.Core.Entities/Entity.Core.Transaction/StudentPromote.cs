@@ -6,14 +6,14 @@ using System.Text;
 
 namespace SERP.Core.Entities.Entity.Core.Transaction
 {
-    [Table("StudentPromote",Schema = "TransactionSch")]
-    public class StudentPromote: Base<int>
+    [Table("StudentPromote", Schema = "TransactionSch")]
+    public class StudentPromote : Base<int>
     {
-        [Required]
+        [Required(ErrorMessage = "Please select Student")]
         public int StudentId { get; set; }
-        [Required]
+        [Required(ErrorMessage ="Please select Course")]
         public int CourseId { get; set; }
-        [Required]
+        [Required(ErrorMessage ="Please select Batch")]
         public int BatchId { get; set; }
         [Required(ErrorMessage ="Promote Date is required")]
         public DateTime PromotionDate { get; set; }

@@ -21,7 +21,7 @@ namespace SERP.Core.Entities.Entity.Core.HRModule
         [Display(Name = "IFSC Code", Prompt = "Enter Branch IFSC Code")]
         public string IFSCCode { get; set; }
         [Display(Name = "Branch Code", Prompt = "Enter Branch  Code")]
-        public string BranchCode { get; set; }
+        public string BranchCode { get; set; } = string.Empty;
 
         [Required(ErrorMessage = "Please Enter Branch Manager Name.")]
         [Display(Name = "Branch Manager Name", Prompt = "Enter Branch Manager Name")]
@@ -32,12 +32,12 @@ namespace SERP.Core.Entities.Entity.Core.HRModule
         public string Phone { get; set; }
 
         [Display(Name = "Branch Email", Prompt = "Enter Branch Email")]
-        public string Email { get; set; }
+        public string Email { get; set; } = string.Empty;
         [Required(ErrorMessage = "Please Enter Contact Person Phone.")]
         [Display(Name = "Branch Manager Name", Prompt = "Enter Branch Manager Phone")]
         public string ContactPersonPhone { get; set; }
         [Display(Name = "Branch Email", Prompt = "Enter Branch Email")]
-        public string BranchEmail { get; set; }
-        public string BranchLogo { get; set; }
+        public string BranchEmail { get; set; } = string.Empty;
+        public string BranchLogo { get; set; } = string.Empty;
     }
 }

@@ -1,0 +1,63 @@
+﻿@model SERP.Core.Model.OnlineTest.OnLineExamDetail
+
+@using Microsoft.AspNetCore.Http
+@inject IHttpContextAccessor httpContextAccessor
+@using SERP.UI.Extension;
+@{
+    var questions = "";
+    if (httpContextAccessor.HttpContext.Session.GetObject<List<string>>("questionIds")!=null)
+    {
+         questions = string.Join(",", httpContextAccessor.HttpContext.Session.GetObject<List<string>>("questionIds"));
+    }
+
+}
+
+<script type="text/javascript"
+        src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+<script type="text/javascript">
+    if (window.MathJax) {
+        MathJax.Hub.Queue(
+            ["resetEquationNumbers", MathJax.InputJax.TeX],
+            ["Typeset", MathJax.Hub]
+        );
+    }
+</script>
+<div class="col-md-12">
+    <div class="panel panel-danger">
+        <div class="panel-body">
+            <h4>(@Model.Sequence)  @Html.Raw(@Model.Question.Replace("<p>", "").Replace("</p>", ""))</h4>
+            <input type="hidden" name="Question" value="@Model.QuestionId" />
+            <input type="hidden" name="Sequence" value="@Model.Sequence" />
+            @foreach (var opt in Model.Options)
+            {
+                if (opt.IsSelected)
+                {
+                    <div class="checkbox">
+                        <label>
+                            <input type="checkbox" checked="checked" name="Option" value="@opt.OptionId"> @Html.Raw(opt.Option.Replace("<p>", "").Replace("</p>", ""))
+                        </label>
+                    </div>
+                }
+                else
+                {
+                    <div class="checkbox">
+                        <label>
+                            <input type="checkbox" name="Option" value="@opt.OptionId"> @Html.Raw(opt.Option.Replace("<p>", "").Replace("</p>", ""))
+                        </label>
+                    </div>
+                }
+
+            }
+        </div>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function () {
+        var data = '@questions';
+        data.split(',').forEach(function (item) {
+            $("#" + item.toString()).attr("style", "background-color:#0095FF")
+        });
+    });
+</script>

@@ -59,19 +59,12 @@
 
                         <div class="col-md-4">
                             <div class="form-group">
-                                <label asp-for="IsSchedule">Is Schedule</label>
-                                <Select asp-for="IsSchedule" class="form-control">
-                                    <option value="0">No</option>
-                                    <option value="1">Yes</option>
+                                <label asp-for="TemplateType">Template Type</label>
+                                <Select asp-for="TemplateType" class="form-control">
+                                    <option value="SMS">SMS</option>
+                                    <option value="Email">Email</option>
                                 </Select>
-                                <span asp-validation-for="IsSchedule" class="text-danger"></span>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="form-group">
-                                <label asp-for="ScheduleTime">Schedule Time</label>
-                                <input asp-for="ScheduleTime" type="time" class="form-control">
-                                <span asp-validation-for="ScheduleTime" class="text-danger"></span>
+                                <span asp-validation-for="TemplateType" class="text-danger"></span>
                             </div>
                         </div>
                         <div class="col-md-12">
@@ -82,8 +75,6 @@
                             </div>
                         </div>
                     </div>
-                    <!-- /.box-body -->
-
                     <div class="box-footer">
                         <div class="col-md-8">
                             @Html.SERPButton("btn btn-primary pull-right btnSubmit", Model == null ? 0 : Model.Id)

@@ -8,11 +8,11 @@ namespace SERP.Core.Entities.Entity.Core.Transaction
     [Table("FeeDiscountParticularWise",Schema= "TransactionSch")]
     public class FeeDiscountParticularWiseModel:Base<int>
     {
-        public int FeeDiscountId { get; set; }
-        public int ParticularId { get; set; }
-        public string DiscountType { get; set; }
-        public string Description { get; set; }
-        public decimal DiscountValue { get; set; }
+        public int FeeDiscountId { get; set; } = default;
+        public int ParticularId { get; set; } = default;
+        public string DiscountType { get; set; } = string.Empty;
+        public string Description { get; set; } = string.Empty;
+        public decimal DiscountValue { get; set; } = default;
         [NotMapped]
         public string CategoryName { get; set; }
 

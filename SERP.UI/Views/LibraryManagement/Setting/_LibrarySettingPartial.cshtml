@@ -1,0 +1,162 @@
+﻿@model SERP.Core.Entities.LibraryManagement.LibrarySetting
+<script src="~/lib/jquery-validation/dist/jquery.validate.js"></script>
+<script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.js"></script>
+<link href="https://cdn.datatables.net/1.10.20/css/jquery.dataTables.min.css" rel="stylesheet" />
+<script src="https://cdn.datatables.net/1.10.20/js/jquery.dataTables.min.js"></script>
+
+
+<section class="content-header">
+    <h1>
+        Library Setting
+        <small>Set up Library Management</small>
+    </h1>
+</section>
+
+<section class="content">
+    <div class="row">
+
+        <div class="col-md-12">
+            <!-- general form elements -->
+            <div class="box box-primary">
+                <div class="box-header with-border">
+                    <h3 class="box-title">Set Up Library Management</h3>
+                    <div class="col-md-12">
+                        <div class="col-md-10">
+                            <a class="btn btn-primary pull-right" onclick="GetNewRecordList()">
+                                <i class="fa fa-list-ul"></i>
+                            </a>
+                        </div>
+                        <div class="col-md-2">
+                            <a class="btn btn-primary pull-left" onclick="NewRecord()">
+                                <i class="fa fa-plus-square"></i>
+                            </a>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="overlay divHidding" id="divFormData">
+                    <i class="fa fa-refresh fa-spin">
+
+                    </i>
+                </div>
+                <form method="post" data-ajax="true" data-ajax-method="post"
+                      asp-action="Create" asp-controller="LibrarySeting" data-ajax-success="Success"
+                      data-ajax-begin="CustomFormSubmitBegin" data-ajax-complete="CustomFormSubmitComplete">
+                    <div class="box-body">
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <input type="hidden" asp-for="Id" />
+                                <input type="hidden" asp-for="CreatedBy" />
+                                <input type="hidden" asp-for="CreatedDate" />
+                                <label asp-for="UserType">User Type</label>
+                                <select asp-for="UserType" class="form-control">
+                                    <option value="">Select</option>
+                                    <option value="staff">Staff</option>
+                                    <option value="student">Student</option>
+                                </select>
+                                <span asp-validation-for="UserType" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label asp-for="IssueDays">Issue Days</label>
+                                <input asp-for="IssueDays" class="form-control">
+                                <span asp-validation-for="IssueDays" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label asp-for="ReIssueTime">Re Issue Time</label>
+                                <select class="form-control" asp-for="ReIssueTime">
+                                    <option value="">Select</option>
+                                    <option value="1">One Time</option>
+                                    <option value="2">Two Time</option>
+                                    <option value="3">Three Time</option>
+                                </select>
+                                <span asp-validation-for="ReIssueTime" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label asp-for="FineAmount">Fine Amount</label>
+                              <input asp-for="FineAmount" class="form-control" />
+                                <span asp-validation-for="FineAmount" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label asp-for="IsFineAmountFixed">Is Fine Amount Fixed</label>
+                                <select asp-for="IsFineAmountFixed" class="form-control">
+                                    <option value="Yes">Yes</option>
+                                    <option value="No">No</option>
+                                </select>
+                                <span asp-validation-for="IsFineAmountFixed" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label asp-for="FineAmountCalulateOn">Fine Amount Calculation</label>
+                                <select asp-for="FineAmountCalulateOn" class="form-control">
+                                    <option value="Daily">Daily</option>
+                                    <option value="Fixed">Fixed</option>
+                                </select>
+                                <span asp-validation-for="FineAmountCalulateOn" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label asp-for="AvailableNotification">Notified when Available</label>
+                                <select asp-for="AvailableNotification" class="form-control">
+                                    <option value="1">Yes</option>
+                                    <option value="0">No</option>
+                                </select>
+                                <span asp-validation-for="AvailableNotification" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label asp-for="ReturnDateNotification">Return Notification</label>
+                                <select asp-for="ReturnDateNotification" class="form-control">
+                                    <option value="1">Yes</option>
+                                    <option value="0">No</option>
+                                </select>
+                                <span asp-validation-for="ReturnDateNotification" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- /.box-body -->
+
+                    <div class="box-footer">
+                        <div class="col-md-8">
+                            @Html.SERPButton("btn btn-primary pull-right btnSubmit", Model == null ? 0 : Model.Id)
+                            <button class="buttonload" style="display:none">
+                                <i class="fa fa-refresh fa-spin"></i>Loading
+                            </button>
+                        </div>
+                        <div class="col-md-4">
+                            <button type="reset" class="btn btn-danger pull-left">Cancel</button>
+                        </div>
+
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        @await Html.PartialAsync("~/Views/Shared/_CommanModalPartial.cshtml")
+
+    </div>
+</section>
+
+<script>
+
+    function GetNewRecordList() {
+        GetCustomRecord("/LibrarySeting/GetDetails");
+        setTimeout(function () {
+            $("#modalTitle").text("Library Setting")
+        }, 300);
+    }
+    function NewRecord() {
+        var url = "/LibrarySeting/Index";
+        NewCustomRecord(url);
+    }
+</script>

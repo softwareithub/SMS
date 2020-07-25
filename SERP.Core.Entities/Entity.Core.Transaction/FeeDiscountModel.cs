@@ -13,14 +13,14 @@ namespace SERP.Core.Entities.Entity.Core.Transaction
         [Required(ErrorMessage ="Please enter the disocunt code")]
         [Display(Name="Discount Code", Prompt ="Enter Discount Code")]
         public string Code { get; set; }
-        [Required(ErrorMessage ="Please enter description")]
-        [Display(Name="Discount Description", Prompt ="Enter Discount Description")]
-        public string Description { get; set; }
-        public string DiscountType { get; set; }
-        
+        [Required(ErrorMessage = "Please enter description")]
+        [Display(Name = "Discount Description", Prompt = "Enter Discount Description")]
+        public string Description { get; set; } = string.Empty;
+        public string DiscountType { get; set; } = string.Empty;
+
         [DataType(DataType.Currency)]
-        [Display(Name="Discount Value",Prompt ="Enter discount value")]
-        public decimal DiscountValue { get; set; }
-        public int DependentOnParticular { get; set; }
+        [Display(Name = "Discount Value", Prompt = "Enter discount value")]
+        public decimal DiscountValue { get; set; } = default;
+        public int DependentOnParticular { get; set; } = default;
     }
 }

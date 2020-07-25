@@ -16,5 +16,13 @@ namespace SERP.Core.Entities.OnlineTest
         public string Regulation { get; set; }
         public string TestTimeLimit { get; set; }
         public int NoOfQuestion { get; set; }
+        public DateTime TestDateTime { get; set; }
+        [Required(ErrorMessage ="Please select Course")]
+        public int CourseId { get; set; }
+
+        [Required(ErrorMessage ="Please select Batch")]
+        public int BatchId { get; set; }
+
+
     }
 }

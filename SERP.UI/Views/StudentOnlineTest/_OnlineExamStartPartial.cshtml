@@ -1,0 +1,130 @@
+﻿@model IEnumerable<SERP.Core.Model.OnlineTest.OnLineExamDetail>
+@using Microsoft.AspNetCore.Http
+@inject IHttpContextAccessor httpContextAccessor
+
+<section class="content-header">
+    <h1>
+        Exam Name
+        <small>Exam Started</small>
+    </h1>
+</section>
+
+
+<section class="content">
+    <div class="row">
+
+        <div class="col-md-12">
+
+            <div class="box box-primary" id="divTestSubmit">
+                <div class="box-header with-border">
+                    <h3 class="box-title"></h3>
+                    <div class="col-md-6">
+                        Test Duration : 
+                    </div>
+                    <div class="col-md-6">
+                        Time Left   <h3 id="countdown" style="text-align:right"></h3>
+                    </div>
+                </div>
+                <form method="post" data-ajax="true" data-ajax-method="post"
+                      asp-action="SaveQuestion" asp-controller="StudentOnlineTest" data-ajax-success="SaveAnswere">
+                    <div class="box-body">
+                        <div id="divQuestion">
+                            @await Html.PartialAsync("~/Views/StudentOnlineTest/_ExamQuestionPartial.cshtml", Model.OrderBy(x => x.Sequence).First())
+                        </div>
+                    </div>
+
+                    <div class="box-footer" id="divFooter">
+                        <div class="col-md-12">
+                            <input type="submit" class="btn btn-primary pull-right" value="Save" />
+                            <button class="buttonload" style="display:none">
+                                <i class="fa fa-refresh fa-spin"></i>Loading
+                            </button>
+                        </div>
+                    </div>
+                </form>
+
+                <div class="box-footer">
+                    <div class="col-md-12">
+                        <table class="table table-responsive" style="width:100%">
+                            <thead>
+                                <tr>
+                                    @foreach (var data in Model.OrderBy(x => x.Sequence))
+                                    {
+                                        <th>
+                                            <a data-ajax="true" data-ajax-mode="replace" id="@data.QuestionId"
+                                               asp-action="GetQuestion" asp-controller="StudentOnlineTest" asp-route-questionId="@data.QuestionId"
+                                               data-ajax-update="#divQuestion"
+                                               data-ajax-begin="AjaxOnBegin" data-ajax-complete="AjaxComplete"
+                                               class="btn btn-default" style="background-color:#F47D11">
+                                                @data.Sequence
+                                            </a>
+                                        </th>
+                                    }
+                                </tr>
+                            </thead>
+                        </table>
+                    </div>
+                    <div class="col-md-12">
+                        <a data-ajax="true" data-ajax-mode="replace"
+                           asp-action="SubmitTest" asp-controller="StudentOnlineTest"
+                           data-ajax-update="#divTestSubmit"
+                           data-ajax-begin="AjaxOnBegin" data-ajax-complete="AjaxComplete"
+                           class="btn btn-primary pull-left">
+                            Submit Test
+                        </a>
+                    </div>
+                </div>
+
+                
+            </div>
+        </div>
+    </div>
+</section>
+
+<script>
+    var timer2 = "01:01";
+    var interval = setInterval(function () {
+
+        var timer = timer2.split(':');
+        //by parsing integer, I avoid all extra string processing
+        var minutes = parseInt(timer[0], 10);
+        var seconds = parseInt(timer[1], 10);
+        --seconds;
+        minutes = (seconds < 0) ? --minutes : minutes;
+
+        if (minutes < 0) {
+
+            clearInterval(interval);
+        }
+        seconds = (seconds < 0) ? 59 : seconds;
+        seconds = (seconds < 10) ? '0' + seconds : seconds;
+        //minutes = (minutes < 10) ?  minutes : minutes;
+        if (minutes < 0) {
+            $('#countdown').html("");
+            setTimeout(function () {
+                $.get("/StudentOnlineTest/SubmitTest", function (data) {
+                    $("#divQuestion").html('<h1>Thanks for completing the Test</h1>')
+                });
+            }, 3000);
+        }
+        else {
+            $('#countdown').html(minutes + ':' + seconds);
+            timer2 = minutes + ':' + seconds;
+
+        }
+
+
+    }, 1000);
+
+    function SaveAnswere(response) {
+        if (response != "1") {
+            $("#divQuestion").html(response);
+        }
+        else {
+            $("#divFooter").attr("style", "display:none");
+            $("#divQuestion").html('');
+            $("#divQuestion").html('<h1>Thanks for completing the Test</h1>')
+        }
+
+    }
+</script>

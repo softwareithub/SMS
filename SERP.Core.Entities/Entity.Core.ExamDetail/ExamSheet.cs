@@ -18,6 +18,7 @@ namespace SERP.Core.Entities.Entity.Core.ExamDetail
         [Required(ErrorMessage = "Please Subject")]
         public int SubjectId { get; set; }
         [DataType(DataType.Date)]
+        [Required(ErrorMessage ="Exam Date is required.")]
         public DateTime ExamDate { get; set; }
         [Required(ErrorMessage = "Please Start Time")]
         [DataType(DataType.Time)]
@@ -26,8 +27,8 @@ namespace SERP.Core.Entities.Entity.Core.ExamDetail
         [DataType(DataType.Time)]
         public TimeSpan EndTime { get; set; }
         [Required(ErrorMessage = "Please Inveligitator")]
-        public int InveligitatorId { get; set; }
-        public int MaxMark { get; set; }
-        public int PassMark { get; set; }
+        public int InveligitatorId { get; set; } = default(int);
+        public int MaxMark { get; set; } = 100;
+        public int PassMark { get; set; } = 35;
     }
 }

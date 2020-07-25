@@ -1,0 +1,43 @@
+﻿@model SERP.Core.Model.OnlineTest.TestSubmissionModel
+<div class="row">
+    <div class="col-md-12">
+       <div class="col-md-4">
+           <img src="@Model.Image" style="height:50px;width:50px" />
+       </div>
+        <div class="col-md-8">
+            <h3 style="text-align:center;color:#FD5308">
+                @Model.Message
+            </h3>
+        </div>
+    </div>
+    <div class="col-md-12">
+        <table class="table table-bordered table-responsive">
+            <thead>
+                <tr>
+                    <th>
+                        Total Question
+                    </th>
+                    <th>
+                        Attempted Question
+                    </th>
+                    <th>
+                        Un Attempted Question
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>
+                        @Model.TotalQuestion
+                    </td>
+                    <td>
+                        @Model.AttemptedQuestion
+                    </td>
+                    <td>
+                        @Model.UnAttemptedQuestion
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>

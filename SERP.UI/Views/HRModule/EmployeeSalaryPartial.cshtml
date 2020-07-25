@@ -1,0 +1,74 @@
+﻿@model IEnumerable<SERP.Core.Model.HRModel.EmployeeSalaryDetailModel>
+
+<script src="~/lib/jquery-validation/dist/jquery.validate.js"></script>
+<script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.js"></script>
+
+<form method="post" data-ajax="true" data-ajax-method="post"
+      asp-action="CreateEmployeeSalary" asp-controller="EmployeeSalaryAllocation" data-ajax-success="Success"
+      data-ajax-begin="CustomFormSubmitBegin" data-ajax-complete="CustomFormSubmitComplete">
+
+    <div class="col-md-12">
+        <table class="table table-responsive table-hover">
+            <thead>
+                <tr>
+                    <th>
+                        Pay Head Name
+                    </th>
+                    <th>
+                        Amount
+                    </th>
+                    <th>
+                        Deduction/Addition
+                    </th>
+                    <th>
+                        Dependent on Day
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var data in Model)
+                {
+                    
+                    <tr>
+                        <td>
+                            @data.HeadName
+                        </td>
+                        <td>
+                            <input type="hidden" name="HeadId" value="@data.HeadId" />
+                            <input type="hidden" name="employeeId" value="@data.EmployeeId" />
+                            <input type="number" class="form-control" name="Amount" value="@data.Amount" />
+                        </td>
+                        <td>
+                            @if (data.AdditionDeduction == "A")
+                            {
+                                <span style="color:forestgreen"> Addition </span>
+                            }
+                            else
+                            {
+                                <span style="color:orangered">Deduction</span>
+                            }
+                        </td>
+                        <td>
+                            @if (data.IsDependentOnDay == 1)
+                            {
+                                <span style="color:forestgreen">Yes</span>
+                            }
+                            else
+                            {
+                                <span style="color:orangered">No</span>
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+    <div class="col-md-12">
+        <div class="col-md-8">
+            <input type="submit" class="btn btn-success pull-right" value="Save" />
+        </div>
+        <div class="col-md-4">
+            <input type="reset" class="btn btn-danger pull-left" value="Cancel" />
+        </div>
+    </div>
+</form>

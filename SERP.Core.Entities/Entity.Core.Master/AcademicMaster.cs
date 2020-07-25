@@ -16,6 +16,6 @@ namespace SERP.Core.Entities.Entity.Core.Master
         [Required(ErrorMessageResourceType = typeof(ValidaionMessage), ErrorMessageResourceName = "AcademicEndDate")]
         [DataType(DataType.Date)]
         public DateTime EndDate { get; set; }
-        public string Description { get; set; }
+        public string Description { get; set; } = string.Empty;
     }
 }

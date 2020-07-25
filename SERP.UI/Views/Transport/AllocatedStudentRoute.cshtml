@@ -1,0 +1,43 @@
+﻿@model IEnumerable<SERP.Core.Entities.Entity.Core.Transaction.StudentMaster>
+
+<table class="table table-hover table-responsive">
+    <thead>
+        <tr>
+            <th>
+                Name
+            </th>
+            <th>
+                Roll 
+            </th>
+            <th>
+                Registration
+            </th>
+            <th>
+                Father
+            </th>
+            <th>
+                Address
+            </th>
+            <th>
+                Action
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach(var data in Model)
+        {
+        <tr>
+            <td>@data.Name</td>
+            <td>@data.RollCode</td>
+            <td>@data.RegistrationNumber</td>
+            <td>@data.FatherName</td>
+            <td>@data.C_Address</td>
+            <td>
+                <a class="btn btn-outline-danger pull-right" data-loading-text="<i class='fa fa-circle-o-notch fa-spin'  style='color:#DD4B39'></i>" onclick="DeleteRecord(@data.Id, this)">
+                    <i class="fa fa-trash" style="color:#DD4B39"></i>
+                </a>
+            </td>
+        </tr>
+        }
+    </tbody>
+</table>

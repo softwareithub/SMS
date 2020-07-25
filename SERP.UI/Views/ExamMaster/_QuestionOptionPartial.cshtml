@@ -1,0 +1,65 @@
+﻿<script type="text/javascript"
+        src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+<script type="text/javascript">
+    if (window.MathJax) {
+        MathJax.Hub.Queue(
+            ["resetEquationNumbers", MathJax.InputJax.TeX],
+            ["Typeset", MathJax.Hub]
+        );
+    }
+</script>
+
+
+@model IEnumerable<SERP.Core.Entities.Entity.Core.ExamDetail.OptionMaster>
+
+<table class="table table-hover table-responsive" width="80%" border="1">
+    <thead>
+        <tr>
+            <th>
+                Option
+            </th>
+            <th>
+                Is Correct
+            </th>
+            <th>
+                Change Correct
+            </th>
+            <th>
+                Action
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var data in Model)
+        {
+            <tr>
+                <td style="word-wrap: break-word">
+                    @Html.Raw(data.OptionData)
+                </td>
+                <td>
+                    @if (data.IsCorrectAnswere == 1)
+                    {
+                        <span>Yes</span>
+                    }
+                    else
+                    {
+                        <span>No</span>
+                    }
+                </td>
+                <td>
+                    <select class="form-control" onchange="changeOptionCorrect(this,@data.Id)">
+                        <option value="0">Select</option>
+                        <option value="0">No</option>
+                        <option value="1">Yes</option>
+                    </select>
+                </td>
+                <td>
+                    <a onclick="DeleteOption(@data.Id)">
+                        <i class="fa fa-trash"></i>
+                    </a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

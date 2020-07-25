@@ -19,7 +19,7 @@ namespace SERP.Core.Entities.Entity.Core.Transaction
         [Display(Name = "Subject Name", Prompt = "Enter Subject Name")]
         public string SubjectName { get; set; }
         [Display(Name = "Subject Description", Prompt = "Enter Subject Description")]
-        public string SubjectDescription { get; set; }
-        public int IsElective { get; set; }
+        public string SubjectDescription { get; set; } = string.Empty;
+        public int IsElective { get; set; } = default;
     }
 }

@@ -11,6 +11,7 @@ namespace SERP.Core.Model.ExamModel
         public string CourseName { get; set; }
         public string BatchName { get; set; }
         public string SubjectName { get; set; }
+        public string SubjectCode { get; set; }
         public DateTime ExamDate { get; set; }
         public TimeSpan StartTime { get; set; }
         public TimeSpan EndTime { get; set; }

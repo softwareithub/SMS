@@ -13,6 +13,6 @@ namespace SERP.Core.Entities.Entity.Core.HRModule
         [Display(Name="Designation Name",Prompt ="Enter Designation Name")]
         public string Name { get; set; }
         [Display(Name = "Designation Code", Prompt = "Enter Designation Code")]
-        public string Code { get; set; }
+        public string Code { get; set; } = string.Empty;
     }
 }

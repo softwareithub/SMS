@@ -78,7 +78,7 @@ namespace SERP.UI.Controllers.HRModule
             {
                 employeeSalaryModels.ForEach(item =>
                 {
-                    item.Amount = employeeSalaryDetails.ToList().Find(x => x.HeadId == item.Id).Amount;
+                    item.Amount =Convert.ToDecimal(employeeSalaryDetails.ToList().Find(x => x.HeadId == item.Id)?.Amount);
                 });
             }
             //populate the viewModel with the List
@@ -93,9 +93,14 @@ namespace SERP.UI.Controllers.HRModule
             {
 
                 List<IFormFile> formFiles = new List<IFormFile>();
-                formFiles.Add(employeePhoto);
-                var imagePaths = await UploadImage.UploadImageOnFolder(formFiles, _hostingEnvironment);
-                model.EmployeeBasicInfoModel.Photo = imagePaths.First();
+                if(employeePhoto!=null && employeePhoto.Length>0)
+                {
+                    formFiles.Add(employeePhoto);
+                    var imagePaths = await UploadImage.UploadImageOnFolder(formFiles, _hostingEnvironment);
+                    model.EmployeeBasicInfoModel.Photo = imagePaths.First();
+                }
+                model.EmployeeBasicInfoModel.Photo = "/Images/UserLogo.jpg"; 
+               
                 //Insert data into employeeBasic Information
                 var basicInfoResponse = await _basicInfoRepo.CreateEntity(model.EmployeeBasicInfoModel);
                 //Create new Context
@@ -120,6 +125,8 @@ namespace SERP.UI.Controllers.HRModule
             }
             else
             {
+                model.EmployeeBasicInfoModel.EmergencyPhone = string.Empty;
+                model.EmployeeBasicInfoModel.Photo = model.EmployeeBasicInfoModel.Photo == string.Empty ? string.Empty : model.EmployeeBasicInfoModel.Photo;
                 var response = await UpdateEmplolyeeInfo(model, employeePhoto);
                 return Json(ResponseData.Instance.GenericResponse(response));
             }

@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -26,7 +27,7 @@ namespace SERP.Infrastructure.Implementation.Infratructure.Implementation
         {
             try
             {
-                await TEntities.AddAsync(model);
+                await TEntities.AddAsync(DefaultIfNullEntity<TEntity>(model));
                 await baseContext.SaveChangesAsync();
                 return ResponseStatus.AddedSuccessfully;
             }
@@ -112,7 +113,7 @@ namespace SERP.Infrastructure.Implementation.Infratructure.Implementation
             {
                 using (baseContext)
                 {
-                    baseContext.UpdateRange(items);
+                    baseContext.UpdateRange(DefaultIfNullEntityArray(items));
                     await baseContext.SaveChangesAsync();
                 }
                 return ResponseStatus.UpdatedSuccessFully;
@@ -153,6 +154,43 @@ namespace SERP.Infrastructure.Implementation.Infratructure.Implementation
             return await Task.Run(() => true);
         }
 
-       
+        public TEntity DefaultIfNullEntity<TEntity>(TEntity Entity)
+        {
+            PropertyInfo[] propInfos = Entity.GetType().GetProperties();
+            foreach(var prop in propInfos)
+            {
+                object value = prop.GetValue(Entity, null);
+                if(value==null)
+                {
+                    if(prop.PropertyType.Name.ToLower().Trim()=="string")
+                    {
+                        prop.SetValue(Entity, string.Empty, null);
+                    }
+                    else if (prop.PropertyType.Name.ToLower().Trim() == "decimal")
+                    {
+                        prop.SetValue(Entity, default(decimal), null);
+                    }
+                    else if (prop.PropertyType.Name.ToLower().Trim() == "integer")
+                    {
+                        prop.SetValue(Entity, default(int), null);
+                    }
+                    else if (prop.PropertyType.Name.ToLower().Trim() == "datetime")
+                    {
+                        prop.SetValue(Entity, default(DateTime), null);
+                    }
+
+                }
+            }
+            return Entity;
+        }
+
+        public TEntity[] DefaultIfNullEntityArray(TEntity[] entities)
+        {
+            foreach(var entity in entities)
+            {
+                DefaultIfNullEntity(entity);
+            }
+            return entities;
+        }
     }
 }

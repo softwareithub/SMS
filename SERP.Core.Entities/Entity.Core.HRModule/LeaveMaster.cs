@@ -8,8 +8,8 @@ namespace SERP.Core.Entities.Entity.Core.HRModule
     [Table("LeaveMaster")]
     public class LeaveMaster: Base<int>
     {
-        public string LeaveName { get; set; }
-        public string LeaveCode { get; set; }
-        public string Description { get; set; }
+        public string LeaveName { get; set; } = string.Empty;
+        public string LeaveCode { get; set; } = string.Empty;
+        public string Description { get; set; } = string.Empty;
     }
 }

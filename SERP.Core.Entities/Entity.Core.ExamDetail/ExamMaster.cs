@@ -13,8 +13,9 @@ namespace SERP.Core.Entities.Entity.Core.ExamDetail
         [Display(Name ="Exam Name" ,Prompt ="Enter Display Exam Name")]
         public string ExamName { get; set; }
         [DataType(DataType.Date)]
-        public DateTime StartDate { get; set; }
+        public DateTime StartDate { get; set; } = DateTime.Now.Date;
+
         [DataType(DataType.Date)]
-        public DateTime EndDate { get; set; }
+        public DateTime EndDate { get; set; } = DateTime.Now.Date;
     }
 }

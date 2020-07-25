@@ -1,0 +1,205 @@
+﻿@model SERP.Core.Entities.LibraryManagement.BookTransaction
+
+<script src="~/lib/jquery-validation/dist/jquery.validate.js"></script>
+<script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.js"></script>
+<link href="https://cdn.datatables.net/1.10.20/css/jquery.dataTables.min.css" rel="stylesheet" />
+<script src="https://cdn.datatables.net/1.10.20/js/jquery.dataTables.min.js"></script>
+<section class="content-header">
+    <h1>
+        Library Book Issue
+    </h1>
+
+</section>
+
+<section class="content">
+    <div class="row">
+        <div class="col-md-12">
+            <!-- general form elements -->
+            <div class="box box-primary">
+                <div class="overlay divHidding" id="divFormData">
+                    <i class="fa fa-refresh fa-spin">
+
+                    </i>
+                </div>
+                <div class="box-header with-border">
+                    <h3 class="box-title">Issue Book To Student/Employee</h3>
+                    <div class="col-md-12">
+                        <div class="col-md-10">
+                            <a class="btn btn-primary pull-right" onclick="GetNewRecordList()">
+                                <i class="fa fa-list-ul"></i>
+                            </a>
+                        </div>
+                        <div class="col-md-2">
+                            <a class="btn btn-primary pull-left" onclick="NewRecord()">
+                                <i class="fa fa-plus-square"></i>
+                            </a>
+                        </div>
+                    </div>
+
+                </div>
+
+                <form method="post" data-ajax="true" data-ajax-method="post"
+                      asp-action="IssueBook" asp-controller="BookIssue" data-ajax-success="Success"
+                      data-ajax-begin="CustomFormSubmitBegin" data-ajax-complete="CustomFormSubmitComplete">
+                    <div class="box-body">
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label>Issue To</label>
+                                <select class="form-control" onchange="IssueToUser()" name="IssueTo" id="ddlIssueTo">
+                                    <option value="stu">Student</option>
+                                    <option value="emp">Employee</option>
+
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="col-md-4" id="divStudent">
+                            <div class="form-group">
+                                <label>Select Student</label>
+                                <select class="form-control select2" asp-for="UserId"  asp-items="@(new SelectList(ViewBag.StudentList ,"Id","Name"))">
+                                </select>
+                                <span asp-validation-for="UserId" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label>Book</label>
+                                <select class="form-control select2" id="ddlBook" onchange="GetBookDetailList()" asp-items="@(new SelectList(ViewBag.BookList ,"Id","BookName"))">
+                                    <option>select</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <input type="hidden" asp-for="Id" />
+                                <input type="hidden" asp-for="CreatedBy" />
+                                <input type="hidden" asp-for="CreatedDate" />
+                                <label asp-for="BookItemId">Issue Book Item</label>
+                                <select class="form-control select2" asp-for="BookItemId" id="ddlBookItem"></select>
+                                <span asp-validation-for="BookItemId" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label asp-for="IssueDate">Date of Issue</label>
+                                <div class="input-group date">
+                                    <div class="input-group-addon">
+                                        <i class="fa fa-calendar"></i>
+                                    </div>
+                                    <input type="date" onchange="ChangeIssueDate(event)" class="form-control pull-right" asp-for="IssueDate">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label asp-for="ExpectedReturnDate">Date of Return</label>
+                                <div class="input-group date">
+                                    <div class="input-group-addon">
+                                        <i class="fa fa-calendar"></i>
+                                    </div>
+                                    <input type="text" disabled="disabled" id="expectedDate" class="form-control pull-right" asp-for="ExpectedReturnDate">
+                                    <input type="hidden" asp-for="ExpectedReturnDate" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="box-footer">
+                        <div class="col-md-8">
+                            @Html.SERPButton("btn btn-primary pull-right btnSubmit", Model == null ? 0 : Model.Id)
+                            <button class="buttonload" style="display:none">
+                                <i class="fa fa-refresh fa-spin"></i>Loading
+                            </button>
+                        </div>
+                        <div class="col-md-4">
+                            <button type="reset" class="btn btn-danger pull-left">Cancel</button>
+                        </div>
+
+                    </div>
+                </form>
+
+            </div>
+        </div>
+
+        <div class="modal fade" id="ModalBookReturn" role="dialog" style="overflow:auto">
+            <div class="modal-dialog modal-dialog-centered  modal-md" style="width:90%">
+                
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                        <h4 class="modal-title">
+                            <a id="modalTitle">Return Book</a>
+                        </h4>
+                    </div><!--modal-header end-->
+
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <fieldset class="fieldset marB0">
+                                    <div class="table-outer" style="min-height: 250px;overflow:auto;" id="returnDiv">
+
+
+                                    </div>
+                                </fieldset>
+                            </div>
+                        </div>
+
+                    </div><!--modal-body end-->
+                </div>
+                <!--modal-content end-->
+            </div><!--modal-dialog end-->
+        </div>
+
+        @await Html.PartialAsync("~/Views/Shared/_CommanModalPartial.cshtml")
+    </div>
+</section>
+
+<script>
+    $(document).ready(function () {
+        $('.select2').select2();
+    });
+    function IssueToUser() {
+        var issueTo = $("#ddlIssueTo").val();
+        $("#UserId").empty();//empty the User Details
+        var url = "";
+        if (issueTo == "stu") {
+            url = "/BookIssue/GetStudentDetails";
+        }
+        else {
+            url = "/BookIssue/GetEmployeeDetails"
+        }
+        $.get(url, function (data) {
+            for (var i = 0; i < data.length; i++) {
+                $("#UserId").append("<option value="+data[i].id+">" + data[i].name+"</option>")
+            }
+        }).done(function () {
+            $('.select2').select2();
+        });
+    }
+    function GetNewRecordList() {
+        GetCustomRecord("/BookIssue/BookIssueDetail");
+        setTimeout(function () {
+            $("#modalTitle").text("Book Issue Details")
+        }, 300);
+    }
+    function NewRecord() {
+        var url = "/BookIssue/Index";
+        NewCustomRecord(url);
+    }
+    function GetBookDetailList() {
+        var bookId = $("#ddlBook").val();
+        $("#ddlBookItem").empty();
+        $.get("/BookIssue/GetBookItems", { bookId: bookId }, function (data) {
+            for (var i = 0; i < data.length; i++) {
+                $("#ddlBookItem").append("<option value=" + data[i].id + ">" + data[i].bookBarCode + "</option>");
+            }
+        })
+    }
+
+    function ChangeIssueDate(e) {
+        var userType = $("#ddlIssueTo").val();
+        $.get("/BookIssue/GetIssueInformation", { userType: userType, Date: e.target.value }, function (data) {
+            $("#ExpectedReturnDate").val(data);
+            $("#expectedDate").val(data);
+        });
+    }
+</script>

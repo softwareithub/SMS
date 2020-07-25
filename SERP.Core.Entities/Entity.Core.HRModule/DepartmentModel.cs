@@ -13,6 +13,6 @@ namespace SERP.Core.Entities.Entity.Core.HRModule
         [Required(ErrorMessage ="Please enter Department Name")]
         [Display(Name ="Enter Department Name", Prompt ="Enter Department Name")]
         public string Name { get; set; }
-        public string Code { get; set; }
+        public string Code { get; set; } = string.Empty;
     }
 }

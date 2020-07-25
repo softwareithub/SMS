@@ -1,0 +1,88 @@
+﻿@{
+    ViewData["Title"] = "Index";
+    Layout = null;
+
+}
+@model SERP.Core.Entities.Accounts.ExpenseHead
+
+<script src="~/lib/jquery-validation/dist/jquery.validate.js"></script>
+<script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.js"></script>
+<link href="https://cdn.datatables.net/1.10.20/css/jquery.dataTables.min.css" rel="stylesheet" />
+<script src="https://cdn.datatables.net/1.10.20/js/jquery.dataTables.min.js"></script>
+
+<section class="content-header">
+    <h1>
+        Expense Head Master
+        <small>Create Income Head Master</small>
+    </h1>
+</section>
+
+
+<section class="content">
+    <div class="row">
+
+        <div class="col-md-12">
+            <div class="box box-primary">
+                <div class="box-header with-border">
+                    <h3 class="box-title">Create Expense Heads</h3>
+                    <a class="btn btn-primary pull-right" onclick="GetRecordList()">
+                        <i class="fa fa-list-ul"></i>
+                        List
+                    </a>
+                </div>
+                <form method="post" data-ajax="true" data-ajax-method="post"
+                      asp-action="Create" asp-controller="ExpenseHead" data-ajax-success="Success">
+                    <div class="box-body">
+
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <input asp-for="Id" type="hidden" />
+                                <input asp-for="CreatedBy" type="hidden" />
+                                <input asp-for="CreatedDate" type="hidden" />
+                                <label asp-for="Name">Expense Name</label>
+                                <input type="text" asp-for="Name" class="form-control" />
+                                <span asp-validation-for="Name" class="text-danger"></span>
+                            </div>
+
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label asp-for="HeadCode">Expense Code</label>
+                                <input asp-for="HeadCode" class="form-control" />
+                                <span asp-validation-for="HeadCode" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="box-footer">
+                        <div class="col-md-8">
+                            @Html.SERPButton("btn btn-primary pull-right btnSubmit", Model == null ? 0 : Model.Id)
+                            <button class="buttonload" style="display:none">
+                                <i class="fa fa-refresh fa-spin"></i>Loading
+                            </button>
+                        </div>
+                        <div class="col-md-4">
+                            <button type="reset" class="btn btn-danger pull-left">Cancel</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+        @await Html.PartialAsync("~/Views/Shared/_CommanModalPartial.cshtml")
+    </div>
+</section>
+
+
+<script type="text/javascript">
+    function GetRecordList() {
+        GetCustomRecord("/ExpenseHead/GetList");
+        setTimeout(function () {
+            $("#modalTitle").text("Expense Head Details")
+        }, 300);
+    }
+    function NewAcademicMaster() {
+        var url = "/ExpenseHead/Index";
+        NewCustomRecord(url);
+    }
+
+</script>

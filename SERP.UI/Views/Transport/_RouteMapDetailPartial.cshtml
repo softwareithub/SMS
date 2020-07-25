@@ -1,0 +1,42 @@
+﻿<section class="content">
+    <div class="row">
+
+        <div class="col-md-12">
+            <div class="box box-primary" style="height:450px;">
+                <div class="box-header with-border">
+
+                </div>
+                <div class="box-body">
+                    <div class="col-md-12">
+                        <div class="col-md-4">
+                            <label>Select Route</label>
+                            <select onchange="GetRouteMapDetails()" id="ddlRoute" class="form-control" asp-items="@(new SelectList(ViewBag.RouteDetails ,"Id","RouteName"))">
+                                <option value="0">Select</option>
+                            </select>
+                        </div>
+                       
+                    </div>
+                    <div class="col-md-12">
+                        <div id="divRouteDetails">
+
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+        
+    </div>
+</section>
+
+<script>
+    function GetRouteMapDetails() {
+        var routeId = $("#ddlRoute").val();
+        if (routeId > 0) {
+            $.get("/RouteMaster/GetRouteMapDetails", { id: routeId }, function (data) {
+                $("#divRouteDetails").html(data);
+            });
+        }
+
+    }
+</script>

@@ -10,9 +10,9 @@
                         <thead>
                             <tr>
                                 <th>Template Name</th>
+                                <th>Template Type</th>
                                 <th>Template</th>
-                                <th>Is Schedule</th>
-                                <th>Schedule Time</th>
+
                                 <th>Action</th>
 
                             </tr>
@@ -20,31 +20,27 @@
                         <tbody>
                             @foreach (var data in Model)
                             {
-                                <tr>
-                                    <td>
-                                        @data.TemplateName
-                                    </td>
-                                    <td>
-                                        @Html.Raw(data.Template)
-                                    </td>
-                                    <td>
-                                        @data.IsSchedule
-                                    </td>
-                                    <td>
-                                        @data.ScheduleTime
-                                    </td>
+                            <tr>
+                                <td>
+                                    @data.TemplateName
+                                </td>
+                                <td>
+                                    @data.TemplateType
+                                </td>
+                                <td>
+                                    @Html.Raw(data.Template)
+                                </td>
+                                <td>
+                                    <a class="btn btn-outline-success pull-right" data-loading-text="<i class='fa fa-circle-o-notch fa-spin'  style='color:#DD4B39'></i>" onclick="UpdateRecord(@data.Id, this)">
+                                        <i class="fa fa-edit" style="color:#3C8DBC"></i>
 
-                                    <td>
-                                        <a class="btn btn-outline-success pull-right" data-loading-text="<i class='fa fa-circle-o-notch fa-spin'  style='color:#DD4B39'></i>" onclick="UpdateRecord(@data.Id, this)">
-                                            <i class="fa fa-edit" style="color:#3C8DBC"></i>
+                                    </a>
 
-                                        </a>
-
-                                        <a class="btn btn-outline-danger pull-right" data-loading-text="<i class='fa fa-circle-o-notch fa-spin'  style='color:#DD4B39'></i>" onclick="DeleteRecord(@data.Id, this)">
-                                            <i class="fa fa-trash" style="color:#DD4B39"></i>
-                                        </a>
-                                    </td>
-                                </tr>
+                                    <a class="btn btn-outline-danger pull-right" data-loading-text="<i class='fa fa-circle-o-notch fa-spin'  style='color:#DD4B39'></i>" onclick="DeleteRecord(@data.Id, this)">
+                                        <i class="fa fa-trash" style="color:#DD4B39"></i>
+                                    </a>
+                                </td>
+                            </tr>
                             }
                         </tbody>
 

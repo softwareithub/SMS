@@ -93,10 +93,10 @@ namespace SERP.UI.Controllers.Assignment
                               EmployeeName= EM.Name,
                               HomeWork= HM.HomeWork,
                               PDFPath= HM.PDFPath,
-                              PublishDate=HM.HomeWorkDate,
-                              SubmissionDate= HM.HomeWorkSubmissionDate,
+                              PublishDate=Convert.ToDateTime(HM.HomeWorkDate),
+                              SubmissionDate=Convert.ToDateTime(HM.HomeWorkSubmissionDate),
                           }).ToList();
-            return PartialView("~/Views/AssignmentWork/_HomeWorkDetail.cshtml", result);            
+            return PartialView("~/Views/AssignmentWork/_HomeWorkDetails.cshtml", result);            
         }
 
         

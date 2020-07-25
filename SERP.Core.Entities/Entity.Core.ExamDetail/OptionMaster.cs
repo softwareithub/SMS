@@ -8,8 +8,8 @@ namespace SERP.Core.Entities.Entity.Core.ExamDetail
     [Table("OptionMaster",Schema = "OnlineTest")]
     public class OptionMaster: Base<int>
     {
-        public int QuestionId { get; set; }
-        public string OptionData { get; set; }
-        public int IsCorrectAnswere { get; set; }
+        public int QuestionId { get; set; } = default;
+        public string OptionData { get; set; } = string.Empty;
+        public int IsCorrectAnswere { get; set; } = default;
     }
 }

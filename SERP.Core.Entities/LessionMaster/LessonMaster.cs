@@ -10,7 +10,7 @@ namespace SERP.Core.Entities.LessionMaster
     [Table("LessonMaster", Schema ="Master")]
     public class LessonMaster:Base<int>
     {
-        public int SubjectId { get; set; }
+        public int SubjectId { get; set; } = default;
         public string LessonName { get; set; }
         [DataType(DataType.Date)]
         public DateTime? StartDate { get; set; }

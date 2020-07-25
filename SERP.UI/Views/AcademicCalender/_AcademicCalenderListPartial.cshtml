@@ -9,10 +9,10 @@
                         <thead>
                             <tr>
                                 <th>Event Name</th>
+                                <th>Event Description</th>
                                 <th>Start Date</th>
                                 <th>End Date</th>
-
-                                <th>Event Description</th>
+                                <th>Is Holiday</th>
                                 <th>
                                     Action
                                 </th>
@@ -34,7 +34,17 @@
                                     <td>
                                         @data.ToDate.ToShortDateString()
                                     </td>
-                                  
+                                    <td>
+                                        @if(data.IsHoliday==1)
+                                        {
+                                            <span>
+                                                Yes
+                                            </span>
+                                        }else
+                                        {
+                                            <span>No</span>
+                                        }
+                                    </td>
                                     <td>
                                         <a class="btn btn-outline-success pull-right"
                                            data-loading-text="<i class='fa fa-circle-o-notch fa-spin'  style='color:#DD4B39'></i>"

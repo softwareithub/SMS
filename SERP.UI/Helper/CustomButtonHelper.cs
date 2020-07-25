@@ -12,7 +12,16 @@ namespace SERP.UI.Helper
         public  static IHtmlContent SERPButton(this IHtmlHelper htmlHelper, string className, int insertUpdate)
         {
             string text = insertUpdate == 0 ? "Submit" : "Update";
-            string htmlContent = $" <button type='submit' class='{className}'>{text}</button>";
+            string htmlContent = string.Empty;
+            if (text== "Submit")
+            {
+                 htmlContent = $" <button type='submit' class='{className}'><span class='glyphicon glyphicon-save'></span>{text}</button>";
+            }
+            else
+            {
+                htmlContent = $" <button type='submit' class='{className}'><span class='glyphicon glyphicon-edit'></span>{text}</button>";
+            }
+         
             return new HtmlString(htmlContent);
         }
     }

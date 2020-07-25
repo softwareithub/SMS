@@ -9,14 +9,14 @@ namespace SERP.Core.Entities.Entity.Core.Transaction
     public class TimeTableAssignSubjTeacherModel :Base<int>
     {
         [ForeignKey("TimeTableDayId")]
-        public int TimeTableDayId { get; set; }
-        public string PeriodName { get; set; }
-        public int SubjecId { get; set; }
-        public int TeacherId { get; set; }
-        public TimeSpan FromTime { get; set; }
-        public TimeSpan ToTime { get; set; }
+        public int TimeTableDayId { get; set; } = default;
+        public string PeriodName { get; set; } = string.Empty;
+        public int SubjecId { get; set; } = default;
+        public int TeacherId { get; set; } = default;
+        public TimeSpan FromTime { get; set; } = default;
+        public TimeSpan ToTime { get; set; } = default;
 
-        public string WeekDays { get; set; }
+        public string WeekDays { get; set; } = string.Empty;
         public TimeTableMasterModel TimeTableMasterModel { get; set; }
     }
 }

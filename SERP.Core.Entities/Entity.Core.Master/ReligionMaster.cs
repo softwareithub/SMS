@@ -9,9 +9,9 @@ namespace SERP.Core.Entities.Entity.Core.Master
     [Table("Religion", Schema = "Master")]
     public class ReligionMaster: Base<int>
     {
-        [Display(Name ="Religion Name",Prompt ="Enter religion name")]
-        public string Name { get; set; }
+        [Display(Name = "Religion Name", Prompt = "Enter religion name")]
+        public string Name { get; set; } = string.Empty;
         [Display(Name = "Religion Description", Prompt = "Enter description name")]
-        public string Description { get; set; }
+        public string Description { get; set; } = string.Empty;
     }
 }

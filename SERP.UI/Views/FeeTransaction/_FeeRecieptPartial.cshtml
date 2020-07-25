@@ -1,40 +1,114 @@
-﻿<section class="content">
-    <div class="row">
-        <div class="col-md-12">
-            <div class="row">
-                <div class="col-md-12 table100 ver5 m-b-110">
-                    <div class="col-md-12">
-                        <div class="col-md-4">
-                            <img src="~/Images/ImstituteName.jpg" />
-                        </div>
-                        <div class="col-md-8">
-                            <h4 style="text-align:center">DAV Public School</h4><br />
-                            <h4 style="text-align:center">Address </h4><br />
-                            <h4 style="text-align:center">GST IN Number</h4>
-                        </div>
-                  
-                    </div>
-                    <div class="col-md-12">
+﻿@model IEnumerable<SERP.Core.Model.FeeDetails.FeeRecieptModel>
 
-                    </div>
-                    <table id="tblDataList" data-vertable="ver5" style="width:100%">
-                        <thead>
-                            <tr class="row100 head">
-                                <th>S.No.</th>
-                                <th>Particular</th>
-                                <th>Amount</th>
-                                <th>Payment For</th>
-                                
+<section class="invoice">
+    <!-- title row -->
+    <div class="row">
+        <div class="col-xs-12">
+            <h2 class="page-header">
+                <i class="fa fa-globe"></i> Vinoba Institute of Mathematics.
+                <small class="pull-right">Date: @Model.First().DateOfDeposit.ToShortDateString()</small>
+            </h2>
+        </div>
+        <!-- /.col -->
+    </div>
+    <!-- info row -->
+    <div class="row invoice-info">
+        
+        <!-- /.col -->
+        <div class="col-sm-8 invoice-col">
+            <address>
+                <strong>@Model.First().Name</strong><br>
+               Class/Section Name: @Model.First().ClassName (@Model.First().SectionName)<br>
+               Registration: @Model.First().Registration<br>
+               Roll Code: @Model.First().RollCode<br>
+               FatherName: @Model.First().FatherName
+            </address>
+        </div>
+        <!-- /.col -->
+        <div class="col-sm-4 invoice-col">
+            <b>Fee Reciept #007612</b><br>
+            <br>
+        </div>
+        <!-- /.col -->
+    </div>
+    <!-- /.row -->
+    <!-- Table row -->
+    <div class="row">
+        <div class="col-xs-12 table-responsive">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>S.No</th>
+                        <th>Perticular Name</th>
+                        <th>Description</th>
+                        <th>Amount</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @{
+                        int i = 1;
+                        foreach (var data in Model)
+                        {
+                            <tr>
+                                <td>@i</td>
+                                <td>@data.CategoryName</td>
+                                <td>@data.PaymentFor</td>
+                                <td>@data.CategoryPayment</td>
                             </tr>
-                        </thead>
-                        <tbody>
-                            
-                        </tbody>
-                    </table>
-                </div>
+                            i++;
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+        <!-- /.col -->
+    </div>
+    <!-- /.row -->
+
+    <div class="row">
+        <!-- accepted payments column -->
+        <div class="col-xs-6">
+           
+        </div>
+        <!-- /.col -->
+        <div class="col-xs-6">
+            <p class="lead">Amount Due 2/22/2014</p>
+
+            <div class="table-responsive">
+                <table class="table">
+                    <tr>
+                        <th style="width:50%">Subtotal:</th>
+                        <td>@Model.First().PayableAmount</td>
+                    </tr>
+                    <tr>
+                        <th>Discount</th>
+                        <td>@Model.First().DiscountAmount</td>
+                    </tr>
+                    <tr>
+                        <th>Diposit Amount:</th>
+                        <td>@Model.First().AmountPaid</td>
+                    </tr>
+                    <tr>
+                        <th>Due Amount:</th>
+                        <td>@Model.First().DueAmount</td>
+                    </tr>
+                </table>
             </div>
+        </div>
+        <!-- /.col -->
+    </div>
+    <!-- /.row -->
+    <!-- this row will not appear when printing -->
+    <div class="row no-print">
+        <div class="col-xs-12">
+            <a href="invoice-print.html" target="_blank" class="btn btn-default"><i class="fa fa-print"></i> Print</a>
+            <button type="button" class="btn btn-success pull-right">
+                <i class="fa fa-globe"></i> Send Mail
+            </button>
+            <button type="button" class="btn btn-primary pull-right" style="margin-right: 5px;">
+                <i class="fa fa-download"></i> Generate PDF
+            </button>
         </div>
     </div>
 </section>
-
 

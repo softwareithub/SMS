@@ -14,11 +14,7 @@
         User Login
         <small>Manage User Login</small>
     </h1>
-    <ol class="breadcrumb">
-        <li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
-        <li><a href="#">Forms</a></li>
-        <li class="active">General Elements</li>
-    </ol>
+
 </section>
 
 
@@ -62,7 +58,7 @@
                                 </select>
                             </div>
                         </div>
-                        <div class="col-md-4" id="divEmployee" >
+                        <div class="col-md-4" id="divEmployee">
                             <div class="form-group">
                                 <input type="hidden" asp-for="Id" />
                                 <input type="hidden" asp-for="CreatedBy" />
@@ -73,29 +69,43 @@
                                 @Html.SerpSelectList("form-control", (IEnumerable<SERP.Core.Entities.Entity.Core.HRModule.EmployeeBasicInfoModel>)ViewBag.Employee, "EmployeeId", "Select Employee", "Name", Model?.EmployeeId)
                                 <span asp-validation-for="EmployeeId" class="text-danger"></span>
                             </div>
-                            </div>
-                            <div class="col-md-4" id="divStudent" style="display:none">
-                                <div class="form-group">
-                                    <label asp-for="StudentId">Student</label>
-                                    @Html.SerpSelectList("form-control", (IEnumerable<SERP.Core.Entities.Entity.Core.Transaction.StudentMaster>)ViewBag.StudentList, "Id", "Select Student", "Name", Model?.StudentId)
-                                    <span asp-validation-for="EmployeeId" class="text-danger"></span>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="form-group">
-                                    <label asp-for="UserName">User Name</label>
-                                    <input asp-for="UserName" class="form-control">
-                                    <span asp-validation-for="UserName" class="text-danger"></span>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="form-group">
-                                    <label asp-for="Password">Password</label>
-                                    <input asp-for="Password" class="form-control">
-                                    <span asp-validation-for="Password" class="text-danger"></span>
-                                </div>
+                        </div>
+                        <div class="col-md-4" id="divStudent" style="display:none">
+                            <div class="form-group">
+                                <label asp-for="StudentId">Student</label>
+                                @Html.SerpSelectList("form-control", (IEnumerable<SERP.Core.Entities.Entity.Core.Transaction.StudentMaster>)ViewBag.StudentList, "StudentId", "Select Student", "Name", Model?.StudentId)
+                                <span asp-validation-for="EmployeeId" class="text-danger"></span>
                             </div>
                         </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label asp-for="UserName">User Name</label>
+                                <input asp-for="UserName" class="form-control">
+                                <span asp-validation-for="UserName" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label asp-for="Password">Password</label>
+                                <input asp-for="Password" type="password" class="form-control">
+                                <span asp-validation-for="Password" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label asp-for="ConfirmPassword">Confirm Password</label>
+                                <input asp-for="ConfirmPassword" type="password" class="form-control">
+                                <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label asp-for="RoleId">Select Role</label>
+                                @Html.SerpSelectList("form-control", (IEnumerable<SERP.Core.Entities.UserManagement.RoleMaster>)ViewBag.Rolelist, "RoleId", "Select Role", "RoleName", Model?.RoleId)
+                                <span asp-validation-for="RoleId" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
                       
                     <!-- /.box-body -->
 

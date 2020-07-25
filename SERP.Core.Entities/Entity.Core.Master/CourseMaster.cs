@@ -15,8 +15,8 @@ namespace SERP.Core.Entities.Entity.Core.Master
         [Display(Name ="Course code",Prompt ="Enter Course code")]
         [Required(ErrorMessage = "Course code is required.")]
         public string Code { get; set; }
-        [Display(Name="Description",Prompt ="Enter Course Description")]
-        public string Description { get; set; }
+        [Display(Name = "Description", Prompt = "Enter Course Description")]
+        public string Description { get; set; } = string.Empty;
         [Required(ErrorMessage = "Attendecne Type is required")]
         public string AttendenceType { get; set; }
         [Required(ErrorMessage = "Minimum attendence is required")]

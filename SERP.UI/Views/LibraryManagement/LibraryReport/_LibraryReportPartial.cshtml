@@ -1,0 +1,61 @@
+﻿<section class="content">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="panel with-nav-tabs panel-info">
+                        <div class="panel-heading">
+                            <ul class="nav nav-tabs">
+                                <li class="active"><a href="#tab1info" data-toggle="tab" onclick="GetBookDetailReport()">Book Details</a></li>
+                                <li><a href="#tab2info" data-toggle="tab" onclick="GetBookDetailReport()">Library Due</a></li>
+                                <li><a href="#tab3info" data-toggle="tab"  onclick="GetBookTransactionReport()">Book Transaction</a></li>
+                                <li><a href="#tab4info" data-toggle="tab"  onclick="GetBookDetailReport()">Fine Details</a></li>
+                            </ul>
+                        </div>
+                        <div class="panel-body">
+                            <div class="tab-content">
+                                <div class="tab-pane fade in active" id="tab1info">
+                                    <div id="divBookDetails">
+                                        <h3 style="text-align:center">No Record Found.</h3>
+                                    </div>
+                                </div>
+                                <div class="tab-pane fade" id="tab2info">
+                                    <div id="divBookDetails">
+                                        <h3 style="text-align:center">No Record Found.</h3>
+                                    </div>
+                                </div>
+                                <div class="tab-pane fade" id="tab3info">
+                                    <div id="divTransactionReport">
+                                        <h3 style="text-align:center">No Record Found.</h3>
+                                    </div>
+                                </div>
+                                <div class="tab-pane fade" id="tab4info">
+                                    <div id="divBookDetails">
+                                        <h3 style="text-align:center">No Record Found.</h3>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script>
+    $(document).ready(function () {
+        GetBookDetailReport();
+    })
+    function GetBookDetailReport() {
+        $.get("/BookDetailReport/GetBookDetails", function (data) {
+            $("#divBookDetails").html(data);
+        })
+    }
+
+    function GetBookTransactionReport() {
+            $.get("/BookDetailReport/GetBookTransactionDetail", function (data) {
+                $("#divTransactionReport").html(data);
+        })
+    }
+</script>

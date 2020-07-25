@@ -21,8 +21,7 @@ namespace SERP.UI.Controllers.Master
         }
         public async Task<IActionResult> Create(int id)
         {
-            Thread.Sleep(5000);
-            return PartialView("~/Views/SMSTemplate/_CreateSMSTemplate.cshtml", await _ISMSTemplateRepo.GetSingle(x=>x.Id==id));
+            return PartialView("~/Views/SMSTemplate/_CreateSMSTemplate.cshtml", await _ISMSTemplateRepo.GetSingle(x => x.Id == id));
         }
 
 
@@ -36,7 +35,8 @@ namespace SERP.UI.Controllers.Master
                 var response = await _ISMSTemplateRepo.Update(model);
                 return Json(ResponseData.Instance.GenericResponse(response));
             }
-            else {
+            else
+            {
                 var response = await _ISMSTemplateRepo.CreateEntity(model);
                 return Json(ResponseData.Instance.GenericResponse(response));
             }
@@ -45,7 +45,7 @@ namespace SERP.UI.Controllers.Master
         public async Task<IActionResult> Delete(int id)
         {
             var model = await _ISMSTemplateRepo.GetSingle(x => x.Id == id);
-            var deleteModel=CommanDeleteHelper.CommanDeleteCode(model, 1);
+            var deleteModel = CommanDeleteHelper.CommanDeleteCode(model, 1);
             await _ISMSTemplateRepo.CreateNewContext();
             var response = await _ISMSTemplateRepo.Update(deleteModel);
             return Json(ResponseData.Instance.GenericResponse(response));

@@ -20,10 +20,10 @@ namespace SERP.Core.Entities.Entity.Core.HRModule
         public DateTime ToDate { get; set; }
         [Required(ErrorMessage ="Reason for Leave required.")]
         public string ReasonForLeave { get; set; }
-        public string LeaveStatus { get; set; }
-        public DateTime? ApproveDate { get; set; }
-        public DateTime? RejectDate { get; set; }
-        public string RejectReason { get; set; }
+        public string LeaveStatus { get; set; } = string.Empty;
+        public DateTime? ApproveDate { get; set; } = DateTime.Now.Date;
+        public DateTime? RejectDate { get; set; } = default(DateTime);
+        public string RejectReason { get; set; } = string.Empty;
     }
 }
 

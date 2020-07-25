@@ -1,0 +1,220 @@
+﻿
+@{
+    ViewData["Title"] = "Index";
+    Layout = null;
+
+}
+
+<script src="~/lib/jquery-validation/dist/jquery.validate.js"></script>
+<script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.js"></script>
+<link href="https://cdn.datatables.net/1.10.20/css/jquery.dataTables.min.css" rel="stylesheet" />
+<script src="https://cdn.datatables.net/1.10.20/js/jquery.dataTables.min.js"></script>
+
+<section class="content-header">
+    <h1>
+        Student Route Mapping
+        <small>Student Route Mapping</small>
+    </h1>
+</section>
+
+
+<section class="content">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="box box-primary">
+                <div class="box-header with-border">
+                    <h3 class="box-title">Route Student Mapping</h3>
+                    <a class="btn btn-primary pull-right" onclick="GetStudentDetails()">
+                        <i class="fa fa-list-ul"></i>
+                        Add Students
+                    </a>
+                </div>
+                <form method="post" data-ajax="true" data-ajax-method="post"
+                      asp-action="StudentRouteMapp" asp-controller="RouteStudentMapping" data-ajax-success="Success">
+                    <div class="box-body">
+                        <div class="col-md-12">
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label>Route Name</label>
+                                    <select type="text" id="ddlRoute" name="RouteName" onchange="GetStopage()" class="form-control" asp-items="@(new SelectList(ViewBag.RouteDetails ,"Id","RouteName"))">
+                                        <option value="0">Select</option>
+                                    </select>
+                                </div>
+
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label>Select Stopage</label>
+                                    <select class="form-control" id="ddlStopage" name="Stopage" onchange="GetMappedStudents()">
+                                        <option value="0">Select</option>
+                                    </select>
+
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6" style="overflow:auto">
+                            <a>
+                                <h5>New Student Allocate for Route</h5>
+                            </a>
+                            <table class="table table-hover table-responsive">
+                                <thead>
+                                    <tr>
+                                        <th>
+                                            Name
+                                        </th>
+                                        <th>
+                                            Father 
+                                        </th>
+                                        <th>
+                                            Roll 
+                                        </th>
+                                        <th>
+                                            Registration
+                                        </th>
+                                        <th>
+                                            Address
+                                        </th>
+                                        <th>
+                                            Action
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tblStudentBody">
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="col-md-6">
+                            <a>
+                                <h5>Already Allocated Student</h5>
+                            </a>
+                            <div id="divMappedStudents">
+
+                            </div>
+                        </div>
+                    </div>
+                   
+                       
+                    <div class="box-footer">
+                        <div class="col-md-4">
+                            <button type="submit" class="btn btn-primary pull-right">
+                                <span class="glyphicon glyphicon-save"></span> Save
+                            </button>
+                            <button class="buttonload" style="display:none">
+                                <i class="fa fa-refresh fa-spin"></i>Loading
+                            </button>
+                        </div>
+                        <div class="col-md-4">
+                            <button type="reset" class="btn btn-danger pull-left">
+                                <span class="glyphicon glyphicon-remove"></span> Cancel
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+        @await Html.PartialAsync("~/Views/Shared/_CommanModalPartial.cshtml")
+    </div>
+</section>
+
+<script type="text/javascript">
+    function GetRecordList() {
+        GetCustomRecord("/Stopage/GetStopageDetails");
+        setTimeout(function () {
+            $("#modalTitle").text("Vehicle Details")
+        }, 300);
+    }
+
+    function GetStopage() {
+        var routeId = $("#ddlRoute").val();
+        $("#ddlStopage").empty();
+        $("#ddlStopage").append("<option value='0'>Select</option>");
+        $.get("/RouteStudentMapping/GetStopageDetails", { routeId: routeId }, function (data) {
+            for (var i = 0; i < data.length; i++) {
+                $("#ddlStopage").append("<option value=" + data[i].id + ">" + data[i].stopageName + "</option>");
+            }
+        })
+    }
+
+    function GetStudentDetails() {
+        GetCustomRecord("/RouteStudentMapping/RouteStudents");
+        setTimeout(function () {
+            $("#modalTitle").text("Select Student To Route.")
+        }, 300);
+    }
+
+    function AddStudentToRoute() {
+        var studentName = [];
+        var fName = [];
+        var rollCode = [];
+        var rsgit = [];
+        var address = [];
+        var ids = [];
+
+        var studentName = $('.csStudent').map(function () {
+            if (this.checked) {
+                return $(this).attr('data-studentName');
+            }
+        }).get();
+
+        var fName = $('.csStudent').map(function () {
+            if (this.checked) {
+                return $(this).attr('data-FName');
+            }
+        }).get();
+
+        var rollCode = $('.csStudent').map(function () {
+            if (this.checked) {
+                return $(this).attr('data-rolCode');
+            }
+        }).get();
+
+        var rsgit = $('.csStudent').map(function () {
+            if (this.checked) {
+                return $(this).attr('data-regist');
+            }
+        }).get();
+
+        var address = $('.csStudent').map(function () {
+            if (this.checked) {
+                return $(this).attr('data-address');
+            }
+        }).get();
+
+        var ids = $('.csStudent').map(function () {
+            if (this.checked) {
+                return $(this).attr('data-id');
+            }
+        }).get();
+        debugger;
+
+        for (var i = 0; i < ids.length; i++) {
+            var html = '<tr>';
+            html += '<td><input name="StudentId" type="hidden" value='+ids[i]+'>' + studentName[i] + '</td>';
+            html += '<td>' + fName[i] + '</td>';
+            html += '<td>' + rollCode[i] + '</td>';
+            html += '<td>' + rsgit[i] + '</td>';
+            html += '<td>' + address[i] + '</td>';
+            html += '<td> <a class="btn btn-outline-danger pull-right" onclick="DeleteRecord(this)">Delete</a></td>';
+            html += '</tr>';
+            $("#tblStudentBody").append(html);
+        }
+
+        $("#divModalPop").modal('hide')
+    }   
+
+    function DeleteRecord(id) {
+        if (confirm("Are you sure want to delete?")) {
+            $($(id).parent()).parent().remove()
+        }
+    }
+
+    function GetMappedStudents() {
+        var routeId = $("#ddlRoute").val();
+        var stopageId = $("#ddlStopage").val();
+        $.get("/RouteStudentMapping/GetMappedStudent", { routeId: routeId, stopageId: stopageId }, function (data) {
+            $("#divMappedStudents").html(data);
+        })
+    }
+</script>
+

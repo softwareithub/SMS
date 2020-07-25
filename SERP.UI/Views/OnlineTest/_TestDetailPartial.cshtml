@@ -1,4 +1,4 @@
-﻿@model IEnumerable<SERP.Core.Entities.OnlineTest.TestMaster>
+﻿@model IEnumerable<SERP.Core.Model.OnlineTest.TestMasterVm>
 
 <section class="content">
     <div class="row">
@@ -11,7 +11,8 @@
                                 <th>Test Name</th>
                                 <th>Regulation</th>
                                 <th>Test Time Limit</th>
-                                <th>No.Of Question</th>
+                                <th>Course </th>
+                                <th>Batch</th>
                                 <th>
                                     Action
                                 </th>
@@ -26,19 +27,22 @@
                                         @data.TestName
                                     </td>
                                     <td>
-                                        @Html.Raw(data.Regulation)
+                                        @Html.Raw(data.TestRuleRegulation)
                                     </td>
                                     <td>
                                         @data.TestTimeLimit
                                     </td>
                                     <td>
-                                        @data.NoOfQuestion
+                                        @data.CourseName
                                     </td>
                                     <td>
-                                        <a class="btn btn-outline-success pull-right" data-loading-text="<i class='fa fa-circle-o-notch fa-spin'  style='color:#DD4B39'></i>" onclick="EditBatch(@data.Id, this)">
+                                        @data.BatchName
+                                    </td>
+                                    <td>
+                                        <a class="btn btn-outline-success pull-right" data-loading-text="<i class='fa fa-circle-o-notch fa-spin'  style='color:#DD4B39'></i>" onclick="EditBatch(@data.TestId, this)">
                                             <i class="fa fa-edit" style="color:#3C8DBC"></i>
                                         </a>
-                                        <a class="btn btn-outline-danger pull-right" data-loading-text="<i class='fa fa-circle-o-notch fa-spin'  style='color:#DD4B39'></i>" onclick="DeleteBatch(@data.Id, this)">
+                                        <a class="btn btn-outline-danger pull-right" data-loading-text="<i class='fa fa-circle-o-notch fa-spin'  style='color:#DD4B39'></i>" onclick="DeleteBatch(@data.TestId, this)">
                                             <i class="fa fa-trash" style="color:#DD4B39"></i>
 
                                         </a>

@@ -1,0 +1,94 @@
+﻿@model SERP.Core.Entities.LibraryManagement.BookStatusModel
+<script src="~/lib/jquery-validation/dist/jquery.validate.js"></script>
+<script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.js"></script>
+<link href="https://cdn.datatables.net/1.10.20/css/jquery.dataTables.min.css" rel="stylesheet" />
+<script src="https://cdn.datatables.net/1.10.20/js/jquery.dataTables.min.js"></script>
+
+
+<section class="content-header">
+    <h1>
+        Book Status
+        <small>Create Book Status</small>
+    </h1>
+</section>
+
+<section class="content">
+    <div class="row">
+
+        <div class="col-md-12">
+            <!-- general form elements -->
+            <div class="box box-primary">
+                <div class="box-header with-border">
+                    <h3 class="box-title">Create Book Status</h3>
+                    <div class="col-md-12">
+                        <div class="col-md-10">
+                            <a class="btn btn-primary pull-right" onclick="GetNewRecordList()">
+                                <i class="fa fa-list-ul"></i>
+                            </a>
+                        </div>
+                        <div class="col-md-2">
+                            <a class="btn btn-primary pull-left" onclick="NewRecord()">
+                                <i class="fa fa-plus-square"></i>
+                            </a>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="overlay divHidding" id="divFormData">
+                    <i class="fa fa-refresh fa-spin">
+
+                    </i>
+                </div>
+                <form method="post" data-ajax="true" data-ajax-method="post"
+                      asp-action="CreateStatus" asp-controller="BookStatus" data-ajax-success="Success"
+                      data-ajax-begin="CustomFormSubmitBegin" data-ajax-complete="CustomFormSubmitComplete">
+                    <div class="box-body">
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <input type="hidden" asp-for="Id" />
+                                <input type="hidden" asp-for="CreatedBy" />
+                                <input type="hidden" asp-for="CreatedDate" />
+                                <label asp-for="StatusName">Book Status</label>
+                                <input asp-for="StatusName" class="form-control">
+                                <span asp-validation-for="StatusName" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- /.box-body -->
+
+                    <div class="box-footer">
+                        <div class="col-md-8">
+                            @Html.SERPButton("btn btn-primary pull-right btnSubmit", Model == null ? 0 : Model.Id)
+                            <button class="buttonload" style="display:none">
+                                <i class="fa fa-refresh fa-spin"></i>Loading
+                            </button>
+                        </div>
+                        <div class="col-md-4">
+                            <button type="reset" class="btn btn-danger pull-left">Cancel</button>
+                        </div>
+
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        @await Html.PartialAsync("~/Views/Shared/_CommanModalPartial.cshtml")
+
+    </div>
+</section>
+
+
+<script>
+
+    function GetNewRecordList() {
+        GetCustomRecord("/BookStatus/StatusList");
+        setTimeout(function () {
+            $("#modalTitle").text("Book Stauts")
+        }, 300);
+    }
+    function NewAcademicMaster() {
+        var url = "/BookStatus/Index";
+        NewCustomRecord(url);
+    }
+     
+</script>

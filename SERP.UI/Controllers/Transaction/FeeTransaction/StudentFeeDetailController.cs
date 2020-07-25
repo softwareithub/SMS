@@ -45,20 +45,30 @@ namespace SERP.UI.Controllers.Transaction.FeeTransaction
             return await Task.Run(() => PartialView("~/Views/FeeTransaction/_StudentFeeDetailIndexPartial.cshtml"));
         }
 
-        public async Task<IActionResult> GetStudentDetail(int courseId,int batchId)
+        public async Task<IActionResult> GetStudentDetail(int courseId, int batchId)
         {
-            List<StudentMaster> modelList = (await _studentMasterRepo.GetList(x => x.IsActive == 1 && x.IsDeleted == 0 && x.CourseId==courseId && x.BatchId==batchId)).ToList();
+
+
+            List<StudentMaster> modelList = (from SP in await _IStudentPromote.GetList(x => x.CourseId == courseId && x.BatchId == batchId && x.IsActive == 1 && x.IsDeleted == 0)
+                                             join SM 
+                                             in await _studentMasterRepo.GetList(x => x.IsDeleted == 0 && x.IsActive == 1)
+                                             on SP.StudentId equals SM.Id
+                                             select new StudentMaster
+                                             {
+                                                 Id=SM.Id,
+                                                 Name= SM.Name
+                                             }).ToList();
             return Json(modelList);
         }
 
         public async Task<IActionResult> GetFeeDetail(int studentId)
         {
             var result = await _feeDetailRepo.GetFeeDetailRepo(studentId);
-            
+
 
             result.ForEach(x =>
             {
-                switch(x.FeePaymentType)
+                switch (x.FeePaymentType)
                 {
                     case "OT":
                         x.FeePaymentType = "One Time";

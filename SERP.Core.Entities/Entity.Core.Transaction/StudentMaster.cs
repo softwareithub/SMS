@@ -13,15 +13,16 @@ namespace SERP.Core.Entities.Entity.Core.Transaction
         [Display(Name = "Academic Name", Prompt = "Enter Academic name")]
         [Required(ErrorMessage = "Please select Academic Year")]
         public int AcademicId { get; set; }
+        [Required(ErrorMessage ="Registration number is required.")]
         [Display(Name = "Registration Number", Prompt = "Enter Registration number")]
-        [MaxLength(110,ErrorMessage ="Registration number is too long.")]
-        public string RegistrationNumber { get; set; }
+        [MaxLength(110, ErrorMessage = "Registration number is too long.")]
+        public string RegistrationNumber { get; set; } = string.Empty;
         [Display(Name = "Joining Date", Prompt = "Enter Joining Date")]
         [DataType(DataType.Date, ErrorMessage = "Please enter Date of Birth")]
         [Required(ErrorMessage = "Joining Date is required")]
         public DateTime JoiningDate { get; set; }
         [Required(ErrorMessage = "Please select Course")]
-        public int CourseId { get; set; }
+        public int CourseId { get; set; } = default;
         public int BatchId { get; set; }
         [Display(Name = "Roll Code", Prompt = "Enter Roll Code")]
         [Required(ErrorMessage = "Roll Code is required")]
@@ -44,18 +45,18 @@ namespace SERP.Core.Entities.Entity.Core.Transaction
         [DataType(DataType.Date)]
         [CustomDateValidator]
         public DateTime DateOfBirth { get; set; }
-        public string Gender { get; set; }
-        public string BloodGroup { get; set; }
+        public string Gender { get; set; } = string.Empty;
+        public string BloodGroup { get; set; } = string.Empty;
         public int? Religion { get; set; } = 0;
         public int? FeeCategoryId { get; set; } = 0;
 
         [Display(Name = "Father Email", Prompt = "Enter Father Email")]
         [DataType(DataType.EmailAddress)]
-        public string FatherEmail { get; set; }
+        public string FatherEmail { get; set; } = string.Empty;
         [Display(Name = "Student Email", Prompt = "Enter Student Email")]
-        
+
         [DataType(DataType.EmailAddress)]
-        public string StudentEmail { get; set; }
+        public string StudentEmail { get; set; } = string.Empty;
         [Display(Name = "Father Phone", Prompt = "Enter Father Phone")]
         [Required(ErrorMessage = "Father phone is required.")]
         [DataType(DataType.PhoneNumber)]
@@ -64,7 +65,7 @@ namespace SERP.Core.Entities.Entity.Core.Transaction
         [Display(Name = "Emergency Phone", Prompt = "Enter Emergency Phone")]
         [DataType(DataType.PhoneNumber)]
         [RegularExpression("^[6-9]\\d{9}", ErrorMessage = "Invalid phone number")]
-        public string EmergencyPhone { get; set; }
+        public string EmergencyPhone { get; set; } = string.Empty;
         [Display(Name = "Student Phone", Prompt = "Enter Student Phone")]
         [Required(ErrorMessage = "Student phone is required.")]
         [DataType(DataType.PhoneNumber)]
@@ -72,16 +73,16 @@ namespace SERP.Core.Entities.Entity.Core.Transaction
         public string StudentPhone { get; set; }
         [Display(Name = "Mother Phone", Prompt = "Enter Mother Phone")]
         [RegularExpression("^[6-9]\\d{9}", ErrorMessage = "Invalid phone number")]
-        public string MotherPhone { get; set; }
+        public string MotherPhone { get; set; } = string.Empty;
         [Display(Name = "Permanet Address", Prompt = "Enter Permanent Address")]
         [DataType(DataType.MultilineText)]
-        [MaxLength(250,ErrorMessage ="Permanent address is too long.")]
-        public string P_Address { get; set; }
+        [MaxLength(250, ErrorMessage = "Permanent address is too long.")]
+        public string P_Address { get; set; } = string.Empty;
         [Display(Name = "Crosspondence Address", Prompt = "Enter Crosspondence Address")]
         [DataType(DataType.MultilineText)]
         [MaxLength(250, ErrorMessage = "Crosspondence address is too long.")]
-        public string C_Address { get; set; }
-        public string StudentPhoto { get; set; }
-        public string ParentsPhoto { get; set; }
+        public string C_Address { get; set; } = string.Empty;
+        public string StudentPhoto { get; set; } = string.Empty;
+        public string ParentsPhoto { get; set; } = string.Empty;
     }
 }

@@ -10,7 +10,7 @@ namespace SERP.Core.Entities.UserManagement
     public class UserAccessRight: Base<int>
     {
         public int ModuleId { get; set; }
-        public int EmployeeId { get; set; }
+        public int RoleId { get; set; }
         public int SubModuleId { get; set; }
         public int ReadAccess { get; set; }
         public int CreateAccess { get; set; }

@@ -9,12 +9,12 @@ namespace SERP.Core.Entities.Entity.Core.HRModule
     [Table("EmployeeAttendence", Schema= "HR")]
     public class EmployeeAttendenceModel :Base<int>
     {
-        public int EmployeeId { get; set; }
+        public int EmployeeId { get; set; } = default;
 
         [Display(Name="Attendence Date", Prompt ="Please select Date")]
         [Required(ErrorMessage ="Attendence Date is required")]
         [DataType(DataType.Date)]
         public DateTime AttendenceDate { get; set; }
-        public string AttendenceType { get; set; }
+        public string AttendenceType { get; set; } = string.Empty;
     }
 }

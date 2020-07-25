@@ -8,10 +8,10 @@ namespace SERP.Core.Entities.Entity.Core.HRModule
     [Table("EmployeeQualification", Schema="HR")]
     public class EmployeeQualificationModel
     {
-        public int EmployeeId { get; set; }
-        public string DegreeName { get; set; }
-        public string InstituteName { get; set; }
-        public string Location { get; set; }
-        public string Years { get; set; }
+        public int EmployeeId { get; set; } = default;
+        public string DegreeName { get; set; } = string.Empty;
+        public string InstituteName { get; set; } = string.Empty;
+        public string Location { get; set; } = string.Empty;
+        public string Years { get; set; } = string.Empty;
     }
 }

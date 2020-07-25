@@ -13,6 +13,11 @@ namespace SERP.Infrastructure.Implementation.ServiceExtension
             serviceCollection.AddTransient<ITimeSheetRepo, TimeSheetImplementation>();
             serviceCollection.AddTransient<IFeeDetailRepo, FeeDetailImplementation>();
             serviceCollection.AddTransient<IDashBoardGraphRepo, DashBoardRepo>();
+            serviceCollection.AddTransient<IFeeDepositRecieptRepo, FeeDepositRepo>();
+            serviceCollection.AddTransient<IBookDetailReport, BookDetailReportImplementation>();
+            serviceCollection.AddTransient<ISalaryHeadRepo, SalarySlipImplementation>();
+            serviceCollection.AddTransient<IAccountTransactionRepo, AccountTransactionImplementation>();
+            serviceCollection.AddTransient<IOnlineTestSubmitRepository, OnlineTestSubmitImplementation>();
         }
     }
 }

@@ -1,0 +1,88 @@
+﻿@model SERP.Core.Model.LibraryManagement.BookIssueDetailModel
+<script src="~/lib/jquery-validation/dist/jquery.validate.js"></script>
+<script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.js"></script>
+<div class="row">
+    <form method="post" data-ajax="true" data-ajax-method="post"
+          asp-action="ReturnBook" asp-controller="BookReturn" data-ajax-success="Success"
+          data-ajax-begin="CustomFormSubmitBegin" data-ajax-complete="CustomFormSubmitComplete">
+        <div class="col-md-12">
+            <div class="col-md-4">
+                <div class="form-group">
+                    <input type="hidden" asp-for="Id" />
+                    <input type="hidden" asp-for="BookItemId" />
+                    <label asp-for="BookName">Book Name</label>
+                    <label asp-for="BookName" class="form-control">@Model.BookName</label>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="form-group">
+                    <label asp-for="BookItemName">Book Volume Name</label>
+                    <label asp-for="BookItemName" class="form-control">@Model.BookItemName</label>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="form-group">
+                    <label asp-for="IssueDate">Date of Issue</label>
+                    <label asp-for="IssueDate" class="form-control">@Model.IssueDate.ToShortDateString()</label>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="form-group">
+                    <label asp-for="ExpectedReturnDate">Expected Return Date</label>
+                    <label asp-for="ExpectedReturnDate" class="form-control">@Model.ExpectedReturnDate.ToShortDateString()</label>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="form-group">
+                    <label asp-for="IssueTo">Issue To</label>
+                    <label asp-for="IssueTo" class="form-control">@Model.IssueTo</label>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="form-group">
+                    <label asp-for="ActualReturnDate">Return Date</label>
+                    <input type="date" class="form-control" asp-for="ActualReturnDate" />
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="form-group">
+                    <label asp-for="BookCondition">Book Condition</label>
+                    <select class="form-control" asp-for="BookCondition" asp-items="@(new SelectList(ViewBag.BookStatus,"Id","StatusName"))"></select>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="form-group">
+                    <label asp-for="FineAmount">Fine Amount</label>
+                    <input type="text" asp-for="FineAmount" class="form-control" id="FineAmount" />
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="form-group">
+                    <label asp-for="FineReason">Fine Reason</label>
+                    <input type="text" asp-for="FineReason" class="form-control" id="FineReason" />
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="form-group">
+                    <label asp-for="DiscountAmount">Discount Amount</label>
+                    <input type="text" asp-for="DiscountAmount" class="form-control" id="DiscountAmount" />
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="form-group">
+                    <label asp-for="DiscountReason">Discount Reason</label>
+                    <input type="text" asp-for="DiscountReason" class="form-control" id="DiscountReason" />
+                </div>
+            </div>
+
+        </div>
+        <div class="col-md-12">
+            <div class="col-md-8">
+                <input type="submit" class="btn btn-success pull-right" value="Save" />
+            </div>
+            <div class="col-md-4">
+                <input type="reset" class="btn btn-danger pull-left" value="Cancel" />
+            </div>
+        </div>
+    </form>
+</div>

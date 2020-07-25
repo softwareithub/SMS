@@ -14,11 +14,16 @@ namespace SERP.Core.Entities.UserManagement
         public string UserName { get; set; }
         [Required(ErrorMessage = "Please enter passwors.")]
         public string Password { get; set; }
+        [NotMapped]
+        [DataType(DataType.Password)]
+        [Compare("Password",ErrorMessage ="Password and Confirm Password do not match.")]
+        public string ConfirmPassword { get; set; }
         public DateTime LastLoginDateTime { get; set; }
         public int IsExpired { get; set; }
         public int Attempt { get; set; }
         public int IsLocked { get; set; }
         public int EmployeeId { get; set; }
         public int StudentId { get; set; }
+        public int RoleId { get; set; }
     }
 }

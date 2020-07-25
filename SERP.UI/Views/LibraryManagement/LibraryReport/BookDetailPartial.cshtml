@@ -1,0 +1,61 @@
+﻿@model IEnumerable<SERP.Core.Entities.LibraryReport.BookDetailReport>
+<table id="tblDataList" class="table table-striped table-bordered responsive" style="width:100%">
+    <thead>
+        <tr>
+            <th>Book </th>
+            <th>Author </th>
+            <th>Publisher </th>
+            <th>Course </th>
+            <th>Subject </th>
+            <th>Status</th>
+            <th>Cover Image</th>
+            <th>Unit Price</th>
+            <th>Book Count</th>
+            <th>
+                Total Price
+            </th>
+
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var data in Model)
+        {
+            <tr>
+                <td>
+                    @data.TitleName
+                </td>
+                <td>
+                    @data.AuthorName
+                </td>
+                <td>
+                    @data.PublisherName 
+                </td>
+                <td>
+                    @data.CourseName
+                </td>
+                <td>
+                    @data.SubjectName
+                </td>
+                <td>
+                    @data.StatusName
+                </td>
+                <td>
+                  <img src="@data.ImagePath" style="height:50px; width:50px" />
+                </td>
+                <td>
+                    @data.UnitPrice
+                </td>
+                <td>
+                    @data.BookCount
+                </td>
+                <td>
+                  @{ var totalPrice = data.UnitPrice * data.BookCount;}
+                    @totalPrice
+
+                </td>
+              
+            </tr>
+        }
+    </tbody>
+
+</table>

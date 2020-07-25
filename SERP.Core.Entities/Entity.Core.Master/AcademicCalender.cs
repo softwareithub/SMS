@@ -8,10 +8,11 @@ namespace SERP.Core.Entities.Entity.Core.Master
     [Table("AcademicCalender", Schema ="Master")]
     public class AcademicCalender :Base<int>
     {
-        public int AcademicId { get; set; }
-        public string EventName { get; set; }
-        public string EventDescription { get; set; }
-        public DateTime FromDate { get; set; }
-        public DateTime ToDate { get; set; }
+        public int AcademicId { get; set; } = default;
+        public string EventName { get; set; } = string.Empty;
+        public string EventDescription { get; set; } = string.Empty;
+        public DateTime FromDate { get; set; } = DateTime.Now.Date;
+        public DateTime ToDate { get; set; } = DateTime.Now.Date;
+        public int IsHoliday { get; set; } = 0;
     }
 }

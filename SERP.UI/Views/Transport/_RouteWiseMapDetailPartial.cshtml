@@ -1,0 +1,149 @@
+﻿@model IEnumerable<SERP.Core.Model.Transport.StopageDetails>
+
+<script src="https://polyfill.io/v3/polyfill.min.js?features=default"></script>
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBKGAp4SyPy1qnUqz5gMygSOzO8Qm2kNvY&callback=initMap&libraries=&v=weekly"
+        defer></script>
+<style type="text/css">
+    #right-panel {
+        font-family: "Roboto", "sans-serif";
+        line-height: 30px;
+        padding-left: 10px;
+    }
+
+        #right-panel select,
+        #right-panel input {
+            font-size: 15px;
+        }
+
+        #right-panel select {
+            width: 100%;
+        }
+
+        #right-panel i {
+            font-size: 12px;
+        }
+
+
+    #divMap {
+        height: 300px;
+        width: 575px;
+    }
+
+    #right-panel {
+        margin: 20px;
+        border-width: 2px;
+        width: 20%;
+        height: 400px;
+        float: left;
+        text-align: left;
+        padding-top: 0;
+    }
+
+    #directions-panel {
+        overflow: scroll;
+        height: 300px;
+    }
+</style>
+
+
+
+<div class="col-md-12">
+    <div class="col-md-4">
+        @foreach (var data in Model)
+        {
+            <input type="hidden" name="address" value="@data.Address" />
+        }
+        <div id="directions-panel"></div>
+    </div>
+    <div class="col-md-8">
+        <div id="divMap" class="google_maps" style="position:absolute;"></div>
+    </div>
+</div>
+
+
+
+<script>
+    (function (exports) {
+        "use strict";
+        var marker;
+        var checkboxArray = [];
+        debugger;
+
+        $("input[name=address]").each(function () {
+            checkboxArray.push(this.value);
+        })
+
+
+        function initMap() {
+            var directionsService = new google.maps.DirectionsService();
+            var directionsRenderer = new google.maps.DirectionsRenderer();
+            var map = new google.maps.Map(document.getElementById("divMap"), {
+                zoom: 6,
+                center: {
+                    lat: 41.85,
+                    lng: -87.65
+                }
+            });
+            marker = new google.maps.Marker({
+                map: map,
+                draggable: true,
+                animation: google.maps.Animation.BOUNCE
+            });
+            marker.setAnimation(google.maps.Animation.BOUNCE);
+            directionsRenderer.setMap(map);
+            calculateAndDisplayRoute(directionsService, directionsRenderer);
+        }
+
+        function calculateAndDisplayRoute(
+            directionsService,
+            directionsRenderer
+        ) {
+            var waypts = [];
+
+
+
+            for (var i = 0; i < checkboxArray.length; i++) {
+                debugger;
+                waypts.push({
+                    location: checkboxArray[i],
+                    stopover: true
+                });
+
+            }
+
+            directionsService.route(
+                {
+                    origin: checkboxArray[0],
+                    destination: checkboxArray[checkboxArray.length - 1],
+                    waypoints: waypts,
+                    optimizeWaypoints: true,
+                    travelMode: "DRIVING"
+                },
+                function (response, status) {
+                    if (status === "OK") {
+                        directionsRenderer.setDirections(response);
+                        var route = response.routes[0];
+                        var summaryPanel = document.getElementById("directions-panel");
+                        summaryPanel.innerHTML = ""; // For each route, display summary information.
+
+                        for (var i = 0; i < route.legs.length; i++) {
+                            var routeSegment = i + 1;
+                            summaryPanel.innerHTML +=
+                                "<b>Route Segment: " + routeSegment + "</b><br>";
+                            summaryPanel.innerHTML +=
+                                route.legs[i].start_address + " to ";
+                            summaryPanel.innerHTML += route.legs[i].end_address + "<br>";
+                            summaryPanel.innerHTML +=
+                                route.legs[i].distance.text + "<br><br>";
+                        }
+                    } else {
+                        window.alert("Directions request failed due to " + status);
+                    }
+                }
+            );
+        }
+
+        exports.calculateAndDisplayRoute = calculateAndDisplayRoute;
+        exports.initMap = initMap;
+    })((this.window = this.window || {}));
+</script>

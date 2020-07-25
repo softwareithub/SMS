@@ -13,6 +13,9 @@
                                 <th>Name</th>
                                 <th>From Percentage</th>
                                 <th>To Percentage</th>
+                                <th>
+                                    Result Type
+                                </th>
                                 <th>Action</th>
 
                             </tr>
@@ -25,10 +28,13 @@
                                         @data.GradeName
                                     </td>
                                     <td>
-                                        @data.FromPercentage
+                                        @data.FromMarks
                                     </td>
                                     <td>
-                                        @data.ToPercentage
+                                        @data.ToMarks
+                                    </td>
+                                    <td>
+                                        @data.ResultType
                                     </td>
                                     <td>
                                         <a class="btn btn-outline-success pull-right" data-loading-text="<i class='fa fa-circle-o-notch fa-spin'  style='color:#DD4B39'></i>" onclick="UpdateRecord(@data.Id, this)">

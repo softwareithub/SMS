@@ -14,6 +14,9 @@ using SERP.Core.Entities.UserManagement;
 using SERP.Core.Entities.LessionMaster;
 using SERP.Core.Entities.OnlineTest;
 using SERP.Core.Entities.OnlineVideo;
+using SERP.Core.Entities.Transport;
+using SERP.Core.Entities.Accounts;
+using SERP.Core.Entities.Student;
 
 namespace SERP.Core.Entities.Context
 {
@@ -22,7 +25,7 @@ namespace SERP.Core.Entities.Context
     {
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseSqlServer("Server= DESKTOP-SF1G3N8\\VIPRAIT; Database= VinobaEducationPortal; User Id=sa;Password = vi@pra91");
+            optionsBuilder.UseSqlServer("Server= DESKTOP-SF1G3N8\\VIPRAIT; Database= SERPDevelopment; User Id=sa;Password = vi@pra91");
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -88,6 +91,29 @@ namespace SERP.Core.Entities.Context
         public DbSet<LeaveMaster> LeaveMasters { get; set; }
         public DbSet<LeaveAllotment> LeaveAllotments { get; set; }
         public DbSet<LeaveTransactionModel> LeaveTransactionModels { get; set; }
+
+        public DbSet<CategoryMaster> CategoryMasters { get; set; }
+
+        public DbSet<BookItemModel> BookItemModels { get; set; }
+        public DbSet<BookStatusModel> BookStatusModels { get; set; }
+        public DbSet<BookTransaction> BookTransactions { get; set; }
+        public DbSet<LibrarySetting> LibrarySettings { get; set; }
+        public DbSet<VehicleModel> VehicleModels { get; set; }
+        public DbSet<StopageModel> StopageModels { get; set; }
+        public DbSet<RouteMaster> RouteMasters { get; set; }
+        public DbSet<RouteStopageModel> RouteStopageModels { get; set; }
+        public DbSet<VehicleFuelDetail> VehicleFuelDetails { get; set; }
+        public DbSet<RouteStudentMapping> StudentMappings { get; set; }
+        public DbSet<IncomeHeads> IncomeHeads { get; set; }
+        public DbSet<ExpenseHead> ExpenseHeads { get; set; }
+        public DbSet<AccountDetail> Accounts { get; set; }
+        public DbSet<AccountTransaction> AccountTransactions { get; set; }
+
+        public DbSet<RoleMaster> RoleMasters { get; set; }
+        public DbSet<UserAnswereSheetModel> UserAnswereSheetModels { get; set; }
+        public DbSet<UserTestDetailModel> UserTestDetailModels { get; set; }
+        public DbSet<AssginmentUpload> AssginmentUploads { get; set; }
+
         #endregion
 
     }

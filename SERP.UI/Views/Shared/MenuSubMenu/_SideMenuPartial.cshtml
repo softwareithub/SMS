@@ -26,309 +26,72 @@
 
 
         <!-- search form (Optional) -->
-        <form action="#" method="get" class="sidebar-form">
-            <div class="input-group">
-                <input type="text" name="q" onkeypress="MasterSearch()" class="form-control" placeholder="Search...">
-                <span class="input-group-btn">
-                    <button type="submit" name="search" id="search-btn" class="btn btn-flat">
-                        <i class="fa fa-search"></i>
-                    </button>
-                </span>
-            </div>
-        </form>
+
+        <div class="input-group">
+            <input type="search" name="q" id="txtMenu" class="form-control" placeholder="Search...">
+            <span class="input-group-btn">
+                <button type="button" name="search" id="search-btn" class="btn btn-flat">
+                    <i class="fa fa-search"></i>
+                </button>
+            </span>
+        </div>
+
         @foreach (var data in Model.GroupBy(x => x.ModuleName))
         {
-        <ul class="sidebar-menu" data-widget="tree">
-            <li class="treeview">
-                <a href="#">
-                    <i class="@data.First().ModuleClassName"></i> <span>@data.Key</span>
-                </a>
-                <ul class="treeview-menu">
-                    @foreach (var item in data)
+            <ul class="sidebar-menu menuList" data-widget="tree">
+                <li class="treeview">
+                    <a href="#">
+                        <i class="@data.First().ModuleClassName"></i> <span>@data.Key</span>
+                    </a>
+                    <ul class="treeview-menu" id="ulMenu">
+                        @foreach (var item in data)
                         {
-                    <li class="active">
-                        <a data-ajax="true" data-ajax-mode="replace"
-                           asp-action="@item.ActionName" asp-controller="@item.ControllerName"
-                           data-ajax-update="#divSERP"
-                           data-ajax-begin="AjaxOnBegin" data-ajax-complete="AjaxComplete"
-                           class="nav-link">
-                            <i class="@item.SubModuleClass"></i>
-                            <span>
-                                @item.SubModuleName
-                            </span>
-                        </a>
-                    </li>
+                            <li class="active">
+                                <a data-ajax="true" data-ajax-mode="replace"
+                                   asp-action="@item.ActionName" asp-controller="@item.ControllerName"
+                                   data-ajax-update="#divSERP"
+                                   data-ajax-begin="AjaxOnBegin" data-ajax-complete="AjaxComplete"
+                                   class="nav-link">
+                                    <i class="@item.SubModuleClass"></i>
+                                    <span>
+                                        @item.SubModuleName
+                                    </span>
+                                </a>
+                            </li>
                         }
 
-                </ul>
-            </li>
-        </ul>
+                    </ul>
+                </li>
+            </ul>
         }
 
 
+        
 
-        @*<ul class="sidebar-menu" data-widget="tree">
-                <li class="treeview">
-                    <a href="#">
-                        <i class="fa fa-link"></i> <span>Academic Detail</span>
-                        <span class="pull-right-container">
-                            <i class="fa fa-angle-left pull-right"></i>
-                        </span>
-                    </a>
-                    <ul class="treeview-menu">
-                        <li>
-                            <a data-ajax="true" data-ajax-mode="replace"
-                               asp-action="Index" asp-controller="Course"
-                               data-ajax-update="#divSERP"
-                               data-ajax-begin="AjaxOnBegin" data-ajax-complete="AjaxComplete">
-                                <i class="fa fa-bank"></i>
-                                <span>Course</span>
-                            </a>
-                        </li>
-                        <li>
-                            <a data-ajax="true" data-ajax-mode="replace"
-                               asp-action="Index" asp-controller="BatchMaster"
-                               data-ajax-update="#divSERP" data-ajax-begin="AjaxOnBegin" data-ajax-complete="AjaxComplete">
-                                <i class="fa fa-bank"></i>
-                                <span>Batch</span>
-                            </a>
-                        </li>
-                        <li>
-                            <a data-ajax="true" data-ajax-mode="replace"
-                               asp-action="CasteMaster" asp-controller="CasteMaster"
-                               data-ajax-update="#divSERP" data-ajax-begin="AjaxOnBegin" data-ajax-complete="AjaxComplete">
-                                <i class="fa fa-bank"></i>
-                                <span>Category</span>
-                            </a>
-                        </li>
-                        <li>
-                            <a data-ajax="true" data-ajax-mode="replace"
-                               asp-action="CreateReligion" asp-controller="Religion"
-                               data-ajax-update="#divSERP" data-ajax-begin="AjaxOnBegin" data-ajax-complete="AjaxComplete">
-                                <i class="fa fa-bank"></i>
-                                <span>Religion</span>
-                            </a>
-                        </li>
-                        <li>
-                            <a data-ajax="true" data-ajax-mode="replace"
-                               asp-action="Index" asp-controller="SubjectMaster"
-                               data-ajax-update="#divSERP" data-ajax-begin="AjaxOnBegin" data-ajax-complete="AjaxComplete">
-                                <i class="fa fa-bank"></i>
-                                <span>Subject Master</span>
-                            </a>
-                        </li>
-
-                        <li>
-                            <a data-ajax="true" data-ajax-mode="replace"
-                               asp-action="Index" asp-controller="Exam"
-                               data-ajax-update="#divSERP"
-                               data-ajax-begin="AjaxOnBegin" data-ajax-complete="AjaxComplete">
-                                <i class="fa fa-bank"></i>
-                                <span>Exam Master</span>
-                            </a>
-                        </li>
-                        <li>
-                            <a data-ajax="true" data-ajax-mode="replace"
-                               asp-action="Index" asp-controller="ExamSheet"
-                               data-ajax-update="#divSERP"
-                               data-ajax-begin="AjaxOnBegin" data-ajax-complete="AjaxComplete">
-                                <i class="fa fa-bank"></i>
-                                <span>Exam TimeSheet</span>
-                            </a>
-                        </li>
-                    </ul>
-                </li>
-            </ul>
-
-            <ul class="sidebar-menu" data-widget="tree">
-                <li class="treeview">
-                    <a href="#">
-                        <i class="fa fa-link"></i> <span>Finance</span>
-                        <span class="pull-right-container">
-                            <i class="fa fa-angle-left pull-right"></i>
-                        </span>
-                    </a>
-                    <ul class="treeview-menu">
-                        <li>
-                            <a data-ajax="true" data-ajax-mode="replace"
-                               asp-action="Index" asp-controller="FeeDiscount"
-                               data-ajax-update="#divSERP" data-ajax-begin="AjaxOnBegin" data-ajax-complete="AjaxComplete">
-                                <i class="fa fa-bank"></i>
-                                <span>Fee Discount</span>
-                            </a>
-                        </li>
-                        <li>
-                            <a data-ajax="true" data-ajax-mode="replace"
-                               asp-action="Index" asp-controller="FeeCategory"
-                               data-ajax-update="#divSERP" data-ajax-begin="AjaxOnBegin" data-ajax-complete="AjaxComplete">
-                                <i class="fa fa-bank"></i>
-                                <span>Fee Category</span>
-                            </a>
-                        </li>
-                        <li>
-                            <a data-ajax="true" data-ajax-mode="replace"
-                               asp-action="ClassWiseFeeAllocation" asp-controller="FeeAllocationClassWise"
-                               data-ajax-update="#divSERP" data-ajax-begin="AjaxOnBegin" data-ajax-complete="AjaxComplete">
-                                <i class="fa fa-bank"></i>
-                                <span>Fee Allocation</span>
-                            </a>
-                        </li>
-                        <li>
-                            <a data-ajax="true" data-ajax-mode="replace"
-                               asp-action="Index" asp-controller="StudentFeeDetail"
-                               data-ajax-update="#divSERP" data-ajax-loading="#loading"
-                               data-ajax-begin="AjaxOnBegin" data-ajax-complete="AjaxComplete">
-                                <i class="fa fa-bank"></i>
-                                <span>Fee Detail</span>
-                            </a>
-                        </li>
-                        <li>
-                            <a data-ajax="true" data-ajax-mode="replace"
-                               asp-action="Index" asp-controller="FeeDeposit"
-                               data-ajax-update="#divSERP" data-ajax-loading="#loading"
-                               data-ajax-begin="AjaxOnBegin" data-ajax-complete="AjaxComplete">
-                                <i class="fa fa-bank"></i>
-                                <span>Fee Deposit</span>
-                            </a>
-                        </li>
-                        <li><a href="#">Assign Subjects</a></li>
-                        <li><a href="#">Subject Allocation</a></li>
-                        <li><a href="#">Elective Subject</a></li>
-                        <li><a href="#">Subjec Allocation Import</a></li>
-                    </ul>
-                </li>
-            </ul>
-
-            <ul class="sidebar-menu" data-widget="tree">
-                <li class="treeview">
-                    <a href="#">
-                        <i class="fa fa-link"></i> <span>HR Module</span>
-                        <span class="pull-right-container">
-                            <i class="fa fa-angle-left pull-right"></i>
-                        </span>
-                    </a>
-                    <ul class="treeview-menu">
-                        <li>
-                            <a data-ajax="true" data-ajax-mode="replace"
-                               asp-action="Index" asp-controller="Department"
-                               data-ajax-update="#divSERP" data-ajax-begin="AjaxOnBegin" data-ajax-complete="AjaxComplete">
-                                <i class="fa fa-bank"></i>
-                                <span>Department</span>
-                            </a>
-                        </li>
-                        <li>
-                            <a data-ajax="true" data-ajax-mode="replace"
-                               asp-action="Index" asp-controller="Designation"
-                               data-ajax-update="#divSERP" data-ajax-begin="AjaxOnBegin" data-ajax-complete="AjaxComplete">
-                                <i class="fa fa-bank"></i>
-                                <span>Designation</span>
-                            </a>
-                        </li>
-                        <li>
-                            <a data-ajax="true" data-ajax-mode="replace"
-                               asp-action="Index" asp-controller="Employee"
-                               data-ajax-update="#divSERP" data-ajax-begin="AjaxOnBegin" data-ajax-complete="AjaxComplete">
-                                <i class="fa fa-bank"></i>
-                                <span>Employee</span>
-                            </a>
-                        </li>
-                        <li>
-                            <a data-ajax="true" data-ajax-mode="replace"
-                               asp-action="Index" asp-controller="PayHead"
-                               data-ajax-update="#divSERP" data-ajax-begin="AjaxOnBegin" data-ajax-complete="AjaxComplete">
-                                <i class="fa fa-bank"></i>
-                                <span>Salary Heads</span>
-                            </a>
-                        </li>
-                        <li>
-                            <a data-ajax="true" data-ajax-mode="replace"
-                               asp-action="ClassWiseFeeAllocation" asp-controller="FeeAllocationClassWise"
-                               data-ajax-update="#divSERP" data-ajax-begin="AjaxOnBegin" data-ajax-complete="AjaxComplete">
-                                <i class="fa fa-bank"></i>
-                                <span>Salary Allocation</span>
-                            </a>
-                        </li>
-                        <li>
-                            <a data-ajax="true" data-ajax-mode="replace"
-                               asp-action="Index" asp-controller="EmployeeAttendence"
-                               data-ajax-update="#divSERP" data-ajax-begin="AjaxOnBegin" data-ajax-complete="AjaxComplete">
-                                <i class="fa fa-bank"></i>
-                                <span>Employee Attendence</span>
-                            </a>
-                        </li>
-                        <li>
-                            <a data-ajax="true" data-ajax-mode="replace"
-                               asp-action="Index" asp-controller="Branch"
-                               data-ajax-update="#divSERP" data-ajax-begin="AjaxOnBegin" data-ajax-complete="AjaxComplete">
-                                <i class="fa fa-bank"></i>
-                                <span>Bank Details</span>
-                            </a>
-                        </li>
-                        <li>
-                            <a data-ajax="true" data-ajax-mode="replace"
-                               asp-action="ClassWiseFeeAllocation" asp-controller="FeeAllocationClassWise"
-                               data-ajax-update="#divSERP" data-ajax-begin="AjaxOnBegin" data-ajax-complete="AjaxComplete">
-                                <i class="fa fa-bank"></i>
-                                <span>Payslip</span>
-                            </a>
-                        </li>
-                        <li>
-                            <a data-ajax="true" data-ajax-mode="replace"
-                               asp-action="ClassWiseFeeAllocation" asp-controller="FeeAllocationClassWise"
-                               data-ajax-update="#divSERP" data-ajax-begin="AjaxOnBegin" data-ajax-complete="AjaxComplete">
-                                <i class="fa fa-bank"></i>
-                                <span>Salary Statement</span>
-                            </a>
-                        </li>
-
-                    </ul>
-                </li>
-            </ul>
-            <ul class="sidebar-menu" data-widget="tree">
-                <li class="treeview">
-                    <a href="#">
-                        <i class="fa fa-link"></i> <span>Student</span>
-                        <span class="pull-right-container">
-                            <i class="fa fa-angle-left pull-right"></i>
-                        </span>
-                    </a>
-                    <ul class="treeview-menu">
-                        <li>
-                            <a data-ajax="true" data-ajax-mode="replace"
-                               asp-action="CreateStudent" asp-controller="StudentMaster"
-                               data-ajax-update="#divSERP" data-ajax-loading="#loading">
-                                <i class="fa fa-bank"></i>
-                                <span>Student Admission</span>
-                            </a>
-                        </li>
-                        <li>
-                            <a data-ajax="true" data-ajax-mode="replace"
-                               asp-action="PromoteStudent" asp-controller="StudentPromote"
-                               data-ajax-update="#divSERP" data-ajax-loading="#loading"
-                               data-ajax-begin="AjaxOnBegin" data-ajax-complete="AjaxComplete">
-                                <i class="fa fa-bank"></i>
-                                <span>Student Promote</span>
-                            </a>
-                        </li>
-                        <li><a href="#">Attendence</a></li>
-                        <li><a href="#">Guardian List</a></li>
-                        <li><a href="#">Student Gate Pass</a></li>
-                        <li><a href="#">Student ID Card</a></li>
-                    </ul>
-                </li>
-            </ul>*@
-
-
-        <!-- /.sidebar-menu -->
     </section>
-    <!-- /.sidebar -->
+    
 </aside>
-
-@await Html.PartialAsync("~/Views/Shared/_CommanModalPartial.cshtml")
 <script type="text/javascript">
-    function MasterSearch() {
-        $("#divModalPop").modal('show');
-        $("#modalTitle").text("Advance Search")
+    $(document).ready(function () {
+        $("#txtMenu").on("keyup", function () {
+            debugger;
+            if (this.value.length > 0) {
+                $(".menuList li").hide().filter(function () {
+                    debugger;
+                    return $(this).text().toLowerCase().indexOf($("#txtMenu").val().toLowerCase()) != -1;
+                }).show();
+            }
+            else {
+                $(".menuList li").show();
+            }
+        });
+
+    });
+
+    function AdvanceSearch() {
+        $("#ModalAdvanceSearch").modal('show');
     }
+
+   
 </script>
 

@@ -1,0 +1,111 @@
+﻿@model IEnumerable<SERP.Core.Model.OnlineTest.TestQuestionVm>
+@{
+    var totalCount = default(int);
+    var totalMarks = default(int);
+    Model.GroupBy(x => x.TestName).ToList().ForEach(x => {
+        x.ToList().ForEach(item => {
+            totalMarks += item.QuestionMark;
+            totalCount++;
+        });
+    });
+}
+
+<style>
+    .collapse {
+        display: none;
+    }
+</style>
+<section class="content">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="row">
+
+                    <div class="col-md-12">
+
+
+                        <table id="tblDataList" class="table table-striped table-bordered responsive" style="width:100%">
+                            <thead>
+                                <tr>
+                                    <th>Test Name</th>
+                                    <th>Time Limit</th>
+                                    <th>Question</th>
+                                    <th>Total Question Count</th>
+                                    <th>Total Marks</th>
+                                    <th>Test Publish</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tblAssign">
+                                @foreach (var data in Model.GroupBy(x => x.TestId))
+                                {
+                                    <tr>
+                                        <td colspan="5">
+                                            <a class="btn btn-outline-danger"
+                                               value="@data.Key" onclick="ExpandCollapse('@data.First().TestId')">
+                                                @data.First().TestName
+                                            </a>
+                                        </td>
+                                        <td>
+                                            <button class="btn btn-primary" onclick="PublishTest(@data.Key)">
+                                                <i class="fa fa-space-shuttle">Publish Test</i>
+                                            </button>
+                                        </td>
+                                    </tr>
+
+                                    @foreach (var item in data)
+                                    {
+                                        <tr id="@data.First().TestId" class="collapse @data.First().TestId">
+                                            <td>
+                                                @item.TestName
+                                            </td>
+                                            <td>
+                                                @item.TimeLimit
+                                            </td>
+                                            <td>
+                                                @Html.Raw(item.Question)
+                                            </td>
+                                            <td>
+                                                @totalCount
+                                            </td>
+                                            <td>
+                                                @totalMarks
+                                            </td>
+                                            
+
+                                        </tr>
+                                    }
+
+                                }
+
+                            </tbody>
+
+                        </table>
+
+                        <div class="col-md-12">
+                          
+                        </div>
+
+                    </div>
+           
+            </div>
+        </div>
+    </div>
+</section>
+<script type="text/javascript">
+    function ExpandCollapse(event) {
+        $("." + event).toggleClass('collapse');
+        $('i').find("[data-id='" + event + "']").removeClass('fa fa-plus').addClass('fa fa-minus');
+    }
+</script>
+
+
+<script type="text/javascript"
+        src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+<script type="text/javascript">
+    if (window.MathJax) {
+        MathJax.Hub.Queue(
+            ["resetEquationNumbers", MathJax.InputJax.TeX],
+            ["Typeset", MathJax.Hub]
+        );
+    }
+</script>

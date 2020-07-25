@@ -217,9 +217,7 @@ namespace SERP.UI.Controllers.Transaction.FeeTransaction
 
             var studentViewModel = (from sp in studentPromotes
                                     from sl in studentList
-                                    where (sp.StudentId == sl.Id
-                                     && sp.CourseId == sl.CourseId
-                                     && sp.BatchId == sl.BatchId)
+                                    where (sp.StudentId == sl.Id)
                                     join Cl in courseList
                                     on sp.CourseId equals Cl.Id
                                     join bl in sectionList

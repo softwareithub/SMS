@@ -17,9 +17,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SERP.UI", "SERP.UI\SERP.UI.
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SERP.API", "SERP.API\SERP.API.csproj", "{92DEA332-C77A-499B-8797-196E69D5B90B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UploadVideoYouTube", "UploadVideoYouTube\UploadVideoYouTube.csproj", "{CD9DBF27-8AED-4178-AB9E-1AD288AC27F9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UploadVideoYouTube", "UploadVideoYouTube\UploadVideoYouTube.csproj", "{CD9DBF27-8AED-4178-AB9E-1AD288AC27F9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SERP.UnitTest", "SERP.UnitTest\SERP.UnitTest.csproj", "{FCEC49CA-B5F3-4F78-BF7E-61824F108DF6}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SERP.UnitTest", "SERP.UnitTest\SERP.UnitTest.csproj", "{FCEC49CA-B5F3-4F78-BF7E-61824F108DF6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BarCodeGenerator", "BarCodeGenerator\BarCodeGenerator.csproj", "{393422E3-0C19-46B5-962B-00B1DD801538}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -63,6 +65,10 @@ Global
 		{FCEC49CA-B5F3-4F78-BF7E-61824F108DF6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FCEC49CA-B5F3-4F78-BF7E-61824F108DF6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FCEC49CA-B5F3-4F78-BF7E-61824F108DF6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{393422E3-0C19-46B5-962B-00B1DD801538}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{393422E3-0C19-46B5-962B-00B1DD801538}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{393422E3-0C19-46B5-962B-00B1DD801538}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{393422E3-0C19-46B5-962B-00B1DD801538}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

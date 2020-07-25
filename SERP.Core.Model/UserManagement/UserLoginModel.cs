@@ -14,5 +14,8 @@ namespace SERP.Core.Model.UserManagement
         public int IsLocked { get; set; }
         public int IsActive { get; set; }
         public string EmployeeCode { get; set; }
+        public string StudentName { get; set; }
+        public string RegistrationNumber { get; set; }
+        public int RoleId { get; set; }
     }
 }

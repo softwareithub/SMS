@@ -126,4 +126,16 @@
   <data name="AcademinName" xml:space="preserve">
     <value>Academic name is required.</value>
   </data>
+  <data name="LibraryFineAmount" xml:space="preserve">
+    <value>Fine Amount is required.</value>
+  </data>
+  <data name="LibrarySettingIssueDays" xml:space="preserve">
+    <value>Issue Days is required.</value>
+  </data>
+  <data name="LibrarySettingIssueTimes" xml:space="preserve">
+    <value>Issue Time is required.</value>
+  </data>
+  <data name="LibrarySettingUserType" xml:space="preserve">
+    <value>User Type is required.</value>
+  </data>
 </root>

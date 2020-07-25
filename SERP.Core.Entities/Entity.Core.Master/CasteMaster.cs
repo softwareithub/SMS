@@ -12,7 +12,7 @@ namespace SERP.Core.Entities.Entity.Core.Master
         [Required(ErrorMessage ="Caste name is required")]
         [Display(Name ="Caste Name",Prompt ="Enter Caste name")]
         public string Name { get; set; }
-        [Display(Name="Description",Prompt ="Enter Caste Description")]
-        public string Description { get; set; }
+        [Display(Name = "Description", Prompt = "Enter Caste Description")]
+        public string Description { get; set; } = string.Empty;
     }
 }

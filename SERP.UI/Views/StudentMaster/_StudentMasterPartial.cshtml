@@ -149,7 +149,7 @@
                         <div class="col-md-4">
                             <div class="form-group">
                                 <label asp-for="RegistrationNumber">Registration Number</label>
-                                <input asp-for="RegistrationNumber" class="form-control" />
+                                <input asp-for="RegistrationNumber" onblur="ValidateRegistrationNumber()" class="form-control" />
                                 <span asp-validation-for="RegistrationNumber" class="text-danger"></span>
                             </div>
                         </div>
@@ -352,4 +352,13 @@
         }, 300)
     });
 
+    function ValidateRegistrationNumber() {
+        var registrationNumber = $("#RegistrationNumber").val();
+        $.get("/StudentMaster/ValidateStudentRegistratioNumber", { registration: registrationNumber}, function (data) {
+            if (data == "1") {
+                alertify.success("The registration number " + registrationNumber + " already exists.Please use another registration number.")
+                $("#RegistrationNumber").val('');
+            }
+        })
+    }
 </script>

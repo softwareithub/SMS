@@ -18,25 +18,29 @@ namespace SERP.UI.Controllers.UserManagement
         private readonly IGenericRepository<SubModuleMaster, int> _ISubModuleRepo;
         private readonly IGenericRepository<UserAccessRight, int> _IUserAccessRepo;
         private readonly IGenericRepository<EmployeeBasicInfoModel, int> _IEmployeeRepo;
+        private readonly IGenericRepository<Authenticate, int> _authenticateRepo;
+        private readonly IGenericRepository<RoleMaster, int> _roleRepo;
 
         public UserAccessRightController(IGenericRepository<ModuleMaster, int> moduleRepo,
                                 IGenericRepository<SubModuleMaster, int> subModuleRepo,
                                 IGenericRepository<UserAccessRight, int> userAceessRepo, 
-                                IGenericRepository<EmployeeBasicInfoModel, int> employeeRepo)
+                                IGenericRepository<EmployeeBasicInfoModel, int> employeeRepo, IGenericRepository<Authenticate, int> authenticateRepo, IGenericRepository<RoleMaster, int> roleRepo)
         {
             _IModuleMasterRepo = moduleRepo;
             _ISubModuleRepo = subModuleRepo;
             _IUserAccessRepo = userAceessRepo;
             _IEmployeeRepo = employeeRepo;
+            _authenticateRepo = authenticateRepo;
+            _roleRepo = roleRepo;
         }
         public async Task<IActionResult> Index()
         {
-            ViewBag.employees = await _IEmployeeRepo.GetList(x => x.IsActive == 1);
+            ViewBag.roleList = await _roleRepo.GetList(x => x.IsActive == 1);
             return PartialView("~/Views/UserManagement/_UserEmployeePartial.cshtml");
         }
-        public async Task<IActionResult> GetUserAccess(int employeeId)
+        public async Task<IActionResult> GetUserAccess(int roleId)
         {
-            HttpContext.Session.SetInt32("employeeId", employeeId);
+            HttpContext.Session.SetInt32("RoleId", roleId);
             var result = (from MM in await _IModuleMasterRepo.GetList(x => x.IsActive == 1)
                           join SM in await _ISubModuleRepo.GetList(x => x.IsActive == 1)
                           on MM.Id equals SM.ModuleId
@@ -47,7 +51,7 @@ namespace SERP.UI.Controllers.UserManagement
                               ModuleName= MM.ModuleName,
                               SubModuleName= SM.SubModuleName,
                           }).ToList();
-            var userAccessList = await _IUserAccessRepo.GetList(x => x.EmployeeId == employeeId && x.IsActive == 1);
+            var userAccessList = await _IUserAccessRepo.GetList(x => x.RoleId == roleId && x.IsActive == 1);
             foreach(var data in userAccessList)
             {
                 var model = result.Find(x => x.ModuleId == data.ModuleId && x.SubModuleId == data.SubModuleId);
@@ -63,9 +67,19 @@ namespace SERP.UI.Controllers.UserManagement
         [HttpPost]
         public async Task<IActionResult> UserAccess(int [] module,int[] access)
         {
-            int employeeId = Convert.ToInt32(HttpContext.Session.GetInt32("employeeId"));
+            int roleId = Convert.ToInt32(HttpContext.Session.GetInt32("RoleId"));
 
-            var useRightModels = await _IUserAccessRepo.GetList(x => x.EmployeeId == employeeId);
+            //Get All the Submodules
+            var subModuleDetails = await _ISubModuleRepo.GetList(x => x.IsActive == 1);
+
+            List<int> moduleList = new List<int>();
+
+            for(int i=0; i<access.Count(); i++)
+            {
+                moduleList.Add(subModuleDetails.Where(x => x.Id == access[i]).Select(x => x.ModuleId).FirstOrDefault());
+            }
+
+            var useRightModels = await _IUserAccessRepo.GetList(x => x.RoleId == roleId);
             await _IUserAccessRepo.CreateNewContext();
 
             useRightModels.ToList().ForEach(item => {
@@ -80,9 +94,9 @@ namespace SERP.UI.Controllers.UserManagement
             for(int i=0; i< access.Count(); i++)
             {
                 UserAccessRight model = new UserAccessRight();
-                model.ModuleId = module[i];
+                model.ModuleId = moduleList[i];
                 model.SubModuleId = access[i];
-                model.EmployeeId = Convert.ToInt32(HttpContext.Session.GetInt32("employeeId"));
+                model.RoleId = roleId;
                 model.ReadAccess = 1;
                 model.CreateAccess = 1;
                 model.UpdateAccess = 1;

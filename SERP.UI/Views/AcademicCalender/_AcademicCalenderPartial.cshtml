@@ -6,7 +6,7 @@
 @model SERP.Core.Entities.Entity.Core.Master.AcademicCalender
 <script src="~/lib/jquery-validation/dist/jquery.validate.js"></script>
 <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.js"></script>
-<link href="https://cdn.datatables.net/1.10.20/css/jquery.dataTables.min.css" rel="stylesheet" />
+<link href="~/DataTable/DataTable.css" rel="stylesheet" />
 <script src="https://cdn.datatables.net/1.10.20/js/jquery.dataTables.min.js"></script>
 <script src="~/ckeditor/ckeditor.js"></script>
 
@@ -55,6 +55,12 @@
                       data-ajax-begin="CustomFormSubmitBegin" data-ajax-complete="CustomFormSubmitComplete">
                     <div class="box-body">
                         <div class="col-md-4">
+                            <label>Academic(Session)</label>
+                            <select id="CourseId" asp-for="AcademicId" class="form-control" asp-items="@(new SelectList(ViewBag.AcademicList ,"Id","Name"))">
+                                <option value="">Select</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
                             <div class="form-group">
                                 <input type="hidden" asp-for="Id" />
                                 <input type="hidden" asp-for="CreatedBy" />
@@ -76,6 +82,16 @@
                                 <label asp-for="ToDate">End Date</label>
                                 <input asp-for="ToDate" class="form-control">
                                 <span asp-validation-for="ToDate" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label asp-for="IsHoliday">Is Holiday</label>
+                                <select asp-for="IsHoliday" class="form-control">
+                                    <option value="0">No</option>
+                                    <option value="1">Yes</option>
+                                </select>
+                                <span asp-validation-for="IsHoliday" class="text-danger"></span>
                             </div>
                         </div>
 

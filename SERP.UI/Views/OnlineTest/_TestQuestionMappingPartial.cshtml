@@ -4,21 +4,25 @@
 
 }
 @model IEnumerable<SERP.Core.Model.ExamModel.TestQuestionModel>
-<script src="~/lib/jquery-validation/dist/jquery.validate.js"></script>
-<script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.js"></script>
-<link href="https://cdn.datatables.net/1.10.20/css/jquery.dataTables.min.css" rel="stylesheet" />
-<script src="https://cdn.datatables.net/1.10.20/js/jquery.dataTables.min.js"></script>
-<script src="~/ckeditor/ckeditor.js"></script>
+
+<style>
+    .invalid {
+        border: 2px solid red;
+    }
+
+    .valid {
+        border: 2px solid green;
+    }
+    td {
+        word-break: break-all;
+    }
+</style>
+
 <section class="content-header">
     <h1>
         Test Question Bank
         <small>Mapped Question To Test</small>
     </h1>
-    <ol class="breadcrumb">
-        <li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
-        <li><a href="#">Forms</a></li>
-        <li class="active">General Elements</li>
-    </ol>
 </section>
 
 
@@ -29,7 +33,7 @@
             <!-- general form elements -->
             <div class="box box-primary">
                 <div class="box-header with-border">
-                    <h3 class="box-title">Mapped Test Question</h3>
+                    <h3 class="box-title">Test Question Mapping</h3>
                     <div class="col-md-12">
                         <div class="col-md-10">
                             <a class="btn btn-primary pull-right" onclick="GetNewRecordList()">
@@ -55,18 +59,18 @@
                     <div class="box-body">
                         <div class="col-md-4">
                             <div class="form-group">
-                                <label >Select Test</label>
-                                <select class="form-control" name="TestId"  asp-items="@(new SelectList(ViewBag.TestDetail ,"Id","TestName"))" onchange="GetQuestionDetails()">
+                                <label>Select Test</label>
+                                <select class="form-control" name="TestId" asp-items="@(new SelectList(ViewBag.TestDetail ,"Id","TestName"))" onchange="GetQuestionDetails()">
                                     <option value="0">Select</option>
                                 </select>
                             </div>
                         </div>
                         <div class="col-md-12">
-                            <table class="table table-responsive" id="tblQuestionDetail">
+                            <table class="table table-responsive" style="width:100%" id="tblQuestionDetail">
                                 <thead>
                                     <tr>
                                         <th>
-                                            Select 
+                                            Select
                                         </th>
                                         <th>
                                             Course
@@ -83,7 +87,7 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @foreach(var data in Model)
+                                    @foreach (var data in Model)
                                     {
                                         <tr>
                                             <td>
@@ -95,11 +99,11 @@
                                             <td>
                                                 @data.SubjectName
                                             </td>
-                                            <td>
-                                                <label>@Html.Raw(data.Question) </label>
+                                            <td style="word-break:break-all">
+                                                <label style="word-break:break-all">@Html.Raw(data.Question) </label>
                                             </td>
                                             <td>
-                                                <input type="number" name="questionMark" value="@data.QuestionPoint" class="form-control"/>
+                                                <input type="number" name="questionMark" value="@data.QuestionPoint" class="form-control" />
                                             </td>
                                         </tr>
                                     }
@@ -107,7 +111,7 @@
                             </table>
                         </div>
                     </div>
-                    
+
 
                     <div class="box-footer">
                         <div class="col-md-8">
@@ -127,32 +131,87 @@
 
         @await Html.PartialAsync("~/Views/Shared/_CommanModalPartial.cshtml")
 
+        <div class="modal fade" id="TestPublishModal" role="dialog">
+            <div class="modal-dialog modal-sm">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                        <h4 class="modal-title">
+                            <a>
+                                Set Test Start Date Time
+                            </a>
+                        </h4>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label>Test Start Date Time</label>
+                                    <input type="hidden" id="hiddenTestId" />
+                                    <input type="datetime-local" class="form-control" id="txtDateTime" />
+                                </div>
+                                <div class="col-md-12">
+                                    <label>
+                                        Send Email/SMS Notification
+                                    </label>
+                                    <select class="form-control" id="ddlNotificationType" onchange="GetNotification()">
+                                        <option value="SMS">SMS</option>
+                                        <option value="Email">Email</option>
+                                    </select>
+
+                                </div>
+                                <div class="col-md-12">
+                                    <label>Select Template</label>
+                                    <select class="form-control" id="ddlNotification">
+                                    </select>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" onclick="Publish()" class="btn btn-primary">
+                            <i class="fa fa-arrow-up">
+                                Publish
+
+                            </i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
     </div>
 </section>
-
+<script type="text/javascript"
+        src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+<script type="text/javascript">
+    if (window.MathJax) {
+        MathJax.Hub.Queue(
+            ["resetEquationNumbers", MathJax.InputJax.TeX],
+            ["Typeset", MathJax.Hub]
+        );
+    }
+</script>
 <script>
 
     function GetNewRecordList() {
-        GetCustomRecord("/OnlineTest/GetList");
+        GetCustomRecord("/TestQuestionMapping/GetTestDetail");
         setTimeout(function () {
-            $("#modalTitle").text("Question Details")
+            $("#modalTitle").text("Test Question Mapping")
         }, 300);
     }
     function NewAcademicMaster() {
-        var url = "/OnlineTest/Index";
+        var url = "/TestQuestionMapping/Index";
         NewCustomRecord(url);
     }
-
-    $(document).ready(function () {
-        CKEDITOR.replace("QuestionModel_Question");
-    })
-
     function CheckThis(eData) {
         debugger;
         $('input:checkbox').removeAttr('checked');
 
     }
-        function GetSubjectList() {
+    function GetSubjectList() {
         debugger;
         var courseId = $("#CourseId").val();
         $("#SubjectId").empty()
@@ -171,11 +230,46 @@
             $("#divMultipleChoice").removeAttr('style');
         }
         else {
-            $("#divMultipleChoice").attr('style',"display:none");
+            $("#divMultipleChoice").attr('style', "display:none");
         }
     }
     $(document).ready(function () {
-        $("#tblQuestionDetail").DataTable();
+        $("#tblQuestionDetail").DataTable({
+            pagination: false
+        });
     });
+
+    function PublishTest(id) {
+        $("#hiddenTestId").val(id);
+        $("#TestPublishModal").modal('show');
+    }
+
+    function Publish() {
+        var testId = $("#hiddenTestId").val();
+        var date = $("#txtDateTime").val();
+        var templateId = $("#ddlNotification").val();
+        if (date.length > 0) {
+            $("#txtDateTime").removeClass("invalid")
+            $("#txtDateTime").addClass('valid');
+            $.get("/TestQuestionMapping/PublishTest", { dateTime: date, testId: testId, templateId: templateId}, function (data) {
+                alertify.success(data);
+            });
+        }
+        else {
+            $("#txtDateTime").addClass("invalid")
+            $("#txtDateTime").removeClass('valid');
+        }
+    }
+
+    function GetNotification() {
+        var notificationType = $("#ddlNotificationType").val();
+        $("#ddlNotification").empty();
+        $.get("/OnlineTest/GetSMSEmailTemplate", { notificationType: notificationType }, function (data) {
+            for (var i = 0; i < data.length; i++) {
+                debugger;
+                $("#ddlNotification").append("<option value=" + data[i].id+">" + data[i].templateName+"</option>")
+            }
+        });
+    }
 </script>
 

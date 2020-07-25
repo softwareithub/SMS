@@ -32,10 +32,17 @@ namespace SERP.UI.Controllers.Master
         {
             model.IsActive = 1;
             model.IsDeleted = 0;
-            if(model.InstituteLogo!=InstituteLogo.FileName)
+            if (InstituteLogo != null)
             {
-                model.InstituteLogo = await UploadImage(InstituteLogo);
+                if (model.InstituteLogo != InstituteLogo.FileName)
+                {
+                    model.InstituteLogo = await UploadImage(InstituteLogo);
+                }
             }
+            else {
+                model.InstituteLogo = string.Empty;
+            }
+
            
             if (model.Id == 0)
             {

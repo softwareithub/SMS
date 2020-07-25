@@ -1,0 +1,93 @@
+﻿
+@{
+    ViewData["Title"] = "Index";
+    Layout = null;
+
+}
+
+<script src="~/lib/jquery-validation/dist/jquery.validate.js"></script>
+<script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.js"></script>
+<link href="https://cdn.datatables.net/1.10.20/css/jquery.dataTables.min.css" rel="stylesheet" />
+<script src="https://cdn.datatables.net/1.10.20/js/jquery.dataTables.min.js"></script>
+
+
+<div class="col-md-12">
+    <div class="col-md-3">
+        <div class="form-group">
+            <label>Student Name</label>
+            <input type="text" class="form-control" id="txtName" placeholder="Enter Student Name" />
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="form-group">
+            <label>Father Name</label>
+            <input type="text" class="form-control" id="txtFatherName" placeholder="Enter Father Name" />
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="form-group">
+            <label>Mother Name</label>
+            <input type="text" class="form-control" id="txtMotherName" placeholder="Enter Mother Name" />
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="form-group">
+            <label>Roll Code</label>
+            <input type="text" class="form-control" id="txtRollCode" placeholder="Enter Roll Code" />
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="form-group">
+            <label>Registration Number</label>
+            <input type="text" class="form-control" id="txtRegistration" placeholder="Enter Registration" />
+        </div>
+    </div>
+    <div class="col-md-12">
+        <div class="col-md-8">
+            <button type="button" class="btn btn-primary pull-right" value="Search" onclick="Search()">
+                <span class="glyphicon glyphicon-search"></span> Search
+            </button>
+        </div>
+        <div class="col-md-4">
+            <button type="button" class="btn btn-danger pull-left" value="Cancel" onclick="Cancel()">
+                <span class="glyphicon glyphicon-remove"></span> Cancel
+            </button>
+        </div>
+
+    </div>
+</div>
+
+<div class="col-md-12" style="margin-top:15px">
+    <div id="divStudentList">
+
+    </div>
+</div>
+
+<script type="text/javascript">
+    function Search() {
+        var studentName = $("#txtName").val();
+        var fatherName = $("#txtFatherName").val();
+        var motherName = $("#txtMotherName").val();
+        var rollCode = $("#txtRollCode").val();
+        var registrationNumber = $("#txtRegistration").val();
+
+        $.get("/RouteStudentMapping/GetStudentList", {
+            name: studentName,
+            rollCode: rollCode,
+            fatherName: fatherName,
+            motherName: motherName,
+            registrationNUmber: registrationNumber
+        }, function (data) {
+            $("#divStudentList").html(data);
+        });
+    }
+
+    function Cancel() {
+        $("#txtName").val('');
+        $("#txtFatherName").val('');
+        $("#txtMotherName").val('');
+        $("#txtRollCode").val('');
+        $("#txtRegistration").val('');
+    }
+</script>
+

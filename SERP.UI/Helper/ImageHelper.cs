@@ -15,6 +15,10 @@ namespace SERP.UI.Helper
         private static IHttpContextAccessor _httpContextAccessor;
         public static IHtmlContent SerpImageHelper(this IHtmlHelper htmlHelper, string imgsrc, int height, int width, string Id)
         {
+            if(!string.IsNullOrEmpty(imgsrc))
+            {
+                imgsrc = imgsrc.Replace("~", string.Empty);
+            }
             string basepath="http://"+SERPHttpContextAccessor.Current.Request.Host.ToString();
             var imagePath = basepath+ "//Images/UserLogo.jpg";
             imgsrc = string.IsNullOrEmpty(imgsrc) ? imagePath : basepath+"//"+imgsrc;

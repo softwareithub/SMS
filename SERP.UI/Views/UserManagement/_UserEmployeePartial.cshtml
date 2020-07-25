@@ -9,11 +9,7 @@
         User Access Information
         <small>User Management user access information</small>
     </h1>
-    <ol class="breadcrumb">
-        <li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
-        <li><a href="#">Forms</a></li>
-        <li class="active">General Elements</li>
-    </ol>
+  
 </section>
 
 
@@ -35,12 +31,12 @@
                     <div class="box-body">
                         <div class="col-md-4">
                             <div class="form-group">
-                                <label for="Employee">Select Employee</label>
+                                <label for="Employee">Select Role</label>
                                <select class="form-control" id="ddlEmployee" onchange="GetEmployeeAccess()">
-                                   <option value="">Select Employee</option>
-                                   @foreach(var data in (IEnumerable<SERP.Core.Entities.Entity.Core.HRModule.EmployeeBasicInfoModel>)ViewBag.employees)
+                                   <option value="">Select User</option>
+                                   @foreach(var data in (IEnumerable<SERP.Core.Entities.UserManagement.RoleMaster>)ViewBag.roleList)
                                    {
-                                       <option value="@data.Id">@data.Name (@data.EmpCode)</option>
+                                       <option value="@data.Id">@data.RoleName</option>
                                    }
                                </select>
                             </div>
@@ -68,7 +64,7 @@
 
 <script>
     function GetEmployeeAccess() {
-        $.get("/UserAccessRight/GetUserAccess", { employeeId: $("#ddlEmployee").val()}, function (responseData) {
+        $.get("/UserAccessRight/GetUserAccess", { roleId: $("#ddlEmployee").val()}, function (responseData) {
             $("#employeeAccessData").html(responseData);
         })
     }

@@ -1,0 +1,108 @@
+﻿@{
+    ViewData["Title"] = "Index";
+    Layout = null;
+
+}
+@model SERP.Core.Entities.Transport.VehicleModel
+
+<script src="~/lib/jquery-validation/dist/jquery.validate.js"></script>
+<script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.js"></script>
+<link href="https://cdn.datatables.net/1.10.20/css/jquery.dataTables.min.css" rel="stylesheet" />
+<script src="https://cdn.datatables.net/1.10.20/js/jquery.dataTables.min.js"></script>
+
+<section class="content-header">
+    <h1>
+        Vehicle Master
+        <small>Vehicle Details</small>
+    </h1>
+</section>
+
+
+<section class="content">
+    <div class="row">
+
+        <div class="col-md-12">
+            <!-- general form elements -->
+            <div class="box box-primary">
+                <div class="box-header with-border">
+                    <h3 class="box-title">Vehicle Details</h3>
+                    <a class="btn btn-primary pull-right" onclick="GetRecordList()">
+                        <i class="fa fa-list-ul"></i>
+                        List
+                    </a>
+                </div>
+                <form method="post" data-ajax="true" data-ajax-method="post"
+                      asp-action="Create" asp-controller="Vehicle" data-ajax-success="Success">
+                    <div class="box-body">
+
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <input asp-for="Id" type="hidden" />
+                                <input asp-for="CreatedBy" type="hidden" />
+                                <input asp-for="CreatedDate" type="hidden" />
+                                <label asp-for="VehicleName">Vehicle Name</label>
+                                <input type="text" asp-for="VehicleName" class="form-control" />
+                                <span asp-validation-for="VehicleName" class="text-danger"></span>
+                            </div>
+
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label asp-for="VehicleType">Vehicle Type</label>
+                                <select asp-for="VehicleType" class="form-control">
+                                    <option value="N/A">Select</option>
+                                    <option value="Bus">Bus</option>
+                                    <option value="Bolero">Bolero</option>
+                                </select>
+                                <span asp-validation-for="VehicleType" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label asp-for="VehicleNumber">Vehicle Number</label>
+                                <input asp-for="VehicleNumber" class="form-control" />
+                                <span asp-validation-for="VehicleNumber" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label asp-for="VehicleDeviceId">Vehicle Device Id (GPS Device Id)</label>
+                                <input asp-for="VehicleDeviceId" class="form-control" />
+                                <span asp-validation-for="VehicleDeviceId" class="text-danger"></span>
+                            </div>
+                        </div>
+                        
+                    </div>
+
+                    <div class="box-footer">
+                        <div class="col-md-8">
+                            @Html.SERPButton("btn btn-primary pull-right btnSubmit", Model == null ? 0 : Model.Id)
+                            <button class="buttonload" style="display:none">
+                                <i class="fa fa-refresh fa-spin"></i>Loading
+                            </button>
+                        </div>
+                        <div class="col-md-4">
+                            <button type="reset" class="btn btn-danger pull-left">Cancel</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+        @await Html.PartialAsync("~/Views/Shared/_CommanModalPartial.cshtml")
+    </div>
+</section>
+
+
+<script type="text/javascript">
+    function GetRecordList() {
+        GetCustomRecord("/Vehicle/GetVehicleList");
+        setTimeout(function () {
+            $("#modalTitle").text("Vehicle Details")
+        }, 300);
+    }
+    function NewAcademicMaster() {
+        var url = "/Vehicle/Index";
+        NewCustomRecord(url);
+    }
+
+</script>

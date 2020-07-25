@@ -18,20 +18,23 @@ namespace SERP.UI.Controllers.UserManagement
         private readonly IGenericRepository<EmployeeBasicInfoModel, int> _IEmployeeRepo;
         private readonly IGenericRepository<Authenticate, int> _IAuthenticate;
         private readonly IGenericRepository<StudentMaster, int> _IStudentRepo;
+        private readonly IGenericRepository<RoleMaster, int> _roleMasterRepo;
        
 
         public UserLoginController(IGenericRepository<EmployeeBasicInfoModel, int> employeeRepo,
-            IGenericRepository<Authenticate, int> authenticateRepo, IGenericRepository<StudentMaster, int> studentRepo)
+            IGenericRepository<Authenticate, int> authenticateRepo, IGenericRepository<StudentMaster, int> studentRepo, IGenericRepository<RoleMaster, int> roleMasterRepo)
         {
             _IEmployeeRepo = employeeRepo;
             _IAuthenticate = authenticateRepo;
             _IStudentRepo = studentRepo;
+            _roleMasterRepo = roleMasterRepo;
          
         }
         public async Task<IActionResult> Index(int id)
         {
             ViewBag.Employee = await _IEmployeeRepo.GetList(x => x.IsActive == 1);
             ViewBag.StudentList = await _IStudentRepo.GetList(x => x.IsActive == 1);
+            ViewBag.Rolelist = await _roleMasterRepo.GetList(x => x.IsActive == 1);
             return PartialView("~/Views/UserManagement/_UserLoginCreatePartial.cshtml",await _IAuthenticate.GetSingle(x=>x.Id==id));
         }
 
@@ -63,6 +66,8 @@ namespace SERP.UI.Controllers.UserManagement
             var result = (from AM in await _IAuthenticate.GetList(x => x.IsActive == 1)
                           join EM in await _IEmployeeRepo.GetList(x => x.IsActive == 1)
                           on AM.EmployeeId equals EM.Id
+                          join SM in await _IStudentRepo.GetList(x=>x.IsActive==1)
+                          on AM.StudentId equals SM.Id
                           select new UserLoginModel
                           {
                                 Id= AM.Id,
@@ -72,7 +77,9 @@ namespace SERP.UI.Controllers.UserManagement
                                 IsExpired= AM.IsExpired,
                                 IsActive= AM.IsActive,
                                 IsLocked= AM.IsLocked,
-                                EmployeeCode= EM.EmpCode
+                                EmployeeCode= EM.EmpCode,
+                                StudentName= SM.Name,
+
                           }).ToList();
             return PartialView("~/Views/UserManagement/_UserManagementList.cshtml", result);
         }

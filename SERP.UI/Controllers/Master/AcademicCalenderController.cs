@@ -15,13 +15,16 @@ namespace SERP.UI.Controllers.Master
     public class AcademicCalenderController : Controller
     {
         private readonly IGenericRepository<AcademicCalender, int> _IAcademicCalenderRepo;
+        private readonly IGenericRepository<AcademicMaster, int> _academicMasterRepo;
 
-        public AcademicCalenderController(IGenericRepository<AcademicCalender, int> academiCalenderRepo)
+        public AcademicCalenderController(IGenericRepository<AcademicCalender, int> academiCalenderRepo, IGenericRepository<AcademicMaster, int> academicMasterRepo)
         {
             _IAcademicCalenderRepo = academiCalenderRepo;
+            _academicMasterRepo = academicMasterRepo;
         }
         public async Task<IActionResult> AcademicCalender(int id)
         {
+            ViewBag.AcademicList = await _academicMasterRepo.GetList(x => x.IsActive == 1);
             var responseData = await _IAcademicCalenderRepo.GetSingle(x => x.Id == id);
             return PartialView("~/Views/AcademicCalender/_AcademicCalenderPartial.cshtml", responseData);
         }

@@ -10,13 +10,13 @@ namespace SERP.Core.Entities.HomeAssignment
     [Table("StudentHomeWorkSubmission", Schema ="Master")]
     public class StudentHomeWork: Base<int>
     {
-        public int StudentId { get; set; }
-        public int HomeWorkId { get; set; }
+        public int StudentId { get; set; } = default;
+        public int HomeWorkId { get; set; } = default;
         [DataType(DataType.Date)]
-        public DateTime SubmissionDate { get; set; }
-        public int IsSubmitted { get; set; }
-        public string Grade { get; set; }
-        public string Reason { get; set; }
+        public DateTime SubmissionDate { get; set; } = default;
+        public int IsSubmitted { get; set; } = default;
+        public string Grade { get; set; } = string.Empty;
+        public string Reason { get; set; } = string.Empty;
       
     }
 }

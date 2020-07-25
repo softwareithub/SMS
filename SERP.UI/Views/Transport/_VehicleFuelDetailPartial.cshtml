@@ -1,0 +1,118 @@
+﻿@model SERP.Core.Entities.Transport.VehicleFuelDetail
+
+<script src="~/lib/jquery-validation/dist/jquery.validate.js"></script>
+<script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.js"></script>
+<link href="https://cdn.datatables.net/1.10.20/css/jquery.dataTables.min.css" rel="stylesheet" />
+<script src="https://cdn.datatables.net/1.10.20/js/jquery.dataTables.min.js"></script>
+
+<section class="content-header">
+    <h1>
+        Vehicle Fuel Master
+        <small>Fuel Details</small>
+    </h1>
+</section>
+
+
+<section class="content">
+    <div class="row">
+
+        <div class="col-md-12">
+            <!-- general form elements -->
+            <div class="box box-primary">
+                <div class="box-header with-border">
+                    <h3 class="box-title">Fuels  Details</h3>
+                    <a class="btn btn-primary pull-right" onclick="GetRecordList()">
+                        <i class="fa fa-list-ul"></i>
+                        List
+                    </a>
+                </div>
+                <form method="post" data-ajax="true" data-ajax-method="post"
+                      asp-action="Create" asp-controller="FuelDetail" data-ajax-success="Success"  enctype="multipart/form-data">
+                    <div class="box-body">
+
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <input asp-for="Id" type="hidden" />
+                                <input asp-for="CreatedBy" type="hidden" />
+                                <input asp-for="CreatedDate" type="hidden" />
+                                <label asp-for="VehicleId">Select Vehicle</label>
+                                <select type="text" asp-for="VehicleId" class="form-control" asp-items="@(new SelectList(ViewBag.Vehicles ,"Id","VehicleName"))">
+                                    <option value="0">Select</option>
+                                </select>
+                                <span asp-validation-for="VehicleId" class="text-danger"></span>
+                            </div>
+
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label>Fuel Qantity</label>
+                                <input asp-for="Quantity" class="form-control" />
+                                <span asp-validation-for="Quantity" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label asp-for="Rate">Fuel Rate</label>
+                                <input asp-for="Rate" class="form-control" />
+                                <span asp-validation-for="Rate" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label asp-for="FuelDate">Fuel Date</label>
+                                <input asp-for="FuelDate" class="form-control" />
+                                <span asp-validation-for="FuelDate" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label asp-for="ReciptNumber">Recipt Number</label>
+                                <input asp-for="ReciptNumber" class="form-control" />
+                                <span asp-validation-for="ReciptNumber" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label asp-for="RecieptImage">Upload Reciept</label>
+                                <input type="file" asp-for="RecieptImage" class="form-control" />
+                                <span asp-validation-for="RecieptImage" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label asp-for="Remark">Remarks</label>
+                                <input asp-for="Remark" class="form-control" />
+                                <span asp-validation-for="Remark" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="box-footer">
+                        <div class="col-md-8">
+                            @Html.SERPButton("btn btn-primary pull-right btnSubmit", Model == null ? 0 : Model.Id)
+                            <button class="buttonload" style="display:none">
+                                <i class="fa fa-refresh fa-spin"></i>Loading
+                            </button>
+
+                        </div>
+                        <div class="col-md-4">
+                            <input type="reset" class="btn btn-danger pull-left" value="Cancel" />
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+        @await Html.PartialAsync("~/Views/Shared/_CommanModalPartial.cshtml")
+
+        
+    </div>
+</section>
+<script type="text/javascript">
+    function GetRecordList() {
+        GetCustomRecord("/FuelDetail/GetList");
+        setTimeout(function () {
+            $("#modalTitle").text("Fuel Details")
+        }, 300);
+    }
+</script>

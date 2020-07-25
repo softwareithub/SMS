@@ -24,7 +24,7 @@
             <!-- general form elements -->
             <div class="box box-primary">
                 <div class="box-header with-border">
-                    <h3 class="box-title">Create Exam Master</h3>
+                    <h3 class="box-title">Create Grade Master</h3>
                     <div class="col-md-12">
                         <div class="col-md-10">
                             <a class="btn btn-primary pull-right" onclick="GetNewRecordList()">
@@ -60,16 +60,26 @@
                         </div>
                         <div class="col-md-4">
                             <div class="form-group">
-                                <label asp-for="FromPercentage">From Percentage</label>
-                                <input asp-for="FromPercentage" class="form-control">
-                                <span asp-validation-for="FromPercentage" class="text-danger"></span>
+                                <label asp-for="FromMarks">From Marks</label>
+                                <input asp-for="FromMarks" class="form-control">
+                                <span asp-validation-for="FromMarks" class="text-danger"></span>
                             </div>
                         </div>
                         <div class="col-md-4">
                             <div class="form-group">
-                                <label asp-for="ToPercentage">To Percentage</label>
-                                <input asp-for="ToPercentage" class="form-control">
-                                <span asp-validation-for="ToPercentage" class="text-danger"></span>
+                                <label asp-for="ToMarks">To Marks</label>
+                                <input asp-for="ToMarks" class="form-control">
+                                <span asp-validation-for="ToMarks" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label asp-for="ResultType">Result Type</label>
+                                <select asp-for="ResultType" class="form-control">
+                                    <option value="Pass">Pass</option>
+                                    <option value="Fail">Fail</option>
+                                </select>
+                                <span asp-validation-for="ResultType" class="text-danger"></span>
                             </div>
                         </div>
                     </div>

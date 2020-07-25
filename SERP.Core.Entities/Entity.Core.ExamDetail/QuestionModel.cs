@@ -9,9 +9,9 @@ namespace SERP.Core.Entities.Entity.Core.ExamDetail
     [Table("QuestionMaster", Schema = "OnlineTest")]
     public class QuestionModel:Base<int>
     {
-        public string Question { get; set; }
-        public int QuestionPoint { get; set; }
-        public int SubjectId { get; set; }
-        public int CourseId { get; set; }
+        public string Question { get; set; } = string.Empty;
+        public int QuestionPoint { get; set; } = default;
+        public int SubjectId { get; set; } = default;
+        public int CourseId { get; set; } = default;
     }
 }

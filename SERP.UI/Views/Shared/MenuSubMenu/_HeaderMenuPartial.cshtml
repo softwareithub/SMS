@@ -1,5 +1,69 @@
 ﻿@using Microsoft.AspNetCore.Http
 @inject IHttpContextAccessor HttpContextAccessor
+
+<style>
+    * {
+        box-sizing: border-box;
+    }
+
+    body {
+        font: 16px Arial;
+    }
+
+    /*the container must be positioned relative:*/
+    .autocomplete {
+        position: relative;
+        display: inline-block;
+    }
+
+    input {
+        border: 1px solid transparent;
+        background-color: #f1f1f1;
+        padding: 10px;
+        font-size: 16px;
+    }
+
+        input[type=text] {
+            background-color: #f1f1f1;
+            width: 100%;
+        }
+
+        input[type=submit] {
+            background-color: DodgerBlue;
+            color: #fff;
+            cursor: pointer;
+        }
+
+    .autocomplete-items {
+        position: absolute;
+        border: 1px solid #d4d4d4;
+        border-bottom: none;
+        border-top: none;
+        z-index: 99;
+        /*position the autocomplete items to be the same width as the container:*/
+        top: 100%;
+        left: 0;
+        right: 0;
+    }
+
+        .autocomplete-items div {
+            padding: 10px;
+            cursor: pointer;
+            background-color: #fff;
+            border-bottom: 1px solid #d4d4d4;
+        }
+
+            /*when hovering an item:*/
+            .autocomplete-items div:hover {
+                background-color: #e9e9e9;
+            }
+
+    /*when navigating through the items using the arrow keys:*/
+    .autocomplete-active {
+        background-color: DodgerBlue !important;
+        color: #ffffff;
+    }
+</style>
 <header class="main-header">
     <!-- Logo -->
     <a asp-action="Index" asp-controller="Home" class="logo">
@@ -21,37 +85,9 @@
                 <!-- Messages: style can be found in dropdown.less-->
                 <li class="dropdown messages-menu">
                     <!-- Menu toggle button -->
-                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-                        <i class="fa fa-mod"></i>
-                        <span class="label label-success">4</span>
+                    <a onclick="AdvanceSearch()" class="dropdown-toggle" data-toggle="dropdown">
+                        <i class="fa fa-search"></i>
                     </a>
-                    <ul class="dropdown-menu">
-                        <li class="header">You have 4 messages</li>
-                        <li>
-                            <!-- inner menu: contains the messages -->
-                            <ul class="menu">
-                                <li>
-                                    <!-- start message -->
-                                    <a href="#">
-                                        <div class="pull-left">
-                                            <!-- User Image -->
-                                            <img src="~/Images/UserLogo.jpg" class="img-circle" alt="User Image">
-                                        </div>
-                                        <!-- Message title and timestamp -->
-                                        <h4>
-                                            Support Team
-                                            <small><i class="fa fa-clock-o"></i> 5 mins</small>
-                                        </h4>
-                                        <!-- The message -->
-                                        <p>Why not buy a new awesome theme?</p>
-                                    </a>
-                                </li>
-                                <!-- end message -->
-                            </ul>
-                            <!-- /.menu -->
-                        </li>
-                        <li class="footer"><a href="#">See All Messages</a></li>
-                    </ul>
                 </li>
                 <!-- /.messages-menu -->
                 <!-- Notifications Menu -->
@@ -104,47 +140,148 @@
                         </li>
                     </ul>
                 </li>
-
-                <li class="dropdown tasks-menu">
-                    <!-- Menu Toggle Button -->
-                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-                        <i class="fa fa-gears"></i>
-                    </a>
-                    <ul class="dropdown-menu">
-                        <li class="header">Institute Settings</li>
-                        <li>
-                            <ul class="menu">
-                                <li>
-                                    <a data-ajax="true" data-ajax-mode="replace"
-                                       asp-action="Index" asp-controller="UserLogin"
-                                       data-ajax-update="#divSERP"
-                                       data-ajax-begin="AjaxOnBegin" data-ajax-complete="AjaxComplete"
-                                       class="nav-link">
-                                        <i class="fa fa-user-circle"></i>
-                                        <span>
-                                            User Credential
-                                        </span>
-                                    </a>
-                                </li>
-                                <li>
-                                    <a data-ajax="true" data-ajax-mode="replace"
-                                       asp-action="Index" asp-controller="UserAccessRight"
-                                       data-ajax-update="#divSERP"
-                                       data-ajax-begin="AjaxOnBegin" data-ajax-complete="AjaxComplete"
-                                       class="nav-link">
-                                        <i class="fa fa-registered"></i>
-                                        <span>
-                                            Access Right
-                                        </span>
-                                    </a>
-                                </li>
-                            </ul>
-                        </li>
-                    </ul>
-                </li>
-
-                <!-- Control Sidebar Toggle Button -->
             </ul>
         </div>
     </nav>
 </header>
+
+<div class="modal fade" id="ModalAdvanceSearch" role="dialog" style="overflow:auto">
+    <div class="modal-dialog modal-dialog-centered  modal-lg" style="width:90%">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">
+                    <a>Advance Search</a>
+                </h4>
+            </div><!--modal-header end-->
+
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="col-md-12">
+                            <div class="col-md-4">
+                                <div class="panel panel-default">
+                                    <div class="panel-heading">
+                                        Student Search
+                                    </div>
+                                    <div class="panel-body">
+                                        <div class="col-md-12">
+                                            <div class="autocomplete" style="width:300px;">
+                                                <input type="text" id="txtStudentName" placeholder="Enter Student Name" class="form-control" />
+                                            </div>
+
+                                        </div>
+                                        <div class="col-md-12" style="padding-top:10px;">
+                                            <button class="btn btn-success pull-right">
+                                                <i class="fa fa-search"> &nbsp;&nbsp;Search </i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-4">
+                                <div class="panel panel-default">
+                                    <div class="panel-heading">
+                                        Employee Search
+                                    </div>
+                                    <div class="panel-body">
+                                        <div class="col-md-12">
+                                            <input type="text" id="txtEmployee" placeholder="Enter Employee Name" class="form-control" />
+                                        </div>
+                                        <div class="col-md-12" style="padding-top:10px;">
+                                            <button class="btn btn-success pull-right">
+                                                <i class="fa fa-search"> &nbsp;&nbsp;Search </i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-4">
+                                <div class="panel panel-default">
+                                    <div class="panel-heading">
+                                        Book Search
+                                    </div>
+                                    <div class="panel-body">
+                                        <div class="col-md-12">
+                                            <input type="text" placeholder="Enter Book Name" id="txtBook" class="form-control" />
+                                        </div>
+                                        <div class="col-md-12" style="padding-top:10px;">
+                                            <button class="btn btn-success pull-right" onclick="fn_bookSearch()">
+                                                <i class="fa fa-search"> &nbsp;&nbsp;Search </i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="panel panel-default">
+                                    <div class="panel-heading">
+                                        Fee Detail
+                                    </div>
+                                    <div class="panel-body">
+                                        <div class="col-md-12">
+                                            <input type="text" placeholder="Enter Student Name" class="form-control" />
+                                        </div>
+                                        <div class="col-md-12" style="padding-top:10px;">
+                                            <button class="btn btn-success pull-right">
+                                                <i class="fa fa-search"> &nbsp;&nbsp;Search </i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <fieldset class="fieldset marB0">
+                            <div class="table-outer" style="min-height: 250px;overflow:auto;" id="divAdvanceSearch">
+
+
+                            </div>
+                        </fieldset>
+                    </div>
+                </div>
+
+            </div><!--modal-body end-->
+        </div>
+        <!--modal-content end-->
+    </div><!--modal-dialog end-->
+</div>
+<script src="~/Custom/AutoComplete.js"></script>
+<script>
+    $(document).ready(function () {
+        var studentList = [];
+        var employeeList = [];
+        var bookList = [];
+
+
+        $.get("/AdvanceSearch/GetStudent", function (data) {
+            studentList = data;
+        }).done(function () {
+            autocomplete(document.getElementById("txtStudentName"), studentList);
+        });
+
+        $.get("/AdvanceSearch/GetEmployeeDetails", function (data) {
+            employeeList = data;
+        }).done(function () {
+            autocomplete(document.getElementById("txtEmployee"), employeeList);
+        });
+
+        $.get("/AdvanceSearch/GetBookDetails", function (data) {
+            bookList = data;
+        }).done(function () {
+            autocomplete(document.getElementById("txtBook"), bookList);
+        });
+
+    })
+    function fn_bookSearch() {
+        var bookName = $("#txtBook").val();
+        if (bookName.length == 0) {
+            $("#txtBook").addClass('input-validation-error');
+        }
+        else {
+            $("#txtBook").removeClass('input-validation-error');
+        }
+    }
+</script>

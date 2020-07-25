@@ -1,0 +1,141 @@
+﻿@model SERP.Core.Entities.Accounts.AccountTransaction
+
+<script src="~/lib/jquery-validation/dist/jquery.validate.js"></script>
+<script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.js"></script>
+<link href="https://cdn.datatables.net/1.10.20/css/jquery.dataTables.min.css" rel="stylesheet" />
+<script src="https://cdn.datatables.net/1.10.20/js/jquery.dataTables.min.js"></script>
+
+<section class="content-header">
+    <h1>
+        Account Transaction
+        <small>Create Account Transaction</small>
+    </h1>
+</section>
+
+
+<section class="content">
+    <div class="row">
+
+        <div class="col-md-12">
+            <div class="box box-primary">
+                <div class="box-header with-border">
+                    <h3 class="box-title">Create Account Transaction</h3>
+                    <a class="btn btn-primary pull-right" onclick="GetRecordList()">
+                        <i class="fa fa-list-ul"></i>
+                        List
+                    </a>
+                </div>
+                <form method="post" data-ajax="true" data-ajax-method="post"
+                      asp-action="Create" asp-controller="AccountTransaction" data-ajax-success="Success">
+                    <div class="box-body">
+
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <input asp-for="Id" type="hidden" />
+                                <input asp-for="CreatedBy" type="hidden" />
+                                <input asp-for="CreatedDate" type="hidden" />
+                                <label asp-for="AccountId">Select Account</label>
+                                <select id="CourseId" asp-for="AccountId" class="form-control" asp-items="@(new SelectList(ViewBag.AccountDetails ,"Id","AccountName"))" onchange="GetBatchList()">
+                                    <option value="">Select</option>
+                                </select>
+                                <span asp-validation-for="AccountId" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label>Select Expense/Income</label>
+                                <select class="form-control" id="ddlExpenseIncome"onchange="IncomeExpense()">
+                                    <option value="EX">Expense</option>
+                                    <option value="IN">Income</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-4" id="divExpense">
+                            <div class="form-group">
+                                <label asp-for="ExpenseId">Select Expense</label>
+                                <select id="CourseId" asp-for="ExpenseId" class="form-control" asp-items="@(new SelectList(ViewBag.ExpenseDetails ,"Id","Name"))" onchange="GetBatchList()">
+                                    <option value="">Select</option>
+                                </select>
+                                <span asp-validation-for="ExpenseId" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="col-md-4" id="divIncome" style="display:none">
+                            <div class="form-group">
+                                <label asp-for="IncomeId">Select Income</label>
+                                <select id="CourseId" asp-for="IncomeId" class="form-control" asp-items="@(new SelectList(ViewBag.IncomeDetails ,"Id","Name"))" onchange="GetBatchList()">
+                                    <option value="">Select</option>
+                                </select>
+                                <span asp-validation-for="IncomeId" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label asp-for="Amount">Amount</label>
+                                <input asp-for="Amount" class="form-control" />
+                                <span asp-validation-for="Amount" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label asp-for="DateOfIncomeExpense">Date</label>
+                                <input asp-for="DateOfIncomeExpense" class="form-control" />
+                                <span asp-validation-for="DateOfIncomeExpense" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label asp-for="RecieptNumber">Reciept Number</label>
+                                <input asp-for="RecieptNumber" class="form-control" />
+                                <span asp-validation-for="RecieptNumber" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label asp-for="Purpose">Purpose</label>
+                                <input asp-for="Purpose" class="form-control" />
+                                <span asp-validation-for="Purpose" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label asp-for="Remarks">Remarks</label>
+                                <input asp-for="Remarks" class="form-control" />
+                                <span asp-validation-for="Remarks" class="text-danger"></span>
+                            </div>
+                        </div>
+                        
+                    </div>
+
+                    <div class="box-footer">
+                        <div class="col-md-8">
+                            @Html.SERPButton("btn btn-primary pull-right btnSubmit", Model == null ? 0 : Model.Id)
+                            <button class="buttonload" style="display:none">
+                                <i class="fa fa-refresh fa-spin"></i>Loading
+                            </button>
+                        </div>
+                        <div class="col-md-4">
+                            <button type="reset" class="btn btn-danger pull-left">Cancel</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+        @await Html.PartialAsync("~/Views/Shared/_CommanModalPartial.cshtml")
+    </div>
+</section>
+
+
+<script type="text/javascript">
+    function GetRecordList() {
+        GetCustomRecord("/AccountTransaction/GetList");
+        setTimeout(function () {
+            $("#modalTitle").text("Account Transaction")
+        }, 300);
+    }
+    function NewAcademicMaster() {
+        var url = "/AccountTransaction/Index";
+        NewCustomRecord(url);
+    }
+
+</script>

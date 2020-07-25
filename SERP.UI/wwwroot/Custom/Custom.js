@@ -1,11 +1,10 @@
 ﻿function Success(response) {
+    debugger;
     alertify.set('notifier', 'position', 'top-right');
     alertify.success(response);
+    //$("#form")[0].reset();
 }
-//function Error(response) {
-//    alertify.set('notifier', 'position', 'top-right');
-//    alertify.error(response);
-//}
+
 
 function CustomDelete(id, url) {
     alertify.set('notifier', 'position', 'top-right');
@@ -98,11 +97,14 @@ function AjaxComplete() {
 }
 
 function CustomFormSubmitBegin() {
-    $('#divFormData').removeClass('loading');
+    $("#divSERP").addClass('loading');
+    $("#loading").removeClass('loading');
 }
 
 function CustomFormSubmitComplete() {
-    $('#divFormData').addClass('loading');
+    $("#divSERP").removeClass('loading');
+    $("#loading").addClass('loading');
+   
 }
 
 function GetInfo() {

@@ -10,11 +10,6 @@
         Test Paper
         <small>Create Test Paper</small>
     </h1>
-    <ol class="breadcrumb">
-        <li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
-        <li><a href="#">Forms</a></li>
-        <li class="active">General Elements</li>
-    </ol>
 </section>
 
 
@@ -46,7 +41,7 @@
                       asp-action="CreateTest" asp-controller="TestMaster" data-ajax-success="Success"
                       data-ajax-begin="CustomFormSubmitBegin" data-ajax-complete="CustomFormSubmitComplete">
                     <div class="box-body">
-                        <div class="col-md-4">
+                        <div class="col-md-3">
                             <div class="form-group">
                                 <input type="hidden" asp-for="Id" />
                                 <input type="hidden" asp-for="CreatedBy" />
@@ -57,10 +52,10 @@
                             </div>
                         </div>
 
-                        <div class="col-md-4">
+                        <div class="col-md-3">
                             <div class="form-group">
                                 <label asp-for="TestTimeLimit">Time Limit</label>
-                                
+
                                 <select class="form-control" asp-for="TestTimeLimit">
                                     <option value="0">Select</option>
                                     <option value="20min">20 min</option>
@@ -72,6 +67,16 @@
                                 </select>
                                 <span asp-validation-for="TestTimeLimit" class="text-danger"></span>
                             </div>
+                        </div>
+                        <div class="col-md-3">
+                            <label>Select Course</label>
+                            <select class="form-control" asp-for="CourseId" asp-items="@(new SelectList(ViewBag.CourseList ,"Id","Name"))" onchange="GetBatchList()">
+                                <option value="">Select</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label>Select BatchId</label>
+                            <select class="form-control" asp-for="BatchId"></select>
                         </div>
                         <div class="col-md-12">
                             <div class="form-group">
@@ -114,5 +119,21 @@
 
     $(document).ready(function () {
         CKEDITOR.replace("Regulation");
+        GetBatchList();
     })
+
+        function GetBatchList() {
+        debugger;
+        var batchId = '@Model?.BatchId';
+        var courseId = $("#CourseId").val();
+        $("#BatchId").empty();
+        $("#BatchId").append('<option value="">Select</option>');
+        $.get("/CommanDataForJson/BatchJson", { courseId: courseId }, function (responseData) {
+            for (var i = 0; i < responseData.length; i++) {
+                var html = '<option value=' + responseData[i].id + '>' + responseData[i].batchName + '</option>';
+                $("#BatchId").append(html);
+            }
+            $("#BatchId").val(parseInt(batchId));
+        });
+    }
 </script>

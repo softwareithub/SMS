@@ -115,11 +115,46 @@ namespace SERP.UI.Controllers.ExamMaster
             return Json(grade);
         }
 
-       
+
+        public async Task<IActionResult> StudentMarkSheetSearch()
+        {
+            ViewBag.ExamList = await _IExamRepo.GetList(x => x.IsActive == 1);
+            ViewBag.CourseList = await _ICourseRepo.GetList(x => x.IsActive == 1);
+            return PartialView("~/Views/ExamMaster/_studentMarkSheetSearchPartial.cshtml");
+        }
+        public async Task<IActionResult> GetStudentSearcList(int courseId, int batchId)
+        {
+            List<StudentPartialInfoViewModel> models = new List<StudentPartialInfoViewModel>();
+            models = (from SP in await _IStudentPromote.GetList(x => x.IsActive == 1 && x.CourseId==courseId && x.BatchId== batchId)
+                      join SM in await _IStudentMaster.GetList(x => x.IsActive == 1)
+                      on SP.StudentId equals SM.Id
+                      join CM in await _ICourseRepo.GetList(x => x.IsActive == 1)
+                      on SP.CourseId equals CM.Id
+                      join BM in await _IBatchRepo.GetList(x => x.IsActive == 1)
+                      on SP.BatchId equals BM.Id
+
+                      select new StudentPartialInfoViewModel
+                      {
+                          Id = SP.StudentId,
+                          RollCode = SM.RollCode,
+                          Registration = SM.RegistrationNumber,
+                          CourseName = CM.Name,
+                          BatchName = BM.BatchName,
+                          StudentName = SM.Name,
+                          FatherName = SM.FatherName,
+                          MotherName = SM.MotherName,
+                          StudentPhoto = SM.StudentPhoto,
+                          DateOfBirth = SM.DateOfBirth,
+                          Gender = SM.Gender,
+                          JoiningDate = SM.JoiningDate
+                      }).ToList();
+
+            return Json(models);
+        }
 
         public async Task<IActionResult> StudentMarkSheet(int studentId, int examId)
         {
-            studentId = 1; examId = 2;
+            
             StudentMarkSheetVm model = new StudentMarkSheetVm();
             var gradeList = await _IGradeRepo.GetList(x => x.IsActive == 1);
             model.InstituteModel = await _IInstituteRepo.GetSingle(x => x.IsActive == 1);
@@ -206,7 +241,7 @@ namespace SERP.UI.Controllers.ExamMaster
            
             gradeMasters.ToList().ForEach(item =>
             {
-                if (ToInt32(item.FromPercentage) >= marks && marks<= ToInt32(item.ToPercentage))
+                if (ToInt32(item.FromMarks) >= marks && marks<= ToInt32(item.ToMarks))
                 {
                     grade = item.GradeName;
                 }

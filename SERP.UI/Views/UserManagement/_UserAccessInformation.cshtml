@@ -29,7 +29,10 @@
                                 @foreach (var data in Model.GroupBy(x => x.ModuleName))
                                 {
                                     <tr>
-                                        <td colspan="6">
+                                        <td>
+                                            <input type="checkbox" checked="checked" onchange="MasterCheckChange(this)" data-moduleId="@data.First().ModuleId" />
+                                        </td>
+                                        <td colspan="5">
                                             <a class="btn btn-outline-danger"
                                                value="@data.Key" onclick="ExpandCollapse('@data.First().ModuleId')">
                                                 @data.Key
@@ -42,7 +45,7 @@
                                         <tr id="@data.First().ModuleId" class="collapse @data.First().ModuleId">
                                             <td>
                                                 <input type="hidden" name="module" value="@item.ModuleId" />
-                                                <input type="checkbox" name="access" checked="checked" value="@item.SubModuleId" />
+                                                <input type="checkbox" data-moduleId="@item.ModuleId" name="access" checked="checked" value="@item.SubModuleId" />
                                             </td>
                                             <td>
                                                 @item.ModuleName
@@ -52,7 +55,6 @@
                                             </td>
                                             <td>
                                                 <input type="checkbox" name="ReadAccess" />
-
                                             </td>
                                             <td>
                                                 <input type="checkbox" />
@@ -83,6 +85,22 @@
     function ExpandCollapse(event) {
         $("." + event).toggleClass('collapse');
         $('i').find("[data-id='" + event + "']").removeClass('fa fa-plus').addClass('fa fa-minus');
+    }
+
+    function MasterCheckChange(id) {
+        if (id.checked) {
+            var childAttributeId = $(id).attr("data-moduleId");
+            $('[data-moduleId=' + childAttributeId + ']').each(function (i, data) {
+                $(data).prop('checked', true)
+            })
+        }
+        else {
+            var childAttributeId = $(id).attr("data-moduleId");
+            $('[data-moduleId=' + childAttributeId + ']').each(function (i, data) {
+                $(data).prop('checked', false)
+            })
+        }
+       
     }
 </script>
 
