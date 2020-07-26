@@ -220,14 +220,14 @@
         NewCustomRecord(url);
     }
      function GetSubjectList() {
-        debugger;
+        
         var courseId = $("#CourseId").val();
         var subjectId = '@Model?.SubjectId';
         $("#SubjectId").empty()
         $("#SubjectId").append('<option value="">Select</option>');
         $.get("/CommanDataForJson/SubjectJson", { courseId: courseId }, function (responseData) {
             for (var i = 0; i < responseData.length; i++) {
-                debugger;
+                
                 var html = '<option value=' + responseData[i].id + '>' + responseData[i].subjectName + '</option>'
                 $("#SubjectId").append(html);
             }

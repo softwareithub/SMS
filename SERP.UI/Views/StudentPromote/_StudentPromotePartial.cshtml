@@ -139,7 +139,7 @@
     function GetStudentDetails() {
         var courseId = $("#FromCourse option:selected").val();
         var batchId = $("#FromBatch option:selected").val();
-        debugger;
+        
         if (courseId != '' && batchId != '') {
             $("#tblStudentPartial").empty();
             $.get("/StudentPromote/GetStudentList", { courseId: courseId, batchId: batchId }, function (responseData) {

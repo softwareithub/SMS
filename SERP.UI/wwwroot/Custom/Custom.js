@@ -1,5 +1,5 @@
 ﻿function Success(response) {
-    debugger;
+    
     alertify.set('notifier', 'position', 'top-right');
     alertify.success(response);
     //$("#form")[0].reset();
@@ -88,7 +88,7 @@ function NewCustomRecord(url) {
 }
 
 function AjaxOnBegin() {
-    debugger;
+    
     $("#divSERP").addClass('loading');
     $("#loading").removeClass('loading');
 }

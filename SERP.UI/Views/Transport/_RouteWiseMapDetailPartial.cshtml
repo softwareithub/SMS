@@ -67,7 +67,7 @@
         "use strict";
         var marker;
         var checkboxArray = [];
-        debugger;
+        
 
         $("input[name=address]").each(function () {
             checkboxArray.push(this.value);
@@ -103,7 +103,7 @@
 
 
             for (var i = 0; i < checkboxArray.length; i++) {
-                debugger;
+                
                 waypts.push({
                     location: checkboxArray[i],
                     stopover: true

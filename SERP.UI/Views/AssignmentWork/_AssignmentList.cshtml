@@ -102,9 +102,9 @@
         $("#pdfFrame").attr('src', pdfSrc);
     }
     function showAssign(id) {
-        debugger;
+        
         $.get("/AssignmentMaster/GetAssignDetails", { id: id }, function (responseData) {
-            debugger;
+            
             var response = jQuery.parseHTML(responseData);
             $("#assignment").html(response);
         })
@@ -116,7 +116,7 @@
         CustomDeleteRecord(id, geturl, deleteUrl, event);
     }
     function UpdateRecord(id, event) {
-        debugger;
+        
         var updateUrl = "/AssignmentMaster/Index";
         UpdateCustomRecord(id, updateUrl, event);
     }

@@ -105,9 +105,9 @@
         $("#pdfFrame").attr('src', pdfSrc);
     }
     function showAssign(id) {
-        debugger;
+        
         $.get("/HomeWork/GetDetail", { id: id }, function (responseData) {
-            debugger;
+            
             var response = jQuery.parseHTML(responseData);
             $("#assignment").html(response);
         })
@@ -119,7 +119,7 @@
         CustomDeleteRecord(id, geturl, deleteUrl, event);
     }
     function UpdateRecord(id, event) {
-        debugger;
+        
         var updateUrl = "/HomeWork/Index";
         UpdateCustomRecord(id, updateUrl, event);
     }

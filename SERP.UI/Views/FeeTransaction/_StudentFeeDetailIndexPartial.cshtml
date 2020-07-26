@@ -71,7 +71,7 @@
 
 <script>
     function SearchData() {
-        debugger;
+        
         var studentName = $("#studentName").val();
         var phone = $("#phone").val();
         var rollCode = $("#rollCode").val();
@@ -105,7 +105,7 @@
         var batchId = $("#FromBatch option:selected").val();
         $("#ddlStudent").empty();
         $.get("/StudentFeeDetail/GetStudentDetail", { courseId: courseId, batchId: batchId }, function (data) {
-            debugger;
+            
             for (var i = 0; i < data.length; i++) {
                 
                 $("#ddlStudent").append("<option value="+data[i].id+">"+data[i].name+"</option>")

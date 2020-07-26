@@ -221,7 +221,7 @@
                         anchor: new google.maps.Point(17, 34),
                         scaledSize: new google.maps.Size(25, 25)
                     }; // Create a marker for each place.
-                    debugger;
+                    
                     markers.push(
                         new google.maps.Marker({
                             map: map,
@@ -242,7 +242,7 @@
                     $("#PlaceId").val(place.place_id);
 
                 });
-                debugger;
+                
                 map.fitBounds(bounds);
                 $("#Longitude").val(bounds.Ua.i );
                 $("#Latituide").val(bounds.Za.i);

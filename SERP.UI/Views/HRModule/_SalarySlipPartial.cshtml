@@ -91,7 +91,7 @@
         var year = $("#ddlYear").val();
         var month = $("#ddlMonth").val();
         $('#divSalaryPartial').addClass('loading');
-        debugger;
+        
         $.get("/SalarySlip/SalarySlipDetails", { employeeId: employeeId, year: year, month: month }, function (data) {
             $("#divSalaryPartial").html(data);
 

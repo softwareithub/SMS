@@ -28,7 +28,7 @@
 
         $.get("/DashBoardMaster/StudentAttendeceReportMonthDayWise", { year: 0, month: 0, day: 0 }, function (responseData) {
             for (var i = 0; i < responseData.length; i++) {
-                debugger;
+                
                 StudentClassWisedata.addRow([responseData[i].courseBatchName, responseData[i].presentCount, responseData[i].absentCount]);
             }
         })

@@ -320,7 +320,7 @@
 
 
     function GetMonthlyAmount(id, data, catname) {
-        debugger;
+        
         var count = parseInt($(id).val().length);
         var amount = parseFloat(data) * count;
         var catId = "#" + catname;
@@ -329,7 +329,7 @@
     }
 
     function SetNetAmount() {
-        debugger;
+        
         var netSumAmount = 0;
         $('.netAmount').each(function () {
             if (this.tagName == "LABEL") {
@@ -370,7 +370,7 @@
     }
 
     function ValidateQuaterly() {
-        debugger;
+        
         if ($("#ddlQuaterly option[value='1stQTR']").length == 0) {
             $("#ddlQuaterly").append(' <option value="1stQTR">1st Quater</option>');
         }

@@ -171,7 +171,7 @@
         GetExamList();
     });
      function GetBatchList() {
-        debugger;
+        
         var batchId = '@Model?.BatchId';
         var courseId = $("#CourseId").val();
         $("#BatchId").empty();
@@ -186,14 +186,14 @@
     }
 
     function GetSubjectList() {
-        debugger;
+        
         var courseId = $("#CourseId").val();
         var subjectId = '@Model?.SubjectId';
         $("#SubjectId").empty()
         $("#SubjectId").append('<option value="">Select</option>');
         $.get("/CommanDataForJson/SubjectJson", { courseId: courseId }, function (responseData) {
             for (var i = 0; i < responseData.length; i++) {
-                debugger;
+                
                 var html = '<option value=' + responseData[i].id + '>' + responseData[i].subjectName + '</option>'
                 $("#SubjectId").append(html);
             }
@@ -206,7 +206,7 @@
         $("#ExamDate").empty();
         $.get("/ExamSheet/GetDateTimeList", { id: examId }, function (responseData) {
             for (var i = 0; i < responseData.length; i++) {
-                debugger;
+                
                 var html = '<option value=' + responseData[i].replace("T00:00:00", "") + '>' + responseData[i].replace("T00:00:00", "")+'</option>';
                 $("#ExamDate").append(html);
             }

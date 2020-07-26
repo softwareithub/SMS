@@ -86,7 +86,7 @@
         $("#ddlStudent").empty();
         $("#ddlStudent").append("<option value='0'>-Select-</option>")
         $.get("/StudentFeeDetail/GetStudentDetail", { courseId: courseId, batchId: batchId }, function (data) {
-            debugger;
+            
             for (var i = 0; i < data.length; i++) {
 
                 $("#ddlStudent").append("<option value=" + data[i].id + ">" + data[i].name + "</option>")

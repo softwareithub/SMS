@@ -87,10 +87,10 @@
 <script type="text/javascript">
     $(document).ready(function () {
         $("#txtMenu").on("keyup", function () {
-            debugger;
+            
             if (this.value.length > 0) {
                 $(".menuList li").hide().filter(function () {
-                    debugger;
+                    
                     return $(this).text().toLowerCase().indexOf($("#txtMenu").val().toLowerCase()) != -1;
                 }).show();
             }
