@@ -29,26 +29,59 @@
             <h4>(@Model.Sequence)  @Html.Raw(@Model.Question.Replace("<p>", "").Replace("</p>", ""))</h4>
             <input type="hidden" name="Question" value="@Model.QuestionId" />
             <input type="hidden" name="Sequence" value="@Model.Sequence" />
-            @foreach (var opt in Model.Options)
-            {
-                if (opt.IsSelected)
-                {
-                    <div class="checkbox">
-                        <label>
-                            <input type="checkbox" checked="checked" name="Option" value="@opt.OptionId"> @Html.Raw(opt.Option.Replace("<p>", "").Replace("</p>", ""))
-                        </label>
-                    </div>
-                }
-                else
-                {
-                    <div class="checkbox">
-                        <label>
-                            <input type="checkbox" name="Option" value="@opt.OptionId"> @Html.Raw(opt.Option.Replace("<p>", "").Replace("</p>", ""))
-                        </label>
-                    </div>
-                }
 
+            @if (Model.AnswereType.ToLower().Trim() == "multtiselect")
+            {
+                @foreach (var opt in Model.Options)
+                {
+                    if (opt.IsSelected)
+                    {
+                        <div class="checkbox">
+                            <label>
+                                <input type="checkbox" checked="checked" name="Option" value="@opt.OptionId"> @Html.Raw(opt.Option.Replace("<p>", "").Replace("</p>", ""))
+                            </label>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="checkbox">
+                            <label>
+                                <input type="checkbox" name="Option" value="@opt.OptionId"> @Html.Raw(opt.Option.Replace("<p>", "").Replace("</p>", ""))
+                            </label>
+                        </div>
+                    }
+
+                }
             }
+            else if (Model.AnswereType.ToLower().Trim() == "singleselect")
+            {
+                @foreach (var opt in Model.Options)
+                {
+                    if (opt.IsSelected)
+                    {
+                        <div class="checkbox">
+                            <label>
+                                <input type="radio"  checked="checked" name="Option" value="@opt.OptionId"> @Html.Raw(opt.Option.Replace("<p>", "").Replace("</p>", ""))
+                            </label>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="checkbox">
+                            <label>
+                                <input type="radio" name="Option" value="@opt.OptionId"> @Html.Raw(opt.Option.Replace("<p>", "").Replace("</p>", ""))
+                            </label>
+                        </div>
+                    }
+
+                }
+            }
+            else
+            {
+                <textarea class="form-control" name="Option"></textarea>
+            }
+
+
         </div>
     </div>
 </div>

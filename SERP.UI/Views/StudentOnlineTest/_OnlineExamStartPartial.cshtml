@@ -1,6 +1,9 @@
 ﻿@model IEnumerable<SERP.Core.Model.OnlineTest.OnLineExamDetail>
 @using Microsoft.AspNetCore.Http
 @inject IHttpContextAccessor httpContextAccessor
+@{
+    var testLimit = httpContextAccessor.HttpContext.Session.GetString("TestLimit");
+}
 
 <section class="content-header">
     <h1>
@@ -82,7 +85,9 @@
 </section>
 
 <script>
-    var timer2 = "01:01";
+
+    var timer2 = ExamTime('@testLimit');
+    alert(timer2);
     var interval = setInterval(function () {
 
         var timer = timer2.split(':');
@@ -126,5 +131,22 @@
             $("#divQuestion").html('<h1>Thanks for completing the Test</h1>')
         }
 
+    }
+
+    function ExamTime(timer) {
+        switch (timer) {
+            case "20min":
+                return "20:01";
+            case "40min":
+                return "40:01";
+            case "1Hr":
+                return "60:01";
+            case "90min":
+                return "90:01";
+            case "150Min":
+                return "150:01";
+            case "3Hour":
+                return "180:01";
+        }
     }
 </script>

@@ -1,0 +1,113 @@
+﻿@model SERP.Core.Entities.Entity.Core.Transaction.StudentDocumentUpload
+<script src="~/lib/jquery-validation/dist/jquery.validate.js"></script>
+<script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.js"></script>
+<link href="https://cdn.datatables.net/1.10.20/css/jquery.dataTables.min.css" rel="stylesheet" />
+<script src="https://cdn.datatables.net/1.10.20/js/jquery.dataTables.min.js"></script>
+
+<section class="content-header">
+    <h1>
+        Student Document Details
+    </h1>
+</section>
+
+
+<section class="content">
+    <div class="row">
+
+        <div class="col-md-12">
+            <!-- general form elements -->
+            <div class="box box-primary">
+                <div class="box-header with-border">
+                    <h3 class="box-title">Upload Document </h3>
+                    <div class="col-md-12">
+                        <div class="col-md-10">
+                            <a class="btn btn-primary pull-right" onclick="GetRecordList()">
+                                <i class="fa fa-list-ul"></i>
+                                List
+                            </a>
+                        </div>
+                        <div class="col-md-2">
+                            <a class="btn btn-primary pull-left" onclick="NewAcademicMaster()">
+                                <i class="fa fa-plus-square"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <form method="post" data-ajax="true" data-ajax-method="post"
+                      asp-action="Create" asp-controller="StudentDocument" data-ajax-success="Success"  enctype="multipart/form-data">
+                    <div class="box-body">
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <input type="hidden" asp-for="Id" />
+                                <input type="hidden" asp-for="CreatedBy" />
+                                <input type="hidden" asp-for="CreatedDate" />
+                                <label asp-for="StudentId">Seelct Student</label>
+                                <select class="form-control select2" asp-for="StudentId" asp-items="@(new SelectList(ViewBag.StudentList ,"Id","Name"))">
+                                </select>
+                                <span asp-validation-for="StudentId" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label asp-for="DocumentName">Document Name</label>
+                                <input asp-for="DocumentName" class="form-control">
+                                <span asp-validation-for="DocumentName" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label asp-for="DocumentPath">Upload Document</label>
+                                <input type="file" asp-for="DocumentPath" class="form-control">
+                                <span asp-validation-for="DocumentPath" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label asp-for="DocumentDescription">Document Description</label>
+                                <input asp-for="DocumentDescription" class="form-control">
+                                <span asp-validation-for="DocumentDescription" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                      
+                    </div>
+                    <!-- /.box-body -->
+
+                    <div class="box-footer">
+                        <div class="col-md-8">
+                            @Html.SERPButton("btn btn-primary pull-right btnSubmit", Model == null ? 0 : Model.Id)
+                            <button class="buttonload" style="display:none">
+                                <i class="fa fa-refresh fa-spin"></i>Loading
+                            </button>
+                        </div>
+                        <div class="col-md-4">
+                            <button type="reset" class="btn btn-danger pull-left">Cancel</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        @await Html.PartialAsync("~/Views/Shared/_CommanModalPartial.cshtml")
+
+    </div>
+</section>
+
+<script type="text/javascript">
+    function GetRecordList() {
+        GetCustomRecord("/StudentDocument/GetDocumentDetails");
+        setTimeout(function () {
+            $("#modalTitle").text("Student Document Details")
+        }, 300);
+    }
+    function NewAcademicMaster() {
+        var url = "/StudentDocument/Index";
+        NewCustomRecord(url);
+    }
+    $(document).ready(function () {
+        $('.select2').select2();
+    });
+    </script>

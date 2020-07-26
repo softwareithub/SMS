@@ -68,13 +68,13 @@
 
 <script type="text/javascript">
     function DeleteRecord(id, event) {
-        var geturl = "FeeCategory/GetFeeCategoryList";
-        var deleteUrl = "FeeCategory/DeleteFeeCategory";
+        var geturl = "/FeeDiscount/GetDiscontList";
+        var deleteUrl = "/FeeDiscount/Delete";
         CustomDeleteRecord(id, geturl, deleteUrl, event);
     }
     function UpdateRecord(id, event) {
         debugger;
-        var updateUrl = "FeeDiscount/Index";
+        var updateUrl = "/FeeDiscount/Index";
         UpdateCustomRecord(id, updateUrl, event);
         setTimeout(function () {
             GetParticularList(id);

@@ -1,0 +1,105 @@
+﻿@model IEnumerable<SERP.Core.Entities.Entity.Core.Master.StudentEducationalDetail>
+
+<section class="content">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="row">
+                <div class="col-md-12">
+                    <table id="tblDataList" class="table-responsive-md table-striped table-bordered" style="width:100%">
+                        <tbody>
+                            @foreach (var data in Model.GroupBy(x => x.StudentName))
+                            {
+                                <tr>
+                                    <td colspan="7" onclick="ExpandCollapse('@data.First().StudentId')">
+                                        <a> @data.Key</a>
+                                    </td>
+                                </tr>
+                                <tr class="collapse @data.First().StudentId">
+                                    <td colspan="7">
+                                        <table class="table table-responsive table-hover">
+                                            <thead>
+                                                <tr>
+                                                    <th>
+                                                        University
+                                                    </th>
+                                                    <th>
+                                                        College Name
+                                                    </th>
+                                                    <th>
+                                                        Course Name
+                                                    </th>
+                                                    <th>
+                                                        Enrollement
+                                                    </th>
+                                                    <th>
+                                                        Year of Joining
+                                                    </th>
+                                                    <th>
+                                                        Year of Passing
+                                                    </th>
+                                                    <th>
+                                                        Action
+                                                    </th>
+                                                </tr>
+                                                @foreach (var item in data)
+                                                {
+                                                    <tr>
+                                                        <td>
+                                                            @item.University
+                                                        </td>
+                                                        <td>
+                                                            @item.CollegeName
+                                                        </td>
+                                                        <td>
+                                                            @item.CourseName
+                                                        </td>
+                                                        <td>
+                                                            @item.EnrollmentNumber
+                                                        </td>
+                                                        <td>
+                                                            @item.YearOfJoining
+                                                        </td>
+                                                        <td>
+                                                            @item.YearOfPassing
+                                                        </td>
+                                                        <td>
+                                                            <a class="btn btn-outline-success pull-right" data-loading-text="<i class='fa fa-circle-o-notch fa-spin'  style='color:#DD4B39'></i>" onclick="UpdateRecord(@item.Id, this)">
+                                                                <i class="fa fa-edit" style="color:#3C8DBC"></i>
+                                                            </a>
+                                                            <a class="btn btn-outline-danger pull-right" data-loading-text="<i class='fa fa-circle-o-notch fa-spin'  style='color:#DD4B39'></i>" onclick="DeleteRecord(@item.Id, this)">
+                                                                <i class="fa fa-trash" style="color:#DD4B39"></i>
+                                                            </a>
+                                                        </td>
+                                                    </tr>
+                                                }
+
+                                            </thead>
+                                        </table>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script type="text/javascript">
+    function DeleteRecord(id, event) {
+        var geturl = "/StudentEducational/EducationDetails";
+        var deleteUrl = "/StudentEducational/Delete";
+        CustomDeleteRecord(id, geturl, deleteUrl, event);
+    }
+    function UpdateRecord(id, event) {
+        debugger;
+        var updateUrl = "/StudentEducational/Index";
+        UpdateCustomRecord(id, updateUrl, event);
+    }
+    function ExpandCollapse(event) {
+        $("." + event).toggleClass('collapse');
+        $('i').find("[data-id='" + event + "']").removeClass('fa fa-plus').addClass('fa fa-minus');
+    }
+</script>

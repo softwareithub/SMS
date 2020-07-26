@@ -78,7 +78,18 @@
                                 <span asp-validation-for="SubjectId" class="text-danger"></span>
                             </div>
                         </div>
-                        
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label asp-for="AnswereType">Select OptionType</label>
+                                <select asp-for="AnswereType" class="form-control" id="SubjectId">
+                                    <option value="SingleSelect">SingleSelect</option>
+                                    <option value="MulttiSelect">MulttiSelect</option>
+                                    <option value="Descriptive">Descriptive</option>
+                                </select>
+                                <span asp-validation-for="AnswereType" class="text-danger"></span>
+                            </div>
+                        </div>
+
                         <div class="col-md-6">
                             <div class="form-group">
                                 <input type="hidden" asp-for="Id" />
@@ -89,7 +100,7 @@
                                 <span asp-validation-for="Question" class="text-danger"></span>
                             </div>
                         </div>
-                        
+
 
                     </div>
                     <!-- /.box-body -->

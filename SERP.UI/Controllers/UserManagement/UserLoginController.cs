@@ -19,7 +19,7 @@ namespace SERP.UI.Controllers.UserManagement
         private readonly IGenericRepository<Authenticate, int> _IAuthenticate;
         private readonly IGenericRepository<StudentMaster, int> _IStudentRepo;
         private readonly IGenericRepository<RoleMaster, int> _roleMasterRepo;
-       
+
 
         public UserLoginController(IGenericRepository<EmployeeBasicInfoModel, int> employeeRepo,
             IGenericRepository<Authenticate, int> authenticateRepo, IGenericRepository<StudentMaster, int> studentRepo, IGenericRepository<RoleMaster, int> roleMasterRepo)
@@ -28,14 +28,14 @@ namespace SERP.UI.Controllers.UserManagement
             _IAuthenticate = authenticateRepo;
             _IStudentRepo = studentRepo;
             _roleMasterRepo = roleMasterRepo;
-         
+
         }
         public async Task<IActionResult> Index(int id)
         {
             ViewBag.Employee = await _IEmployeeRepo.GetList(x => x.IsActive == 1);
             ViewBag.StudentList = await _IStudentRepo.GetList(x => x.IsActive == 1);
             ViewBag.Rolelist = await _roleMasterRepo.GetList(x => x.IsActive == 1);
-            return PartialView("~/Views/UserManagement/_UserLoginCreatePartial.cshtml",await _IAuthenticate.GetSingle(x=>x.Id==id));
+            return PartialView("~/Views/UserManagement/_UserLoginCreatePartial.cshtml", await _IAuthenticate.GetSingle(x => x.Id == id));
         }
 
         [HttpPost]
@@ -63,31 +63,51 @@ namespace SERP.UI.Controllers.UserManagement
 
         public async Task<IActionResult> GetList()
         {
-            var result = (from AM in await _IAuthenticate.GetList(x => x.IsActive == 1)
-                          join EM in await _IEmployeeRepo.GetList(x => x.IsActive == 1)
-                          on AM.EmployeeId equals EM.Id
-                          join SM in await _IStudentRepo.GetList(x=>x.IsActive==1)
-                          on AM.StudentId equals SM.Id
-                          select new UserLoginModel
-                          {
-                                Id= AM.Id,
-                                EmployeeName= EM.Name,
-                                UserName= AM.UserName,
-                                Password= AM.Password,
-                                IsExpired= AM.IsExpired,
-                                IsActive= AM.IsActive,
-                                IsLocked= AM.IsLocked,
-                                EmployeeCode= EM.EmpCode,
-                                StudentName= SM.Name,
+            List<UserLoginModel> models = new List<UserLoginModel>();
+            var authenticateModels = await _IAuthenticate.GetList(x => x.IsActive == 1);
+            var studentModels = await _IStudentRepo.GetList(x => x.IsActive == 1);
+            var employeeList = await _IEmployeeRepo.GetList(x => x.IsActive == 1);
 
-                          }).ToList();
-            return PartialView("~/Views/UserManagement/_UserManagementList.cshtml", result);
+            authenticateModels.ToList().ForEach(item =>
+            {
+                if (item.StudentId != 0)
+                {
+                    models.Add(new UserLoginModel
+                    {
+                        Id = item.Id,
+                        UserName = item.UserName,
+                        Password = item.Password,
+                        IsExpired = item.IsExpired,
+                        IsActive = item.IsActive,
+                        IsLocked = item.IsLocked,
+                        StudentName = studentModels.ToList().Find(x => x.Id == item.StudentId).Name
+                    }); ;
+
+
+                }
+                else
+                {
+                    models.Add(new UserLoginModel
+                    {
+                        Id = item.Id,
+                        UserName = item.UserName,
+                        Password = item.Password,
+                        IsExpired = item.IsExpired,
+                        IsActive = item.IsActive,
+                        IsLocked = item.IsLocked,
+                        EmployeeCode = employeeList.ToList().Find(x => x.Id == item.EmployeeId).EmpCode,
+                        EmployeeName = employeeList.ToList().Find(x => x.Id == item.EmployeeId).Name
+                    });
+                }
+
+            });
+            return PartialView("~/Views/UserManagement/_UserManagementList.cshtml", models);
         }
 
         public async Task<IActionResult> Delete(int id)
         {
             var model = await _IAuthenticate.GetSingle(x => x.Id == id);
-            var deleteModel= Utilities.CommanHelper.CommanDeleteHelper.CommanDeleteCode(model,1);
+            var deleteModel = Utilities.CommanHelper.CommanDeleteHelper.CommanDeleteCode(model, 1);
             await _IAuthenticate.CreateNewContext();
             var response = await _IAuthenticate.Update(deleteModel);
             return Json(ResponseData.Instance.GenericResponse(response));

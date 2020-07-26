@@ -48,17 +48,23 @@ namespace SERP.UI.Controllers.OnlineTest
         {
             var userId = HttpContext.Session.GetInt32("UserId");
             var model = await _testMasterRepo.GetSingle(x => x.Id == testId);
+            HttpContext.Session.SetString("TestLimit", model.TestTimeLimit);
             var userTestDetail = await _userDetailRepo.GetSingle(x => x.TestId == testId && x.UserId == userId);
             if (userTestDetail == null && string.IsNullOrEmpty(userTestDetail?.TestStatus))
             {
                 return PartialView("~/Views/StudentOnlineTest/OnlineExamRuleRegulationPartial.cshtml", model);
             }
-            else {
+            if (userTestDetail.TestStatus.Trim().ToLower() == "started")
+            {
+                return PartialView("~/Views/StudentOnlineTest/OnlineExamRuleRegulationPartial.cshtml", model);
+            }
+            else
+            {
                 TestMaster testMaster = new TestMaster();
                 testMaster.Regulation = "Test has been Expired.";
                 return PartialView("~/Views/StudentOnlineTest/OnlineExamRuleRegulationPartial.cshtml", testMaster);
             }
-          
+
         }
 
         public async Task<IActionResult> TestQuestions(int testId)
@@ -73,8 +79,8 @@ namespace SERP.UI.Controllers.OnlineTest
                 TestId = testId,
                 UserId = Convert.ToInt32(userId),
                 DateOfExamination = DateTime.Now,
-                TestStatus="Started"
-                
+                TestStatus = "Started"
+
             };
             var response = await _userDetailRepo.CreateEntity(userTestModel);
             var userDetailId = (await _userDetailRepo.GetList(x => x.IsActive == 1)).Max(x => x.Id);
@@ -135,7 +141,7 @@ namespace SERP.UI.Controllers.OnlineTest
                 if (questions.Count >= lastSequence)
                 {
                     int testId = Convert.ToInt32(HttpContext.Session.GetInt32("testId"));
-                    var userId =Convert.ToInt32(HttpContext.Session.GetInt32("UserId"));
+                    var userId = Convert.ToInt32(HttpContext.Session.GetInt32("UserId"));
                     var model = await GetFinalSubmisionModel(userId, testId);
                     return PartialView("~/Views/OnlineTest/_TestSubmissionPartialView.cshtml", model);
                 }
@@ -221,7 +227,8 @@ namespace SERP.UI.Controllers.OnlineTest
                                          Id = TQM.Id,
                                          QuestionId = QM.Id,
                                          Question = QM.Question,
-                                         QuestionPoint = QM.QuestionPoint
+                                         QuestionPoint = QM.QuestionPoint,
+                                         AnswereType=QM.AnswereType
 
                                      }).ToList();
 

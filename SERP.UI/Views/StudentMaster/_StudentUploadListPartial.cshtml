@@ -1,0 +1,88 @@
+﻿@model IEnumerable<SERP.Core.Entities.Entity.Core.Transaction.StudentDocumentUpload>
+
+<section class="content">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="row">
+                <div class="col-md-12">
+                    <table id="tblDataList" class="table-responsive-md table-striped table-bordered" style="width:100%">
+                        <tbody>
+                            @foreach (var data in Model.GroupBy(x => x.StudentName))
+                            {
+                                <tr>
+                                    <td colspan="7" onclick="ExpandCollapse('@data.First().StudentId')">
+                                        <a> @data.Key</a>
+                                    </td>
+                                </tr>
+                                <tr class="collapse @data.First().StudentId">
+                                    <td colspan="7">
+                                        <table class="table table-responsive table-hover">
+                                            <thead>
+                                                <tr>
+                                                    <th>
+                                                        Document Name
+                                                    </th>
+                                                    <th>
+                                                        Description
+                                                    </th>
+                                                    <th>
+                                                        Document
+                                                    </th>
+                                                    <th>
+                                                        Action
+                                                    </th>
+                                                </tr>
+                                                @foreach (var item in data)
+                                                {
+                                                    <tr>
+                                                        <td>
+                                                            @item.DocumentName
+                                                        </td>
+                                                        <td>
+                                                            @item.DocumentDescription
+                                                        </td>
+                                                        <td>
+                                                          @Html.SerpImageHelper(item.DocumentPath,75,75,"documentId")
+                                                        </td>
+                                                       
+                                                        <td>
+                                                            <a class="btn btn-outline-success pull-right" data-loading-text="<i class='fa fa-circle-o-notch fa-spin'  style='color:#DD4B39'></i>" onclick="UpdateRecord(@item.Id, this)">
+                                                                <i class="fa fa-edit" style="color:#3C8DBC"></i>
+                                                            </a>
+                                                            <a class="btn btn-outline-danger pull-right" data-loading-text="<i class='fa fa-circle-o-notch fa-spin'  style='color:#DD4B39'></i>" onclick="DeleteRecord(@item.Id, this)">
+                                                                <i class="fa fa-trash" style="color:#DD4B39"></i>
+                                                            </a>
+                                                        </td>
+                                                    </tr>
+                                                }
+
+                                            </thead>
+                                        </table>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script type="text/javascript">
+    function DeleteRecord(id, event) {
+        var geturl = "/StudentDocument/GetDocumentDetails";
+        var deleteUrl = "/StudentDocument/Delete";
+        CustomDeleteRecord(id, geturl, deleteUrl, event);
+    }
+    function UpdateRecord(id, event) {
+        debugger;
+        var updateUrl = "/StudentDocument/Index";
+        UpdateCustomRecord(id, updateUrl, event);
+    }
+    function ExpandCollapse(event) {
+        $("." + event).toggleClass('collapse');
+        $('i').find("[data-id='" + event + "']").removeClass('fa fa-plus').addClass('fa fa-minus');
+    }
+</script>

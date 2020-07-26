@@ -10,6 +10,7 @@ using SERP.Core.Entities.Entity.Core.Transaction;
 using SERP.Core.Model.MasterViewModel;
 using SERP.Infrastructure.Repository.Infrastructure.Repo;
 using SERP.Utilities.BlobUtility;
+using SERP.Utilities.CommanHelper;
 using SERP.Utilities.ResponseMessage;
 using SERP.Utilities.ResponseUtilities;
 
@@ -214,6 +215,15 @@ namespace SERP.UI.Controllers.Transaction.StudentTransaction
             }
             return Json("0");
 
+        }
+
+        public async Task<IActionResult> DeleteStudent(int id)
+        {
+            var model = await _IStudentMaster.GetSingle(x => x.Id == id);
+            var deleteModel = CommanDeleteHelper.CommanDeleteCode<StudentMaster>(model, 1);
+            await _IStudentMaster.CreateNewContext();
+            var response = await _IStudentMaster.Update(deleteModel);
+            return Json(ResponseData.Instance.GenericResponse(response));
         }
 
         private async Task<IActionResult> CreateStudentEntity(StudentMaster model)

@@ -149,15 +149,24 @@
         $.get("/FeeDiscount/GetParticularList", { id: id }, function (responseData) {
             $("#_tblParticularDiscount").empty();
             $.each(responseData, function (index, value) {
-                debugger;
+                
+                var description = value.description;
+                var discountValue = value.discountValue;
+                if (typeof description == undefined || description == null) {
+                    description = 'N/A';
+                }
+                if (typeof discountValue == undefined || discountValue == null) {
+                    discountValue = '0';
+                }
+                
                 var markup = '';
                 if (value.particularId > 0) {
-                    markup += '<tr><td data-id=' + value.id + '>' + value.categoryName + '>';
+                    markup += '<tr><td data-id=' + value.id + '>' + value.categoryName + '';
                     markup += '<input type = "hidden" name = "CategoryId" value = ' + value.particularId + ' > ';
                     markup += '<input type = "hidden" name = "discountPertId" value = ' + value.id + ' ></td> ';
                 }
                 else {
-                    markup += '<tr><td data-id=' + value.id + '>' + value.name + '>';
+                    markup += '<tr><td data-id=' + value.id + '>' + value.name + '';
                     markup += '<input type = "hidden" name = "CategoryId" value = ' + value.id + ' ></td> ';
                 }
                 markup += '<td><select  class="form-control" name="ParticularDiscountType"> ';
@@ -170,8 +179,8 @@
                     markup += '<option value = "Per" selected > Percentage</option >';
                 }
                 markup += '</select ></td > ';
-                markup += '<td> <input class="form-control" name="PerticularDiscountValue" value=' + value.discountValue + ' /></td>';
-                markup += '<td> <input class="form-control" name="PerticularDescription" value=' + value.description + ' /></td>';
+                markup += '<td> <input class="form-control" required type="number" name="PerticularDiscountValue" value=' + discountValue + ' /></td>';
+                markup += '<td> <input class="form-control"  name="PerticularDescription" value=' + description + ' /></td>';
                 markup += '</tr>';
                 $("#_tblParticularDiscount").append(markup);
             });

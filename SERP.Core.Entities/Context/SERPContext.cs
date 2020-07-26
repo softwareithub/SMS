@@ -25,7 +25,7 @@ namespace SERP.Core.Entities.Context
     {
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseSqlServer("Server= DESKTOP-SF1G3N8\\VIPRAIT; Database= SERPDevelopment; User Id=sa;Password = vi@pra91");
+            optionsBuilder.UseSqlServer("Server= DESKTOP-SF1G3N8\\VIPRAIT; Database= VinobaEducationPortal; User Id=sa;Password = vi@pra91");
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -113,7 +113,9 @@ namespace SERP.Core.Entities.Context
         public DbSet<UserAnswereSheetModel> UserAnswereSheetModels { get; set; }
         public DbSet<UserTestDetailModel> UserTestDetailModels { get; set; }
         public DbSet<AssginmentUpload> AssginmentUploads { get; set; }
-
+         public DbSet<StudentEducationalDetail> StudentEducationDetails { get; set; }
+        public DbSet<StudentDocumentUpload> StudentDocumentUploads { get; set; }
+        public DbSet<InstituteSettingModel> InstituteSettingModels { get; set; }
         #endregion
 
     }

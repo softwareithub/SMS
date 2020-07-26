@@ -281,10 +281,9 @@
 
                             </div>
                         </fieldset>
-                    </div><!--modal-body end-->
+                    </div>
                 </div>
-                <!--modal-content end-->
-            </div><!--modal-dialog end-->
+            </div>
         </div>
 
     </div>
@@ -360,5 +359,42 @@
                 $("#RegistrationNumber").val('');
             }
         })
+    }
+
+    function DeleteRecord(id) {
+        alertify.confirm("Are you sure want to delete the record ?", function () {
+            $.get("/StudentMaster/DeleteStudent", { id: id }, function (response) {
+                alertify.alert("Record deleted successfully");
+            }).done(function () {
+                $.get("/StudentMaster/GetStudentList", function (response) {
+                    $("#divPartialData").html(response);
+                }).done(function () {
+                    $("#tblDataList").DataTable({
+                        fixedHeader: true,
+                        select: true,
+                        responsive: true
+                    });
+                });
+            });
+        }, function () {
+            alertify.warning("you cancel the delete.");
+        });
+    }
+
+    function UpdateRecord(id) {
+        $.get("/StudentMaster/CreateStudent", { id: id }, function (response) {
+            $("#divSERP").html(response);
+            $("#divModalPop").modal('hide');
+            $('.modal-backdrop').remove();
+            $("#divSerpBody").removeClass('modal-open');    
+        });
+    }
+
+    function StudentInfo(id) {
+        $.get("/StudentMaster/GetStudentCompleteList", { id: id }, function (response) {
+            $("#divPartialData").html(response);
+            $("#divModalPop").modal('show');
+        });
+
     }
 </script>

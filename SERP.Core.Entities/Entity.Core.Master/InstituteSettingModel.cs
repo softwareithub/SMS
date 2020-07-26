@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Text;
 
 namespace SERP.Core.Entities.Entity.Core.Master
 {
+	[Table("InstituteSetting", Schema = "Master")]
     public class InstituteSettingModel:Base<int>
     {
 		public int InstituteId { get; set; }
@@ -15,6 +17,7 @@ namespace SERP.Core.Entities.Entity.Core.Master
 		[Display(Prompt ="Enter Affliation Number")]
 		public string AffliationNumber { get; set; }
 		[Display(Prompt ="Enter Date of Eastblishment")]
+		[DataType(DataType.Date)]
 		public DateTime DateOfEastablishment { get; set; }
 		[Display(Prompt ="Enter Affliation Board")]
 		public string Board { get; set; }

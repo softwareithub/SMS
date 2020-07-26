@@ -51,6 +51,7 @@ function UpdateCustomRecord(id, updateUrl, event) {
         $("#divSERP").html(response);
         $("#divModalPop").modal('hide');
         $('.modal-backdrop').remove();
+        $("#divSerpBody").removeClass('modal-open');    
     }).done(function () {
        
     });

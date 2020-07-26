@@ -13,5 +13,6 @@ namespace SERP.Core.Entities.Entity.Core.ExamDetail
         public int QuestionPoint { get; set; } = default;
         public int SubjectId { get; set; } = default;
         public int CourseId { get; set; } = default;
+        public string AnswereType { get; set; } = "SingleSelect";
     }
 }

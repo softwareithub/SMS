@@ -7,6 +7,8 @@ using Microsoft.Extensions.Primitives;
 using SERP.Core.Entities.Entity.Core.Transaction;
 using SERP.Core.Model.TransactionViewModel;
 using SERP.Infrastructure.Repository.Infrastructure.Repo;
+using SERP.UI.Helper;
+using SERP.Utilities.CommanHelper;
 using SERP.Utilities.ResponseMessage;
 using SERP.Utilities.ResponseUtilities;
 
@@ -60,12 +62,12 @@ namespace SERP.UI.Controllers.Transaction.FeeTransaction
                               on FDP.ParticularId equals FC.Id
                               select new FeeDiscountParticularWiseModel
                               {
-                                  Id=FDP.Id,
+                                  Id = FDP.Id,
                                   ParticularId = FC.Id,
                                   CategoryName = FC.Name,
                                   DiscountValue = FDP.DiscountValue,
                                   DiscountType = FDP.DiscountType,
-                                  Description = FDP.Description,
+                                  Description = FDP.Description ?? string.Empty,
                               }).ToList();
 
                 return Json(result);
@@ -77,6 +79,14 @@ namespace SERP.UI.Controllers.Transaction.FeeTransaction
         {
             var perticularDiscountType = Request.Form["ParticularDiscountType"].ToString().Split(',');
             var particularDiscountValue = Request.Form["PerticularDiscountValue"].ToString().Split(',');
+            particularDiscountValue.ToList().ForEach(item =>
+            {
+                if (string.IsNullOrEmpty(item))
+                {
+                    item = "0.0";
+                }
+
+            });
             var particularDescription = Request.Form["PerticularDescription"].ToString().Split(',');
             var categoriesId = Request.Form["CategoryId"];
             var discountPerticularId = Request.Form["discountPertId"];
@@ -91,6 +101,22 @@ namespace SERP.UI.Controllers.Transaction.FeeTransaction
         {
             var result = await _feeDsicountRepo.GetList(x => x.IsActive == 1 && x.IsDeleted == 0);
             return PartialView("~/Views/FeeTransaction/_FeeDiscountListPartial.cshtml", result);
+        }
+
+        public async Task<IActionResult> Delete(int id)
+        {
+            try
+            {
+                var model = await _feeDsicountRepo.GetSingle(x => x.Id == id);
+                var deleteModel = CommanDeleteHelper.CommanDeleteCode(model, 1);
+                await _feeDsicountRepo.CreateNewContext();
+                var response = await _feeDsicountRepo.Update(deleteModel);
+                return Json(ResponseData.Instance.GenericResponse(response));
+            }
+            catch(Exception ex)
+            {
+                return Json("Unable to delete.Please contact admin.");
+            }
         }
 
         #region Private
@@ -113,8 +139,8 @@ namespace SERP.UI.Controllers.Transaction.FeeTransaction
                     var perticulaModel = new FeeDiscountParticularWiseModel()
                     {
                         DiscountType = perticularDiscountType[i].ToString(),
-                        DiscountValue = Convert.ToDecimal(particularDiscountValue[i]),
-                        Description = particularDescription[i].ToString(),
+                        DiscountValue = Convert.ToDecimal(particularDiscountValue.ElementOrDefault(i)),
+                        Description = particularDescription.ElementOrDefault(i),
                         ParticularId = Convert.ToInt32(categoriesId[i]),
                         FeeDiscountId = maxDiscountId
                     };
@@ -148,7 +174,7 @@ namespace SERP.UI.Controllers.Transaction.FeeTransaction
                         Description = particularDescription[i].ToString(),
                         ParticularId = Convert.ToInt32(categoriesId[i]),
                         FeeDiscountId = model.FeeDiscountVm.Id,
-                        Id=Convert.ToInt32(discountPerticularId[i])
+                        Id = Convert.ToInt32(discountPerticularId[i])
 
                     };
                     models.Add(perticulaModel);

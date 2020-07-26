@@ -5,12 +5,14 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using SERP.Core.Entities.Entity.Core.HRModule;
 using SERP.Core.Entities.Entity.Core.Master;
 using SERP.Core.Entities.Entity.Core.Transaction;
 using SERP.Core.Entities.UserManagement;
 using SERP.Core.Model.UserManagement;
 using SERP.Infrastructure.Repository.Infrastructure.Repo;
 using SERP.UI.Extension;
+using SERP.Utilities.EmailHelper;
 
 namespace SERP.UI.Controllers.UserManagement
 {
@@ -25,6 +27,7 @@ namespace SERP.UI.Controllers.UserManagement
         private readonly IGenericRepository<StudentPromote, int> _studentPromoteRepo;
         private readonly IGenericRepository<CourseMaster, int> _courseRepo;
         private readonly IGenericRepository<BatchMaster, int> _batchRepo;
+        private readonly IGenericRepository<EmployeeBasicInfoModel, int> _employeeRepo;
         public AuthenticateController(IGenericRepository<Authenticate, int> authenticateRepo,
             IGenericRepository<ModuleMaster, int> moduleRepo,
             IGenericRepository<SubModuleMaster, int> subModuleRepo,
@@ -33,7 +36,7 @@ namespace SERP.UI.Controllers.UserManagement
             IGenericRepository<StudentMaster, int> studentMasterRepo,
             IGenericRepository<StudentPromote, int> studentPromoteRepo,
             IGenericRepository<CourseMaster, int> courseRepo,
-            IGenericRepository<BatchMaster, int> batchRepo
+            IGenericRepository<BatchMaster, int> batchRepo, IGenericRepository<EmployeeBasicInfoModel, int> employeeRepo
             )
         {
             _IAuthenticateRepo = authenticateRepo;
@@ -45,6 +48,7 @@ namespace SERP.UI.Controllers.UserManagement
             _studentPromoteRepo = studentPromoteRepo;
             _courseRepo = courseRepo;
             _batchRepo = batchRepo;
+            _employeeRepo = employeeRepo;
         }
 
         [AllowAnonymous]
@@ -78,6 +82,11 @@ namespace SERP.UI.Controllers.UserManagement
                 {
                     //Populate session with student Information
                     await GetStudentInfo(response.StudentId);
+                }
+                else if(response.EmployeeId!=0)
+                {
+                    //Populate session with student Information
+                    await GetEmployeeInfo(response.EmployeeId);
                 }
 
                 if (response.IsExpired == 1)
@@ -152,13 +161,68 @@ namespace SERP.UI.Controllers.UserManagement
         private async Task GetStudentInfo(int studentId)
         {
             var model = await _studentPromoteRepo.GetSingle(x => x.IsActive == 1 && x.StudentId == studentId);
+            var studentModel = await _studentMasterRepo.GetSingle(x => x.Id == studentId);
             StudentAccountModel accountModel = new StudentAccountModel()
             {
                 BatchId = model.BatchId,
                 CourseId = model.CourseId,
-                StudentId = model.StudentId
+                StudentId = model.StudentId,
+                ImagePath= studentModel.StudentPhoto
+                
             };
             HttpContext.Session.SetObject("StudentInfo",accountModel);
         }
+        private async Task GetEmployeeInfo(int userId)
+        {
+            var model = await _employeeRepo.GetSingle(x=>x.Id==userId);
+            StudentAccountModel accountModel = new StudentAccountModel()
+            {
+                BatchId =0,
+                CourseId =0,
+                StudentId = model.Id,
+                ImagePath = model.Photo
+
+            };
+            HttpContext.Session.SetObject("StudentInfo", accountModel);
+        }
+
+        public async Task<IActionResult> SendLoginCredential(string userName)
+        {
+            if(string.IsNullOrEmpty(userName))
+            {
+                return Json("User name does not exists.");
+            }
+            var model = await _IAuthenticateRepo.GetSingle(x => x.UserName.Trim().ToLower() == userName.ToLower().Trim());
+            string email = string.Empty;
+            if(model==null)
+            {
+                return Json("User name does not exists.");
+            }
+            if(model.StudentId>0)
+            {
+                email = (await _studentMasterRepo.GetSingle(x => x.Id == model.StudentId)).StudentEmail;
+            }
+            else if(model.EmployeeId>0)
+            {
+                email = (await _employeeRepo.GetSingle(x => x.Id == model.EmployeeId)).Email;
+            }
+            if (!string.IsNullOrEmpty(email))
+            {
+                new SendEmailNotification().SendCustomEmail(userName, email, "Password reset request for SERP Portal", await GetHtmlHelperEmail(userName, model.Password));
+                return Json("Password has been reset.Please check your email.");
+            }
+            else {
+                return Json("User name does not exists.");
+            }
+
+        }
+
+
+        public async Task<string> GetHtmlHelperEmail(string userName, string password)
+        {
+            string emailBody = @"Dear Candidate "+ userName +" your password has been reset please login to the portal with Password :"+ password;
+            return await Task.Run(() => emailBody);
+        }
+        
     }
 }

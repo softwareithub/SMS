@@ -1,5 +1,10 @@
 ﻿@using Microsoft.AspNetCore.Http
+@using SERP.UI.Extension;
 @inject IHttpContextAccessor HttpContextAccessor
+@{
+    var studentDetail = HttpContextAccessor.HttpContext.Session.GetObject<SERP.Core.Model.UserManagement.StudentAccountModel>("StudentInfo");
+
+}
 
 <style>
     * {
@@ -120,14 +125,29 @@
                     <!-- Menu Toggle Button -->
                     <a href="#" class="dropdown-toggle" data-toggle="dropdown">
                         <!-- The user image in the navbar-->
-                        <img src="~/Images/UserLogo.jpg" class="user-image" alt="User Image">
+                        @if (string.IsNullOrEmpty(studentDetail.ImagePath))
+                        {
+                            <img src="~/Images/UserLogo.jpg"  style="width:25px;height:25px" class="img-circle" alt="User Image">
+                        }
+                        else
+                        {
+                            <img src="@studentDetail.ImagePath" style="width:25px;height:25px" class="img-circle" alt="User Image">
+                        }
                         <!-- hidden-xs hides the username on small devices so only the image appears. -->
                         <span class="hidden-xs">@HttpContextAccessor.HttpContext.Session.GetString("userName")</span>
                     </a>
                     <ul class="dropdown-menu">
                         <!-- The user image in the menu -->
                         <li class="user-header">
-                            <img src="~/Images/UserLogo.jpg" class="img-circle" alt="User Image">
+                            @if (string.IsNullOrEmpty(studentDetail.ImagePath))
+                            {
+                                <img src="~/Images/UserLogo.jpg" class="img-circle" alt="User Image">
+                            }
+                            else
+                            {
+                                <img src="@studentDetail.ImagePath" class="img-circle" alt="User Image">
+                            }
+
                         </li>
                         <!-- Menu Footer-->
                         <li class="user-footer">

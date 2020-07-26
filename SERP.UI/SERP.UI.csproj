@@ -331,6 +331,14 @@
     <None Include="wwwroot\ckeditor\skins\moono-lisa\readme.md" />
     <None Include="wwwroot\ckeditor\styles.js" />
     <None Include="wwwroot\ckeditor\vendor\promise.js" />
+    <None Include="wwwroot\Images\3ec56759-01ea-4288-b60b-c252aebbade4_Syllabus_of_Asp.Net_Core.pdf" />
+    <None Include="wwwroot\Images\bacterilogy.pdf.pdf" />
+    <None Include="wwwroot\Images\CSIR_JRF.pdf" />
+    <None Include="wwwroot\Images\evsassingement.pdf" />
+    <None Include="wwwroot\Images\ExamDateSheet %282%29.pdf" />
+    <None Include="wwwroot\Images\InterviewTips.pdf" />
+    <None Include="wwwroot\Images\registrationslip.pdf" />
+    <None Include="wwwroot\Images\Salary.pdf" />
     <None Include="wwwroot\lib\AjaxUnobrrusive\AjaxUnobtrusive.js" />
     <None Include="wwwroot\lib\bootstrap\dist\css\bootstrap-grid.css.map" />
     <None Include="wwwroot\lib\bootstrap\dist\css\bootstrap-grid.min.css.map" />
@@ -613,6 +621,7 @@
   <ItemGroup>
     <Folder Include="Controllers\ExtraInfo\" />
     <Folder Include="wwwroot\HotKey\" />
+    <Folder Include="wwwroot\Document\" />
     <Folder Include="wwwroot\StudentDocument\" />
     <Folder Include="wwwroot\RecieptImage\" />
     <Folder Include="wwwroot\StudyMaterial\" />

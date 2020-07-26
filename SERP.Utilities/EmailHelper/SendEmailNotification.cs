@@ -64,5 +64,29 @@ namespace SERP.Utilities.EmailHelper
 
             return body;
         }
+
+        public bool SendCustomEmail(string userName,string email, string subject, string body)
+        {
+            MimeMessage message = new MimeMessage();
+            MailboxAddress from = new MailboxAddress("Vipra Infotech","Bhaweshdeepak@gmail.com");
+            message.From.Add(from);
+            MailboxAddress to = new MailboxAddress(userName, email);
+            message.To.Add(to);
+            message.Subject = subject;
+
+            BodyBuilder bodyBuilder = new BodyBuilder();
+            bodyBuilder.HtmlBody = body;
+            message.Body = bodyBuilder.ToMessageBody();
+
+            SmtpClient client = new SmtpClient();
+            client.Connect("smtp.gmail.com", 587, false);
+            client.Authenticate("bhaweshdeepak@gmail.com", "vi@pra91");
+
+            client.Send(message);
+            client.Disconnect(true);
+            client.Dispose();
+
+            return true;
+        }
     }
 }

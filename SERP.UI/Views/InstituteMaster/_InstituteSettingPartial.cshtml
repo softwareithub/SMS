@@ -1,0 +1,275 @@
+﻿
+@{
+    ViewData["Title"] = "Index";
+    Layout = null;
+}
+@model SERP.Core.Entities.Entity.Core.Master.InstituteSettingModel
+
+
+<script src="~/lib/jquery-validation/dist/jquery.validate.js"></script>
+<script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.js"></script>
+<link href="https://cdn.datatables.net/1.10.20/css/jquery.dataTables.min.css" rel="stylesheet" />
+<script src="https://cdn.datatables.net/1.10.20/js/jquery.dataTables.min.js"></script>
+<style type="text/css">
+    /* Always set the map height explicitly to define the size of the div
+        * element that contains the map. */
+    #divMap {
+        height: 300px;
+        width: 575px;
+    }
+
+    /* Optional: Makes the sample page fill the window. */
+
+    #description {
+        font-family: Roboto;
+        font-size: 15px;
+        font-weight: 300;
+    }
+
+    #infowindow-content .title {
+        font-weight: bold;
+    }
+
+    #infowindow-content {
+        display: none;
+    }
+
+    #map #infowindow-content {
+        display: inline;
+    }
+
+    .pac-card {
+        margin: 10px 10px 0 0;
+        border-radius: 2px 0 0 2px;
+        box-sizing: border-box;
+        -moz-box-sizing: border-box;
+        outline: none;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+        background-color: #fff;
+        font-family: Roboto;
+    }
+
+    #pac-container {
+        padding-bottom: 12px;
+        margin-right: 12px;
+    }
+
+    .pac-controls {
+        display: inline-block;
+        padding: 5px 11px;
+    }
+
+        .pac-controls label {
+            font-family: Roboto;
+            font-size: 13px;
+            font-weight: 300;
+        }
+
+    #pac-input {
+        background-color: #fff;
+        font-family: Roboto;
+        font-size: 15px;
+        font-weight: 300;
+        margin-left: 12px;
+        padding: 0 11px 0 13px;
+        text-overflow: ellipsis;
+        width: 400px;
+    }
+
+        #pac-input:focus {
+            border-color: #4d90fe;
+        }
+
+    #title {
+        color: #fff;
+        background-color: #4d90fe;
+        font-size: 25px;
+        font-weight: 500;
+        padding: 6px 12px;
+    }
+
+    #target {
+        width: 345px;
+    }
+
+    .content {
+        min-height: 600px !important;
+    }
+</style>
+<section class="content-header">
+    <h1>
+        Instiute Setting Master
+    </h1>
+</section>
+
+
+<section class="content">
+    <div class="row">
+
+        <div class="col-md-12">
+            <div class="box box-primary">
+                <form method="post" data-ajax="true" data-ajax-method="post" enctype="multipart/form-data"
+                      asp-action="Create" asp-controller="InstituteSetting" data-ajax-success="Success">
+                    <div class="box-body" style="height:450px;">
+                        <div class="col-md-12">
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <input type="hidden" asp-for="Id" />
+                                    <label asp-for="RegistrationNumber">Registration Number</label>
+                                    <input asp-for="RegistrationNumber" class="form-control">
+                                    <span asp-validation-for="RegistrationNumber" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label asp-for="AffliatedBy">Affliated By</label>
+                                    <input asp-for="AffliatedBy" class="form-control">
+                                    <span asp-validation-for="AffliatedBy" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label asp-for="AffliationNumber">Affliation Number</label>
+                                    <input asp-for="AffliationNumber" class="form-control">
+                                    <span asp-validation-for="AffliationNumber" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-12">
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label asp-for="DateOfEastablishment">Date Of Eastablishment</label>
+                                    <input asp-for="DateOfEastablishment" class="form-control">
+                                    <span asp-validation-for="DateOfEastablishment" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label asp-for="Board">Board</label>
+                                    <input asp-for="Board" class="form-control">
+                                    <span asp-validation-for="Board" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label asp-for="AboutUsDetail">About Us Detail</label>
+                                    <textarea asp-for="AboutUsDetail" class="form-control" rows="3"></textarea>
+                                    <span asp-validation-for="AboutUsDetail" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label>Institute Address</label>
+                                    <input type="hidden" asp-for="Latitude" />
+                                    <input type="hidden" asp-for="Longitude" />
+                                    <input type="hidden" asp-for="PlaceAddress" />
+                                    <input id="pac-input"
+                                           class="mailbox-controls form-control"
+                                           type="text"
+                                           placeholder="Search Box" />
+                                    <div id="divMap" class="google_maps" style="position:absolute;"></div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                    <div class="box-footer">
+                        <button type="submit" class="btn btn-primary pull-right">Submit</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
+<script src="https://polyfill.io/v3/polyfill.min.js?features=default"></script>
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBKGAp4SyPy1qnUqz5gMygSOzO8Qm2kNvY&callback=initAutocomplete&libraries=places&v=weekly"
+        defer></script>
+<script>
+    (function (exports) {
+        "use strict";
+        function initAutocomplete() {
+            var map = new google.maps.Map(document.getElementById("divMap"), {
+                center: {
+                    lat: -33.8688,
+                    lng: 151.2195
+                },
+                zoom: 13,
+                mapTypeId: "roadmap"
+            }); // Create the search box and link it to the UI element.
+
+            var input = document.getElementById("pac-input");
+            var searchBox = new google.maps.places.SearchBox(input);
+            map.controls[google.maps.ControlPosition.TOP_LEFT].push(input); // Bias the SearchBox results towards current map's viewport.
+
+            map.addListener("bounds_changed", function () {
+                searchBox.setBounds(map.getBounds());
+            });
+            var markers = []; // Listen for the event fired when the user selects a prediction and retrieve
+            // more details for that place.
+
+            searchBox.addListener("places_changed", function () {
+                var places = searchBox.getPlaces();
+
+                if (places.length == 0) {
+                    return;
+                } // Clear out the old markers.
+
+                markers.forEach(function (marker) {
+                    marker.setMap(null);
+                });
+                markers = []; // For each place, get the icon, name and location.
+
+                var bounds = new google.maps.LatLngBounds();
+                places.forEach(function (place) {
+                    if (!place.geometry) {
+                        console.log("Returned place contains no geometry");
+                        return;
+                    }
+
+                    var icon = {
+                        url: place.icon,
+                        size: new google.maps.Size(71, 71),
+                        origin: new google.maps.Point(0, 0),
+                        anchor: new google.maps.Point(17, 34),
+                        scaledSize: new google.maps.Size(25, 25)
+                    }; // Create a marker for each place.
+                    debugger;
+                    markers.push(
+                        new google.maps.Marker({
+                            map: map,
+                            icon: icon,
+                            title: place.name,
+                            position: place.geometry.location
+                        })
+                    );
+
+                    if (place.geometry.viewport) {
+                        // Only geocodes have viewport.
+                        bounds.union(place.geometry.viewport);
+                    } else {
+                        bounds.extend(place.geometry.location);
+                    }
+
+                    $("#PlaceAddress").val(place.formatted_address);
+                    $("#PlaceId").val(place.place_id);
+
+                });
+                debugger;
+                map.fitBounds(bounds);
+                $("#Longitude").val(bounds.Ua.i);
+                $("#Latitude").val(bounds.Za.i);
+
+            });
+        }
+
+        exports.initAutocomplete = initAutocomplete;
+    })((this.window = this.window || {}));
+
+    $('form input').keydown(function (e) {
+        if (e.keyCode == 13) {
+            e.preventDefault();
+            return false;
+        }
+    });
+</script>
+

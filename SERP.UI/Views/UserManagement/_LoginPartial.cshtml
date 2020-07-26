@@ -165,11 +165,12 @@
                 </div>
                 <div class="row">
                     <!-- /.col -->
+
                     <div class="col-md-6">
-                        <button type="submit" class="btn btn-primary btn-block btn-flat pull-right">Sign In</button>
+                        <button type="button" class="btn btn-danger btn-block btn-flat pull-right" onclick="Register()">Forget Password</button>
                     </div>
                     <div class="col-md-6">
-                        <button type="button" class="btn btn-primary btn-block btn-flat pull-right" onclick="Register()">Register</button>
+                        <button type="submit" class="btn btn-primary btn-block btn-flat pull-right">Sign In</button>
                     </div>
                     <!-- /.col -->
                 </div>
@@ -177,48 +178,31 @@
         </div>
 
         <div class="col-md-6 login-form-2" id="divOnlineRegister" style="display:none">
-            <h3>@ViewBag.Name</h3>
-            <p>Please Register to unlock the mystery.</p>
+            <h3 style="color:#ff6a00">@ViewBag.Name</h3>
             <form asp-action="Authenticate" asp-controller="Authenticatet">
                 <div class="form-group">
-                    <input type="text" id="txtCandidateName" class="form-control" placeholder="Candidate Name*" value="" />
+                    <input type="text" id="txtUserName" class="form-control" placeholder="User Name*" value="" />
                 </div>
                 <div class="form-group">
-                    <input type="text" id="txtCandidatePhone" class="form-control" placeholder="Candidate Phone*" value="" />
-                </div>
-                <div class="form-group">
-                    <input type="text" id="txtCandidateEmail" class="form-control" placeholder="Candidate Email *" value="" />
-                </div>
-                <div class="form-group">
-                    <select class="form-control" id="ddlSubject">
-                        <option class="hidden" selected disabled>Please select your Dream Course</option>
-                        <option value="SSC">SSC</option>
-                        <option value="Railway">Railway</option>
-                        <option value="State Police">State Police</option>
-                        <option value="Bank">Bank</option>
-                        <option value="Insurance">Insurance</option>
-                        <option value="TeachingClass">TeachingClass</option>
-                        <option value="Foundation">Class 6  to 10(CBSE/BSEB)</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <input type="button" onclick="SendMail()" class="btnSubmit" value="Register" />
+                    <input type="button" onclick="SendMail()" class="btnSubmit" value="Submit" />
                 </div>
 
                 <div class="form-group">
-                    <p>
+                    <span style="color:#333">
                         Once you enter the required detail.You will get the Login Credential detail on you mail
                         This mail will send to you once your credential are verified by our Team.
                         Thanks From Vipra Infotech Admin Team.
-                    </p>
+                    </span>
                 </div>
 
                 <div class="form-group">
-                    <a  onclick="BackToLogin()" class="ForgetPwd btn btnSubmit" value="Login">Back To Login</a>
+                    <a onclick="BackToLogin()" class="ForgetPwd btn btnSubmit" value="Login">Back To Login</a>
                 </div>
             </form>
         </div>
     </div>
+
+    
 </div>
 
 
@@ -240,8 +224,8 @@
     }
 
     function SendMail() {
-        $.get("/OnlineTestPaper/SendMail", function (data) {
-            alert(data);
+        $.get("/Authenticate/SendLoginCredential", { userName: $("#txtUserName").val()}, function (data) {
+            alertify.success(data);
         });
     }
 

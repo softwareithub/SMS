@@ -12,6 +12,7 @@
                         <thead>
                             <tr>
                                 <th>Question</th>
+                                <th>Option Type</th>
                                 <th>Action</th>
 
                             </tr>
@@ -23,7 +24,9 @@
                                     <td>
                                         @Html.Raw(data.Question)
                                     </td>
-                                    
+                                    <td>
+                                        @data.AnswereType
+                                    </td>
                                     <td>
                                         <a class="btn btn-outline-success pull-right" data-loading-text="<i class='fa fa-circle-o-notch fa-spin'  style='color:#DD4B39'></i>" onclick="UpdateRecord(@data.Id, this)">
                                             <i class="fa fa-edit" style="color:#3C8DBC"></i>
