@@ -84,8 +84,8 @@ namespace SERP.API.Controllers
                         EmployeeName = EM.Name,
                         HomeWork = HM.HomeWork,
                         PDFPath = HM.PDFPath,
-                        PublishDate = HM.HomeWorkDate,
-                        SubmissionDate = HM.HomeWorkSubmissionDate,
+                        PublishDate =Convert.ToDateTime(HM.HomeWorkDate),
+                        SubmissionDate =Convert.ToDateTime(HM.HomeWorkSubmissionDate),
                     }).ToList();
         }
 
@@ -99,8 +99,8 @@ namespace SERP.API.Controllers
                     select new StudentHomeWorkModel
                     {
                         HomeWorkName = HM.Name,
-                        HomeWorkDate = HM.HomeWorkDate,
-                        SubmissionDate = HM.HomeWorkSubmissionDate,
+                        HomeWorkDate =Convert.ToDateTime(HM.HomeWorkDate),
+                        SubmissionDate =Convert.ToDateTime(HM.HomeWorkSubmissionDate),
                         ActualSubmissionDate = HMS.SubmissionDate,
                         Grade = HMS.Grade,
                         Notes = HMS.Reason
