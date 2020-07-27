@@ -37,7 +37,7 @@
                                 <input type="hidden" asp-for="Id" />
                                 <input type="hidden" asp-for="CreatedBy" />
                                 <input type="hidden" asp-for="CreatedDate" />
-                                <label asp-for="CourseId">From Course Name</label>
+                                <label asp-for="CourseId">From Course/Class</label>
                                 <select asp-for="CourseId" id="FromCourse" class="form-control" asp-items="@(new SelectList(ViewBag.CourseList ,"Id","Name"))" onchange="GetBatchList()">
                                     <option value="">Select</option>
                                 </select>
@@ -46,7 +46,7 @@
                         </div>
                         <div class="col-md-3">
                             <div class="form-group">
-                                <label asp-for="BatchId">From Batch Name</label>
+                                <label asp-for="BatchId">From Batch/Section</label>
                                 <select asp-for="BatchId" id="FromBatch" class="form-control">
                                     <option value="">Select</option>
                                 </select>
@@ -55,16 +55,15 @@
                         </div>
                         <div class="col-md-3">
                             <div class="form-group">
-                                <label asp-for="CourseId">To Course Name</label>
-                                <select asp-for="CourseId" id="ToCourse" class="form-control" asp-items="@(new SelectList(ViewBag.CourseList ,"Id","Name"))" onchange="GetToBatchList()">
-                                    <option value="">Select</option>
+                                <label asp-for="CourseId">To Course/Class</label>
+                                <select asp-for="CourseId" id="ToCourse" class="form-control" asp-items="@(new SelectList(ViewBag.CourseList ,"Id","Name"))" onchange="GetToBatchList()">                                    
                                 </select>
                                 <span asp-validation-for="CourseId" class="text-danger"></span>
                             </div>
                         </div>
                         <div class="col-md-3">
                             <div class="form-group">
-                                <label asp-for="BatchId">To Batch Name</label>
+                                <label asp-for="BatchId">To Batch/Section</label>
                                 <select asp-for="BatchId" id="ToBatch" class="form-control">
                                     <option value="">Select</option>
                                 </select>
@@ -119,12 +118,16 @@
 
 <script type="text/javascript">
     function GetBatchList() {
+        $('#FromBatch').html('<option value="">Select</option>');
         var courseId = $("#FromCourse option:selected").val();
-        $.get("/StudentMaster/GetBatchList", { courseId: courseId }, function (responseData) {
-            $.each(responseData, function (index, value) {
-                $('#FromBatch').append($('<option></option>').text(value.batchName).attr('value', value.id));
+        alert(courseId);
+        if (courseId != 'Select' && courseId != '' && courseId != null) {
+            $.get("/StudentMaster/GetBatchList", { courseId: courseId }, function (responseData) {
+                $.each(responseData, function (index, value) {
+                    $('#FromBatch').append($('<option></option>').text(value.batchName).attr('value', value.id));
+                });
             });
-        });
+        }
     }
 
     function GetToBatchList() {
