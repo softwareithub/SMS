@@ -5331,3 +5331,16 @@ hr {
 .input-validation-error {
     color: red;
 }
+
+/*Custom css*/
+.TopMar22 {
+    margin-top: 22px;
+}
+
+.LeftMar18 {
+    margin-left: 18px;
+}
+
+.table-row-text-light > tr {
+    font-weight: lighter;
+}

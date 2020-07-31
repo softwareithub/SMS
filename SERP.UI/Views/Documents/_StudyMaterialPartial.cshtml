@@ -12,7 +12,6 @@
 <section class="content-header">
     <h1>
         Upload Study Material
-        <small>Create Upload Study Material</small>
     </h1>
     <ol class="breadcrumb">
         <li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
@@ -58,7 +57,7 @@
                                 <input type="hidden" asp-for="Id" />
                                 <input type="hidden" asp-for="CreatedBy" />
                                 <input type="hidden" asp-for="CreatedDate" />
-                                <label asp-for="MaterialName">Study Material</label>
+                                <label asp-for="MaterialName">Title</label>
                                 <input asp-for="MaterialName" class="form-control">
                                 <span asp-validation-for="MaterialName" class="text-danger"></span>
                             </div>
@@ -82,7 +81,7 @@
                         </div>
                         <div class="col-md-4">
                             <div class="form-group">
-                                <label asp-for="CourseId">Select Course</label>
+                                <label asp-for="CourseId">Select Course/Class</label>
                                 <select id="CourseId" asp-for="CourseId" class="form-control" asp-items="@(new SelectList(ViewBag.CourseList ,"Id","Name"))" onchange="GetBatchList()">
                                     <option value="">Select</option>
                                 </select>
@@ -91,7 +90,7 @@
                         </div>
                         <div class="col-md-4">
                             <div class="form-group">
-                                <label asp-for="BatchId">Select Batch</label>
+                                <label asp-for="BatchId">Select Batch/Section</label>
                                 <select id="BatchId" asp-for="BatchId" class="form-control">
                                     <option value="">Select</option>
                                 </select>
@@ -199,7 +198,7 @@
     }
 
     function GetBatchList() {
-        
+
         var batchId = '@Model?.BatchId';
         var courseId = $("#CourseId").val();
         $("#BatchId").empty();
@@ -214,14 +213,14 @@
     }
 
     function GetSubjectList() {
-        
+
         var courseId = $("#CourseId").val();
         var subjectId = '@Model?.SubjectId';
         $("#SubjectId").empty()
         $("#SubjectId").append('<option value="">Select</option>');
         $.get("/CommanDataForJson/SubjectJson", { courseId: courseId }, function (responseData) {
             for (var i = 0; i < responseData.length; i++) {
-                
+
                 var html = '<option value=' + responseData[i].id + '>' + responseData[i].subjectName + '</option>'
                 $("#SubjectId").append(html);
             }

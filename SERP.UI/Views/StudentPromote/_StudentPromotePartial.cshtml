@@ -7,7 +7,6 @@
 <section class="content-header">
     <h1>
         Student Promote
-        <small>Create Caste Detail</small>
     </h1>
     <ol class="breadcrumb">
         <li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
@@ -32,7 +31,7 @@
                 <form method="post" data-ajax="true" data-ajax-method="post"
                       asp-action="CreateStudent" asp-controller="StudentMaster" data-ajax-success="Success" enctype="multipart/form-data">
                     <div class="box-body">
-                        <div class="col-md-3">
+                        <div class="col-md-4">
                             <div class="form-group">
                                 <input type="hidden" asp-for="Id" />
                                 <input type="hidden" asp-for="CreatedBy" />
@@ -44,7 +43,7 @@
                                 <span asp-validation-for="CourseId" class="text-danger"></span>
                             </div>
                         </div>
-                        <div class="col-md-3">
+                        <div class="col-md-4">
                             <div class="form-group">
                                 <label asp-for="BatchId">From Batch/Section</label>
                                 <select asp-for="BatchId" id="FromBatch" class="form-control">
@@ -53,15 +52,21 @@
                                 <span asp-validation-for="BatchId" class="text-danger"></span>
                             </div>
                         </div>
-                        <div class="col-md-3">
+                        <div class="col-md-4">
+                            <button type="button" onclick="GetStudentDetails()" class="btn btn-primary pull-left TopMar22">Get Student List</button>
+                        </div>
+                    </div>
+                    <div class="box-body dvPromoteSection hide">
+                        <div class="col-md-4">
                             <div class="form-group">
                                 <label asp-for="CourseId">To Course/Class</label>
-                                <select asp-for="CourseId" id="ToCourse" class="form-control" asp-items="@(new SelectList(ViewBag.CourseList ,"Id","Name"))" onchange="GetToBatchList()">                                    
+                                <select asp-for="CourseId" id="ToCourse" class="form-control" asp-items="@(new SelectList(ViewBag.CourseList ,"Id","Name"))" onchange="GetToBatchList()">
+                                    <option value="">Select</option>
                                 </select>
                                 <span asp-validation-for="CourseId" class="text-danger"></span>
                             </div>
                         </div>
-                        <div class="col-md-3">
+                        <div class="col-md-4">
                             <div class="form-group">
                                 <label asp-for="BatchId">To Batch/Section</label>
                                 <select asp-for="BatchId" id="ToBatch" class="form-control">
@@ -70,46 +75,42 @@
                                 <span asp-validation-for="BatchId" class="text-danger"></span>
                             </div>
                         </div>
-                    </div>
-                    <div class="col-md-12">
-                        <button type="button" onclick="GetStudentDetails()" class="btn btn-primary pull-right">Get Student List</button>
-                    </div>
-                    <div class="col-md-12">
-                        <br />
-                        <br />
+                        <div class="col-md-4"></div>
+                        </div>
+                        <div class="box-body" id="dvEmptyText"></div>
+                        <div class="box-body hide dvPromoteSection">
 
-                    </div>
+                            <div class="col-md-12">
+                                <table class="table table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th>
+                                                Select
+                                            </th>
+                                            <th>
+                                                Student Name
+                                            </th>
+                                            <th>
+                                                Role No
+                                            </th>
+                                            <th>
+                                                Registration Number
+                                            </th>
+                                            <th>
+                                                Phone No
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="tblStudentPartial" class="table-row-text-light">
+                                    </tbody>
+                                </table>
+                            </div>
 
-                    <div class="col-md-12">
-                        <table class="table table-responsive table-active table-info">
-                            <thead>
-                                <tr>
-                                    <td>
-                                        Select
-                                    </td>
-                                    <td>
-                                        Student Name
-                                    </td>
-                                    <td>
-                                        Roll Code
-                                    </td>
-                                    <td>
-                                        Registration Number
-                                    </td>
-                                    <td>
-                                        Father Name
-                                    </td>
-                                </tr>
-                            </thead>
-                            <tbody id="tblStudentPartial">
-                            </tbody>
-                        </table>
-                    </div>
-
-                    <div class="box-footer">
-                        <button type="button" class="btn btn-primary pull-right" onclick="PromoteStudent(this)">Prmote Student</button>
-                    </div>
-                </form>
+                            <div class="box-footer">
+                                <button type="button" class="btn btn-primary pull-right" onclick="PromoteStudent(this)">Promote Student</button>
+                            </div>
+                        </div>
+</form>
             </div>
         </div>
 
@@ -120,7 +121,6 @@
     function GetBatchList() {
         $('#FromBatch').html('<option value="">Select</option>');
         var courseId = $("#FromCourse option:selected").val();
-        alert(courseId);
         if (courseId != 'Select' && courseId != '' && courseId != null) {
             $.get("/StudentMaster/GetBatchList", { courseId: courseId }, function (responseData) {
                 $.each(responseData, function (index, value) {
@@ -142,19 +142,30 @@
     function GetStudentDetails() {
         var courseId = $("#FromCourse option:selected").val();
         var batchId = $("#FromBatch option:selected").val();
-        
+
         if (courseId != '' && batchId != '') {
             $("#tblStudentPartial").empty();
+            $("#FromCourse").attr("style", "border-color:");
+            $("#FromBatch").attr("style", "border-color:")
             $.get("/StudentPromote/GetStudentList", { courseId: courseId, batchId: batchId }, function (responseData) {
+                
                 $.each(responseData, function (index, value) {
                     var markup = '<tr>';
-                    markup += '<td><input type="checkbox" name="ids" checked style="width:25px;height:25px" value=' + value.studentId + '></td>';
+                    markup += '<td><input type="checkbox" class="custom-control-input" name="ids" checked value=' + value.studentId + '></td>';
                     markup += '<td>' + value.studentName + '</td>';
                     markup += '<td>' + value.rollCode + '</td>';
                     markup += '<td>' + value.registration + '</td>';
                     markup += '<td>' + value.phone + '</td>';
                     $("#tblStudentPartial").append(markup);
                 });
+                $('#dvEmptyText').html('');
+                if (responseData.length > 0) {
+                    $('.dvPromoteSection').removeClass('hide');
+                }
+                else {
+                    $('.dvPromoteSection').addClass('hide');
+                    $('#dvEmptyText').append('No Record Found');
+                }
             })
         }
         else {
@@ -191,7 +202,7 @@
 
         $.post("/StudentPromote/PostStudentPromote", {
             studentIds: studentids, courseId: toCourse, batchId: toBatchId,
-             prevBatchId:batchId,  prevCourseId :courseId
+            prevBatchId: batchId, prevCourseId: courseId
         }, function (responseData) {
             alertify.success(responseData)
         })
