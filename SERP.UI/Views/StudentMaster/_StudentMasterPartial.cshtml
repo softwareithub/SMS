@@ -324,8 +324,9 @@
     });
 
     function GetBatchList() {
-        
+        $('#BatchId').empty();
         var courseId = $("#CourseId option:selected").val();
+        debugger;
         $.get("/StudentMaster/GetBatchList", { courseId: courseId }, function (responseData) {
             $.each(responseData, function (index, value) {
                 $('#BatchId').append($('<option></option>').text(value.batchName).attr('value', value.id));
@@ -334,7 +335,6 @@
     }
 
     function ValidateForm(e) {
-        
         if ($("#AcademicName option:selected").val() == 0) {
             return false;
         }

@@ -1,0 +1,51 @@
+﻿@model SERP.Core.Model.QuickSearchModel.StudentQuickModel
+
+    <div class="col-md-12">
+        <div class="box box-solid">
+            <div class="box-header with-border">
+                <i class="fa fa-text-width"></i>
+
+                <h3 class="box-title">@ViewBag.HeaderDetail</h3>
+            </div>
+            
+            <div class="box-body">
+                <div class="col-md-12">
+                    <div class="box box-widget widget-user-2">
+                        <div class="widget-user-header bg-yellow">
+                            <div class="widget-user-image">
+                                @Html.SerpImageHelper(Model.StudentPhoto,50,50,"StudentId")
+                            </div>
+                            <h3 class="widget-user-username">@Model.StudentName</h3>
+                            <h5 class="widget-user-desc">@Model.CourseName (@Model.BatchName)</h5>
+                        </div>
+                        <div class="box-footer no-padding">
+                            <ul class="nav nav-stacked">
+                                <li><a href="#">Course Name <span class="pull-right">@Model.CourseName</span></a></li>
+                                <li><a href="#">Batch Name <span class="pull-right">@Model.BatchName</span></a></li>
+                                <li><a href="#">Student Phone <span class="pull-right">@Model.StudentPhone</span></a></li>
+
+
+                                <li><a href="#">Father Name <span class="pull-right">@Model.FatherName</span></a></li>
+                                <li><a href="#">Father Email <span class="pull-right">@Model.FatherEmail</span></a></li>
+
+                                <li><a href="#">Roll Code <span class="pull-right">@Model.RollCode</span></a></li>
+                                <li><a href="#">Date Of Birth <span class="pull-right">@Model.DateOfBirth</span></a></li>
+                                <li><a href="#">Gender <span class="pull-right">@Model.Gender</span></a></li>
+                                <li><a href="#">Blood Group <span class="pull-right">@Model.BloodGroup</span></a></li>
+
+                                <li><a href="#">Religion <span class="pull-right">@Model.ReligionName</span></a></li>
+                                <li><a href="#">Fee Category <span class="pull-right">@Model.FeeCategory</span></a></li>
+
+
+                                <li><a href="#">Mother Name <span class="pull-right">@Model.MotherName</span></a></li>
+                                <li><a href="#">P Address <span class="pull-right">@Model.PAddress</span></a></li>
+                                <li><a href="#">C Address <span class="pull-right">@Model.CAddress</span></a></li>
+
+                            </ul>
+                        </div>
+                    </div>
+                    <!-- /.widget-user -->
+                </div>
+            </div>
+        </div>
+    </div>

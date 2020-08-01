@@ -18,6 +18,7 @@ namespace SERP.Infrastructure.Implementation.ServiceExtension
             serviceCollection.AddTransient<ISalaryHeadRepo, SalarySlipImplementation>();
             serviceCollection.AddTransient<IAccountTransactionRepo, AccountTransactionImplementation>();
             serviceCollection.AddTransient<IOnlineTestSubmitRepository, OnlineTestSubmitImplementation>();
+            serviceCollection.AddTransient<IQuickSearchRepo, QuickSearchImplementation>();
         }
     }
 }

@@ -1,0 +1,53 @@
+﻿@model IEnumerable<SERP.Core.Entities.Entity.Core.Master.GuardianMaster>
+
+<table class="table-active table table-hover">
+    <thead>
+        <tr>
+            <th>
+                Guardian Name
+            </th>
+            <th>
+                RelationShip
+            </th>
+            <th>
+                Phone
+            </th>
+            <th>
+                Email
+            </th>
+            <th>
+                Image
+            </th>
+            <th>
+                Action
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach(var data in Model)
+        {
+            <tr>
+                <td>
+                    @data.GuradianName
+                </td>
+                <td>
+                    @data.RelationShip
+                </td>
+                <td>
+                    @data.Phone
+                </td>
+                <td>
+                    @data.Email
+                </td>
+                <td>
+                    @Html.SerpImageHelper(data.GuardianImage, 50, 50, "GuardianId")
+                </td>
+                <td>
+                    <a class="btn btn-success" onclick="AddGuradian('@data.GuradianName',@data.Id)">
+                        <i class="fa fa-plus">Add</i>
+                    </a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

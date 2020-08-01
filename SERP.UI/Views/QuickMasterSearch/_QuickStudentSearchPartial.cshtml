@@ -1,0 +1,132 @@
+﻿<style>
+
+
+    * {
+        box-sizing: border-box;
+    }
+
+    /* Create a column layout with Flexbox */
+    .row {
+        display: flex;
+    }
+
+    /* Left column (menu) */
+    .left {
+        flex: 35%;
+        padding: 15px 0;
+    }
+
+        .left h2 {
+            padding-left: 8px;
+        }
+
+    /* Right column (page content) */
+    .right {
+        flex: 65%;
+        padding: 15px;
+    }
+
+    /* Style the search box */
+    #mySearch {
+        width: 100%;
+        font-size: 18px;
+        padding: 11px;
+        border: 1px solid #ddd;
+    }
+
+    /* Style the navigation menu inside the left column */
+    #myMenu {
+        list-style-type: none;
+        padding: 0;
+        margin: 0;
+    }
+
+        #myMenu li a {
+            padding: 12px;
+            text-decoration: none;
+            display: block
+        }
+
+            #myMenu li a:hover {
+                background-color: #ff6a00;
+                color:whitesmoke
+            }
+</style>
+
+<section class="content">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="row">
+                        <div class="left" style="background-color:#eee;">
+                            <h2>Quick Search</h2>
+                            <input type="search" id="mySearch" onkeyup="myFunction()" placeholder="Search.." title="Type in a category">
+                            <ul id="myMenu">
+                                <li>
+                                    <a data-ajax="true" data-ajax-mode="replace"
+                                       asp-action="StudentBasicInfo" asp-controller="MasterQuickSearch"
+                                       data-ajax-update="#divQuickSearch"
+                                       data-ajax-begin="AjaxOnBegin" data-ajax-complete="AjaxComplete"
+                                       class="nav-link">
+                                        <span>
+                                            Basic Info
+                                        </span>
+                                    </a>
+                                </li>
+                                <li><a href="#">Guardina Info</a></li>
+                                <li><a href="#">Education Qualification</a></li>
+                                <li><a href="#">Fee Detail</a></li>
+                                <li>
+                                    <a data-ajax="true" data-ajax-mode="replace"
+                                       asp-action="GetStudentAttandenceReport" asp-controller="MasterQuickSearch"
+                                       data-ajax-update="#divQuickSearch"
+                                       data-ajax-begin="AjaxOnBegin" data-ajax-complete="AjaxComplete"
+                                       class="nav-link">
+                                        <span>
+                                            Attandence Report
+                                        </span>
+                                    </a>
+                                </li>
+                                <li><a href="#">Time Table</a></li>
+                                <li><a href="#">Exam Details</a></li>
+                                <li><a href="#">Quick Message</a></li>
+                                <li><a href="#">Quick Email</a></li>
+                            </ul>
+                        </div>
+
+                        <div class="right" style="background-color:#ddd;">
+                           <div id="divQuickSearch"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script>
+    function myFunction() {
+        var input, filter, ul, li, a, i;
+        input = document.getElementById("mySearch");
+        filter = input.value.toUpperCase();
+        ul = document.getElementById("myMenu");
+        li = ul.getElementsByTagName("li");
+        for (i = 0; i < li.length; i++) {
+            a = li[i].getElementsByTagName("a")[0];
+            if (a.innerHTML.toUpperCase().indexOf(filter) > -1) {
+                li[i].style.display = "";
+            } else {
+                li[i].style.display = "none";
+            }
+        }
+    }
+
+    function GetAttandenceReport() {
+        var year = $("#ddlYear").val();
+        var month = $("#ddlMonth").val();
+        $.get("/MasterQuickSearch/GetStudentAttandenceReport", { monthId: month, yearId: year }, function (data) {
+            $("#divQuickSearch").html(data);
+        })
+    }
+</script>

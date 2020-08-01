@@ -17,6 +17,7 @@ using SERP.Core.Entities.OnlineVideo;
 using SERP.Core.Entities.Transport;
 using SERP.Core.Entities.Accounts;
 using SERP.Core.Entities.Student;
+using SERP.Core.Entities.FrontOffice;
 
 namespace SERP.Core.Entities.Context
 {
@@ -25,7 +26,7 @@ namespace SERP.Core.Entities.Context
     {
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseSqlServer("Server= DESKTOP-SF1G3N8\\VIPRAIT; Database= VinobaEducationPortal; User Id=sa;Password = vi@pra91");
+            optionsBuilder.UseSqlServer("Server= DESKTOP-SF1G3N8\\VIPRAIT; Database= SERPDevelopment; User Id=sa;Password = vi@pra91");
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -116,6 +117,8 @@ namespace SERP.Core.Entities.Context
          public DbSet<StudentEducationalDetail> StudentEducationDetails { get; set; }
         public DbSet<StudentDocumentUpload> StudentDocumentUploads { get; set; }
         public DbSet<InstituteSettingModel> InstituteSettingModels { get; set; }
+        public DbSet<StudentGatePass> StudentGatePasses { get; set; }
+        public DbSet<VisitorBook> VisitorBooks { get; set; }
         #endregion
 
     }

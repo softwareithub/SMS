@@ -339,3 +339,4 @@ ASALocalRun/
 # BeatPulse healthcheck temp database
 healthchecksdb
 SERP.Core.Entities/Context/SERPContext.cs
+/SERP.UI/wwwroot/Images

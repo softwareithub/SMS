@@ -1,0 +1,173 @@
+﻿@model SERP.Core.Entities.FrontOffice.StudentGatePass
+
+<script src="~/lib/jquery-validation/dist/jquery.validate.js"></script>
+<script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.js"></script>
+<link href="https://cdn.datatables.net/1.10.20/css/jquery.dataTables.min.css" rel="stylesheet" />
+<script src="https://cdn.datatables.net/1.10.20/js/jquery.dataTables.min.js"></script>
+
+<section class="content-header">
+    <h1>
+        Student Gate Pass Detail
+    </h1>
+</section>
+
+
+<section class="content">
+    <div class="row">
+
+        <div class="col-md-12">
+            <!-- general form elements -->
+            <div class="box box-primary">
+                <div class="box-header with-border">
+                    <h3 class="box-title">Create Student Educational Master</h3>
+                    <div class="col-md-12">
+                        <div class="col-md-10">
+                            <a class="btn btn-primary pull-right" onclick="GetRecordList()">
+                                <i class="fa fa-list-ul"></i>
+                                List
+                            </a>
+                        </div>
+                        <div class="col-md-2">
+                            <a class="btn btn-primary pull-left" onclick="NewAcademicMaster()">
+                                <i class="fa fa-plus-square"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <!-- /.box-header -->
+                <!-- form start -->
+                <form method="post" data-ajax="true" data-ajax-method="post"
+                      asp-action="CreateStudentGatePass" asp-controller="StudentGatePass" data-ajax-success="Success">
+                    <div class="box-body">
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <input type="hidden" asp-for="Id" />
+                                <input type="hidden" asp-for="CreatedBy" />
+                                <input type="hidden" asp-for="CreatedDate" />
+                                <label asp-for="StudentId">Seelct Student</label>
+                                <select class="form-control select2" onchange="ClearGuardianSelect()" asp-for="StudentId" asp-items="@(new SelectList(ViewBag.StudentList ,"Id","Name"))">
+                                </select>
+                                <span asp-validation-for="StudentId" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label asp-for="GuardianName">
+                                    Guardian<a class="pull-right" onclick="GetGuradianList()"> Select Guardian
+                                    </a>
+                                </label>
+                                <input asp-for="GuardianName" class="form-control" />
+                                <span asp-validation-for="GuardianName" class="text-danger"></span>
+                                <input type="hidden" asp-for="GuradianId" />
+                            </div>
+                        </div>
+
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label asp-for="ApproveBy">Approve By</label>
+                                <input asp-for="ApproveBy" class="form-control">
+                                <span asp-validation-for="ApproveBy" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label asp-for="Reason">Reason For Early Leaving</label>
+                                <textarea asp-for="Reason" class="form-control"></textarea>
+                                <span asp-validation-for="Reason" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label asp-for="StudentLeave">
+                                    Leaving Time
+                                </label>
+                                <input asp-for="StudentLeave" class="form-control datePicker">
+                                <span asp-validation-for="StudentLeave" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- /.box-body -->
+
+                    <div class="box-footer">
+                        <div class="col-md-8">
+                            @Html.SERPButton("btn btn-primary pull-right btnSubmit", Model == null ? 0 : Model.Id)
+                            <button class="buttonload" style="display:none">
+                                <i class="fa fa-refresh fa-spin"></i>Loading
+                            </button>
+                        </div>
+                        <div class="col-md-4">
+                            <button type="reset" class="btn btn-danger pull-left">Cancel</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        @await Html.PartialAsync("~/Views/Shared/_CommanModalPartial.cshtml")
+
+        <div id="GuardianModal" class="modal fade" role="dialog">
+            <div class="modal-dialog modal-lg">
+
+                <!-- Modal content-->
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                        <h4 class="modal-title"><a>Guardian List</a></h4>
+                    </div>
+                    <div class="modal-body">
+                        <div id="divGuardian"></div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+</section>
+
+<script type="text/javascript">
+    function GetRecordList() {
+        GetCustomRecord("/StudentGatePass/GetSudentGatePass");
+        setTimeout(function () {
+            $("#modalTitle").text("Student Gate Pass Details")
+        }, 300);
+    }
+    function NewAcademicMaster() {
+        var url = "/StudentGatePass/Index";
+        NewCustomRecord(url);
+    }
+    $(document).ready(function () {
+        $('.select2').select2();
+    });
+
+    function GetGuradianList() {
+        $.get("/StudentGatePass/GuardianList", { studentId: $("#StudentId").val()}, function (data) {
+            $("#divGuardian").html(data);
+        }).done(function () {
+            $("#GuardianModal").modal('show');
+        })
+
+    }
+
+    function AddGuradian(name, id) {
+        debugger;
+        $("#GuardianName").val(name);
+        $("#GuradianId").val(id);
+        $("#GuardianModal").modal('hide');
+    }
+    function ClearGuardianSelect() {
+        $("#GuardianName").val('');
+        $("#GuardianId").val(0);
+    }
+    $(document).ready(function () {
+        $('.datePicker').datepicker({
+            startDate: '-3d'
+        });
+    })
+</script>

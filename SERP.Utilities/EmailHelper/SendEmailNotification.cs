@@ -40,7 +40,7 @@ namespace SERP.Utilities.EmailHelper
             message.Subject = subject;
 
             BodyBuilder bodyBuilder = new BodyBuilder();
-            bodyBuilder.HtmlBody = GetMailBody(hostingEnviroment);
+            bodyBuilder.HtmlBody = GetMailBody(hostingEnviroment, stduentName);
             message.Body = bodyBuilder.ToMessageBody();
 
             SmtpClient client = new SmtpClient();
@@ -54,12 +54,16 @@ namespace SERP.Utilities.EmailHelper
             return true;
         }
 
-        public string GetMailBody(IHostingEnvironment hostEnvironment)
+        public string GetMailBody(IHostingEnvironment hostEnvironment, string stduentName)
         {
             string body = string.Empty;
             using (StreamReader reader = new StreamReader(hostEnvironment.ContentRootPath + "/OnlineTestNotification.html"))
             {
                 body = reader.ReadToEnd();
+                body.Replace("{Candidate}", stduentName);
+                body.Replace("{TestDateTime}", "26-07-2020 05:30 PM");
+                body.Replace("{TestRegulation}", "All Questions are mandatory");
+                
             }
 
             return body;
@@ -68,11 +72,12 @@ namespace SERP.Utilities.EmailHelper
         public bool SendCustomEmail(string userName,string email, string subject, string body)
         {
             MimeMessage message = new MimeMessage();
-            MailboxAddress from = new MailboxAddress("Vipra Infotech","Bhaweshdeepak@gmail.com");
+            MailboxAddress from = new MailboxAddress("Vinoba Institute of Mathematics","Bhaweshdeepak@gmail.com");
             message.From.Add(from);
             MailboxAddress to = new MailboxAddress(userName, email);
             message.To.Add(to);
             message.Subject = subject;
+            
 
             BodyBuilder bodyBuilder = new BodyBuilder();
             bodyBuilder.HtmlBody = body;

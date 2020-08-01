@@ -1,0 +1,96 @@
+﻿@model IEnumerable<SERP.Core.Entities.FrontOffice.VisitorBook>
+
+<section class="content">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="row">
+                <div class="col-md-12">
+                    <table id="tblDataList" class="table-responsive-md table-striped table-bordered" style="width:100%">
+                        <thead>
+                            <tr>
+                                <th>Person Name</th>
+                                <th>Number Of Person</th>
+                                <th>Phone</th>
+                                <th>Address</th>
+                                <th>To Whoom To Meet</th>
+                                <th>Purpose</th>
+                                <th>
+                                    Appointment Number
+                                </th>
+                                <th>
+                                    In Date Time
+                                </th>
+                                <th>
+                                    Out Date Time
+                                </th>
+                                <th>
+                                    Action
+                                </th>
+
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var data in Model)
+                            {
+                                <tr>
+                                    <td>
+                                        @data.PersonName
+                                    </td>
+                                    <td>
+                                        @data.NumberOfPerson
+                                    </td>
+                                    <td>
+                                        @data.PersonPhone
+                                    </td>
+                                    <td>
+                                        @data.PersonAddress
+                                    </td>
+                                    <td>
+                                        @data.ToWhoomToMeet
+                                    </td>
+                                    <td>
+                                        @data.Purpose
+                                    </td>
+                                    <td>
+                                        @data.AppointmentNumber
+                                    </td>
+                                    <td>
+                                        @data.InDateTime
+                                    </td>
+                                    <td>
+                                        @data.OutDateTime
+                                    </td>
+                                    <td>
+                                        <a class="btn btn-outline-success pull-right" data-loading-text="<i class='fa fa-circle-o-notch fa-spin'  style='color:#DD4B39'></i>" onclick="UpdateRecord(@data.Id, this)">
+                                            <i class="fa fa-edit" style="color:#3C8DBC"></i>
+                                        </a>
+                                        <a class="btn btn-outline-danger pull-right" data-loading-text="<i class='fa fa-circle-o-notch fa-spin'  style='color:#DD4B39'></i>" onclick="DeleteRecord(@data.Id, this)">
+                                            <i class="fa fa-trash" style="color:#DD4B39"></i>
+
+                                        </a>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script>
+
+
+    function DeleteRecord(id, event) {
+        var geturl = "/VistorBookDetail/GetList";
+        var deleteUrl = "/VistorBookDetail/Delete";
+        CustomDeleteRecord(id, geturl, deleteUrl, event);
+    }
+    function UpdateRecord(id, event) {
+
+        var updateUrl = "/VistorBookDetail/Index";
+        UpdateCustomRecord(id, updateUrl, event);
+    }
+</script>

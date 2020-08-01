@@ -193,7 +193,7 @@
 
                                         </div>
                                         <div class="col-md-12" style="padding-top:10px;">
-                                            <button class="btn btn-success pull-right">
+                                            <button class="btn btn-success pull-right" onclick="fn_StudentDetails()">
                                                 <i class="fa fa-search"> &nbsp;&nbsp;Search </i>
                                             </button>
                                         </div>
@@ -303,5 +303,12 @@
         else {
             $("#txtBook").removeClass('input-validation-error');
         }
+    }
+
+    function fn_StudentDetails() {
+        $.get("/MasterQuickSearch/Index", { studentName: $("#txtStudentName").val()}, function (data) {
+            $("#divSERP").html(data);
+            $("#ModalAdvanceSearch").modal('hide');
+        })
     }
 </script>
