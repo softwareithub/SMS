@@ -92,7 +92,7 @@ namespace SERP.UI.Controllers.HRModule
                 x.UpdatedBy = 1;
                 x.UpdatedDate = DateTime.Now.Date;
             });
-
+            await _employeeAttendenceRepo.CreateNewContext();
             var deleteResult = await _employeeAttendenceRepo.Delete(employees.ToArray());
             await _employeeAttendenceRepo.CreateNewContext();
 

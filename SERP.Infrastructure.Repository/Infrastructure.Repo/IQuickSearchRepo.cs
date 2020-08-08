@@ -10,5 +10,8 @@ namespace SERP.Infrastructure.Repository.Infrastructure.Repo
     {
         Task<StudentQuickModel> GetStudentBasicInfo(int studentId);
         Task<List<StudentAttendenceReport>> GetStudentAttandenceReport(int studentId, int monthId, int year);
+        Task<StudentFeeDetailModel> StudentFeeDetailReport(int studentId);
+        Task<List<BookDetailModel>> GetBookDetails();
+        Task<EmployeeInformationModel> GetEmployeeInformationModel(int employeeId);
     }
 }
