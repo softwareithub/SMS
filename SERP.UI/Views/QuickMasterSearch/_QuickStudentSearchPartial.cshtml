@@ -74,9 +74,39 @@
                                         </span>
                                     </a>
                                 </li>
-                                <li><a href="#">Guardina Info</a></li>
-                                <li><a href="#">Education Qualification</a></li>
-                                <li><a href="#">Fee Detail</a></li>
+                                <li>
+                                    <a data-ajax="true" data-ajax-mode="replace"
+                                       asp-action="GuardinaListPartial" asp-controller="MasterQuickSearch"
+                                       data-ajax-update="#divQuickSearch"
+                                       data-ajax-begin="AjaxOnBegin" data-ajax-complete="AjaxComplete"
+                                       class="nav-link">
+                                        <span>
+                                           Guardian Report
+                                        </span>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a data-ajax="true" data-ajax-mode="replace"
+                                       asp-action="EducationalDetail" asp-controller="MasterQuickSearch"
+                                       data-ajax-update="#divQuickSearch"
+                                       data-ajax-begin="AjaxOnBegin" data-ajax-complete="AjaxComplete"
+                                       class="nav-link">
+                                        <span>
+                                            Educational Details
+                                        </span>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a data-ajax="true" data-ajax-mode="replace"
+                                       asp-action="StudentFeeDetail" asp-controller="MasterQuickSearch"
+                                       data-ajax-update="#divQuickSearch"
+                                       data-ajax-begin="AjaxOnBegin" data-ajax-complete="AjaxComplete"
+                                       class="nav-link">
+                                        <span>
+                                            Fee Details
+                                        </span>
+                                    </a>
+                                </li>
                                 <li>
                                     <a data-ajax="true" data-ajax-mode="replace"
                                        asp-action="GetStudentAttandenceReport" asp-controller="MasterQuickSearch"
@@ -89,7 +119,17 @@
                                     </a>
                                 </li>
                                 <li><a href="#">Time Table</a></li>
-                                <li><a href="#">Exam Details</a></li>
+                                <li>
+                                    <a data-ajax="true" data-ajax-mode="replace"
+                                       asp-action="ExamDetails" asp-controller="MasterQuickSearch"
+                                       data-ajax-update="#divQuickSearch"
+                                       data-ajax-begin="AjaxOnBegin" data-ajax-complete="AjaxComplete"
+                                       class="nav-link">
+                                        <span>
+                                            Exam Report
+                                        </span>
+                                    </a>
+                                </li>
                                 <li><a href="#">Quick Message</a></li>
                                 <li><a href="#">Quick Email</a></li>
                             </ul>

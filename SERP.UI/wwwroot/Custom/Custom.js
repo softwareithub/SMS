@@ -1,13 +1,19 @@
 ﻿function Success(response) {
-    
-    alertify.set('notifier', 'position', 'top-right');
-    alertify.success(response);
+    if (response == "Server error please contact admin team") {
+        alertify.set('notifier', 'position', 'top-center');
+        alertify.error(response);
+    }
+    else {
+        alertify.set('notifier', 'position', 'top-center');
+        alertify.success(response);
+    }
+
     //$("#form")[0].reset();
 }
 
 
 function CustomDelete(id, url) {
-    alertify.set('notifier', 'position', 'top-right');
+    alertify.set('notifier', 'position', 'top-center');
     var defered = $.Deferred();
     alertify.confirm("Are you sure want to Inactivate this record ?", function () {
         $.get(url, { Id: id }, function (response) {
@@ -20,7 +26,7 @@ function CustomDelete(id, url) {
 }
 
 function CustomDeleteRecord(id, getUrl, deleteUrl, event) {
-    alertify.set('notifier', 'position', 'top-right');
+    alertify.set('notifier', 'position', 'top-center');
     alertify.confirm("Are you sure want to delete the record ?", function () {
 
         var thisId = $(event);

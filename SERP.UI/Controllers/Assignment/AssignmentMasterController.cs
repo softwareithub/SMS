@@ -8,10 +8,13 @@ using Microsoft.AspNetCore.Mvc;
 using SERP.Core.Entities.Entity.Core.Master;
 using SERP.Core.Entities.Entity.Core.Transaction;
 using SERP.Core.Entities.HomeAssignment;
+using SERP.Core.Entities.SERPExceptionLogging;
 using SERP.Infrastructure.Repository.Infrastructure.Repo;
 using SERP.UI.Helper;
 using SERP.Utilities.BlobUtility;
+using SERP.Utilities.ExceptionHelper;
 using SERP.Utilities.ResponseMessage;
+using SERP.Utilities.ResponseUtilities;
 
 namespace SERP.UI.Controllers.Assignment
 {
@@ -22,48 +25,79 @@ namespace SERP.UI.Controllers.Assignment
         private readonly IGenericRepository<CourseMaster, int> _ICourseRepo;
         private readonly ISubjectMasterRepo _ISubjectRepo;
         private readonly IGenericRepository<BatchMaster, int> _IBatchRepo;
+        private readonly IGenericRepository<ExceptionLogging, int> _exceptionLoggingRepo;
         public AssignmentMasterController(IGenericRepository<AssignmentModel, int> assignmentRepo,
             IHostingEnvironment hostingEnvironment, IGenericRepository<CourseMaster, int> _courseRepo,
-             IGenericRepository<BatchMaster, int> _batchRepo, ISubjectMasterRepo _subjectRepo, IGenericRepository<BatchMaster, int> batchRepo)
+             IGenericRepository<BatchMaster, int> _batchRepo, ISubjectMasterRepo _subjectRepo, IGenericRepository<BatchMaster, int> batchRepo, IGenericRepository<ExceptionLogging, int>  exceptionLogging)
         {
             _assignmentRepo = assignmentRepo;
             _hostingEnviroment = hostingEnvironment;
              _ICourseRepo= _courseRepo;
             _ISubjectRepo = _subjectRepo;
             _IBatchRepo = batchRepo;
+            _exceptionLoggingRepo = exceptionLogging;
         }
         public async Task<IActionResult> Index(int id)
         {
-            await PopulateViewBag();
-            var model =await  _assignmentRepo.GetSingle(x => x.Id == id);
-            HttpContext.Session.SetString("pdfPath",string.IsNullOrEmpty(model?.PDFPath)? string.Empty: model.PDFPath);
-            return View("~/Views/AssignmentWork/_AssignCreate.cshtml", model);
+            try
+            {
+                await PopulateViewBag();
+                var model = await _assignmentRepo.GetSingle(x => x.Id == id);
+                HttpContext.Session.SetString("pdfPath", string.IsNullOrEmpty(model?.PDFPath) ? string.Empty : model.PDFPath);
+                return View("~/Views/AssignmentWork/_AssignCreate.cshtml", model);
+            }
+            catch(Exception ex)
+            {
+                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(nameof(Index), nameof(AssignmentMasterController), ex.Message,LoggingType.httpGet.ToString(), 0);
+                var exceptionResponse = await _exceptionLoggingRepo.CreateEntity(exceptionHelper);
+                return await Task.Run(() => PartialView("~/Views/Shared/Error.cshtml"));
+
+            }
+
         }
 
         public async Task<IActionResult> CreateAssignment(AssignmentModel model, IFormFile PDFPath)
         {
-            if (model.Id == 0)
+            try
             {
-                List<IFormFile> formFiles = new List<IFormFile>();
-                formFiles.Add(PDFPath);
-                var pdfPath = await UploadImage.UploadImageOnFolder(formFiles, _hostingEnviroment);
-                model.PDFPath = pdfPath.First();
-                var result = await _assignmentRepo.CreateEntity(model);
-                return Json(ResponseData.Instance.GenericResponse(result));
+                if (model.Id == 0)
+                {
+                    List<IFormFile> formFiles = new List<IFormFile>();
+                    formFiles.Add(PDFPath);
+                    var pdfPath = await UploadImage.UploadImageOnFolder(formFiles, _hostingEnviroment);
+                    model.PDFPath = pdfPath.First();
+                    var result = await _assignmentRepo.CreateEntity(model);
+                    return Json(ResponseData.Instance.GenericResponse(result));
+                }
+                else
+                {
+                    model.PDFPath = string.IsNullOrEmpty(model.PDFPath) ? HttpContext.Session.GetString("pdfPath") : model.PDFPath;
+                    var result = await _assignmentRepo.Update(model);
+                    return Json(ResponseData.Instance.GenericResponse(result));
+                }
             }
-            else
+            catch (Exception ex)
             {
-                model.PDFPath = string.IsNullOrEmpty(model.PDFPath) ? HttpContext.Session.GetString("pdfPath") : model.PDFPath;
-                var result = await _assignmentRepo.Update(model);
-                return Json(ResponseData.Instance.GenericResponse(result));
+                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(nameof(CreateAssignment), nameof(AssignmentMasterController), ex.Message, LoggingType.httpDelete.ToString(), 0);
+                var exceptionResponse = await _exceptionLoggingRepo.CreateEntity(exceptionHelper);
+                return Json(ResponseData.Instance.GenericResponse(ResponseStatus.ServerError));
             }
-
-
         }
 
         public async Task<IActionResult> AssignmentList()
         {
-            return PartialView("~/Views/AssignmentWork/_AssignmentList.cshtml", await GetAssignmentList());
+            try
+            {
+                return PartialView("~/Views/AssignmentWork/_AssignmentList.cshtml", await GetAssignmentList());
+            }
+            catch(Exception ex)
+            {
+                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(nameof(AssignmentList),nameof(AssignmentMasterController), ex.Message, "HTTPGETCALL", 0);
+                var exceptionResponse = await _exceptionLoggingRepo.CreateEntity(exceptionHelper);
+                return await Task.Run(() => PartialView("~/Views/Shared/Error.cshtml"));
+
+            }
+
         }
 
         public async Task<IActionResult> GetAssignDetails(int id)

@@ -37,6 +37,8 @@
                         <tbody>
                             @foreach (var data in Model.GroupBy(x => x.EmployeeName))
                             {
+                                addition = default;
+                                deduction = default;
                                 <tr>
                                     <td>
                                         @data.First().EmployeeName
@@ -59,8 +61,10 @@
 
                                     @foreach (var payData in payName)
                                     {
+
+
                                         var payAmount = default(decimal);
-                                        foreach (var x in Model)
+                                        foreach (var x in data)
                                         {
                                             if (x.PaySalary.Find(x => x.Item1 == payData).Item2 != default(decimal))
                                             {

@@ -211,7 +211,7 @@
                                             <input type="text" id="txtEmployee" placeholder="Enter Employee Name" class="form-control" />
                                         </div>
                                         <div class="col-md-12" style="padding-top:10px;">
-                                            <button class="btn btn-success pull-right">
+                                            <button class="btn btn-success pull-right" onclick="fn_EmployeeSearch()">
                                                 <i class="fa fa-search"> &nbsp;&nbsp;Search </i>
                                             </button>
                                         </div>
@@ -297,16 +297,21 @@
     })
     function fn_bookSearch() {
         var bookName = $("#txtBook").val();
-        if (bookName.length == 0) {
-            $("#txtBook").addClass('input-validation-error');
-        }
-        else {
-            $("#txtBook").removeClass('input-validation-error');
-        }
+        $.get("/MasterQuickSearch/BookDetails", function (data) {
+            $("#divSERP").html(data);
+            $("#ModalAdvanceSearch").modal('hide');
+        })
     }
 
     function fn_StudentDetails() {
         $.get("/MasterQuickSearch/Index", { studentName: $("#txtStudentName").val()}, function (data) {
+            $("#divSERP").html(data);
+            $("#ModalAdvanceSearch").modal('hide');
+        })
+    }
+    function fn_EmployeeSearch() {
+        var employee = $("#txtEmployee").val();
+        $.get("/MasterQuickSearch/EmployeeQuickSearch", { employee: employee }, function (data) {
             $("#divSERP").html(data);
             $("#ModalAdvanceSearch").modal('hide');
         })

@@ -1,0 +1,214 @@
+﻿@model SERP.Core.Model.QuickSearchModel.EmployeeInformationModel
+
+<section class="content">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="panel with-nav-tabs panel-info">
+                        <div class="panel-heading">
+                            <ul class="nav nav-tabs">
+                                <li class="active">
+                                    <a href="#tab1info" data-toggle="tab">
+                                    <i class="fa fa-info-circle"></i>    Basic Information
+                                    </a>
+                                </li>
+                                <li><a href="#tab2info" data-toggle="tab">Salary Details</a></li>
+                                <li><a href="#tab3info" data-toggle="tab">Attandence</a></li>
+                                <li><a href="#tab3info" data-toggle="tab">Class Allocation</a></li>
+                                <li><a href="#tab3info" data-toggle="tab">Time Sheet</a></li>
+                                <li><a href="#tab3info" data-toggle="tab">Parent Review</a></li>
+                                <li><a href="#tab3info" data-toggle="tab">Direct Complain</a></li>
+
+                            </ul>
+                        </div>
+                        <div class="panel-body">
+                            <div class="tab-content">
+                                <div class="tab-pane fade in active" id="tab1info">
+                                    <div class="col-md-12">
+                                        <div class="box box-widget widget-user-2">
+                                            <div class="widget-user-header bg-yellow">
+                                                <div class="widget-user-image">
+                                                    @Html.SerpImageHelper(Model.Photo, 50, 50, "EmployeeId")
+                                                </div>
+                                                <h3 class="widget-user-username">@Model.EmployeeName (@Model.EmpCode)</h3>
+                                                <h5 class="widget-user-desc">@Model.DepartmentName (@Model.DesignationName)</h5>
+                                            </div>
+                                            <div class="box-footer no-padding">
+                                                <ul class="nav nav-stacked">
+                                                    <li><a href="#">Father Name<span class="pull-right">@Model.FatherName</span></a></li>
+                                                    <li><a href="#">Mother Name <span class="pull-right">@Model.MotherName</span></a></li>
+                                                    <li><a href="#">Phone <span class="pull-right">@Model.Phone</span></a></li>
+
+
+                                                    <li><a href="#">Email <span class="pull-right">@Model.Email</span></a></li>
+                                                    <li><a href="#">Crosspondence Address <span class="pull-right">@Model.CAddress</span></a></li>
+
+                                                    <li><a href="#">Permanent Address <span class="pull-right">@Model.P_Address</span></a></li>
+                                                    <li><a href="#">Gender <span class="pull-right">@Model.Gender</span></a></li>
+                                                    <li><a href="#">Blood Group <span class="pull-right">@Model.BloodGroup</span></a></li>
+
+                                                    <li><a href="#">Joining Date <span class="pull-right">@Model.JoiningDate</span></a></li>
+                                                    <li><a href="#">Department <span class="pull-right">@Model.DepartmentName</span></a></li>
+                                                    <li><a href="#">Designation <span class="pull-right">@Model.DesignationName</span></a></li>
+
+                                                </ul>
+                                            </div>
+                                        </div>
+                                        <!-- /.widget-user -->
+                                    </div>
+                                </div>
+                                <div class="tab-pane fade" id="tab2info">
+                                    <table class="table table-hover table-responsive">
+                                        <thead>
+                                            <tr>
+                                                <th>
+                                                    Head Name
+                                                </th>
+                                                <th>
+                                                    Amount
+                                                </th>
+                                                <th>
+                                                    Deduction/Addition
+                                                </th>
+                                                <th>Depende on Day</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @foreach (var data in Model.EmployeeSalaryHeads)
+                                            {
+                                                <tr>
+                                                    <td>
+                                                        @data.HeadName
+                                                    </td>
+                                                    <td>
+                                                        @data.Amount
+                                                    </td>
+                                                    <td>
+                                                        @{
+                                                            var additionDeduction = data.AdditionDeduction == "A" ? "Addition" : "Deduction";
+                                                        }
+                                                        @additionDeduction
+                                                    </td>
+                                                    <td>
+                                                        @{
+                                                            var dependeOnDay = data.IsDependentOnPerDay == 0 ? "No Dependent" : "Dependent";
+                                                        }
+                                                        @dependeOnDay
+                                                    </td>
+                                                </tr>
+                                            }
+                                            <tr>
+                                                <td colspan="3">
+                                                    Net Payment
+                                                </td>
+                                                <td>
+                                                    @Model.EmployeeSalaryHeads.Sum(x => x.Amount)
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td colspan="3">
+                                                    Net Deduction
+                                                </td>
+                                                <td>
+                                                    @Model.EmployeeSalaryHeads.Where(x => x.AdditionDeduction == "D").Sum(x => x.Amount)
+                                                </td>
+                                            </tr>
+
+                                            <tr>
+                                                <td colspan="3">
+                                                    Net Payable Amount
+                                                </td>
+                                                <td>
+                                                    @Model.EmployeeSalaryHeads.Where(x => x.AdditionDeduction == "A").Sum(x => x.Amount)
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <div class="tab-pane fade" id="tab3info">
+                                    <div id="divTransactionReport">
+                                        <table class="table table-hover table-responsive">
+                                            <thead>
+                                                <tr>
+                                                    <th>
+                                                        Attandence Count
+                                                    </th>
+                                                    <th>
+                                                        Attandence Type
+                                                    </th>
+                                                    <th>
+                                                        Month Name
+                                                    </th>
+                                                    <th>
+                                                        Year
+                                                    </th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @foreach (var data in Model.EmployeeAttandence)
+                                                {
+                                                    if (data.AttendenceType.ToLower().Trim() == "a")
+                                                    {
+                                                        <tr style="background-color:#ffd800">
+                                                            <td>
+                                                                @data.AttendenceCount
+                                                            </td>
+                                                            <td>
+                                                                @{
+                                                                    var attandenceType = data.AttendenceType == "P" ? "Present" : "Absent";
+                                                                }
+                                                                @attandenceType
+                                                            </td>
+                                                            <td>
+
+                                                                @data.DateMonthName
+                                                            </td>
+                                                            <td>
+                                                                @data.DateYear
+                                                            </td>
+                                                        </tr>
+                                                    }
+                                                    else
+                                                    {
+                                                        <tr style="background-color:#4cff00">
+                                                            <td>
+                                                                @data.AttendenceCount
+                                                            </td>
+                                                            <td>
+                                                                @{
+                                                                    var attandenceType = data.AttendenceType == "P" ? "Present" : "Absent";
+                                                                }
+                                                                @attandenceType
+                                                            </td>
+                                                            <td>
+
+                                                                @data.DateMonthName
+                                                            </td>
+                                                            <td>
+                                                                @data.DateYear
+                                                            </td>
+                                                        </tr>
+                                                    }
+
+                                                }
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                                <div class="tab-pane fade" id="tab4info">
+                                    <div id="divBookDetails">
+                                        <h3 style="text-align:center">No Record Found.</h3>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+@*
+    For more information on enabling MVC for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
+*@

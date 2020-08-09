@@ -18,6 +18,7 @@ using SERP.Core.Entities.Transport;
 using SERP.Core.Entities.Accounts;
 using SERP.Core.Entities.Student;
 using SERP.Core.Entities.FrontOffice;
+using SERP.Core.Entities.SERPExceptionLogging;
 
 namespace SERP.Core.Entities.Context
 {
@@ -88,13 +89,10 @@ namespace SERP.Core.Entities.Context
         public DbSet<TestMaster> TestMasters { get; set; }
         public DbSet<TestQuestionMapping> TestQuestionMappings { get; set; }
         public DbSet<OnlineVideoFeeDetail> OnlineVideoFeeDetails { get; set; }
-
         public DbSet<LeaveMaster> LeaveMasters { get; set; }
         public DbSet<LeaveAllotment> LeaveAllotments { get; set; }
         public DbSet<LeaveTransactionModel> LeaveTransactionModels { get; set; }
-
         public DbSet<CategoryMaster> CategoryMasters { get; set; }
-
         public DbSet<BookItemModel> BookItemModels { get; set; }
         public DbSet<BookStatusModel> BookStatusModels { get; set; }
         public DbSet<BookTransaction> BookTransactions { get; set; }
@@ -109,7 +107,6 @@ namespace SERP.Core.Entities.Context
         public DbSet<ExpenseHead> ExpenseHeads { get; set; }
         public DbSet<AccountDetail> Accounts { get; set; }
         public DbSet<AccountTransaction> AccountTransactions { get; set; }
-
         public DbSet<RoleMaster> RoleMasters { get; set; }
         public DbSet<UserAnswereSheetModel> UserAnswereSheetModels { get; set; }
         public DbSet<UserTestDetailModel> UserTestDetailModels { get; set; }
@@ -119,6 +116,7 @@ namespace SERP.Core.Entities.Context
         public DbSet<InstituteSettingModel> InstituteSettingModels { get; set; }
         public DbSet<StudentGatePass> StudentGatePasses { get; set; }
         public DbSet<VisitorBook> VisitorBooks { get; set; }
+        public DbSet<ExceptionLogging> ExceptionLoggings { get; set; }
         #endregion
 
     }

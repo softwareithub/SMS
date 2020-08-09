@@ -1,0 +1,48 @@
+﻿
+
+<link href="https://cdn.datatables.net/1.10.20/css/jquery.dataTables.min.css" rel="stylesheet" />
+<script src="https://cdn.datatables.net/1.10.20/js/jquery.dataTables.min.js"></script>
+
+<div class="col-md-12">
+    <div class="box box-solid">
+        <div class="box-header with-border">
+            <i class="fa fa-text-width"></i>
+            <h3 class="box-title">@ViewBag.HeaderDetail</h3>
+        </div>
+
+        <div class="box-body">
+            <div class="col-md-12">
+                <div class="box box-widget widget-user-2">
+                    <div class="box-footer no-padding">
+                        <div class="form-group  col-md-4">
+                            <label>Select Exam </label>
+                            <select id="ExamId" onchange="GetStudentPerformance()" class="form-control" asp-items="@(new SelectList(ViewBag.ExamList ,"Id","ExamName"))">
+                                <option value="">Select</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-12">
+                <div class="box box-widget widget-user-2">
+                    <div class="box-footer no-padding">
+                        <div id="divStudentPerformance">
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script>
+    function GetStudentPerformance() {
+        var examId = $("#ExamId").val();
+        $.get("/MasterQuickSearch/StudentExam", { examId: examId }, function (data) {
+            $("#divStudentPerformance").html(data);
+        });
+    }
+</script>

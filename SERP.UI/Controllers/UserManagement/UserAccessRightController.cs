@@ -55,9 +55,13 @@ namespace SERP.UI.Controllers.UserManagement
             foreach(var data in userAccessList)
             {
                 var model = result.Find(x => x.ModuleId == data.ModuleId && x.SubModuleId == data.SubModuleId);
-                model.CreateAccess = data.CreateAccess;
-                model.ReadAccess = data.ReadAccess;
-                model.UpdateAccess = data.UpdateAccess;
+                if(model!=null)
+                {
+                    model.CreateAccess = data.CreateAccess;
+                    model.ReadAccess = data.ReadAccess;
+                    model.UpdateAccess = data.UpdateAccess;
+                }
+               
             }
 
             return PartialView("~/Views/UserManagement/_UserAccessInformation.cshtml", result);

@@ -122,6 +122,7 @@
         var courseId = $("#FromCourse option:selected").val();
         var batchId = $("#FromBatch option:selected").val();
         $("#ddlStudent").empty();
+        $("#ddlStudent").append("<option value=''>Seelct</option>")
         $.get("/StudentFeeDetail/GetStudentDetail", { courseId: courseId, batchId: batchId }, function (data) {
             
             for (var i = 0; i < data.length; i++) {

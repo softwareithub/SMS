@@ -14,5 +14,6 @@ namespace SERP.Core.Entities.LibraryManagement
         [Required(ErrorMessage ="Book Status is required.")]
         [DisplayName("Status")]
         public string StatusName { get; set; }
+        public string ColorCode { get; set; }
     }
 }

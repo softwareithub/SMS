@@ -1,0 +1,73 @@
+﻿@model IEnumerable<SERP.Core.Entities.Entity.Core.Master.StudentEducationalDetail>
+<link href="https://cdn.datatables.net/1.10.20/css/jquery.dataTables.min.css" rel="stylesheet" />
+<script src="https://cdn.datatables.net/1.10.20/js/jquery.dataTables.min.js"></script>
+
+<div class="col-md-12">
+    <div class="box box-solid">
+        <div class="box-header with-border">
+            <i class="fa fa-text-width"></i>
+            <h3 class="box-title">@ViewBag.HeaderDetail</h3>
+        </div>
+
+        <div class="box-body">
+            <div class="col-md-12">
+                <div class="box box-widget widget-user-2">
+                    <div class="box-footer no-padding">
+                        <table id="tblDataList" class="table table-striped table-bordered responsive" style="width:100%">
+                            <thead>
+                                <tr>
+                                    <th>University</th>
+                                    <th>College</th>
+                                    <th>Course</th>
+                                    <th>Enrollement</th>
+                                    <th>Year of Joining</th>
+                                    <th>Year of Passing</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+
+                                @foreach (var item in Model)
+                                {
+                                    <tr>
+                                        <td>
+                                            @item.University
+                                        </td>
+                                        <td>
+                                            @item.CollegeName
+                                        </td>
+                                        <td>
+                                            @item.CourseName
+                                        </td>
+                                        <td>
+                                            @item.EnrollmentNumber
+                                        </td>
+                                        <td>
+                                            @item.YearOfJoining
+                                        </td>
+                                        <td>
+                                            @item.YearOfPassing
+                                        </td>
+                                    </tr>
+                                }
+
+
+                            </tbody>
+
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script>
+    $(document).ready(function () {
+        setTimeout(function () {
+            $("#tblDataList").DataTable();
+        }, 500)
+    });
+
+
+</script>
