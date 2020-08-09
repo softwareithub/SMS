@@ -3,7 +3,6 @@
 <section class="content-header">
     <h1>
         Student Attendence
-        <small>Create Student Attendence</small>
     </h1>
     <ol class="breadcrumb">
         <li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
@@ -33,6 +32,7 @@
                             <select id="CourseId" class="form-control" asp-items="@(new SelectList(ViewBag.CourseList ,"Id","Name"))" onchange="GetBatchList()">
                                 <option value="">Select</option>
                             </select>
+                            <span id="spnCourse" style="display:none;">Please Select Course</span>
                         </div>
                     </div>
                     <div class="col-md-3">
@@ -41,6 +41,7 @@
                             <select id="BatchId" class="form-control" onchange="CheckAttendenceType()">
                                 <option value="">Select</option>
                             </select>
+                            <span id="spnBatch" style="display:none;">Please Select Batch</span>
                         </div>
                     </div>
                     <div class="col-md-3">
@@ -117,12 +118,25 @@
                     $("#divPeriod").attr("style", "display:none");
                 }
             });
-
     }
 
     function CreateAttendence() {
         var courseId = $("#CourseId option:selected").val();
+        if (courseId <= 0) {
+            $('#spnCourse').show();
+            return false;
+        }
+        else
+            $('#spnCourse').hide();
+
         var batchId = $("#BatchId option:selected").val();
+        if (batchId <= 0) {
+            $('#spnBatch').show();
+            return false;
+        }
+        else
+            $('#spnBatch').hide();
+
         var attendenceDate = $("#attendenceDate").val();
         var period = $("#period option:selected").val();
         $("#AttendenceDiv").html("");

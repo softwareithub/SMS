@@ -42,6 +42,7 @@ namespace SERP.UI.Controllers.Master
                           on GM.StudentId equals SM.Id
                           select new GuardianMaster
                           {
+                              Id = GM.Id,
                               StudentName = SM.Name,
                               StudentId = GM.StudentId,
                               GuradianName = GM.GuradianName,
@@ -62,6 +63,7 @@ namespace SERP.UI.Controllers.Master
             };
 
             var uploadImages = await UploadImage.UploadImageOnFolder(formFiles, _hostingEnviroment);
+            if(uploadImages.Count > 0)
             model.GuardianImage = uploadImages.First();
                 
             if (model.Id > 0)
