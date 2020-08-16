@@ -9,7 +9,7 @@
 <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.js"></script>
 <link href="https://cdn.datatables.net/1.10.20/css/jquery.dataTables.min.css" rel="stylesheet" />
 <script src="https://cdn.datatables.net/1.10.20/js/jquery.dataTables.min.js"></script>
-<form method="post" data-ajax="true" data-ajax-method="post"
+<form id="form" method="post" data-ajax="true" data-ajax-method="post"
       asp-action="CreateBasicInfo" asp-controller="Employee" data-ajax-success="EmployeeSuccess"
       data-ajax-begin="CustomFormSubmitBegin" data-ajax-complete="CustomFormSubmitComplete" enctype="multipart/form-data">
     <div class="box-body">

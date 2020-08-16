@@ -8,7 +8,7 @@
         alertify.success(response);
     }
 
-    //$("#form")[0].reset();
+    $("#form")[0].reset();
 }
 
 

@@ -2,7 +2,7 @@
 <link href="~/Multiselect/example-styles.css" rel="stylesheet" />
 <script src="~/Multiselect/jquery.multi-select.js"></script>
 @model IEnumerable<SERP.Core.Model.FeeDetails.StudentFeeDetailVm>
-<form method="post" data-ajax="true" data-ajax-method="post"
+<form id="form" method="post" data-ajax="true" data-ajax-method="post"
       asp-action="FeeSubmit" asp-controller="FeeDeposit" data-ajax-success="Success"
       data-ajax-begin="CustomFormSubmitBegin" data-ajax-complete="CustomFormSubmitComplete">
 
