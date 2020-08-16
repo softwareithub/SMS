@@ -45,46 +45,50 @@
                 <form method="post" data-ajax="true" data-ajax-method="post"
                       asp-action="Create" asp-controller="Course" data-ajax-success="Success">
                     <div class="box-body">
-                        <div class="col-md-4">
-                            <div class="form-group">
-                                <input type="hidden" asp-for="Id" />
-                                <input type="hidden" asp-for="CreatedBy" />
-                                <input type="hidden" asp-for="CreatedDate" />
-                                <label asp-for="Name">Course Name</label>
-                                <input asp-for="Name" class="form-control">
-                                <span asp-validation-for="Name" class="text-danger"></span>
+                        <div class="col-md-12">
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <input type="hidden" asp-for="Id" />
+                                    <input type="hidden" asp-for="CreatedBy" />
+                                    <input type="hidden" asp-for="CreatedDate" />
+                                    <label asp-for="Name">Course Name</label>
+                                    <input asp-for="Name" class="form-control">
+                                    <span asp-validation-for="Name" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label asp-for="Code">Code</label>
+                                    <input asp-for="Code" class="form-control">
+                                    <span asp-validation-for="Code" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label asp-for="Description">Description</label>
+                                    <input asp-for="Description" class="form-control">
+                                    <span asp-validation-for="Description" class="text-danger"></span>
+                                </div>
                             </div>
                         </div>
-                        <div class="col-md-4">
-                            <div class="form-group">
-                                <label asp-for="Code">Code</label>
-                                <input asp-for="Code" class="form-control">
-                                <span asp-validation-for="Code" class="text-danger"></span>
+                        <div class="col-md-12">
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label asp-for="AttendenceType">Attendence Type</label>
+                                    <select class="form-control" asp-for="AttendenceType">
+                                        <option value="none">Select Attendence Type</option>
+                                        <option value="Daily">Daily</option>
+                                        <option value="SW">Subject Wise</option>
+                                    </select>
+                                    <span asp-validation-for="AttendenceType" class="text-danger"></span>
+                                </div>
                             </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="form-group">
-                                <label asp-for="Description">Description</label>
-                                <input asp-for="Description" class="form-control">
-                                <span asp-validation-for="Description" class="text-danger"></span>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="form-group">
-                                <label asp-for="AttendenceType">Attendence Type</label>
-                                <select class="form-control" asp-for="AttendenceType">
-                                    <option value="none">Select Attendence Type</option>
-                                    <option value="Daily">Daily</option>
-                                    <option value="SW">Subject Wise</option>
-                                </select>
-                                <span asp-validation-for="AttendenceType" class="text-danger"></span>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="form-group">
-                                <label asp-for="MinimumAttendencePercentage">Minimum Percentage</label>
-                                <input asp-for="MinimumAttendencePercentage" class="form-control">
-                                <span asp-validation-for="MinimumAttendencePercentage" class="text-danger"></span>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label asp-for="MinimumAttendencePercentage">Minimum Percentage</label>
+                                    <input asp-for="MinimumAttendencePercentage" class="form-control">
+                                    <span asp-validation-for="MinimumAttendencePercentage" class="text-danger"></span>
+                                </div>
                             </div>
                         </div>
                     </div>

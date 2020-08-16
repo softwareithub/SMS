@@ -10,6 +10,7 @@ namespace SERP.Core.Entities.Entity.Core.Master
     public class ReligionMaster: Base<int>
     {
         [Display(Name = "Religion Name", Prompt = "Enter religion name")]
+        [Required(ErrorMessage ="Please enter religion name")]
         public string Name { get; set; } = string.Empty;
         [Display(Name = "Religion Description", Prompt = "Enter description name")]
         public string Description { get; set; } = string.Empty;

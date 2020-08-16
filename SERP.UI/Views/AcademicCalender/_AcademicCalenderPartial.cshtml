@@ -13,7 +13,6 @@
 <section class="content-header">
     <h1>
         Academic Calender
-        <small>Create Academic Calender</small>
     </h1>
     <ol class="breadcrumb">
         <li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
@@ -55,7 +54,7 @@
                       data-ajax-begin="CustomFormSubmitBegin" data-ajax-complete="CustomFormSubmitComplete">
                     <div class="box-body">
                         <div class="col-md-4">
-                            <label>Academic(Session)</label>
+                            <label>Session</label>
                             <select id="CourseId" asp-for="AcademicId" class="form-control" asp-items="@(new SelectList(ViewBag.AcademicList ,"Id","Name"))">
                                 <option value="">Select</option>
                             </select>
@@ -65,7 +64,7 @@
                                 <input type="hidden" asp-for="Id" />
                                 <input type="hidden" asp-for="CreatedBy" />
                                 <input type="hidden" asp-for="CreatedDate" />
-                                <label asp-for="EventName">Event Name</label>
+                                <label asp-for="EventName">Event</label>
                                 <input asp-for="EventName" class="form-control">
                                 <span asp-validation-for="EventName" class="text-danger"></span>
                             </div>

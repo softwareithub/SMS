@@ -9,11 +9,13 @@ namespace SERP.Core.Entities.Entity.Core.Master
     [Table("BatchMaster", Schema = "Master")]
     public class BatchMaster : Base<int>
     {
-        [Required(ErrorMessage = "Batch Name is required"), MaxLength(150)]
+        [Required(ErrorMessage = "Please enter batch name"), MaxLength(150)]        
         public string BatchName { get; set; }
-        public string BatchCode { get; set; } = string.Empty;
-        [Required(ErrorMessage = "Please select Course")]
 
+        [Required(ErrorMessage = "Please enter batch code")]
+        public string BatchCode { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "Please select course")]
         [Column("CourseMasterId")]
         public int? CourseId { get; set; }
     }

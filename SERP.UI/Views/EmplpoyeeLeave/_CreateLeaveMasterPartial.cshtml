@@ -13,7 +13,6 @@
 <section class="content-header">
     <h1>
         Leave Master
-        <small>Create Leave Master</small>
     </h1>
     <ol class="breadcrumb">
         <li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
@@ -54,7 +53,8 @@
                       asp-action="CreateLeave" asp-controller="LeaveMaster" data-ajax-success="Success"
                       data-ajax-begin="CustomFormSubmitBegin" data-ajax-complete="CustomFormSubmitComplete">
                     <div class="box-body">
-                        <div class="col-md-4">
+                        <div class="col-md-12">
+                        <div class="col-md-6">
                             <div class="form-group">
                                 <input type="hidden" asp-for="Id" />
                                 <input type="hidden" asp-for="CreatedBy" />
@@ -64,18 +64,21 @@
                                 <span asp-validation-for="LeaveName" class="text-danger"></span>
                             </div>
                         </div>
-                        <div class="col-md-4">
+                        <div class="col-md-6">
                             <div class="form-group">
                                 <label asp-for="LeaveCode">Leave Code</label>
                                 <input asp-for="LeaveCode" class="form-control">
                                 <span asp-validation-for="LeaveCode" class="text-danger"></span>
                             </div>
                         </div>
-                        <div class="col-md-4">
-                            <div class="form-group">
-                                <label asp-for="Description">Description</label>
-                                <textarea asp-for="Description" class="form-control" rows="3"></textarea>
-                                <span asp-validation-for="Description" class="text-danger"></span>
+                            </div>
+                        <div class="col-md-12">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label asp-for="Description">Description</label>
+                                    <textarea asp-for="Description" class="form-control" rows="3"></textarea>
+                                    <span asp-validation-for="Description" class="text-danger"></span>
+                                </div>
                             </div>
                         </div>
                     </div>

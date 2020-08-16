@@ -42,6 +42,7 @@ namespace SERP.UI.Controllers.StudentTransaction
                       on SP.BatchId equals BM.Id
                       select new StudentPartialInfoViewModel
                       {
+                          Id = SM.Id,
                           StudentName= SM.Name,
                           FatherName=SM.FatherName,
                           RollCode= SM.RollCode,
