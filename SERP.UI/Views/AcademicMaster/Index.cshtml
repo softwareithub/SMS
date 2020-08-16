@@ -12,8 +12,7 @@
 
 <section class="content-header">
     <h1>
-        Academic Master
-        <small>Create Academic Detail</small>
+        Session Master
     </h1>
     <ol class="breadcrumb">
         <li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
@@ -30,7 +29,7 @@
             <!-- general form elements -->
             <div class="box box-primary">
                 <div class="box-header with-border">
-                    <h3 class="box-title">Create Academic Master</h3>
+                    <h3 class="box-title">Create Session Master</h3>
                     <div class="col-md-12">
                         <div class="col-md-10">
                             <a class="btn btn-primary pull-right" onclick="GetAcademicList()">
@@ -59,7 +58,7 @@
                                 <input type="hidden" asp-for="Id" />
                                 <input type="hidden" asp-for="CreatedBy" />
                                 <input type="hidden" asp-for="CreatedDate" />
-                                <label asp-for="Name">Academic Name</label>
+                                <label asp-for="Name">Session Name</label>
                                 <input asp-for="Name" class="form-control">
                                 <span asp-validation-for="Name" class="text-danger"></span>
                             </div>
@@ -111,7 +110,7 @@
     function GetAcademicList() {
         GetCustomRecord("/AcademicMaster/GetAcademicList");
         setTimeout(function () {
-            $("#modalTitle").text("Academic Master List")
+            $("#modalTitle").text("Session Master List")
         }, 300);
     }
     function NewAcademicMaster() {

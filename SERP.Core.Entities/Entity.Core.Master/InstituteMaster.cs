@@ -9,7 +9,7 @@ namespace SERP.Core.Entities.Entity.Core.Master
     [Table("IntituteDetail", Schema = "Master")]
     public class InstituteMaster : Base<int>
     {
-        [Required(ErrorMessage = "Institute name is required.")]
+        [Required(ErrorMessage = "Please enter institute name")]
            
         [Display(Name = "Institute Name", Prompt = "Enter Institute Name"),
             MaxLength(100, ErrorMessage = "Institute name is too long."),
