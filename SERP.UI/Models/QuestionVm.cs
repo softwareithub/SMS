@@ -10,6 +10,6 @@ namespace SERP.UI.Models
     public class QuestionVm:Base<int>
     {
         public QuestionModel QuestionModel { get; set; }
-        public List<OptionMaster> OptionMasters { get; set; }
+        public OptionMaster OptionMasters { get; set; }
     }
 }
