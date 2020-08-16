@@ -1,0 +1,124 @@
+﻿@model IEnumerable<SERP.Core.Model.DashBoardModel.FeeDetailVm>
+
+<script src="https://code.highcharts.com/highcharts.js"></script>
+<script src="https://code.highcharts.com/modules/data.js"></script>
+<script src="https://code.highcharts.com/modules/exporting.js"></script>
+<script src="https://code.highcharts.com/modules/accessibility.js"></script>
+
+<style>
+    #datatable {
+        font-family: Verdana, sans-serif;
+        border-collapse: collapse;
+        border: 1px solid #EBEBEB;
+        margin: 10px auto;
+        text-align: center;
+        width: 100%;
+    }
+
+        #datatable caption {
+            padding: 1em 0;
+            font-size: 1.2em;
+            color: #555;
+        }
+
+        #datatable th {
+            font-weight: 600;
+            padding: 0.5em;
+        }
+
+        #datatable td, #datatable th, #datatable caption {
+            padding: 0.5em;
+        }
+
+        #datatable thead tr, #datatable tr:nth-child(even) {
+            background: #f8f8f8;
+        }
+
+        #datatable tr:hover {
+            background: #f1f7ff;
+        }
+</style>
+<section class="content">
+    <div class="row">
+        <figure class="highcharts-figure">
+            <div id="container"></div>
+            <table id="datatable">
+                <thead>
+                    <tr>
+                        <th></th>
+                        @foreach(var data in Model)
+                        {
+                            <th>@data.MonthYearAcademic</th>
+                        }
+                    </tr>
+                </thead>
+                <tbody>
+                  
+                    <tr>
+                        <th>Payable Amout Till Date</th>
+                        @foreach (var data in Model)
+                        {
+                            <td>@data.PayableAmountTillDate</td>
+                        }
+                    </tr>
+                    <tr>
+                        <th>Discount Amout Till Date</th>
+                        @foreach (var data in Model)
+                        {
+                            <td>@data.DiscountAmountTillDate</td>
+                        }
+                    </tr>
+                    <tr>
+                        <th>Fine Amout Till Date</th>
+                        @foreach (var data in Model)
+                        {
+                            <td>@data.FineAmountTillDate</td>
+                        }
+                    </tr>
+                    <tr>
+                        <th>Amount Paid Till Date</th>
+                        @foreach (var data in Model)
+                        {
+                            <td>@data.AmountPaidTillDate</td>
+                        }
+                    </tr>
+                    <tr>
+                        <th>Amout Due Till Date</th>
+                        @foreach (var data in Model)
+                        {
+                            <td>@data.AmountDueTillDate</td>
+                        }
+                    </tr>
+                </tbody>
+            </table>
+        </figure>
+
+    </div>
+</section>
+
+
+<script>
+    Highcharts.chart('container', {
+        data: {
+            table: 'datatable'
+        },
+        chart: {
+            type: 'bar'
+        },
+        title: {
+            text: 'Fee Deposit Report'
+        },
+        yAxis: {
+            allowDecimals: false,
+            title: {
+                text: 'Units'
+            }
+        },
+        tooltip: {
+            formatter: function () {
+                return '<b>' + this.series.name + '</b><br/>' +
+                    this.point.y + ' ' + this.point.name.toLowerCase();
+            }
+        }
+    });
+</script>

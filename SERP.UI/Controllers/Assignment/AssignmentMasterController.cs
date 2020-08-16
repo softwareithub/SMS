@@ -92,7 +92,7 @@ namespace SERP.UI.Controllers.Assignment
             }
             catch(Exception ex)
             {
-                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(nameof(AssignmentList),nameof(AssignmentMasterController), ex.Message, "HTTPGETCALL", 0);
+                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(nameof(AssignmentList),nameof(AssignmentMasterController), ex.Message,LoggingType.httpGet.ToString(), 0);
                 var exceptionResponse = await _exceptionLoggingRepo.CreateEntity(exceptionHelper);
                 return await Task.Run(() => PartialView("~/Views/Shared/Error.cshtml"));
 
@@ -102,8 +102,19 @@ namespace SERP.UI.Controllers.Assignment
 
         public async Task<IActionResult> GetAssignDetails(int id)
         {
-            var result = await GetAssignmentList();
-            return Json(result.Find(x => x.AssignmentId == id).Assignment);
+            try
+            {
+                var result = await GetAssignmentList();
+                return Json(result.Find(x => x.AssignmentId == id).Assignment);
+            }
+            catch(Exception ex)
+            {
+                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(nameof(GetAssignDetails), nameof(AssignmentMasterController), ex.Message,LoggingType.httpGet.ToString(), 0);
+                var exceptionResponse = await _exceptionLoggingRepo.CreateEntity(exceptionHelper);
+                return await Task.Run(() => PartialView("~/Views/Shared/Error.cshtml"));
+
+            }
+
         }
         private async Task PopulateViewBag()
         {
@@ -112,27 +123,29 @@ namespace SERP.UI.Controllers.Assignment
 
         private async Task<List<SERP.Core.Model.AssignmentHomeModel.AssignmentModel>> GetAssignmentList()
         {
-            var result = (from AM in await _assignmentRepo.GetAll(x => x.IsActive)
-                          join BM in await _IBatchRepo.GetAll(x => x.IsActive == 1)
-                          on AM.BatchId equals BM.Id
-                          join CM in await _ICourseRepo.GetAll(x => x.IsActive == 1)
-                          on AM.CourseId  equals CM.Id
-                          join SM in await _ISubjectRepo.GetAll(x=>x.IsActive==1)
-                          on AM.SubjectId equals SM.Id
-                          select new SERP.Core.Model.AssignmentHomeModel.AssignmentModel
-                          {
-                              AssignmentId= AM.Id,
-                              CourseName= CM.Name,
-                              BatchName= BM.BatchName,
-                              AssignmentName= AM.AssignmentName,
-                              PublishDate= AM.AssignmentPublishDate,
-                              SubmissionDate= AM.SubmissionDate,
-                              PDFPath= AM.PDFPath,
-                              Assignment= AM.Assignment,
-                              SubjectName= SM.SubjectName
-                          }).ToList();
 
-            return result;
+                var result = (from AM in await _assignmentRepo.GetAll(x => x.IsActive)
+                              join BM in await _IBatchRepo.GetAll(x => x.IsActive == 1)
+                              on AM.BatchId equals BM.Id
+                              join CM in await _ICourseRepo.GetAll(x => x.IsActive == 1)
+                              on AM.CourseId equals CM.Id
+                              join SM in await _ISubjectRepo.GetAll(x => x.IsActive == 1)
+                              on AM.SubjectId equals SM.Id
+                              select new SERP.Core.Model.AssignmentHomeModel.AssignmentModel
+                              {
+                                  AssignmentId = AM.Id,
+                                  CourseName = CM.Name,
+                                  BatchName = BM.BatchName,
+                                  AssignmentName = AM.AssignmentName,
+                                  PublishDate = AM.AssignmentPublishDate,
+                                  SubmissionDate = AM.SubmissionDate,
+                                  PDFPath = AM.PDFPath,
+                                  Assignment = AM.Assignment,
+                                  SubjectName = SM.SubjectName
+                              }).ToList();
+
+                return result;
+          
         }
 
     }

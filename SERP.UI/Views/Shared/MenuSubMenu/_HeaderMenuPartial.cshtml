@@ -239,14 +239,14 @@
                             <div class="col-md-4">
                                 <div class="panel panel-default">
                                     <div class="panel-heading">
-                                        Fee Detail
+                                        Today Absent Staff
                                     </div>
                                     <div class="panel-body">
                                         <div class="col-md-12">
-                                            <input type="text" placeholder="Enter Student Name" class="form-control" />
+                                            <label>Affected Class or Time Table due to Absent Teacher/Employee</label>
                                         </div>
                                         <div class="col-md-12" style="padding-top:10px;">
-                                            <button class="btn btn-success pull-right">
+                                            <button class="btn btn-success pull-right" onclick="fn_GetAbsentEmployee()">
                                                 <i class="fa fa-search"> &nbsp;&nbsp;Search </i>
                                             </button>
                                         </div>
@@ -312,6 +312,12 @@
     function fn_EmployeeSearch() {
         var employee = $("#txtEmployee").val();
         $.get("/MasterQuickSearch/EmployeeQuickSearch", { employee: employee }, function (data) {
+            $("#divSERP").html(data);
+            $("#ModalAdvanceSearch").modal('hide');
+        })
+    }
+    function fn_GetAbsentEmployee() {
+        $.get("/MasterQuickSearch/GetAbsentTeacher", function (data) {
             $("#divSERP").html(data);
             $("#ModalAdvanceSearch").modal('hide');
         })

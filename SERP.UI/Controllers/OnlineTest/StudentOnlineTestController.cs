@@ -50,6 +50,9 @@ namespace SERP.UI.Controllers.OnlineTest
             var model = await _testMasterRepo.GetSingle(x => x.Id == testId);
             HttpContext.Session.SetString("TestLimit", model.TestTimeLimit);
             var userTestDetail = await _userDetailRepo.GetSingle(x => x.TestId == testId && x.UserId == userId);
+
+            return PartialView("~/Views/StudentOnlineTest/OnlineExamRuleRegulationPartial.cshtml", model);
+
             if (userTestDetail == null && string.IsNullOrEmpty(userTestDetail?.TestStatus))
             {
                 return PartialView("~/Views/StudentOnlineTest/OnlineExamRuleRegulationPartial.cshtml", model);

@@ -1,0 +1,86 @@
+﻿@model IEnumerable<SERP.Core.Model.QuickSearchModel.AbsentEmployeeModel>
+<link href="https://cdn.datatables.net/1.10.20/css/jquery.dataTables.min.css" rel="stylesheet" />
+<script src="https://cdn.datatables.net/1.10.20/js/jquery.dataTables.min.js"></script>
+
+<div class="col-md-12">
+    <div class="box box-solid">
+        <div class="box-header with-border">
+            <i class="fa fa-text-width"></i>
+            <h3 class="box-title">@ViewBag.HeaderDetail</h3>
+        </div>
+
+        <div class="box-body">
+            <div class="col-md-12">
+                <div class="box box-widget widget-user-2">
+                    <div class="box-footer no-padding">
+                        <table id="tblDataList" class="table table-striped table-bordered responsive" style="width:100%">
+                            <thead>
+                                <tr>
+                                    <th>Course</th>
+                                    <th>Batch</th>
+                                    <th>Period</th>
+                                    <th>From Time</th>
+                                    <th>To Time</th>
+                                    <th>Subject</th>
+                                    <th>Employee</th>
+                                    <th>Assign</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+
+                                @foreach (var item in Model)
+                                {
+                                    <tr>
+                                        <td>
+                                            @item.CourseName
+                                        </td>
+                                        <td>
+                                            @item.BatchName
+                                        </td>
+                                        <td>
+                                            @item.PeriodName
+                                        </td>
+                                        <td>
+                                            @item.FromTime
+                                        </td>
+                                        <td>
+                                            @item.ToTime
+                                        </td>
+                                        <td>
+                                            @item.SubjectName
+                                        </td>
+                                        <td>
+                                            @item.EmployeeName (@item.EmpCode)
+                                        </td>
+                                        <td>
+                                            <a href="#">
+                                                <i class="fa fa-exchange" aria-hidden="true">
+                                                    Assign other Employee
+                                                </i>    
+                                            </a>
+                                        </td>
+                                    </tr>
+                                }
+
+
+                            </tbody>
+
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+
+<script>
+    $(document).ready(function () {
+        setTimeout(function () {
+            $("#tblDataList").DataTable();
+        }, 500)
+    });
+
+
+</script>

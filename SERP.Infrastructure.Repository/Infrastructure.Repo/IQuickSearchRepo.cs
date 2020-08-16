@@ -13,5 +13,7 @@ namespace SERP.Infrastructure.Repository.Infrastructure.Repo
         Task<StudentFeeDetailModel> StudentFeeDetailReport(int studentId);
         Task<List<BookDetailModel>> GetBookDetails();
         Task<EmployeeInformationModel> GetEmployeeInformationModel(int employeeId);
+        Task<List<AbsentEmployeeModel>> GetAbsentEmployeeModels();
+        Task<List<AbsentEmployeeModel>> GetEmployeeClassAllocation(int employeeId);
     }
 }
