@@ -14,5 +14,7 @@ namespace SERP.Infrastructure.Repository.Infrastructure.Repo
 
         Task<List<StudentAttendenceReport>> GetStudentAttendenceReport(int year, int month, int day);
         Task<List<TeacherAbsentModel>> GetAbsentTeacher(DateTime attendenceDate);
+        Task<DashBoardDetailVm> GetDashBoardDetails();
+        Task<List<FeeDetailVm>> GetFeeDetails();
     }
 }

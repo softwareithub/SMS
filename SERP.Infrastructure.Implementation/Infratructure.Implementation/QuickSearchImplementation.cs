@@ -7,6 +7,7 @@ using SERP.Utilities.SqlHelper;
 using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -20,6 +21,31 @@ namespace SERP.Infrastructure.Implementation.Infratructure.Implementation
         {
             baseContext = new SERPContext();
             _connectionString = baseContext.Database.GetDbConnection().ConnectionString;
+        }
+
+        public async Task<List<AbsentEmployeeModel>> GetAbsentEmployeeModels()
+        {
+            List<AbsentEmployeeModel> models = new List<AbsentEmployeeModel>();
+            var commandText = "usp_GetTodayEmployeeAbsent";
+            var reader = await SqlHelperExtension.ExecuteReader(_connectionString, commandText, System.Data.CommandType.StoredProcedure, null);
+            while (reader.Read())
+            {
+                AbsentEmployeeModel model = new AbsentEmployeeModel();
+                model.DayName = reader.DefaultIfNull<string>("Name");
+                model.PeriodName = reader.DefaultIfNull<string>("PeriodName");
+                model.FromTime = reader.DefaultIfNull<TimeSpan>("FromTime");
+                model.ToTime = reader.DefaultIfNull<TimeSpan>("ToTime");
+                model.SubjectName = reader.DefaultIfNull<string>("SubjectName");
+                model.EmployeeName = reader.DefaultIfNull<string>("empName");
+                model.EmpCode = reader.DefaultIfNull<string>("EmpCode");
+                model.Photo = reader.DefaultIfNull<string>("Photo");
+                model.CourseName = reader.DefaultIfNull<string>("CourseName");
+                model.BatchName = reader.DefaultIfNull<string>("BatchName");
+
+                models.Add(model);
+            }
+
+            return models;
         }
 
         public async Task<List<BookDetailModel>> GetBookDetails()
@@ -39,6 +65,35 @@ namespace SERP.Infrastructure.Implementation.Infratructure.Implementation
                 model.CourseName = reader.DefaultIfNull<string>("Course");
                 model.SubjectName = reader.DefaultIfNull<string>("SubjectName");
                 model.ColorCode = reader.DefaultIfNull<string>("colorCode");
+
+                models.Add(model);
+            }
+
+            return models;
+        }
+
+        public async Task<List<AbsentEmployeeModel>> GetEmployeeClassAllocation(int employeeId)
+        {
+            List<AbsentEmployeeModel> models = new List<AbsentEmployeeModel>();
+            var commandText = "usp_GetEmployeeClassAllocation";
+            SqlParameter[] sqlParams = {
+            new SqlParameter("@employeeId",employeeId)
+            };
+            var reader = await SqlHelperExtension.ExecuteReader(_connectionString, commandText, System.Data.CommandType.StoredProcedure, sqlParams);
+
+            while (reader.Read())
+            {
+                AbsentEmployeeModel model = new AbsentEmployeeModel();
+                model.DayName = reader.DefaultIfNull<string>("Name");
+                model.PeriodName = reader.DefaultIfNull<string>("PeriodName");
+                model.FromTime = reader.DefaultIfNull<TimeSpan>("FromTime");
+                model.ToTime = reader.DefaultIfNull<TimeSpan>("ToTime");
+                model.SubjectName = reader.DefaultIfNull<string>("SubjectName");
+                model.EmployeeName = reader.DefaultIfNull<string>("empName");
+                model.EmpCode = reader.DefaultIfNull<string>("EmpCode");
+                model.Photo = reader.DefaultIfNull<string>("Photo");
+                model.CourseName = reader.DefaultIfNull<string>("CourseName");
+                model.BatchName = reader.DefaultIfNull<string>("BatchName");
 
                 models.Add(model);
             }

@@ -7,7 +7,7 @@
 <script src="https://www.gstatic.com/charts/loader.js"></script>
 
 <div class="row">
-    @await Html.PartialAsync("~/Views/DashBoard/_DashBoardInfoHeaderPartial.cshtml")
+    @await Component.InvokeAsync("DashBoardHeader");
     <div class="row">
         <div class="col-md-12">
             <div id="divModuleDetails">
@@ -15,6 +15,29 @@
             </div>
         </div>
         <div class="col-md-12">
+
+            <div class="col-md-6">
+
+                <div class="box box-info">
+                    <div class="box-header with-border">
+                        <h3 class="box-title">Fee Report</h3>
+
+                        <div class="box-tools pull-right">
+                            <button type="button" class="btn btn-box-tool" data-widget="collapse">
+                                <i class="fa fa-minus"></i>
+                            </button>
+                            <button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
+                        </div>
+                    </div>
+                    <div class="box-body">
+                        @await Component.InvokeAsync("FeeDetail") 
+                    </div>
+
+                </div>
+
+
+            </div>
+
             <div class="col-md-6">
 
                 <div class="box box-info">
@@ -129,17 +152,14 @@
                 @await Component.InvokeAsync("NewPortal", DateTime.Now.Date)
                 <!--/.box -->
             </div>
-            <div class="col-md-12">
-                <a href="https://gps-coordinates.org/my-location.php?lat=28.4803455&lng=77.5275351" target="_blank">(28.4803455,77.5275351)</a>
-            </div>
         </div>
     </div>
 </div>
 
 <script>
-    $(document).ready(function () {
-        $.get("/DashBoardMaster/MenuSubMenuDetails", function (response) {
-            $("#divModuleDetails").html(response)
-        })
-    })
+    //$(document).ready(function () {
+    //    $.get("/DashBoardMaster/MenuSubMenuDetails", function (response) {
+    //        $("#divModuleDetails").html(response)
+    //    })
+    //})
 </script>

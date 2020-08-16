@@ -15,9 +15,9 @@
                                 </li>
                                 <li><a href="#tab2info" data-toggle="tab">Salary Details</a></li>
                                 <li><a href="#tab3info" data-toggle="tab">Attandence</a></li>
-                                <li><a href="#tab3info" data-toggle="tab">Class Allocation</a></li>
+                                <li><a href="#tab4info" onclick="fn_GetClassAllocation()" data-toggle="tab">Class Allocation</a></li>
                                 <li><a href="#tab3info" data-toggle="tab">Time Sheet</a></li>
-                                <li><a href="#tab3info" data-toggle="tab">Parent Review</a></li>
+                                <li><a href="#tab5info" onclick="fn_GetParentReview()" data-toggle="tab">Parent Review</a></li>
                                 <li><a href="#tab3info" data-toggle="tab">Direct Complain</a></li>
 
                             </ul>
@@ -197,7 +197,12 @@
                                     </div>
                                 </div>
                                 <div class="tab-pane fade" id="tab4info">
-                                    <div id="divBookDetails">
+                                    <div id="divEmployeeInfo">
+                                        <h3 style="text-align:center">No Record Found.</h3>
+                                    </div>
+                                </div>
+                                <div class="tab-pane fade" id="tab5info">
+                                    <div id="divParentInfo">
                                         <h3 style="text-align:center">No Record Found.</h3>
                                     </div>
                                 </div>
@@ -209,6 +214,16 @@
         </div>
     </div>
 </section>
-@*
-    For more information on enabling MVC for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
-*@
+<script>
+    function fn_GetClassAllocation() {
+        $.get("/MasterQuickSearch/GetClassAllocation", function (data) {
+            $("#divEmployeeInfo").html(data);
+        });
+    }
+
+    function fn_GetParentReview() {
+        $.get("/MasterQuickSearch/GetEmployeeReview", function (data) {
+            $("#divParentInfo").html(data);
+        });
+    }
+</script>

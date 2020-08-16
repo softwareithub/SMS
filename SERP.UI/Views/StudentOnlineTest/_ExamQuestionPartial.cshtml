@@ -12,6 +12,13 @@
 
 }
 
+<style>
+    span {
+        display: block;
+        width: 150px;
+        word-wrap: break-word;
+    }
+</style>
 <script type="text/javascript"
         src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
 </script>
@@ -21,9 +28,16 @@
             ["resetEquationNumbers", MathJax.InputJax.TeX],
             ["Typeset", MathJax.Hub]
         );
+
+        MathJax.Hub.Config({
+            tex2jax: { inlineMath: [["$", "$"], ["\\(", "\\)"]] },
+            "HTML-CSS": {
+                linebreaks: { automatic: true, width: "container" }
+            }
+        });
     }
 </script>
-<div class="col-md-12">
+<div class="col-xs-12">
     <div class="panel panel-danger">
         <div class="panel-body">
             <h4>(@Model.Sequence)  @Html.Raw(@Model.Question.Replace("<p>", "").Replace("</p>", ""))</h4>

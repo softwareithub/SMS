@@ -7,9 +7,11 @@ using SERP.Core.Entities.Entity.Core.HRModule;
 using SERP.Core.Entities.Entity.Core.Master;
 using SERP.Core.Entities.Entity.Core.Transaction;
 using SERP.Core.Entities.HomeAssignment;
+using SERP.Core.Entities.SERPExceptionLogging;
 using SERP.Core.Model.AssignmentHomeModel;
 using SERP.Infrastructure.Repository.Infrastructure.Repo;
 using SERP.Utilities.CommanHelper;
+using SERP.Utilities.ExceptionHelper;
 using SERP.Utilities.ResponseMessage;
 
 namespace SERP.UI.Controllers.Assignment
@@ -23,12 +25,15 @@ namespace SERP.UI.Controllers.Assignment
         private readonly IGenericRepository<EmployeeBasicInfoModel, int> _IEmployeeRepo;
         private readonly IGenericRepository<StudentMaster, int> _IStudentMaster;
         private readonly IGenericRepository<StudentPromote, int> _IStudentPromote;
+        private readonly IGenericRepository<ExceptionLogging, int> _exceptionLoggingRepo;
         public HomeWorkController(IGenericRepository<HomeWorkModel, int> homeworkRepo, 
             IGenericRepository<CourseMaster, int>  courseRepo, IGenericRepository<BatchMaster, int> batchRepo,
             IGenericRepository<SubjectMaster, int> subjectRepo,
             IGenericRepository<EmployeeBasicInfoModel, int> employeeRepo, 
             IGenericRepository<StudentMaster, int> studentRepo,
-             IGenericRepository<StudentPromote, int>  studentPromte)
+             IGenericRepository<StudentPromote, int>  studentPromte,
+             IGenericRepository<ExceptionLogging, int> exceptionLogging
+             )
         {
             _IHomeWorkRepo = homeworkRepo;
             _ICourseRepo = courseRepo;
@@ -37,12 +42,24 @@ namespace SERP.UI.Controllers.Assignment
             _IEmployeeRepo = employeeRepo;
             _IStudentMaster = studentRepo;
             _IStudentPromote = studentPromte;
+            _exceptionLoggingRepo = exceptionLogging;
         }
         public async Task<IActionResult> Index(int id)
         {
-            ViewBag.CourseList = await _ICourseRepo.GetList(x => x.IsActive == 1);
-            var model = await _IHomeWorkRepo.GetSingle(x => x.Id == id);
-            return PartialView("~/Views/AssignmentWork/_HomeWorkPartialView.cshtml", model);
+            try
+            {
+                ViewBag.CourseList = await _ICourseRepo.GetList(x => x.IsActive == 1);
+                var model = await _IHomeWorkRepo.GetSingle(x => x.Id == id);
+                return PartialView("~/Views/AssignmentWork/_HomeWorkPartialView.cshtml", model);
+            }
+            catch(Exception ex)
+            {
+                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(nameof(Index), nameof(HomeWorkController), ex.Message, LoggingType.httpGet.ToString(), 0);
+                var exceptionResponse = await _exceptionLoggingRepo.CreateEntity(exceptionHelper);
+                return await Task.Run(() => PartialView("~/Views/Shared/Error.cshtml"));
+
+            }
+
         }
 
         [HttpPost]

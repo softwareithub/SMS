@@ -224,6 +224,7 @@ namespace SERP.UI.Controllers.QuickSearch
                 employee = employee.Split("(")[0];
                 var model = await _employeeRepo.GetSingle(x => x.Name.ToLower().Trim() == employee.Trim().ToLower());
                 var employeeDetail = await _QuickSearchRepo.GetEmployeeInformationModel(model.Id);
+                HttpContext.Session.SetInt32("employeeId", model.Id);
                 return PartialView("~/Views/QuickMasterSearch/_EmployeeQuickSearchPartial.cshtml", employeeDetail);
             }
             catch (Exception ex)
@@ -235,6 +236,50 @@ namespace SERP.UI.Controllers.QuickSearch
 
         }
 
+        public async Task<IActionResult> GetAbsentTeacher()
+        {
+            try
+            {
+                var model = await _QuickSearchRepo.GetAbsentEmployeeModels();
+                return PartialView("~/Views/QuickMasterSearch/_AbsentTeacherDetailPartial.cshtml", model);
+            }
+            catch(Exception ex)
+            {
+                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj("GetAbsentTeacher", "MasterQuickSearch", ex.Message, "HTTPGETCALL", 0);
+                var exceptionResponse = await _exceptionLoggingRepo.CreateEntity(exceptionHelper);
+                return await Task.Run(() => PartialView("~/Views/Shared/Error.cshtml"));
+            }
+
+        }
+
+        public async Task<IActionResult> GetClassAllocation()
+        {
+            try
+            {
+                var model = await _QuickSearchRepo.GetEmployeeClassAllocation(Convert.ToInt32(HttpContext.Session.GetInt32("employeeId")));
+                return PartialView("~/Views/QuickMasterSearch/_EmployeeClassAllocationPartial.cshtml", model);
+            }
+            catch (Exception ex)
+            {
+                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj("GetAbsentTeacher", "MasterQuickSearch", ex.Message, "HTTPGETCALL", 0);
+                var exceptionResponse = await _exceptionLoggingRepo.CreateEntity(exceptionHelper);
+                return await Task.Run(() => PartialView("~/Views/Shared/Error.cshtml"));
+            }
+        }
+
+        public async Task<IActionResult> GetEmployeeReview()
+        {
+            try
+            {
+                return PartialView("~/Views/QuickMasterSearch/_ParentReviewPartial.cshtml");
+            }
+            catch (Exception ex)
+            {
+                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj("GetAbsentTeacher", "MasterQuickSearch", ex.Message, "HTTPGETCALL", 0);
+                var exceptionResponse = await _exceptionLoggingRepo.CreateEntity(exceptionHelper);
+                return await Task.Run(() => PartialView("~/Views/Shared/Error.cshtml"));
+            }
+        }
         #region PrivateReagion
 
         private string GradeCalcullation(int marks, List<GradeMaster> gradeMasters)

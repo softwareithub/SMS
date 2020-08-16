@@ -50,5 +50,11 @@ namespace SERP.UI.Controllers.DashBoard
         {
             return await Task.Run(() => PartialView("~/Views/Shared/_SubMenuDescriptionPartial.cshtml"));
         }
+
+        public async Task<IActionResult> GetFeeDetailReport()
+        {
+            var result = await _IDashBoardRepo.GetFeeDetails();
+            return await Task.Run(() => Json(result));
+        }
     }
 }

@@ -1,9 +1,9 @@
-﻿
+﻿@model SERP.Core.Model.DashBoardModel.DashBoardDetailVm
 <div class="col-lg-3 col-xs-6">
     <!-- small box -->
     <div class="small-box bg-aqua">
         <div class="inner">
-            <h3>150</h3>
+            <h3>@Model.StudentCount</h3>
 
             <p>Students Enrolled</p>
         </div>
@@ -18,9 +18,9 @@
     <!-- small box -->
     <div class="small-box bg-green">
         <div class="inner">
-            <h3>07</h3>
+            <h3>@Model.EmployeeCount</h3>
 
-            <p>Absent Teachers</p>
+            <p>Employee Count</p>
         </div>
         <div class="icon">
             <i class="fa fa-user-plus"></i>
@@ -33,9 +33,9 @@
     <!-- small box -->
     <div class="small-box bg-yellow">
         <div class="inner">
-            <h3>05</h3>
+            <h3>@Model.BatchCount</h3>
 
-            <p>New Registrations</p>
+            <p>Batch Count</p>
         </div>
         <div class="icon">
             <i class="fa fa-registered"></i>
@@ -48,9 +48,9 @@
     <!-- small box -->
     <div class="small-box bg-red">
         <div class="inner">
-            <h3>65</h3>
+            <h3>@Model.CourseCount</h3>
 
-            <p>Unique Visitors</p>
+            <p>Course/Class Count</p>
         </div>
         <div class="icon">
             <i class="fa fa-ticket"></i>
@@ -63,9 +63,9 @@
     <!-- small box -->
     <div class="small-box bg-aqua">
         <div class="inner">
-            <h3>5</h3>
+            <h3>@Model.BatchCount</h3>
 
-            <p>Course/Class</p>
+            <p>Section/Batch Count</p>
         </div>
         <div class="icon">
             <i class="fa fa-user"></i>
@@ -78,9 +78,9 @@
     <!-- small box -->
     <div class="small-box bg-green">
         <div class="inner">
-            <h3>07</h3>
+            <h3>@Model.BoysCount</h3>
 
-            <p>Batch Section</p>
+            <p>Boys Count</p>
         </div>
         <div class="icon">
             <i class="fa fa-user-plus"></i>
@@ -93,9 +93,9 @@
     <!-- small box -->
     <div class="small-box bg-yellow">
         <div class="inner">
-            <h3>75</h3>
+            <h3>@Model.GirlsCount</h3>
 
-            <p>Boys Registration</p>
+            <p>Girls Count</p>
         </div>
         <div class="icon">
             <i class="fa fa-users"></i>
@@ -108,9 +108,9 @@
     <!-- small box -->
     <div class="small-box bg-red">
         <div class="inner">
-            <h3>75</h3>
+            <h3>@Model.VisitorCount</h3>
 
-            <p>Girs Registration</p>
+            <p>Visitor Count</p>
         </div>
         <div class="icon">
             <i class="fa fa-users"></i>
@@ -118,4 +118,66 @@
         <a href="#" class="small-box-footer">More info <i class="fa fa-arrow-circle-right"></i></a>
     </div>
 </div>
+
+<div class="col-lg-3 col-xs-6">
+    <!-- small box -->
+    <div class="small-box bg-red">
+        <div class="inner">
+            <h3>@Model.PayableAmountTillDate</h3>
+
+            <p>Payable Amount Till Date</p>
+        </div>
+        <div class="icon">
+            <i class="fa fa-users"></i>
+        </div>
+        <a href="#" class="small-box-footer">More info <i class="fa fa-arrow-circle-right"></i></a>
+    </div>
+</div>
+
+<div class="col-lg-3 col-xs-6">
+    <!-- small box -->
+    <div class="small-box bg-red">
+        <div class="inner">
+            <h3>@Model.AmountPaidTillDate</h3>
+
+            <p>Amount paid Till Date</p>
+        </div>
+        <div class="icon">
+            <i class="fa fa-money"></i>
+        </div>
+        <a href="#" class="small-box-footer">More info <i class="fa fa-arrow-circle-right"></i></a>
+    </div>
+</div>
+<div class="col-lg-3 col-xs-6">
+    <!-- small box -->
+    <div class="small-box bg-red">
+        <div class="inner">
+            <h3>@Model.AmountDueTillDate</h3>
+
+            <p>Amount Due Till Date</p>
+        </div>
+        <div class="icon">
+            <i class="fa fa-money"></i>
+        </div>
+        <a href="#" class="small-box-footer">More info <i class="fa fa-arrow-circle-right"></i></a>
+    </div>
+</div>
+
+
+<div class="col-lg-3 col-xs-6">
+    <!-- small box -->
+    <div class="small-box bg-red">
+        <div class="inner">
+            <h3>@Model.FineAmountTillDate</h3>
+
+            <p>Fine Amount Till Date</p>
+        </div>
+        <div class="icon">
+            <i class="fa fa-money"></i>
+        </div>
+        <a href="#" class="small-box-footer">More info <i class="fa fa-arrow-circle-right"></i></a>
+    </div>
+</div>
+
+
 

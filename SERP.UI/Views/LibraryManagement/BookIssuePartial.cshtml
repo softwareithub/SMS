@@ -56,7 +56,7 @@
                         <div class="col-md-4" id="divStudent">
                             <div class="form-group">
                                 <label>Select Student</label>
-                                <select class="form-control select2" asp-for="UserId"  asp-items="@(new SelectList(ViewBag.StudentList ,"Id","Name"))">
+                                <select class="form-control select2" asp-for="UserId" asp-items="@(new SelectList(ViewBag.StudentList ,"Id","Name"))">
                                 </select>
                                 <span asp-validation-for="UserId" class="text-danger"></span>
                             </div>
@@ -120,9 +120,12 @@
             </div>
         </div>
 
-        <div class="modal fade" id="ModalBookReturn" role="dialog" style="overflow:auto">
+
+
+        @await Html.PartialAsync("~/Views/Shared/_CommanModalPartial.cshtml")
+        <div class="modal fade" id="ModalBookReturn">
             <div class="modal-dialog modal-dialog-centered  modal-md" style="width:90%">
-                
+
                 <div class="modal-content">
                     <div class="modal-header">
                         <button type="button" class="close" data-dismiss="modal">&times;</button>
@@ -148,8 +151,6 @@
                 <!--modal-content end-->
             </div><!--modal-dialog end-->
         </div>
-
-        @await Html.PartialAsync("~/Views/Shared/_CommanModalPartial.cshtml")
     </div>
 </section>
 

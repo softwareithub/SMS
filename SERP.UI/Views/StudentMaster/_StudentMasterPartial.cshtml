@@ -9,9 +9,7 @@
         Student Master        
     </h1>
     <ol class="breadcrumb">
-        <li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
-        <li><a href="#">Forms</a></li>
-        <li class="active">General Elements</li>
+        <em>*</em> <span style="color:#ff6a00">Required Fields</span>
     </ol>
 </section>
 
@@ -40,7 +38,7 @@
                                 <input type="hidden" asp-for="Id" />
                                 <input type="hidden" asp-for="CreatedBy" />
                                 <input type="hidden" asp-for="CreatedDate" />
-                                <label asp-for="Name">Student Name</label>
+                                <label asp-for="Name"> Student Name <em>*</em></label>
                                 <input asp-for="Name" class="form-control" />
                                 <span asp-validation-for="Name" class="text-danger"></span>
                             </div>
