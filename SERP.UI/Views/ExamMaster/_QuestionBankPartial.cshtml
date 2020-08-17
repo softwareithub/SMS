@@ -3,7 +3,7 @@
     Layout = null;
 
 }
-@model  SERP.Core.Entities.Entity.Core.ExamDetail.QuestionModel
+@model  SERP.UI.Models.QuestionVm
 
 <script src="~/lib/jquery-validation/dist/jquery.validate.js"></script>
 <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.js"></script>
@@ -56,58 +56,64 @@
 
                     </i>
                 </div>
-                <form method="post" data-ajax="true" data-ajax-method="post"
+                <form id="form" method="post" data-ajax="true" data-ajax-method="post"
                       asp-action="CreateQuestion" asp-controller="OnlineTest" data-ajax-success="Success"
                       data-ajax-begin="CustomFormSubmitBegin" data-ajax-complete="CustomFormSubmitComplete">
                     <div class="box-body">
                         <div class="col-md-4">
                             <div class="form-group">
                                 <label>Select Course</label>
-                                <select id="CourseId" asp-for="CourseId" class="form-control" asp-items="@(new SelectList(ViewBag.CourseList ,"Id","Name"))" onchange="GetSubjectList()">
+                                <select id="CourseId" asp-for="QuestionModel.CourseId" class="form-control" asp-items="@(new SelectList(ViewBag.CourseList ,"Id","Name"))" onchange="GetSubjectList()">
                                     <option value="0">Select</option>
                                 </select>
-                                <span asp-validation-for="CourseId" class="text-danger"></span>
+                                <span asp-validation-for="QuestionModel.CourseId" class="text-danger"></span>
                             </div>
                         </div>
                         <div class="col-md-4">
                             <div class="form-group">
-                                <label asp-for="SubjectId">Select Subject</label>
-                                <select asp-for="SubjectId" class="form-control" id="SubjectId">
+                                <label asp-for="QuestionModel.SubjectId">Select Subject</label>
+                                <select asp-for="QuestionModel.SubjectId" class="form-control" id="SubjectId">
                                     <option value="0">Select</option>
                                 </select>
-                                <span asp-validation-for="SubjectId" class="text-danger"></span>
+                                <span asp-validation-for="QuestionModel.SubjectId" class="text-danger"></span>
                             </div>
                         </div>
                         <div class="col-md-4">
                             <div class="form-group">
-                                <label asp-for="AnswereType">Select OptionType</label>
-                                <select asp-for="AnswereType" class="form-control" id="SubjectId">
+                                <label asp-for="QuestionModel.AnswereType">Select OptionType</label>
+                                <select asp-for="QuestionModel.AnswereType" class="form-control" id="SubjectId">
                                     <option value="SingleSelect">SingleSelect</option>
                                     <option value="MulttiSelect">MulttiSelect</option>
                                     <option value="Descriptive">Descriptive</option>
                                 </select>
-                                <span asp-validation-for="AnswereType" class="text-danger"></span>
+                                <span asp-validation-for="QuestionModel.AnswereType" class="text-danger"></span>
                             </div>
                         </div>
 
                         <div class="col-md-6">
                             <div class="form-group">
-                                <input type="hidden" asp-for="Id" />
-                                <input type="hidden" asp-for="CreatedBy" />
-                                <input type="hidden" asp-for="CreatedDate" />
-                                <label asp-for="Question">Question</label>
-                                <textarea asp-for="Question" class="form-control ckeditor"></textarea>
-                                <span asp-validation-for="Question" class="text-danger"></span>
+                                <input type="hidden" asp-for="QuestionModel.Id" />
+                                <input type="hidden" asp-for="QuestionModel.CreatedBy" />
+                                <input type="hidden" asp-for="QuestionModel.CreatedDate" />
+                                <label asp-for="QuestionModel.Question">Question</label>
+                                <textarea asp-for="QuestionModel.Question" class="form-control ckeditor"></textarea>
+                                <span asp-validation-for="QuestionModel.Question" class="text-danger"></span>
                             </div>
                         </div>
 
-
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label asp-for="OptionMasters.OptionData">Options</label>
+                                <textarea asp-for="OptionMasters.OptionData" class="form-control ckeditor"></textarea>
+                                <span asp-validation-for="OptionMasters.OptionData" class="text-danger"></span>
+                            </div>
+                        </div>
                     </div>
                     <!-- /.box-body -->
 
                     <div class="box-footer">
                         <div class="col-md-8">
-                            @Html.SERPButton("btn btn-primary pull-right btnSubmit", Model == null ? 0 : Model.Id)
+                            @Html.SERPButton("btn btn-primary pull-right btnSubmit", Model == null ? 0 : Model.QuestionModel.Id)
                             <button class="buttonload" style="display:none">
                                 <i class="fa fa-refresh fa-spin"></i>Loading
                             </button>
@@ -231,7 +237,7 @@
 
         CKEDITOR.plugins.addExternal('ckeditor_wiris', 'https://ckeditor.com/docs/ckeditor4/4.14.1/examples/assets/plugins/ckeditor_wiris/', 'plugin.js');
 
-        CKEDITOR.replace('Question', {
+        CKEDITOR.replace('QuestionModel.Question', {
             extraPlugins: 'ckeditor_wiris',
             // For now, MathType is incompatible with CKEditor file upload plugins.
             removePlugins: 'uploadimage,uploadwidget,uploadfile,filetools,filebrowser',
@@ -240,6 +246,15 @@
             extraAllowedContent: mathElements.join(' ') + '(*)[*]{*};img[data-mathml,data-custom-editor,role](Wirisformula)'
         });
 
+
+        CKEDITOR.replace('OptionMasters.OptionData', {
+            extraPlugins: 'ckeditor_wiris',
+            // For now, MathType is incompatible with CKEditor file upload plugins.
+            removePlugins: 'uploadimage,uploadwidget,uploadfile,filetools,filebrowser',
+            height: 320,
+            // Update the ACF configuration with MathML syntax.
+            extraAllowedContent: mathElements.join(' ') + '(*)[*]{*};img[data-mathml,data-custom-editor,role](Wirisformula)'
+        });
        
     }());
 </script>

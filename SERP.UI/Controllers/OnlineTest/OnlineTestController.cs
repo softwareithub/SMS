@@ -39,19 +39,29 @@ namespace SERP.UI.Controllers.OnlineTest
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateQuestion(QuestionModel model)
+        public async Task<IActionResult> CreateQuestion(QuestionVm model)
         {
-            if (model.Id == 0)
+            var response = await _QuestionRepo.CreateEntity(model.QuestionModel);
+            await _QuestionRepo.CreateNewContext();
+            List<OptionMaster> optionMasters = new List<OptionMaster>();
+            var questionId = Convert.ToInt32((await _QuestionRepo.GetList(x => x.IsActive == 1)).Max(x => x.Id));
+
+
+            string[] arr = model.OptionMasters.OptionData.Replace("<p><math xmlns=\"http://www.w3.org/1998/Math/MathML\">", "").Replace("</p>", "").Split(new[] { "<mi" }, StringSplitOptions.RemoveEmptyEntries);
+            for (int i = 0; i < arr.Length; i++)
             {
-                var response = await _QuestionRepo.CreateEntity(model);
-                return Json(ResponseData.Instance.GenericResponse(response));
+                var optionText = "<p><math xmlns='http://www.w3.org/1998/Math/MathML'><mi" + arr[i] + "</p>";
+                OptionMaster optionMaster = new OptionMaster();
+                optionMaster.QuestionId = questionId;
+                optionMaster.OptionData = optionText;
+                optionMasters.Add(optionMaster);
+
             }
-            else
-            {
-                var updateModel = CommanDeleteHelper.CommanUpdateCode<QuestionModel>(model, 1);
-                var response = await _QuestionRepo.Update(updateModel);
-                return Json(ResponseData.Instance.GenericResponse(response));
-            }
+
+            var optionResponse = await _OptionRepo.Add(optionMasters.ToArray());
+
+            return Json(ResponseData.Instance.GenericResponse(response));
+
 
         }
 
@@ -72,7 +82,7 @@ namespace SERP.UI.Controllers.OnlineTest
         {
             ViewBag.QuestionList = await _QuestionRepo.GetList(x => x.IsActive == 1);
             var model = await _OptionRepo.GetSingle(x => x.Id == id);
-            return await Task.Run(() => View("~/Views/ExamMaster/_AddOptionToQuestion.cshtml",model));
+            return await Task.Run(() => View("~/Views/ExamMaster/_AddOptionToQuestion.cshtml", model));
         }
 
         [HttpPost]
@@ -82,13 +92,14 @@ namespace SERP.UI.Controllers.OnlineTest
             return Json(ResponseData.Instance.GenericResponse(response));
         }
 
+
         public async Task<IActionResult> GetQuestionOptionList(int questId)
         {
             var models = await _OptionRepo.GetList(x => x.QuestionId == questId && x.IsActive == 1);
-            return PartialView("~/Views/ExamMaster/_QuestionOptionPartial.cshtml",models);
+            return PartialView("~/Views/ExamMaster/_QuestionOptionPartial.cshtml", models);
         }
 
-        public async Task<IActionResult> UpdateOptionCorrect(int id,int correctOption)
+        public async Task<IActionResult> UpdateOptionCorrect(int id, int correctOption)
         {
             var model = await _OptionRepo.GetSingle(x => x.Id == id);
             model.IsCorrectAnswere = correctOption;

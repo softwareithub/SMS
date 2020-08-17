@@ -8,7 +8,8 @@
         alertify.success(response);
     }
 
-    //$("#form")[0].reset();
+    $("#form")[0].reset();//reset the form controll.
+    $(".form-control").val('');//Clear the controll which is present inside the form.
 }
 
 
@@ -19,6 +20,7 @@ function CustomDelete(id, url) {
         $.get(url, { Id: id }, function (response) {
             alertify.success('Record deactivated successfully')
             return defered.promise();
+
         });
     }, function () {
         alertify.error('There is some server Error please contact admin team .')
@@ -44,6 +46,8 @@ function CustomDeleteRecord(id, getUrl, deleteUrl, event) {
                     responsive: true
                 });
             });
+
+            $(".form-control").val('');//Clear the controll which is present inside the form.
         });
     }, function () {
         alertify.warning("You cancel the delete.");
@@ -59,7 +63,7 @@ function UpdateCustomRecord(id, updateUrl, event) {
         $('.modal-backdrop').remove();
         $("#divSerpBody").removeClass('modal-open');    
     }).done(function () {
-       
+        $("#form")[0].reset();
     });
 }
 

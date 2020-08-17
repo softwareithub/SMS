@@ -41,7 +41,7 @@
                 </div>
                 <!-- /.box-header -->
                 <!-- form start -->
-                <form method="post" data-ajax="true" data-ajax-method="post"
+                <form id="form" method="post" data-ajax="true" data-ajax-method="post"
                       asp-action="CreateBatch" asp-controller="BatchMaster"  data-ajax-success="Success"
                       data-ajax-begin="CustomFormSubmitBegin" data-ajax-complete="CustomFormSubmitComplete">
                     <div class="box-body">
@@ -52,7 +52,7 @@
                                 <input type="hidden" asp-for="CreatedDate" />
                                 <label asp-for="CourseId">Select Course</label>
                                 <select class="form-control" asp-for="CourseId">
-                                    <option value="0" selected>Please select Course</option>
+                                    <option value="" selected>Please select Course</option>
                                     @foreach (var data in (List<SERP.Core.Entities.Entity.Core.Master.CourseMaster>)ViewBag.ClassList)
                                     {
                                         <option value="@data.Id">@data.Name</option>

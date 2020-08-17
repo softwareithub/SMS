@@ -156,7 +156,7 @@
         </div>
         <div class="col-md-6 login-form-2" id="divOnlineLogin">
             <h3 style="color:#007BFF">Please Login Start your session</h3>
-            <form asp-action="Login" asp-controller="Authenticate" method="post">
+            <form id="form" asp-action="Login" asp-controller="Authenticate" method="post">
                 <div class="form-group has-feedback">
                     <input asp-for="UserName" class="form-control" placeholder="User Name">
                 </div>
@@ -179,7 +179,7 @@
 
         <div class="col-md-6 login-form-2" id="divOnlineRegister" style="display:none">
             <h3 style="color:#ff6a00">@ViewBag.Name</h3>
-            <form asp-action="Authenticate" asp-controller="Authenticatet">
+            <form id="form" asp-action="Authenticate" asp-controller="Authenticatet">
                 <div class="form-group">
                     <input type="text" id="txtUserName" class="form-control" placeholder="User Name*" value="" />
                 </div>

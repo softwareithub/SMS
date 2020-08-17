@@ -42,7 +42,7 @@
                 </div>
                 <!-- /.box-header -->
                 <!-- form start -->
-                <form method="post" data-ajax="true" data-ajax-method="post"
+                <form id="form" method="post" data-ajax="true" data-ajax-method="post"
                       asp-action="Create" asp-controller="Course" data-ajax-success="Success">
                     <div class="box-body">
                         <div class="col-md-12">
@@ -76,7 +76,6 @@
                                 <div class="form-group">
                                     <label asp-for="AttendenceType">Attendence Type</label>
                                     <select class="form-control" asp-for="AttendenceType">
-                                        <option value="none">Select Attendence Type</option>
                                         <option value="Daily">Daily</option>
                                         <option value="SW">Subject Wise</option>
                                     </select>
