@@ -95,7 +95,11 @@ namespace SERP.UI.Controllers.Transaction.FeeTransaction
             if (model.FeeDiscountVm.Id == 0)
                 return await CreateFeeDiscount(model, perticularDiscountType, particularDiscountValue, particularDescription, categoriesId);
             else
+            {
+                
                 return await UpdateFeeDiscount(model, perticularDiscountType, particularDiscountValue, particularDescription, categoriesId, discountPerticularId);
+            }
+
         }
         public async Task<IActionResult> GetDiscontList()
         {

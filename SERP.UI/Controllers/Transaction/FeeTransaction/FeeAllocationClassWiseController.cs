@@ -18,17 +18,21 @@ namespace SERP.UI.Controllers.Transaction.FeeTransaction
         private readonly IGenericRepository<FeeDetailClassWise, int> _feeClassWiseDetailRepo;
         private readonly IGenericRepository<CourseMaster, int> _CourseMasterRepo;
         private readonly IGenericRepository<FeeCategory, int> _feeCategoryRepo;
+        private readonly IGenericRepository<AcademicMaster, int> _academicMasterRepo;
         public FeeAllocationClassWiseController(IGenericRepository<FeeDetailClassWise, int> feeClassWiseDetailRepo
-            , IGenericRepository<CourseMaster, int> courseMasterRepo, IGenericRepository<FeeCategory, int> feeCategoryRepo)
+            , IGenericRepository<CourseMaster, int> courseMasterRepo, IGenericRepository<FeeCategory, int> feeCategoryRepo, IGenericRepository<AcademicMaster, int> academicMasterRepo)
         {
             _feeClassWiseDetailRepo = feeClassWiseDetailRepo;
             _CourseMasterRepo = courseMasterRepo;
             _feeCategoryRepo = feeCategoryRepo;
+            _academicMasterRepo = academicMasterRepo;
         }
         public async Task<IActionResult> ClassWiseFeeAllocation()
         {
             var courseDetails = await _CourseMasterRepo.GetList(x => x.IsActive == 1 && x.IsDeleted == 0);
             var mappedCoursed = await _feeClassWiseDetailRepo.GetList(x => x.IsActive == 1 && x.IsDeleted == 0);
+            ViewBag.AcademicList = await _academicMasterRepo.GetList(x => x.IsActive == 1);
+
             courseDetails.ToList().ForEach(x =>
             {
                 mappedCoursed.ToList().ForEach(item =>
