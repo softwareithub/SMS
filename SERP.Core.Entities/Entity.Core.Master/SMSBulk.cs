@@ -17,5 +17,6 @@ namespace SERP.Core.Entities.Entity.Core.Master
         public TimeSpan SentTime { get; set; } = default;
         [DataType(DataType.Date)]
         public DateTime SentDate { get; set; } = default;
+        public int SessionId { get; set; }
     }
 }

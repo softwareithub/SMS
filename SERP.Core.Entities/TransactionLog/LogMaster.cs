@@ -10,5 +10,7 @@ namespace SERP.Core.Entities.TransactionLog
         public string InnerException { get; set; }
         public string StackTrace { get; set; }
         public string CompleteLog { get; set; }
+
+        public int SessionId { get; set; }
     }
 }

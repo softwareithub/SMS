@@ -50,5 +50,7 @@ namespace SERP.Core.Entities.Entity.Core.Master
         public string InstituteLogo { get; set; } = string.Empty;
         [MaxLength(100, ErrorMessage = "Rythum is too long.")]
         public string Rythum { get; set; } = string.Empty;
+
+        public int SessionId { get; set; }
     }
 }

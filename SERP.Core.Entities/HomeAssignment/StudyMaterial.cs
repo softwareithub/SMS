@@ -31,6 +31,6 @@ namespace SERP.Core.Entities.HomeAssignment
 
         [Required(ErrorMessage = "Please Select Upload Type")]
         public string UploadType { get; set; } = string.Empty;
-
+        public int SessionId { get; set; }
     }
 }

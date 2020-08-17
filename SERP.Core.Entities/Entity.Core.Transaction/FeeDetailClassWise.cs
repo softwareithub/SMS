@@ -19,5 +19,6 @@ namespace SERP.Core.Entities.Entity.Core.Transaction
         public string CategoryName { get; set; }
         public int Type { get; set; } = default;
         public int AcademicYear { get; set; }
+        public int SessionId { get; set; }
     }
 }

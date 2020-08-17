@@ -21,5 +21,6 @@ namespace SERP.Core.Entities.Transport
         [MaxLength(100)]
         public string VehicleNumber { get; set; }
         public string VehicleDeviceId { get; set; }
+        public int SessionId { get; set; }
     }
 }

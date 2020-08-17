@@ -17,5 +17,6 @@ namespace SERP.Core.Entities.Entity.Core.Master
         public int IsVerified { get; set; } = default;
         [NotMapped]
         public string StudentName { get; set; }
+        public int SessionId { get; set; }
     }
 }

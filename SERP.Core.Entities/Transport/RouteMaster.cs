@@ -14,5 +14,6 @@ namespace SERP.Core.Entities.Transport
         public string RouteName { get; set; }
         public int VehicleId { get; set; }
         public int DriverId { get; set; }
+        public int SessionId { get; set; }
     }
 }

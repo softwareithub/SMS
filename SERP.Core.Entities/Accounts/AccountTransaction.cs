@@ -28,6 +28,7 @@ namespace SERP.Core.Entities.Accounts
 		public string Purpose { get; set; } = string.Empty;
 		public string Remarks { get; set; } = string.Empty;
 		public string RecieptNumber { get; set; } = string.Empty;
-	
+		public int SessionId { get; set; }
+
 	}
 }

@@ -14,5 +14,6 @@ namespace SERP.Core.Entities.SERPExceptionLogging
         public string ExceptionMessage { get; set; }
         public string ExceptionNature { get; set; }
         public int IsResolved { get; set; } = 0;
+        public int SessionId { get; set; }
     }
 }

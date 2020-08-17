@@ -18,5 +18,6 @@ namespace SERP.Core.Entities.Entity.Core.Master
         public string Template { get; set; } = string.Empty;
         [Required(ErrorMessage ="Please select Template Type")]
         public string TemplateType { get; set; }
+        public int SessionId { get; set; }
     }
 }

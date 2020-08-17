@@ -21,5 +21,6 @@ namespace SERP.Core.Entities.Entity.Core.HRModule
         [Required(ErrorMessage = "Enter Pay Head Deuction Addition")]
         [Display(Name = "AdditionDeduction", Prompt = "Enter Deuction Addition")]
         public string Addition_Deduction { get; set; }
+        public int SessionId { get; set; }
     }
 }

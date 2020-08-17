@@ -23,7 +23,7 @@ namespace SERP.Core.Entities.LibraryManagement
 		public string FineAmountCalulateOn { get; set; }
 		public int AvailableNotification { get; set; }
 		public int ReturnDateNotification { get; set; }
-
+		public int SessionId { get; set; }
 	}
 }
 	

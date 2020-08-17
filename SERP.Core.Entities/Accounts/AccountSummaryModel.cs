@@ -14,5 +14,6 @@ namespace SERP.Core.Entities.Accounts
         public decimal   NetIncomeAmount { get; set; }
         public decimal OpeningBalance { get; set; }
         public decimal CurrentBalance { get; set; }
+        public int SessionId { get; set; }
     }
 }

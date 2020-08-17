@@ -38,5 +38,6 @@ namespace SERP.Core.Entities.Entity.Core.HRModule
         public DateTime? JoiningDate { get; set; }
         public int? BankId { get; set; } = default;
         public string AccountNumber { get; set; } = string.Empty;
+        public int SessionId { get; set; }
     }
 }

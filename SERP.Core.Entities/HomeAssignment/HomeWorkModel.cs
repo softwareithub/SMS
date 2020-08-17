@@ -32,6 +32,6 @@ namespace SERP.Core.Entities.HomeAssignment
         public DateTime? HomeWorkSubmissionDate { get; set; } = default;
         public string HomeWork { get; set; } = string.Empty;
         public string PDFPath { get; set; } = string.Empty;
-
+        public int SessionId { get; set; }
     }
 }

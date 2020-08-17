@@ -15,5 +15,6 @@ namespace SERP.Core.Entities.Entity.Core.HRModule
         [Required(ErrorMessage = "Please enter leave code")]
         public string LeaveCode { get; set; } = string.Empty;
         public string Description { get; set; } = string.Empty;
+        public int SessionId { get; set; }
     }
 }

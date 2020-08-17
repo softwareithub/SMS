@@ -13,5 +13,6 @@ namespace SERP.Core.Entities.OnlineVideo
         public int SubjectId { get; set; }
         public decimal FeeAmount { get; set; }
         public string CourseDescription { get; set; }
+        public int SessionId { get; set; }
     }
 }

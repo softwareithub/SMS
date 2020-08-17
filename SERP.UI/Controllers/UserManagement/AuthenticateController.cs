@@ -28,6 +28,7 @@ namespace SERP.UI.Controllers.UserManagement
         private readonly IGenericRepository<CourseMaster, int> _courseRepo;
         private readonly IGenericRepository<BatchMaster, int> _batchRepo;
         private readonly IGenericRepository<EmployeeBasicInfoModel, int> _employeeRepo;
+        private readonly IGenericRepository<AcademicMaster, int> _sessionRepo;
         public AuthenticateController(IGenericRepository<Authenticate, int> authenticateRepo,
             IGenericRepository<ModuleMaster, int> moduleRepo,
             IGenericRepository<SubModuleMaster, int> subModuleRepo,
@@ -36,7 +37,9 @@ namespace SERP.UI.Controllers.UserManagement
             IGenericRepository<StudentMaster, int> studentMasterRepo,
             IGenericRepository<StudentPromote, int> studentPromoteRepo,
             IGenericRepository<CourseMaster, int> courseRepo,
-            IGenericRepository<BatchMaster, int> batchRepo, IGenericRepository<EmployeeBasicInfoModel, int> employeeRepo
+            IGenericRepository<BatchMaster, int> batchRepo, 
+            IGenericRepository<EmployeeBasicInfoModel, int> employeeRepo,
+            IGenericRepository<AcademicMaster, int> sessionRepo
             )
         {
             _IAuthenticateRepo = authenticateRepo;
@@ -49,6 +52,7 @@ namespace SERP.UI.Controllers.UserManagement
             _courseRepo = courseRepo;
             _batchRepo = batchRepo;
             _employeeRepo = employeeRepo;
+            _sessionRepo = sessionRepo;
         }
 
         [AllowAnonymous]
@@ -61,6 +65,7 @@ namespace SERP.UI.Controllers.UserManagement
             ViewBag.Rythum = instituteModel.Rythum;
             HttpContext.Session.SetString("InstituteName", instituteModel.Name);
             HttpContext.Session.SetString("InstituteLogo", instituteModel.InstituteLogo);
+            ViewBag.SessionList = await _sessionRepo.GetAll(x => x.IsActive == 1);
             return await Task.Run(() => View("~/Views/UserManagement/_LoginPartial.cshtml"));
         }
 
@@ -78,6 +83,7 @@ namespace SERP.UI.Controllers.UserManagement
                 HttpContext.Session.SetInt32("StudentId", response.StudentId);
                 HttpContext.Session.SetInt32("EmployeeId", response.EmployeeId);
                 HttpContext.Session.SetInt32("UserId", response.Id);
+                HttpContext.Session.SetInt32("SessionId", model.SessionId);
                 if (response.StudentId != 0)
                 {
                     //Populate session with student Information

@@ -30,5 +30,6 @@ namespace SERP.Core.Entities.Entity.Core.ExamDetail
         public int InveligitatorId { get; set; } = default(int);
         public int MaxMark { get; set; } = 100;
         public int PassMark { get; set; } = 35;
+        public int SessionId { get; set; }
     }
 }

@@ -17,6 +17,7 @@ namespace SERP.Core.Entities.Accounts
         [Required(ErrorMessage ="Expense Head Code is required.")]
         [Display(Prompt ="Please Enter Expense Head Code.")]
 		public string HeadCode { get; set; }
+        public int SessionId { get; set; }
 
-	}
+    }
 }

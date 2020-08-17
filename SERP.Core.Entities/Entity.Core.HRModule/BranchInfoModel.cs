@@ -39,5 +39,6 @@ namespace SERP.Core.Entities.Entity.Core.HRModule
         [Display(Name = "Branch Email", Prompt = "Enter Branch Email")]
         public string BranchEmail { get; set; } = string.Empty;
         public string BranchLogo { get; set; } = string.Empty;
+        public int SessionId { get; set; }
     }
 }

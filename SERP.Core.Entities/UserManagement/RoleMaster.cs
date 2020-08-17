@@ -10,5 +10,6 @@ namespace SERP.Core.Entities.UserManagement
     public class RoleMaster:Base<int>
     {
         public string RoleName { get; set; }
+        public int SessionId { get; set; }
     }
 }

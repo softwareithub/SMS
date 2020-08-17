@@ -25,5 +25,6 @@ namespace SERP.Core.Entities.Transport
         public string ReciptNumber { get; set; }
         public string RecieptImage { get; set; }
         public string Remark { get; set; }
+        public int SessionId { get; set; }
     }
 }

@@ -27,5 +27,6 @@ namespace SERP.Core.Entities.HomeAssignment
         public DateTime SubmissionDate { get; set; }
 
         public string PDFPath { get; set; } = string.Empty;
+        public int SessionId { get; set; }
     }
 }

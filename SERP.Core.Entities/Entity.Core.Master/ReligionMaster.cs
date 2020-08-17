@@ -14,5 +14,6 @@ namespace SERP.Core.Entities.Entity.Core.Master
         public string Name { get; set; } = string.Empty;
         [Display(Name = "Religion Description", Prompt = "Enter description name")]
         public string Description { get; set; } = string.Empty;
+        public int SessionId { get; set; }
     }
 }

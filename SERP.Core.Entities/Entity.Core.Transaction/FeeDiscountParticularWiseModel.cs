@@ -15,6 +15,6 @@ namespace SERP.Core.Entities.Entity.Core.Transaction
         public decimal DiscountValue { get; set; } = default;
         [NotMapped]
         public string CategoryName { get; set; }
-
+        public int SessionId { get; set; }
     }
 }

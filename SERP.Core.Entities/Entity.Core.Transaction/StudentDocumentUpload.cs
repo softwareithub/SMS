@@ -22,6 +22,6 @@ namespace SERP.Core.Entities.Entity.Core.Transaction
 		public string DocumentDescription { get; set; }
 		[NotMapped]
 		public string StudentName { get; set; }
-
+		public int SessionId { get; set; }
 	}
 }

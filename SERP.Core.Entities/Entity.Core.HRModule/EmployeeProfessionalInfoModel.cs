@@ -11,5 +11,6 @@ namespace SERP.Core.Entities.Entity.Core.HRModule
         public int EmployeeId { get; set; } = default;
         public int DepartmentId { get; set; } = default;
         public int DesignationId { get; set; } = default;
+        public int SessionId { get; set; }
     }
 }

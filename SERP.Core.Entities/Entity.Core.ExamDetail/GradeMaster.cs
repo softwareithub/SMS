@@ -19,5 +19,6 @@ namespace SERP.Core.Entities.Entity.Core.ExamDetail
         [Required(ErrorMessage ="Grade is required.")]
         public string GradeName { get; set; }
         public string ResultType { get; set; } = string.Empty;
+        public int SessionId { get; set; }
     }
 }

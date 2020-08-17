@@ -22,5 +22,6 @@ namespace SERP.Core.Entities.Entity.Core.Transaction
         [Required(ErrorMessage = "Please enter Days")]
         public int [] Days { get; set; }
         public ICollection<TimeTableAssignSubjTeacherModel> TimeTableAssignSubjTeacherModels { get; set; }
+        public int SessionId { get; set; }
     }
 }

@@ -26,5 +26,6 @@ namespace SERP.Core.Entities.LibraryManagement
         public string FineReason { get; set; }
         public decimal FineDiscountAmount { get; set; }
         public string DiscountReason { get; set; }
+        public int SessionId { get; set; }
     }
 }

@@ -20,5 +20,6 @@ namespace SERP.Core.Entities.Accounts
 		[Required(ErrorMessage ="Income head code is required.")]
 		[Display(Prompt ="Please Enter Income Code")]
 		public string IncomeCode { get; set; }
+		public int SessionId { get; set; }
 	}
 }

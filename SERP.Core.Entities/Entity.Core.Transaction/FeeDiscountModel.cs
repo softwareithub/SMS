@@ -22,5 +22,6 @@ namespace SERP.Core.Entities.Entity.Core.Transaction
         [Display(Name = "Discount Value", Prompt = "Enter discount value")]
         public decimal DiscountValue { get; set; } = default;
         public int DependentOnParticular { get; set; } = default;
+        public int SessionId { get; set; }
     }
 }

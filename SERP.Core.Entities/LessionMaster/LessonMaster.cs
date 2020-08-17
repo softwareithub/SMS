@@ -18,5 +18,6 @@ namespace SERP.Core.Entities.LessionMaster
         public DateTime? EndDate { get; set; }
         [DataType(DataType.Date)]
         public DateTime? ClassTestDate { get; set; }
+        public int SessionId { get; set; }
     }
 }

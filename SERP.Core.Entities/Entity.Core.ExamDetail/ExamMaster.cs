@@ -17,5 +17,6 @@ namespace SERP.Core.Entities.Entity.Core.ExamDetail
 
         [DataType(DataType.Date)]
         public DateTime EndDate { get; set; } = DateTime.Now.Date;
+        public int SessionId { get; set; }
     }
 }

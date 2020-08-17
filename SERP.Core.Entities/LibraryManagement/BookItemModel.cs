@@ -15,5 +15,6 @@ namespace SERP.Core.Entities.LibraryManagement
         public string BINShelf { get; set; } = string.Empty;
         public string BookBarCode { get; set; } = string.Empty;
         public int BookStatus { get; set; } = default;
+        public int SessionId { get; set; }
     }
 }

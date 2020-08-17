@@ -27,6 +27,6 @@ namespace SERP.Core.Entities.Entity.Core.Master
 		public string Latitude { get; set; }
 		public string Longitude { get; set; }
 		public int Advertise { get; set; }
-		
+		public int SessionId { get; set; }
 	}
 }

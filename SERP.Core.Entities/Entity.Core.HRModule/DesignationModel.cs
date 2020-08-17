@@ -14,5 +14,6 @@ namespace SERP.Core.Entities.Entity.Core.HRModule
         public string Name { get; set; }
         [Display(Name = "Designation Code", Prompt = "Enter Designation Code")]
         public string Code { get; set; } = string.Empty;
+        public int SessionId { get; set; }
     }
 }

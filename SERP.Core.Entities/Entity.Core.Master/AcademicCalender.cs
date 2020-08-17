@@ -20,5 +20,6 @@ namespace SERP.Core.Entities.Entity.Core.Master
         [Required(ErrorMessage = "Please enter end date")]
         public DateTime ToDate { get; set; } = DateTime.Now.Date;
         public int IsHoliday { get; set; } = 0;
+        public int SessionId { get; set; }
     }
 }

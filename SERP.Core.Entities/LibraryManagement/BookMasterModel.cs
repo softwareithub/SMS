@@ -36,5 +36,7 @@ namespace SERP.Core.Entities.LibraryManagement
 
         [NotMapped]
         public bool IsBarCodeGenerated { get; set; }
+
+        public int SessionId { get; set; }
     }
 }

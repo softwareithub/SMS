@@ -15,5 +15,6 @@ namespace SERP.Core.Entities.LibraryManagement
         public string Name { get; set; }
         [DataType(DataType.MultilineText)]
         public string Description { get; set; }
+        public int SessionId { get; set; }
     }
 }

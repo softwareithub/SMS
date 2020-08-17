@@ -21,5 +21,6 @@ namespace SERP.Core.Entities.Accounts
         [DataType(DataType.Date)]
         [Display(Prompt="Please Enter Account Start Date")]
         public DateTime AccountStartDate { get; set; }
+        public int SessionId { get; set; }
     }
 }

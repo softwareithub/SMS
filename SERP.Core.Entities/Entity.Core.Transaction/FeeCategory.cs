@@ -18,6 +18,6 @@ namespace SERP.Core.Entities.Entity.Core.Transaction
         [Display(Name ="Category Code")]
         [MaxLength(100)]
         public string Code { get; set; }
-
+        public int SessionId { get; set; }
     }
 }

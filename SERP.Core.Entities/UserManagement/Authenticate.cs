@@ -25,5 +25,6 @@ namespace SERP.Core.Entities.UserManagement
         public int EmployeeId { get; set; }
         public int StudentId { get; set; }
         public int RoleId { get; set; }
+        public int SessionId { get; set; }
     }
 }

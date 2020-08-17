@@ -14,5 +14,6 @@ namespace SERP.Core.Entities.OnlineTest
         public int ChooseOptionId { get; set; }
         [NotMapped]
         public bool  IsAttempted { get; set; }
+        public int SessionId { get; set; }
     }
 }

@@ -16,5 +16,6 @@ namespace SERP.Core.Entities.Entity.Core.HRModule
         [DataType(DataType.Date)]
         public DateTime AttendenceDate { get; set; }
         public string AttendenceType { get; set; } = string.Empty;
+        public int SessionId { get; set; }
     }
 }

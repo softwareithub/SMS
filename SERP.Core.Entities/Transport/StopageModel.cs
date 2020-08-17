@@ -19,5 +19,6 @@ namespace SERP.Core.Entities.Transport
         public string Longitude { get; set; }
         public string PLaceAddress { get; set; }
         public string PlaceId { get; set; }
+        public int SessionId { get; set; }
     }
 }

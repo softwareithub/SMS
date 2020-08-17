@@ -17,5 +17,6 @@ namespace SERP.Core.Entities.Entity.Core.ExamDetail
         public string EventDescription { get; set; } 
         public string UploadPDFPath { get; set; } = string.Empty;
         public int SequeneId { get; set; } = default;
+        public int SessionId { get; set; }
     }
 }

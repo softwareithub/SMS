@@ -19,5 +19,6 @@ namespace SERP.Core.Entities.HomeAssignment
         public DateTime? EndDate { get; set; } = default;
         public string TopicDescription { get; set; } = string.Empty;
         public int ExpectedClass { get; set; } = default;
+        public int SessionId { get; set; }
     }
 }

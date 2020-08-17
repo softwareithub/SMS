@@ -18,5 +18,7 @@ namespace SERP.Core.Entities.Entity.Core.Master
         [Required(ErrorMessage = "Please select course")]
         [Column("CourseMasterId")]
         public int? CourseId { get; set; }
+
+        public int SessionId { get; set; }
     }
 }

@@ -17,6 +17,6 @@ namespace SERP.Core.Entities.HomeAssignment
         public int IsSubmitted { get; set; } = default;
         public string Grade { get; set; } = string.Empty;
         public string Reason { get; set; } = string.Empty;
-      
+        public int SessionId { get; set; }
     }
 }

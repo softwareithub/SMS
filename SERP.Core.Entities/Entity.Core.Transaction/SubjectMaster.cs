@@ -21,5 +21,6 @@ namespace SERP.Core.Entities.Entity.Core.Transaction
         [Display(Name = "Subject Description", Prompt = "Enter Subject Description")]
         public string SubjectDescription { get; set; } = string.Empty;
         public int IsElective { get; set; } = default;
+        public int SessionId { get; set; }
     }
 }

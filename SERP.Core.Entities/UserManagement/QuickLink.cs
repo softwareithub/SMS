@@ -12,5 +12,6 @@ namespace SERP.Core.Entities.UserManagement
         public int SubModuleId { get; set; }
         public int RoleId { get; set; }
         public int ModuleId { get; set; }
+        public int SessionId { get; set; }
     }
 }

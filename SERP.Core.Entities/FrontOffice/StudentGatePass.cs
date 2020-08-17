@@ -26,5 +26,6 @@ namespace SERP.Core.Entities.FrontOffice
 		[NotMapped]
 		[Required(ErrorMessage ="Guardian Name is required.")]
 		public string GuardianName { get; set; }
+		public int SessionId { get; set; }
 	}
 }

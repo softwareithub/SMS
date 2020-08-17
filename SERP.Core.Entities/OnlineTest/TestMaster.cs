@@ -22,7 +22,7 @@ namespace SERP.Core.Entities.OnlineTest
 
         [Required(ErrorMessage ="Please select Batch")]
         public int BatchId { get; set; }
-
+        public int SessionId { get; set; }
 
     }
 }

@@ -31,5 +31,6 @@ namespace SERP.Core.Entities.FrontOffice
         public string AppointmentNumber { get; set; }
         public DateTime InDateTime { get; set; } = DateTime.Now;
         public DateTime? OutDateTime { get; set; } = default;
+        public int SessionId { get; set; }
     }
 }

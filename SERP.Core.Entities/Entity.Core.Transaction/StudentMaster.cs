@@ -84,5 +84,6 @@ namespace SERP.Core.Entities.Entity.Core.Transaction
         public string C_Address { get; set; } = string.Empty;
         public string StudentPhoto { get; set; } = string.Empty;
         public string ParentsPhoto { get; set; } = string.Empty;
+        public int SessionId { get; set; }
     }
 }

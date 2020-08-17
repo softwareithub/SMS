@@ -15,5 +15,6 @@ namespace SERP.Core.Entities.UserManagement
         public string ActionName { get; set; }
         public string ControllerName { get; set; }
         public int DisplayOrder { get; set; }
+        public int SessionId { get; set; }
     }
 }

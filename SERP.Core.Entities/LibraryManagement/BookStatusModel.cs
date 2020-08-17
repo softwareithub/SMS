@@ -15,5 +15,6 @@ namespace SERP.Core.Entities.LibraryManagement
         [DisplayName("Status")]
         public string StatusName { get; set; }
         public string ColorCode { get; set; }
+        public int SessionId { get; set; }
     }
 }

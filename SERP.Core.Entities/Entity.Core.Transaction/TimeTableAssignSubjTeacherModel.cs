@@ -18,5 +18,6 @@ namespace SERP.Core.Entities.Entity.Core.Transaction
 
         public string WeekDays { get; set; } = string.Empty;
         public TimeTableMasterModel TimeTableMasterModel { get; set; }
+        public int SessionId { get; set; }
     }
 }

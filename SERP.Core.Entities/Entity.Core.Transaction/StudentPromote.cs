@@ -17,5 +17,6 @@ namespace SERP.Core.Entities.Entity.Core.Transaction
         public int BatchId { get; set; }
         [Required(ErrorMessage ="Promote Date is required")]
         public DateTime PromotionDate { get; set; }
+        public int SessionId { get; set; }
     }
 }

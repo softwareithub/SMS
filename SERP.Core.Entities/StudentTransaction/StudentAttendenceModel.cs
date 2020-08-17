@@ -14,6 +14,6 @@ namespace SERP.Core.Entities.StudentTransaction
         public DateTime AttendenceDate { get; set; }
         public string AttendenceType { get; set; }
         public string PeriodId { get; set; }
-        
+        public int SessionId { get; set; }
     }
 }

@@ -14,5 +14,6 @@ namespace SERP.Core.Entities.Entity.Core.Master
         public string Name { get; set; }
         [Display(Name = "Description", Prompt = "Enter Caste Description")]
         public string Description { get; set; } = string.Empty;
+        public int SessionId { get; set; }
     }
 }

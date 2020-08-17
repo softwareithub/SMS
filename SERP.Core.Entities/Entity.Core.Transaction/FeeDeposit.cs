@@ -17,5 +17,6 @@ namespace SERP.Core.Entities.Entity.Core.Transaction
         public decimal DueAmount { get; set; } = default;
         public DateTime DateOfDeposit { get; set; } = default;
         public int AcademicYear { get; set; } = default;
+        public int SessionId { get; set; }
     }
 }

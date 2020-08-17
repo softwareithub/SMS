@@ -24,6 +24,7 @@ namespace SERP.Core.Entities.Entity.Core.HRModule
         public DateTime? ApproveDate { get; set; } = DateTime.Now.Date;
         public DateTime? RejectDate { get; set; } = default(DateTime);
         public string RejectReason { get; set; } = string.Empty;
+        public int SessionId { get; set; }
     }
 }
 

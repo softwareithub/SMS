@@ -13,5 +13,6 @@ namespace SERP.Core.Entities.OnlineTest
         public int TestId { get; set; }
         public DateTime DateOfExamination { get; set; }
         public string TestStatus { get; set; }
+        public int SessionId { get; set; }
     }
 }

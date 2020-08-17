@@ -14,5 +14,6 @@ namespace SERP.Core.Entities.Entity.Core.ExamDetail
         public decimal AssignedMark { get; set; } = default;
         public int GradeId { get; set; } = default;
         public decimal LabMarks { get; set; } = default;
+        public int SessionId { get; set; }
     }
 }

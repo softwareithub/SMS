@@ -26,6 +26,6 @@ namespace SERP.Core.Entities.Entity.Core.Master
         [NotMapped]
         public bool IsMapped { get; set; }
 
-
+        public int SessionId { get; set; }
     }
 }

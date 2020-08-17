@@ -15,6 +15,6 @@ namespace SERP.Core.Entities.Transport
         [Required(ErrorMessage ="Stopage is required.")]
         public int StopageId { get; set; }
         public string RouteType { get; set; }
-
+        public int SessionId { get; set; }
     }
 }

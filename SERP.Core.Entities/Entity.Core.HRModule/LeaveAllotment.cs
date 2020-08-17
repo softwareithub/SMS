@@ -15,5 +15,6 @@ namespace SERP.Core.Entities.Entity.Core.HRModule
         public int DesignationId { get; set; }
         [Required(ErrorMessage ="Assign Leave per month")]
         public int LeavePerMonth { get; set; }
+        public int SessionId { get; set; }
     }
 }

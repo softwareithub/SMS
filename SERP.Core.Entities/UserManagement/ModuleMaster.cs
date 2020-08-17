@@ -12,5 +12,6 @@ namespace SERP.Core.Entities.UserManagement
         public string ModuleName { get; set; }
         public string ClassName { get; set; }
         public int DisplayOrder { get; set; }
+        public int SessionId { get; set; }
     }
 }

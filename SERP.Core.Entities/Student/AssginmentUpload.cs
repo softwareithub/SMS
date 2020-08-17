@@ -16,5 +16,6 @@ namespace SERP.Core.Entities.Student
         public DateTime AssignmentUploadDate { get; set; }
         public string AssignmentGrade { get; set; }
         public string AssigmentRemarks { get; set; }
+        public int SessionId { get; set; }
     }
 }
