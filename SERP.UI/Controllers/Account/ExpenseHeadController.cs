@@ -29,12 +29,14 @@ namespace SERP.UI.Controllers.Account
                 var model = await _expenseHeadRepo.GetSingle(x => x.IsActive == 1);
                 return PartialView("~/Views/Accounts/_CreateExpenseHeadPartial.cshtml", model);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
-                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(nameof(Index), nameof(ExpenseHead), ex.Message, LoggingType.httpGet.ToString(), 0);
+                string actionName = this.ControllerContext.RouteData.Values["action"].ToString();
+                string controllerName = this.ControllerContext.RouteData.Values["controller"].ToString();
+
+                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(actionName, controllerName, ex.Message, LoggingType.httpGet.ToString(), 0);
                 var exceptionResponse = await _exceptionLoggingRepo.CreateEntity(exceptionHelper);
                 return await Task.Run(() => PartialView("~/Views/Shared/Error.cshtml"));
-
             }
 
         }
@@ -67,12 +69,14 @@ namespace SERP.UI.Controllers.Account
             {
                 return PartialView("~/Views/Accounts/_ExpenseHeadListPartial.cshtml", await _expenseHeadRepo.GetList(x => x.IsActive == 1));
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
-                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(nameof(GetList), nameof(ExpenseHead), ex.Message, LoggingType.httpGet.ToString(), 0);
+                string actionName = this.ControllerContext.RouteData.Values["action"].ToString();
+                string controllerName = this.ControllerContext.RouteData.Values["controller"].ToString();
+
+                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(actionName, controllerName, ex.Message, LoggingType.httpGet.ToString(), 0);
                 var exceptionResponse = await _exceptionLoggingRepo.CreateEntity(exceptionHelper);
                 return await Task.Run(() => PartialView("~/Views/Shared/Error.cshtml"));
-
             }
 
         }

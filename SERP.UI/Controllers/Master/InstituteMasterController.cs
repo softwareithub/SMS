@@ -7,7 +7,9 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using SERP.Core.Entities.Entity.Core.Master;
+using SERP.Core.Entities.SERPExceptionLogging;
 using SERP.Infrastructure.Repository.Infrastructure.Repo;
+using SERP.Utilities.ExceptionHelper;
 
 namespace SERP.UI.Controllers.Master
 {
@@ -15,16 +17,33 @@ namespace SERP.UI.Controllers.Master
     {
         private readonly IGenericRepository<InstituteMaster, int> _IGenericRepo;
         private readonly IHostingEnvironment _hostingEnvironment;
+        private readonly IGenericRepository<ExceptionLogging, int> _exceptionLoggingRepo;
 
-        public InstituteMasterController(IGenericRepository<InstituteMaster, int> genericRepository, IHostingEnvironment hostingEnvironment)
+        public InstituteMasterController(IGenericRepository<InstituteMaster, int> genericRepository,
+                                         IHostingEnvironment hostingEnvironment,
+                                         IGenericRepository<ExceptionLogging, int> exceptionLoggingRepo)
         {
             _IGenericRepo = genericRepository;
             _hostingEnvironment = hostingEnvironment;
+            _exceptionLoggingRepo = exceptionLoggingRepo;
         }
         public async Task<IActionResult> Index()
         {
-            var result = await _IGenericRepo.GetList(x => x.IsActive == 1 && x.IsDeleted == 0);
-            return PartialView(result.FirstOrDefault());
+            try
+            {
+                var result = await _IGenericRepo.GetList(x => x.IsActive == 1 && x.IsDeleted == 0);
+                return PartialView(result.FirstOrDefault());
+            }
+            catch (Exception ex)
+            {
+                string actionName = this.ControllerContext.RouteData.Values["action"].ToString();
+                string controllerName = this.ControllerContext.RouteData.Values["controller"].ToString();
+
+                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(actionName, controllerName, ex.Message, LoggingType.httpGet.ToString(), 0);
+                var exceptionResponse = await _exceptionLoggingRepo.CreateEntity(exceptionHelper);
+                return await Task.Run(() => PartialView("~/Views/Shared/Error.cshtml"));
+            }
+
         }
 
         [HttpPost]

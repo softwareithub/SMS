@@ -9,11 +9,13 @@ using Microsoft.AspNetCore.Mvc;
 using Org.BouncyCastle.Asn1.Ocsp;
 using SERP.Core.Entities.Entity.Core.Master;
 using SERP.Core.Entities.HomeAssignment;
+using SERP.Core.Entities.SERPExceptionLogging;
 using SERP.Core.Entities.Student;
 using SERP.Core.Model.StudentPortal;
 using SERP.Core.Model.UserManagement;
 using SERP.Infrastructure.Repository.Infrastructure.Repo;
 using SERP.UI.Extension;
+using SERP.Utilities.ExceptionHelper;
 
 namespace SERP.UI.Controllers.StudentPortal
 {
@@ -25,10 +27,13 @@ namespace SERP.UI.Controllers.StudentPortal
         private readonly ISubjectMasterRepo _ISubjectRepo;
         private readonly IGenericRepository<BatchMaster, int> _IBatchRepo;
         private readonly IGenericRepository<AssginmentUpload, int> _assignmentUploadRepo;
+        private readonly IGenericRepository<ExceptionLogging, int> _exceptionLoggingRepo;
+
         public StudentAssignmentController(IGenericRepository<AssignmentModel, int> assignmentRepo,
           IHostingEnvironment hostingEnvironment, IGenericRepository<CourseMaster, int> _courseRepo,
            IGenericRepository<BatchMaster, int> _batchRepo, ISubjectMasterRepo _subjectRepo,
-           IGenericRepository<BatchMaster, int> batchRepo, IGenericRepository<AssginmentUpload, int> assignmentUploadRepo)
+           IGenericRepository<BatchMaster, int> batchRepo, IGenericRepository<AssginmentUpload, int> assignmentUploadRepo,
+                   IGenericRepository<ExceptionLogging, int> exceptionLoggingRepo)
         {
             _assignmentRepo = assignmentRepo;
             _hostingEnviroment = hostingEnvironment;
@@ -36,12 +41,26 @@ namespace SERP.UI.Controllers.StudentPortal
             _ISubjectRepo = _subjectRepo;
             _IBatchRepo = batchRepo;
             _assignmentUploadRepo = assignmentUploadRepo;
+            _exceptionLoggingRepo = exceptionLoggingRepo;
         }
         public async Task<IActionResult> Index()
         {
-            var studentDetail = HttpContext.Session.GetObject<StudentAccountModel>("StudentInfo");
-            var assignModel = await GetAssignmentList(studentDetail.CourseId, studentDetail.BatchId, studentDetail.StudentId);
-            return PartialView("~/Views/StudentPortal/StudentAssignment/_StudentAssignmentPartial.cshtml",assignModel);
+            try
+            {
+                var studentDetail = HttpContext.Session.GetObject<StudentAccountModel>("StudentInfo");
+                var assignModel = await GetAssignmentList(studentDetail.CourseId, studentDetail.BatchId, studentDetail.StudentId);
+                return PartialView("~/Views/StudentPortal/StudentAssignment/_StudentAssignmentPartial.cshtml", assignModel);
+            }
+            catch (Exception ex)
+            {
+                string actionName = this.ControllerContext.RouteData.Values["action"].ToString();
+                string controllerName = this.ControllerContext.RouteData.Values["controller"].ToString();
+
+                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(actionName, controllerName, ex.Message, LoggingType.httpGet.ToString(), 0);
+                var exceptionResponse = await _exceptionLoggingRepo.CreateEntity(exceptionHelper);
+                return await Task.Run(() => PartialView("~/Views/Shared/Error.cshtml"));
+            }
+
         }
 
         [HttpPost]

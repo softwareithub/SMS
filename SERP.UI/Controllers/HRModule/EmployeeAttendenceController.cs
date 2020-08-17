@@ -4,8 +4,10 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using SERP.Core.Entities.Entity.Core.HRModule;
+using SERP.Core.Entities.SERPExceptionLogging;
 using SERP.Core.Model.TransactionViewModel;
 using SERP.Infrastructure.Repository.Infrastructure.Repo;
+using SERP.Utilities.ExceptionHelper;
 using SERP.Utilities.ResponseMessage;
 
 namespace SERP.UI.Controllers.HRModule
@@ -15,48 +17,77 @@ namespace SERP.UI.Controllers.HRModule
         private readonly IGenericRepository<EmployeeAttendenceModel, int> _employeeAttendenceRepo;
         private readonly IGenericRepository<DepartmentModel, int> _departmentRepo;
         private readonly IGenericRepository<EmployeeBasicInfoModel, int> _basicInfoRepo;
+        private readonly IGenericRepository<ExceptionLogging, int> _exceptionLoggingRepo;
         public EmployeeAttendenceController(IGenericRepository<EmployeeAttendenceModel, int> attendRepo,
-            IGenericRepository<DepartmentModel, int> departRepo, IGenericRepository<EmployeeBasicInfoModel, int> basicInfoRepo)
+            IGenericRepository<DepartmentModel, int> departRepo, IGenericRepository<EmployeeBasicInfoModel, int> basicInfoRepo,
+            IGenericRepository<ExceptionLogging, int> exceptionLoggingRepo)
         {
             _employeeAttendenceRepo = attendRepo;
             _departmentRepo = departRepo;
             _basicInfoRepo = basicInfoRepo;
+            _exceptionLoggingRepo = exceptionLoggingRepo;
         }
         public async Task<IActionResult> Index()
         {
-            ViewBag.Departments = await _departmentRepo.GetList(x => x.IsActive == 1 && x.IsDeleted == 0);
-            return PartialView("~/Views/HRModule/_EmployeeAttendenceIndex.cshtml");
+            try
+            {
+                ViewBag.Departments = await _departmentRepo.GetList(x => x.IsActive == 1 && x.IsDeleted == 0);
+                return PartialView("~/Views/HRModule/_EmployeeAttendenceIndex.cshtml");
+            }
+            catch (Exception ex)
+            {
+                string actionName = this.ControllerContext.RouteData.Values["action"].ToString();
+                string controllerName = this.ControllerContext.RouteData.Values["controller"].ToString();
+
+                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(actionName, controllerName, ex.Message, LoggingType.httpGet.ToString(), 0);
+                var exceptionResponse = await _exceptionLoggingRepo.CreateEntity(exceptionHelper);
+                return await Task.Run(() => PartialView("~/Views/Shared/Error.cshtml"));
+            }
+
         }
 
         public async Task<IActionResult> GetEmployeeList(int id, string attDate)
         {
-            DateTime dt = DateTime.Parse(attDate);
-            List<EmployeeAttendenceVm> models = new List<EmployeeAttendenceVm>();
-            var employees = await _basicInfoRepo.GetList(x => x.IsActive == 1 && x.IsDeleted == 0 && x.DepartmentId == id);
-
-            employees.ToList().ForEach(item =>
+            try
             {
-                EmployeeAttendenceVm model = new EmployeeAttendenceVm();
-                model.EmployeeId = item.Id;
-                model.EmployeeCode = item.EmpCode;
-                model.EmployeeName = item.Name;
-                model.Image = item.Photo;
-                models.Add(model);
-            });
+                DateTime dt = DateTime.Parse(attDate);
+                List<EmployeeAttendenceVm> models = new List<EmployeeAttendenceVm>();
+                var employees = await _basicInfoRepo.GetList(x => x.IsActive == 1 && x.IsDeleted == 0 && x.DepartmentId == id);
 
-            var employeeAttendences = await _employeeAttendenceRepo.GetList(x => x.IsActive == 1 && x.IsDeleted == 0 && x.AttendenceDate == dt.Date);
-
-            models.ForEach(model =>
-            {
-                employeeAttendences.ToList().ForEach(item =>
+                employees.ToList().ForEach(item =>
                 {
-                    if (model.EmployeeId == item.EmployeeId)
-                    {
-                        model.AttendenceType = item.AttendenceType;
-                    }
+                    EmployeeAttendenceVm model = new EmployeeAttendenceVm();
+                    model.EmployeeId = item.Id;
+                    model.EmployeeCode = item.EmpCode;
+                    model.EmployeeName = item.Name;
+                    model.Image = item.Photo;
+                    models.Add(model);
                 });
-            });
-            return PartialView("~/Views/HRModule/_EmployeeAttendencePartial.cshtml", models);
+
+                var employeeAttendences = await _employeeAttendenceRepo.GetList(x => x.IsActive == 1 && x.IsDeleted == 0 && x.AttendenceDate == dt.Date);
+
+                models.ForEach(model =>
+                {
+                    employeeAttendences.ToList().ForEach(item =>
+                    {
+                        if (model.EmployeeId == item.EmployeeId)
+                        {
+                            model.AttendenceType = item.AttendenceType;
+                        }
+                    });
+                });
+                return PartialView("~/Views/HRModule/_EmployeeAttendencePartial.cshtml", models);
+            }
+            catch (Exception ex)
+            {
+                string actionName = this.ControllerContext.RouteData.Values["action"].ToString();
+                string controllerName = this.ControllerContext.RouteData.Values["controller"].ToString();
+
+                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(actionName, controllerName, ex.Message, LoggingType.httpGet.ToString(), 0);
+                var exceptionResponse = await _exceptionLoggingRepo.CreateEntity(exceptionHelper);
+                return await Task.Run(() => PartialView("~/Views/Shared/Error.cshtml"));
+            }
+
         }
         [HttpPost]
         public async Task<IActionResult> CreateEmployeeAttendence(EmployeeAttendenceVm model)

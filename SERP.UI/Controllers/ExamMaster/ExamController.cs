@@ -4,7 +4,9 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using SERP.Core.Entities.Entity.Core.ExamDetail;
+using SERP.Core.Entities.SERPExceptionLogging;
 using SERP.Infrastructure.Repository.Infrastructure.Repo;
+using SERP.Utilities.ExceptionHelper;
 using SERP.Utilities.ResponseMessage;
 
 namespace SERP.UI.Controllers.ExamMaster
@@ -12,15 +14,30 @@ namespace SERP.UI.Controllers.ExamMaster
     public class ExamController : Controller
     {
         private readonly IGenericRepository<Exam, int> _examRepo;
+        private readonly IGenericRepository<ExceptionLogging, int> _exceptionLoggingRepo;
 
-        public ExamController(IGenericRepository<Exam, int> examRepo)
+        public ExamController(IGenericRepository<Exam, int> examRepo,
+                              IGenericRepository<ExceptionLogging, int> exceptionLoggingRepo)
         {
             _examRepo = examRepo;
+            _exceptionLoggingRepo = exceptionLoggingRepo;
         }
         public async Task<IActionResult> Index(int Id)
         {
-            var result = await _examRepo.GetSingle(x => x.Id == Id);
-            return await Task.Run(()=> PartialView("~/Views/ExamMaster/_ExamPartial.cshtml",result));
+            try
+            {
+                var result = await _examRepo.GetSingle(x => x.Id == Id);
+                return await Task.Run(() => PartialView("~/Views/ExamMaster/_ExamPartial.cshtml", result));
+            }
+            catch (Exception ex)
+            {
+                string actionName = this.ControllerContext.RouteData.Values["action"].ToString();
+                string controllerName = this.ControllerContext.RouteData.Values["controller"].ToString();
+
+                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(actionName, controllerName, ex.Message, LoggingType.httpGet.ToString(), 0);
+                var exceptionResponse = await _exceptionLoggingRepo.CreateEntity(exceptionHelper);
+                return await Task.Run(() => PartialView("~/Views/Shared/Error.cshtml"));
+            }
         }
 
         [HttpPost]
@@ -41,8 +58,20 @@ namespace SERP.UI.Controllers.ExamMaster
 
         public async Task<IActionResult> GetExamList()
         {
-            var result = await _examRepo.GetList(x => x.IsActive == 1 && x.IsDeleted == 0);
-            return PartialView("~/Views/ExamMaster/_ExamListPartial.cshtml", result);
+            try
+            {
+                var result = await _examRepo.GetList(x => x.IsActive == 1 && x.IsDeleted == 0);
+                return PartialView("~/Views/ExamMaster/_ExamListPartial.cshtml", result);
+            }
+            catch (Exception ex)
+            {
+                string actionName = this.ControllerContext.RouteData.Values["action"].ToString();
+                string controllerName = this.ControllerContext.RouteData.Values["controller"].ToString();
+
+                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(actionName, controllerName, ex.Message, LoggingType.httpGet.ToString(), 0);
+                var exceptionResponse = await _exceptionLoggingRepo.CreateEntity(exceptionHelper);
+                return await Task.Run(() => PartialView("~/Views/Shared/Error.cshtml"));
+            }
         }
 
         public async Task<IActionResult> DeleteExam(int Id)

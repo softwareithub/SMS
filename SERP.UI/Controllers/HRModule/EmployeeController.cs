@@ -6,10 +6,12 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using SERP.Core.Entities.Entity.Core.HRModule;
+using SERP.Core.Entities.SERPExceptionLogging;
 using SERP.Core.Model.HRModel;
 using SERP.Core.Model.TransactionViewModel;
 using SERP.Infrastructure.Repository.Infrastructure.Repo;
 using SERP.Utilities.BlobUtility;
+using SERP.Utilities.ExceptionHelper;
 using SERP.Utilities.ResponseMessage;
 using SERP.Utilities.ResponseUtilities;
 
@@ -24,6 +26,7 @@ namespace SERP.UI.Controllers.HRModule
         private readonly IGenericRepository<BranchInfoModel, int> _branchInfoRepo;
         private readonly IGenericRepository<EmployeeSalaryModel, int> _employeeSalaryRepo;
         private readonly IGenericRepository<PayHeadesModel, int> _payHeadRepo;
+        private readonly IGenericRepository<ExceptionLogging, int> _exceptionLoggingRepo;
 
 
 
@@ -32,7 +35,8 @@ namespace SERP.UI.Controllers.HRModule
             IGenericRepository<DesignationModel, int> designationRepo,
             IGenericRepository<BranchInfoModel, int> branchInfoRepo,
             IGenericRepository<EmployeeSalaryModel, int> salaryRepo,
-            IGenericRepository<PayHeadesModel, int> payHeadRepo
+            IGenericRepository<PayHeadesModel, int> payHeadRepo,
+            IGenericRepository<ExceptionLogging, int> exceptionLoggingRepo
             )
         {
             _basicInfoRepo = basicInfoRepo;
@@ -42,48 +46,62 @@ namespace SERP.UI.Controllers.HRModule
             _branchInfoRepo = branchInfoRepo;
             _employeeSalaryRepo = salaryRepo;
             _payHeadRepo = payHeadRepo;
+            _exceptionLoggingRepo = exceptionLoggingRepo;
         }
         public async Task<IActionResult> Index(int id)
         {
-            EmployeeInfoVm model = new EmployeeInfoVm();
-            //populate the ViewBag for Select List items
-            ViewBag.DepartmentDetails = await _departmentRepo.GetList(x => x.IsActive == 1);
-            ViewBag.Designation = await _designationRepo.GetList(x => x.IsActive == 1);
-            ViewBag.BankDetails = await _branchInfoRepo.GetList(x => x.IsActive == 1);
-
-
-            // Get Employee info by Id
-            var employeeModel = await _basicInfoRepo.GetSingle(x => x.Id == id);
-            model.EmployeeBasicInfoModel = employeeModel;
-
-            List<EmployeeSalaryDetailModel> employeeSalaryModels = new List<EmployeeSalaryDetailModel>();
-
-            //Get All  Pay head Details irrespective of employee
-            (await _payHeadRepo.GetList(x => x.IsActive == 1)).ToList().ForEach(item =>
+            try
             {
-                EmployeeSalaryDetailModel model = new EmployeeSalaryDetailModel();
-                model.Id = item.Id;
-                model.HeadName = item.Name;
-                model.HeadId = item.Id;
-                model.IsDependentOnDay = item.IsDependentPerDay;
-                model.AdditionDeduction = item.Addition_Deduction;
-                employeeSalaryModels.Add(model);
-            });
+                EmployeeInfoVm model = new EmployeeInfoVm();
+                //populate the ViewBag for Select List items
+                ViewBag.DepartmentDetails = await _departmentRepo.GetList(x => x.IsActive == 1);
+                ViewBag.Designation = await _designationRepo.GetList(x => x.IsActive == 1);
+                ViewBag.BankDetails = await _branchInfoRepo.GetList(x => x.IsActive == 1);
 
-            // Get employee salary details
-            var employeeSalaryDetails = await _employeeSalaryRepo.GetList(x => x.EmployeeId == id);
 
-            //Populate the employee salary with head name respectively
-            if (employeeSalaryDetails.Count() > 0)
-            {
-                employeeSalaryModels.ForEach(item =>
+                // Get Employee info by Id
+                var employeeModel = await _basicInfoRepo.GetSingle(x => x.Id == id);
+                model.EmployeeBasicInfoModel = employeeModel;
+
+                List<EmployeeSalaryDetailModel> employeeSalaryModels = new List<EmployeeSalaryDetailModel>();
+
+                //Get All  Pay head Details irrespective of employee
+                (await _payHeadRepo.GetList(x => x.IsActive == 1)).ToList().ForEach(item =>
                 {
-                    item.Amount =Convert.ToDecimal(employeeSalaryDetails.ToList().Find(x => x.HeadId == item.Id)?.Amount);
+                    EmployeeSalaryDetailModel model = new EmployeeSalaryDetailModel();
+                    model.Id = item.Id;
+                    model.HeadName = item.Name;
+                    model.HeadId = item.Id;
+                    model.IsDependentOnDay = item.IsDependentPerDay;
+                    model.AdditionDeduction = item.Addition_Deduction;
+                    employeeSalaryModels.Add(model);
                 });
+
+                // Get employee salary details
+                var employeeSalaryDetails = await _employeeSalaryRepo.GetList(x => x.EmployeeId == id);
+
+                //Populate the employee salary with head name respectively
+                if (employeeSalaryDetails.Count() > 0)
+                {
+                    employeeSalaryModels.ForEach(item =>
+                    {
+                        item.Amount = Convert.ToDecimal(employeeSalaryDetails.ToList().Find(x => x.HeadId == item.Id)?.Amount);
+                    });
+                }
+                //populate the viewModel with the List
+                model.EmployeeSalaryModels = employeeSalaryModels;
+                return PartialView("~/Views/HRModule/_EmployeeInfoIndex.cshtml", model);
             }
-            //populate the viewModel with the List
-            model.EmployeeSalaryModels = employeeSalaryModels;
-            return PartialView("~/Views/HRModule/_EmployeeInfoIndex.cshtml", model);
+            catch (Exception ex)
+            {
+                string actionName = this.ControllerContext.RouteData.Values["action"].ToString();
+                string controllerName = this.ControllerContext.RouteData.Values["controller"].ToString();
+
+                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(actionName, controllerName, ex.Message, LoggingType.httpGet.ToString(), 0);
+                var exceptionResponse = await _exceptionLoggingRepo.CreateEntity(exceptionHelper);
+                return await Task.Run(() => PartialView("~/Views/Shared/Error.cshtml"));
+            }
+
         }
 
         [HttpPost]
@@ -137,8 +155,21 @@ namespace SERP.UI.Controllers.HRModule
         [HttpGet]
         public async Task<IActionResult> GetEmployeeList()
         {
-            var employeeDetails = await _basicInfoRepo.GetList(x => x.IsActive == 1);
-            return PartialView("~/Views/HRModule/_EmployeeListPartial.cshtml", employeeDetails);
+            try
+            {
+                var employeeDetails = await _basicInfoRepo.GetList(x => x.IsActive == 1);
+                return PartialView("~/Views/HRModule/_EmployeeListPartial.cshtml", employeeDetails);
+            }
+            catch (Exception ex)
+            {
+                string actionName = this.ControllerContext.RouteData.Values["action"].ToString();
+                string controllerName = this.ControllerContext.RouteData.Values["controller"].ToString();
+
+                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(actionName, controllerName, ex.Message, LoggingType.httpGet.ToString(), 0);
+                var exceptionResponse = await _exceptionLoggingRepo.CreateEntity(exceptionHelper);
+                return await Task.Run(() => PartialView("~/Views/Shared/Error.cshtml"));
+            }
+
         }
 
         [HttpGet]
@@ -167,22 +198,35 @@ namespace SERP.UI.Controllers.HRModule
         [HttpGet]
         public async Task<IActionResult> GetEmployeeSalaryInfo(int empId)
         {
-            var employeeDetail = await _basicInfoRepo.GetSingle(x => x.Id == empId);
-            ViewBag.EmployeeName = employeeDetail.Name + " (" + employeeDetail.EmpCode + ")";
-            List<EmployeeSalaryDetailModel> employeeSalaryDetailModels = new List<EmployeeSalaryDetailModel>();
-            employeeSalaryDetailModels = (from ESI in await _employeeSalaryRepo.GetList(x => x.IsActive == 1 && x.EmployeeId==empId)
-                                          join PM in await _payHeadRepo.GetList(x => x.IsActive == 1)
-                                          on ESI.HeadId equals PM.Id
-                                          select new EmployeeSalaryDetailModel
-                                          {
-                                              HeadId= PM.Id,
-                                              HeadName= PM.Name,
-                                              Amount= ESI.Amount,
-                                              AdditionDeduction= PM.Addition_Deduction,
-                                              IsDependentOnDay= PM.IsDependentPerDay
-                                          }).ToList();
+            try
+            {
+                var employeeDetail = await _basicInfoRepo.GetSingle(x => x.Id == empId);
+                ViewBag.EmployeeName = employeeDetail.Name + " (" + employeeDetail.EmpCode + ")";
+                List<EmployeeSalaryDetailModel> employeeSalaryDetailModels = new List<EmployeeSalaryDetailModel>();
+                employeeSalaryDetailModels = (from ESI in await _employeeSalaryRepo.GetList(x => x.IsActive == 1 && x.EmployeeId == empId)
+                                              join PM in await _payHeadRepo.GetList(x => x.IsActive == 1)
+                                              on ESI.HeadId equals PM.Id
+                                              select new EmployeeSalaryDetailModel
+                                              {
+                                                  HeadId = PM.Id,
+                                                  HeadName = PM.Name,
+                                                  Amount = ESI.Amount,
+                                                  AdditionDeduction = PM.Addition_Deduction,
+                                                  IsDependentOnDay = PM.IsDependentPerDay
+                                              }).ToList();
 
-            return PartialView("~/Views/HRModule/_EmployeeSalaryDetailPartial.cshtml", employeeSalaryDetailModels);
+                return PartialView("~/Views/HRModule/_EmployeeSalaryDetailPartial.cshtml", employeeSalaryDetailModels);
+            }
+            catch (Exception ex)
+            {
+                string actionName = this.ControllerContext.RouteData.Values["action"].ToString();
+                string controllerName = this.ControllerContext.RouteData.Values["controller"].ToString();
+
+                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(actionName, controllerName, ex.Message, LoggingType.httpGet.ToString(), 0);
+                var exceptionResponse = await _exceptionLoggingRepo.CreateEntity(exceptionHelper);
+                return await Task.Run(() => PartialView("~/Views/Shared/Error.cshtml"));
+            }
+
         }
 
         private async Task<ResponseStatus> UpdateEmplolyeeInfo(EmployeeInfoVm model, IFormFile employeePhoto)

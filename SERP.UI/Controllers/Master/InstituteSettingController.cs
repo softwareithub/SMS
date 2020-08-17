@@ -4,8 +4,10 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using SERP.Core.Entities.Entity.Core.Master;
+using SERP.Core.Entities.SERPExceptionLogging;
 using SERP.Infrastructure.Repository.Infrastructure.Repo;
 using SERP.Utilities.CommanHelper;
+using SERP.Utilities.ExceptionHelper;
 using SERP.Utilities.ResponseMessage;
 
 namespace SERP.UI.Controllers.Master
@@ -14,17 +16,34 @@ namespace SERP.UI.Controllers.Master
     {
         private readonly IGenericRepository<InstituteSettingModel, int> _instituteRepo;
         private readonly IGenericRepository<InstituteMaster, int> _instituteMasterRepo;
+        private readonly IGenericRepository<ExceptionLogging, int> _exceptionLoggingRepo;
 
-        public InstituteSettingController(IGenericRepository<InstituteSettingModel, int> instituteRepo, IGenericRepository<InstituteMaster, int> instituteMasterRepo)
+        public InstituteSettingController(IGenericRepository<InstituteSettingModel, int> instituteRepo, 
+                                          IGenericRepository<InstituteMaster, int> instituteMasterRepo,
+                                          IGenericRepository<ExceptionLogging, int> exceptionLoggingRepo)
         {
             _instituteRepo = instituteRepo;
             _instituteMasterRepo = instituteMasterRepo;
+            _exceptionLoggingRepo = exceptionLoggingRepo;
         }
         public async Task<IActionResult> Index(int id)
         {
-            var instituteModel = (await _instituteMasterRepo.GetSingle(x => x.IsActive == 1)).Id;
-            var model = await _instituteRepo.GetSingle(x => x.InstituteId == instituteModel);
-            return PartialView("~/Views/InstituteMaster/_InstituteSettingPartial.cshtml", model);
+            try
+            {
+                var instituteModel = (await _instituteMasterRepo.GetSingle(x => x.IsActive == 1)).Id;
+                var model = await _instituteRepo.GetSingle(x => x.InstituteId == instituteModel);
+                return PartialView("~/Views/InstituteMaster/_InstituteSettingPartial.cshtml", model);
+            }
+            catch (Exception ex)
+            {
+                string actionName = this.ControllerContext.RouteData.Values["action"].ToString();
+                string controllerName = this.ControllerContext.RouteData.Values["controller"].ToString();
+
+                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(actionName, controllerName, ex.Message, LoggingType.httpGet.ToString(), 0);
+                var exceptionResponse = await _exceptionLoggingRepo.CreateEntity(exceptionHelper);
+                return await Task.Run(() => PartialView("~/Views/Shared/Error.cshtml"));
+            }
+
         }
 
         [HttpPost]

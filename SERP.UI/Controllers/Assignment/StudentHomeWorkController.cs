@@ -8,8 +8,10 @@ using SERP.Core.Entities.Entity.Core.HRModule;
 using SERP.Core.Entities.Entity.Core.Master;
 using SERP.Core.Entities.Entity.Core.Transaction;
 using SERP.Core.Entities.HomeAssignment;
+using SERP.Core.Entities.SERPExceptionLogging;
 using SERP.Core.Model.AssignmentHomeModel;
 using SERP.Infrastructure.Repository.Infrastructure.Repo;
+using SERP.Utilities.ExceptionHelper;
 using SERP.Utilities.ResponseMessage;
 
 namespace SERP.UI.Controllers.Assignment
@@ -24,6 +26,8 @@ namespace SERP.UI.Controllers.Assignment
         private readonly IGenericRepository<StudentMaster, int> _IStudentMaster;
         private readonly IGenericRepository<StudentPromote, int> _IStudentPromote;
         private readonly IGenericRepository<StudentHomeWork, int> _IStudentHomeWorkRepo;
+        private readonly IGenericRepository<ExceptionLogging, int> _exceptionLoggingRepo;
+        
 
         public  StudentHomeWorkController(IGenericRepository<HomeWorkModel, int> homeworkRepo,
             IGenericRepository<CourseMaster, int> courseRepo, IGenericRepository<BatchMaster, int> batchRepo,
@@ -31,7 +35,9 @@ namespace SERP.UI.Controllers.Assignment
             IGenericRepository<EmployeeBasicInfoModel, int> employeRepo,
             IGenericRepository<StudentMaster, int> studentRepo,
              IGenericRepository<StudentPromote, int> studentPromte,
-            IGenericRepository<StudentHomeWork, int>  studentHomeWorkRepo)
+            IGenericRepository<StudentHomeWork, int>  studentHomeWorkRepo,
+            IGenericRepository<ExceptionLogging, int> exceptionLoggingRepo
+            )
         {
             _IHomeWorkRepo = homeworkRepo;
             _ICourseRepo = courseRepo;
@@ -41,75 +47,113 @@ namespace SERP.UI.Controllers.Assignment
             _IStudentMaster = studentRepo;
             _IStudentPromote = studentPromte;
             _IStudentHomeWorkRepo = studentHomeWorkRepo;
+            _exceptionLoggingRepo = exceptionLoggingRepo;
         }
         public async Task<IActionResult> Index()
         {
-            ViewBag.CourseList = await _ICourseRepo.GetList(x => x.IsActive == 1);
-            return PartialView("~/Views/AssignmentWork/_HomeWorkSubmissionPartial.cshtml");
+            try
+            {
+                ViewBag.CourseList = await _ICourseRepo.GetList(x => x.IsActive == 1);
+                return PartialView("~/Views/AssignmentWork/_HomeWorkSubmissionPartial.cshtml");
+            }
+            catch (Exception ex)
+            {
+                string actionName = this.ControllerContext.RouteData.Values["action"].ToString();
+                string controllerName = this.ControllerContext.RouteData.Values["controller"].ToString();
+
+                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(actionName, controllerName, ex.Message, LoggingType.httpGet.ToString(), 0);
+                var exceptionResponse = await _exceptionLoggingRepo.CreateEntity(exceptionHelper);
+                return await Task.Run(() => PartialView("~/Views/Shared/Error.cshtml"));
+            }
         }
 
         public async Task<IActionResult> GetHomeWorkDetail(int courseId, int batchId, int subjectId)
         {
-            var result = (from HM in await _IHomeWorkRepo.GetList(x => x.IsActive == 1)
-                          join CM in await _ICourseRepo.GetList(x => x.IsActive == 1 && x.Id==courseId)
-                          on HM.CourseId equals CM.Id
-                          join BM in await _IBatchRepo.GetList(x => x.IsActive == 1 && x.Id== batchId)
-                          on HM.BatchId equals BM.Id
-                          join SM in await _ISubjectRepo.GetList(x => x.IsActive == 1 && x.Id==subjectId)
-                          on HM.SubjectId equals SM.Id
-                          join EM in await _IEmployeeRepo.GetList(x => x.IsActive == 1)
-                          on HM.EmployeeId equals EM.Id
-                          select new HomeWorkModelVm
-                          {
-                              Id = HM.Id,
-                              CourseName = CM.Name,
-                              BatchName = BM.BatchName,
-                              SubjectName = SM.SubjectName,
-                              EmployeeName = EM.Name,
-                              HomeWork = HM.HomeWork,
-                              PDFPath = HM.PDFPath,
-                              PublishDate =Convert.ToDateTime(HM.HomeWorkDate),
-                              SubmissionDate =Convert.ToDateTime(HM.HomeWorkSubmissionDate),
-                          }).ToList();
+            try
+            {
+                var result = (from HM in await _IHomeWorkRepo.GetList(x => x.IsActive == 1)
+                              join CM in await _ICourseRepo.GetList(x => x.IsActive == 1 && x.Id == courseId)
+                              on HM.CourseId equals CM.Id
+                              join BM in await _IBatchRepo.GetList(x => x.IsActive == 1 && x.Id == batchId)
+                              on HM.BatchId equals BM.Id
+                              join SM in await _ISubjectRepo.GetList(x => x.IsActive == 1 && x.Id == subjectId)
+                              on HM.SubjectId equals SM.Id
+                              join EM in await _IEmployeeRepo.GetList(x => x.IsActive == 1)
+                              on HM.EmployeeId equals EM.Id
+                              select new HomeWorkModelVm
+                              {
+                                  Id = HM.Id,
+                                  CourseName = CM.Name,
+                                  BatchName = BM.BatchName,
+                                  SubjectName = SM.SubjectName,
+                                  EmployeeName = EM.Name,
+                                  HomeWork = HM.HomeWork,
+                                  PDFPath = HM.PDFPath,
+                                  PublishDate = Convert.ToDateTime(HM.HomeWorkDate),
+                                  SubmissionDate = Convert.ToDateTime(HM.HomeWorkSubmissionDate),
+                              }).ToList();
 
-            HttpContext.Session.SetInt32("courseId", courseId);
-            HttpContext.Session.SetInt32("batchId", batchId);
-            HttpContext.Session.SetInt32("subjectId", subjectId);
+                HttpContext.Session.SetInt32("courseId", courseId);
+                HttpContext.Session.SetInt32("batchId", batchId);
+                HttpContext.Session.SetInt32("subjectId", subjectId);
 
-            return PartialView("~/Views/AssignmentWork/_HomeWorkDetailForCheck.cshtml", result);
+                return PartialView("~/Views/AssignmentWork/_HomeWorkDetailForCheck.cshtml", result);
+            }
+            catch (Exception ex)
+            {
+                string actionName = this.ControllerContext.RouteData.Values["action"].ToString();
+                string controllerName = this.ControllerContext.RouteData.Values["controller"].ToString();
+
+                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(actionName, controllerName, ex.Message, LoggingType.httpGet.ToString(), 0);
+                var exceptionResponse = await _exceptionLoggingRepo.CreateEntity(exceptionHelper);
+                return await Task.Run(() => PartialView("~/Views/Shared/Error.cshtml"));
+            }
         }
 
         public async Task<IActionResult> GetStudentList(int homeWorkId)
         {
-            int courseId = Convert.ToInt32(HttpContext.Session.GetInt32("courseId"));
-            int batchId = Convert.ToInt32(HttpContext.Session.GetInt32("batchId"));
-            var result = (from SM in await _IStudentMaster.GetList(x => x.IsActive == 1)
-                          join SP in await _IStudentPromote.GetList(x => x.IsActive == 1 &&
-                                                         x.CourseId == courseId && x.BatchId == batchId)
-                          on SM.Id equals SP.StudentId
-                          select new HomeWorkAllocationModel
-                          {
-                              StudentId= SM.Id,
-                              StudentName= SM.Name,
-                              RollCode= SM.RollCode,
-                              ImagePath= SM.StudentPhoto,
-                          }).ToList();
-            var submittedHomeWork = await _IStudentHomeWorkRepo.GetList(x => x.HomeWorkId == homeWorkId && x.IsActive==1);
-            if(submittedHomeWork.Count()>0)
+            try
             {
-                result.ForEach(item => {
-                    var subMittedModel = submittedHomeWork.ToList().Find(x => x.StudentId == item.StudentId);
-                    if(subMittedModel!= null)
+                int courseId = Convert.ToInt32(HttpContext.Session.GetInt32("courseId"));
+                int batchId = Convert.ToInt32(HttpContext.Session.GetInt32("batchId"));
+                var result = (from SM in await _IStudentMaster.GetList(x => x.IsActive == 1)
+                              join SP in await _IStudentPromote.GetList(x => x.IsActive == 1 &&
+                                                             x.CourseId == courseId && x.BatchId == batchId)
+                              on SM.Id equals SP.StudentId
+                              select new HomeWorkAllocationModel
+                              {
+                                  StudentId = SM.Id,
+                                  StudentName = SM.Name,
+                                  RollCode = SM.RollCode,
+                                  ImagePath = SM.StudentPhoto,
+                              }).ToList();
+                var submittedHomeWork = await _IStudentHomeWorkRepo.GetList(x => x.HomeWorkId == homeWorkId && x.IsActive == 1);
+                if (submittedHomeWork.Count() > 0)
+                {
+                    result.ForEach(item =>
                     {
-                        item.Grade = subMittedModel.Grade;
-                        item.FeedBack = subMittedModel.Reason;
-                        item.SubMissionDate = subMittedModel.SubmissionDate;
-                    }
-                   
-                });
+                        var subMittedModel = submittedHomeWork.ToList().Find(x => x.StudentId == item.StudentId);
+                        if (subMittedModel != null)
+                        {
+                            item.Grade = subMittedModel.Grade;
+                            item.FeedBack = subMittedModel.Reason;
+                            item.SubMissionDate = subMittedModel.SubmissionDate;
+                        }
+
+                    });
+                }
+                HttpContext.Session.SetInt32("homeWorkId", homeWorkId);
+                return PartialView("~/Views/AssignmentWork/StudentHomeWorkGradeAllocation.cshtml", result);
             }
-            HttpContext.Session.SetInt32("homeWorkId", homeWorkId);
-            return PartialView("~/Views/AssignmentWork/StudentHomeWorkGradeAllocation.cshtml", result);
+            catch (Exception ex)
+            {
+                string actionName = this.ControllerContext.RouteData.Values["action"].ToString();
+                string controllerName = this.ControllerContext.RouteData.Values["controller"].ToString();
+
+                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(actionName, controllerName, ex.Message, LoggingType.httpGet.ToString(), 0);
+                var exceptionResponse = await _exceptionLoggingRepo.CreateEntity(exceptionHelper);
+                return await Task.Run(() => PartialView("~/Views/Shared/Error.cshtml"));
+            }
         }
 
         [HttpPost]

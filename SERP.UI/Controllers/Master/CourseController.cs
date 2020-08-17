@@ -4,7 +4,9 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using SERP.Core.Entities.Entity.Core.Master;
+using SERP.Core.Entities.SERPExceptionLogging;
 using SERP.Infrastructure.Repository.Infrastructure.Repo;
+using SERP.Utilities.ExceptionHelper;
 using SERP.Utilities.ResponseMessage;
 
 namespace SERP.UI.Controllers.Master
@@ -12,19 +14,34 @@ namespace SERP.UI.Controllers.Master
     public class CourseController : Controller
     {
         private readonly IGenericRepository<CourseMaster, int> _IGenericRepo;
-        public CourseController(IGenericRepository<CourseMaster, int> genericRepository)
+        private readonly IGenericRepository<ExceptionLogging, int> _exceptionLoggingRepo;
+        public CourseController(IGenericRepository<CourseMaster, int> genericRepository,
+                                IGenericRepository<ExceptionLogging, int> exceptionLoggingRepo)
         {
             _IGenericRepo = genericRepository;
+            _exceptionLoggingRepo = exceptionLoggingRepo;
         }
         public async Task<IActionResult> Index(int id = 0)
         {
-            if (id == 0)
-                return await Task.Run(() => PartialView("~/Views/CourseMaster/_CourseMasterPartial.cshtml"));
+            try
+            {
+                if (id == 0)
+                    return await Task.Run(() => PartialView("~/Views/CourseMaster/_CourseMasterPartial.cshtml"));
 
-            var courseDetail = await _IGenericRepo.GetSingle(x => x.Id == id);
-            var attendenceType = courseDetail.AttendenceType.Trim();
-            courseDetail.AttendenceType = attendenceType;
-            return PartialView("~/Views/CourseMaster/_CourseMasterPartial.cshtml", courseDetail);
+                var courseDetail = await _IGenericRepo.GetSingle(x => x.Id == id);
+                var attendenceType = courseDetail.AttendenceType.Trim();
+                courseDetail.AttendenceType = attendenceType;
+                return PartialView("~/Views/CourseMaster/_CourseMasterPartial.cshtml", courseDetail);
+            }
+            catch (Exception ex)
+            {
+                string actionName = this.ControllerContext.RouteData.Values["action"].ToString();
+                string controllerName = this.ControllerContext.RouteData.Values["controller"].ToString();
+
+                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(actionName, controllerName, ex.Message, LoggingType.httpGet.ToString(), 0);
+                var exceptionResponse = await _exceptionLoggingRepo.CreateEntity(exceptionHelper);
+                return await Task.Run(() => PartialView("~/Views/Shared/Error.cshtml"));
+            }
         }
 
         [HttpPost]
@@ -49,8 +66,20 @@ namespace SERP.UI.Controllers.Master
         [HttpGet]
         public async Task<IActionResult> GetCourseList()
         {
-            var result = await _IGenericRepo.GetList(c => c.IsActive == 1 && c.IsDeleted == 0);
-            return PartialView(PartialPages.PartialPageDetails.ClassDetailPartial, result);
+            try
+            {
+                var result = await _IGenericRepo.GetList(c => c.IsActive == 1 && c.IsDeleted == 0);
+                return PartialView(PartialPages.PartialPageDetails.ClassDetailPartial, result);
+            }
+            catch (Exception ex)
+            {
+                string actionName = this.ControllerContext.RouteData.Values["action"].ToString();
+                string controllerName = this.ControllerContext.RouteData.Values["controller"].ToString();
+
+                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(actionName, controllerName, ex.Message, LoggingType.httpGet.ToString(), 0);
+                var exceptionResponse = await _exceptionLoggingRepo.CreateEntity(exceptionHelper);
+                return await Task.Run(() => PartialView("~/Views/Shared/Error.cshtml"));
+            }
         }
 
         [HttpGet]

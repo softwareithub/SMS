@@ -52,12 +52,14 @@ namespace SERP.UI.Controllers.Assignment
                 var model = await _IHomeWorkRepo.GetSingle(x => x.Id == id);
                 return PartialView("~/Views/AssignmentWork/_HomeWorkPartialView.cshtml", model);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
-                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(nameof(Index), nameof(HomeWorkController), ex.Message, LoggingType.httpGet.ToString(), 0);
+                string actionName = this.ControllerContext.RouteData.Values["action"].ToString();
+                string controllerName = this.ControllerContext.RouteData.Values["controller"].ToString();
+
+                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(actionName, controllerName, ex.Message, LoggingType.httpGet.ToString(), 0);
                 var exceptionResponse = await _exceptionLoggingRepo.CreateEntity(exceptionHelper);
                 return await Task.Run(() => PartialView("~/Views/Shared/Error.cshtml"));
-
             }
 
         }
@@ -92,28 +94,40 @@ namespace SERP.UI.Controllers.Assignment
 
         public async Task<IActionResult> GetList()
         {
-            var result = (from HM in await _IHomeWorkRepo.GetList(x => x.IsActive == 1)
-                          join CM in await _ICourseRepo.GetList(x => x.IsActive == 1)
-                          on HM.CourseId equals CM.Id
-                          join BM in await _IBatchRepo.GetList(x => x.IsActive == 1)
-                          on HM.BatchId equals BM.Id
-                          join SM in await _ISubjectRepo.GetList(x => x.IsActive == 1)
-                          on HM.SubjectId equals SM.Id
-                          join EM in await _IEmployeeRepo.GetList(x => x.IsActive == 1)
-                          on HM.EmployeeId equals EM.Id
-                          select new HomeWorkModelVm
-                          {
-                              Id= HM.Id,
-                              CourseName= CM.Name,
-                              BatchName= BM.BatchName,
-                              SubjectName= SM.SubjectName,
-                              EmployeeName= EM.Name,
-                              HomeWork= HM.HomeWork,
-                              PDFPath= HM.PDFPath,
-                              PublishDate=Convert.ToDateTime(HM.HomeWorkDate),
-                              SubmissionDate=Convert.ToDateTime(HM.HomeWorkSubmissionDate),
-                          }).ToList();
-            return PartialView("~/Views/AssignmentWork/_HomeWorkDetails.cshtml", result);            
+            try
+            {
+                var result = (from HM in await _IHomeWorkRepo.GetList(x => x.IsActive == 1)
+                              join CM in await _ICourseRepo.GetList(x => x.IsActive == 1)
+                              on HM.CourseId equals CM.Id
+                              join BM in await _IBatchRepo.GetList(x => x.IsActive == 1)
+                              on HM.BatchId equals BM.Id
+                              join SM in await _ISubjectRepo.GetList(x => x.IsActive == 1)
+                              on HM.SubjectId equals SM.Id
+                              join EM in await _IEmployeeRepo.GetList(x => x.IsActive == 1)
+                              on HM.EmployeeId equals EM.Id
+                              select new HomeWorkModelVm
+                              {
+                                  Id = HM.Id,
+                                  CourseName = CM.Name,
+                                  BatchName = BM.BatchName,
+                                  SubjectName = SM.SubjectName,
+                                  EmployeeName = EM.Name,
+                                  HomeWork = HM.HomeWork,
+                                  PDFPath = HM.PDFPath,
+                                  PublishDate = Convert.ToDateTime(HM.HomeWorkDate),
+                                  SubmissionDate = Convert.ToDateTime(HM.HomeWorkSubmissionDate),
+                              }).ToList();
+                return PartialView("~/Views/AssignmentWork/_HomeWorkDetails.cshtml", result);
+            }
+            catch (Exception ex)
+            {
+                string actionName = this.ControllerContext.RouteData.Values["action"].ToString();
+                string controllerName = this.ControllerContext.RouteData.Values["controller"].ToString();
+
+                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(actionName, controllerName, ex.Message, LoggingType.httpGet.ToString(), 0);
+                var exceptionResponse = await _exceptionLoggingRepo.CreateEntity(exceptionHelper);
+                return await Task.Run(() => PartialView("~/Views/Shared/Error.cshtml"));
+            }
         }
 
         

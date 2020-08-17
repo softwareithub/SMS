@@ -6,8 +6,10 @@ using Microsoft.AspNetCore.Mvc;
 using SERP.Core.Entities.Entity.Core.HRModule;
 using SERP.Core.Entities.Entity.Core.Transaction;
 using SERP.Core.Entities.LibraryManagement;
+using SERP.Core.Entities.SERPExceptionLogging;
 using SERP.Core.Model.LibraryManagement;
 using SERP.Infrastructure.Repository.Infrastructure.Repo;
+using SERP.Utilities.ExceptionHelper;
 using SERP.Utilities.ResponseMessage;
 
 namespace SERP.UI.Controllers.LibraryManagement
@@ -20,10 +22,14 @@ namespace SERP.UI.Controllers.LibraryManagement
         private readonly IGenericRepository<EmployeeBasicInfoModel, int> _employeeRepo;
         private readonly IGenericRepository<StudentMaster, int> _studentRepo;
         private readonly IGenericRepository<BookStatusModel, int> _bookStatusRepo;
+        private readonly IGenericRepository<ExceptionLogging, int> _exceptionLoggingRepo;
         public BookReturnController(IGenericRepository<BookTransaction, int> bookTransactionRepo,
-           IGenericRepository<BookItemModel, int> bookItemRepo, IGenericRepository<BookMasterModel, int> bookMasterRepo,
-            IGenericRepository<EmployeeBasicInfoModel, int> employeeRepo, IGenericRepository<StudentMaster, int> studentRepo
-           , IGenericRepository<BookStatusModel, int> bookStatusRepo)
+                                    IGenericRepository<BookItemModel, int> bookItemRepo, 
+                                    IGenericRepository<BookMasterModel, int> bookMasterRepo,
+                                    IGenericRepository<EmployeeBasicInfoModel, int> employeeRepo,
+                                    IGenericRepository<StudentMaster, int> studentRepo,
+                                    IGenericRepository<BookStatusModel, int> bookStatusRepo,
+                                    IGenericRepository<ExceptionLogging, int> exceptionLoggingRepo)
         {
             _bookTransactionRepo = bookTransactionRepo;
             _bookItemRepo = bookItemRepo;
@@ -31,12 +37,25 @@ namespace SERP.UI.Controllers.LibraryManagement
             _employeeRepo = employeeRepo;
             _studentRepo = studentRepo;
             _bookStatusRepo = bookStatusRepo;
+            _exceptionLoggingRepo = exceptionLoggingRepo;
         }
         public async Task<IActionResult> Index(int id)
         {
-            ViewBag.BookStatus = await _bookStatusRepo.GetList(x => x.IsActive == 1);
-            var issueDetailModel = await GetBookItemDetail(id);
-            return PartialView("~/Views/LibraryManagement/_BookReturnPartial.cshtml", issueDetailModel.FirstOrDefault());
+            try
+            {
+                ViewBag.BookStatus = await _bookStatusRepo.GetList(x => x.IsActive == 1);
+                var issueDetailModel = await GetBookItemDetail(id);
+                return PartialView("~/Views/LibraryManagement/_BookReturnPartial.cshtml", issueDetailModel.FirstOrDefault());
+            }
+            catch (Exception ex)
+            {
+                string actionName = this.ControllerContext.RouteData.Values["action"].ToString();
+                string controllerName = this.ControllerContext.RouteData.Values["controller"].ToString();
+
+                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(actionName, controllerName, ex.Message, LoggingType.httpGet.ToString(), 0);
+                var exceptionResponse = await _exceptionLoggingRepo.CreateEntity(exceptionHelper);
+                return await Task.Run(() => PartialView("~/Views/Shared/Error.cshtml"));
+            }
         }
 
         [HttpPost]

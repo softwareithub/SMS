@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using SERP.Core.Entities.SERPExceptionLogging;
 using SERP.Core.Entities.UserManagement;
 using SERP.Infrastructure.Repository.Infrastructure.Repo;
 using SERP.Utilities.CommanHelper;
+using SERP.Utilities.ExceptionHelper;
 using SERP.Utilities.ResponseMessage;
 
 namespace SERP.UI.Controllers.UserManagement
@@ -11,14 +13,32 @@ namespace SERP.UI.Controllers.UserManagement
     public class MenuController : Controller
     {
         private readonly IGenericRepository<ModuleMaster, int> _IModuleRepo;
+        private readonly IGenericRepository<ExceptionLogging, int> _exceptionLoggingRepo;
 
-        public MenuController(IGenericRepository<ModuleMaster, int> _moduleRepo)
+
+        public MenuController(IGenericRepository<ModuleMaster, int> _moduleRepo,
+                        IGenericRepository<ExceptionLogging, int> exceptionLoggingRepo)
         {
             _IModuleRepo = _moduleRepo;
+            _exceptionLoggingRepo = exceptionLoggingRepo;
+
         }
         public async Task<IActionResult> Index(int id)
         {
-            return PartialView("~/Views/UserManagement/_ModuleMasterView.cshtml",await _IModuleRepo.GetSingle(x=>x.Id==id));
+            try
+            {
+                return PartialView("~/Views/UserManagement/_ModuleMasterView.cshtml", await _IModuleRepo.GetSingle(x => x.Id == id));
+            }
+            catch (Exception ex)
+            {
+                string actionName = this.ControllerContext.RouteData.Values["action"].ToString();
+                string controllerName = this.ControllerContext.RouteData.Values["controller"].ToString();
+
+                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(actionName, controllerName, ex.Message, LoggingType.httpGet.ToString(), 0);
+                var exceptionResponse = await _exceptionLoggingRepo.CreateEntity(exceptionHelper);
+                return await Task.Run(() => PartialView("~/Views/Shared/Error.cshtml"));
+            }
+
         }
 
         [HttpPost]
@@ -39,8 +59,21 @@ namespace SERP.UI.Controllers.UserManagement
 
         public async Task<IActionResult> ModuleList()
         {
-            var responseData = await _IModuleRepo.GetList(x => x.IsActive == 1);
-            return PartialView("~/Views/UserManagement/_ModuleMasterListPartial.cshtml", responseData);
+            try
+            {
+                var responseData = await _IModuleRepo.GetList(x => x.IsActive == 1);
+                return PartialView("~/Views/UserManagement/_ModuleMasterListPartial.cshtml", responseData);
+            }
+            catch (Exception ex)
+            {
+                string actionName = this.ControllerContext.RouteData.Values["action"].ToString();
+                string controllerName = this.ControllerContext.RouteData.Values["controller"].ToString();
+
+                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(actionName, controllerName, ex.Message, LoggingType.httpGet.ToString(), 0);
+                var exceptionResponse = await _exceptionLoggingRepo.CreateEntity(exceptionHelper);
+                return await Task.Run(() => PartialView("~/Views/Shared/Error.cshtml"));
+            }
+
         }
 
         public async Task<IActionResult> DeleteModule(int id)

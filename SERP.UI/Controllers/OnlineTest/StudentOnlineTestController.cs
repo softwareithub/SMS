@@ -8,9 +8,11 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using SERP.Core.Entities.Entity.Core.ExamDetail;
 using SERP.Core.Entities.OnlineTest;
+using SERP.Core.Entities.SERPExceptionLogging;
 using SERP.Core.Model.OnlineTest;
 using SERP.Infrastructure.Repository.Infrastructure.Repo;
 using SERP.UI.Extension;
+using SERP.Utilities.ExceptionHelper;
 
 namespace SERP.UI.Controllers.OnlineTest
 {
@@ -26,9 +28,10 @@ namespace SERP.UI.Controllers.OnlineTest
         private readonly IGenericRepository<UserTestDetailModel, int> _userDetailRepo;
         private readonly IGenericRepository<UserAnswereSheetModel, int> _userAnswereSheetModelRepo;
         private readonly IOnlineTestSubmitRepository _onlineTestSubmitRepository;
+        private readonly IGenericRepository<ExceptionLogging, int> _exceptionLoggingRepo;
 
         public StudentOnlineTestController(IGenericRepository<TestMaster, int> testMasterRepo, IGenericRepository<TestQuestionMapping, int> testQuestionMappingRepo, IGenericRepository<QuestionModel, int> questionRepo,
-        IGenericRepository<OptionMaster, int> optionRepo, IGenericRepository<UserTestDetailModel, int> userTestDetailRepo, IGenericRepository<UserAnswereSheetModel, int> userAnswereSheetRepo, IOnlineTestSubmitRepository onlineTestSubmitRepository)
+        IGenericRepository<OptionMaster, int> optionRepo, IGenericRepository<UserTestDetailModel, int> userTestDetailRepo, IGenericRepository<UserAnswereSheetModel, int> userAnswereSheetRepo, IOnlineTestSubmitRepository onlineTestSubmitRepository, IGenericRepository<ExceptionLogging, int> exceptionLoggingRepo)
         {
             _testMasterRepo = testMasterRepo;
             _testQuestionMappingRepo = testQuestionMappingRepo;
@@ -37,116 +40,168 @@ namespace SERP.UI.Controllers.OnlineTest
             _userDetailRepo = userTestDetailRepo;
             _userAnswereSheetModelRepo = userAnswereSheetRepo;
             _onlineTestSubmitRepository = onlineTestSubmitRepository;
+            _exceptionLoggingRepo = exceptionLoggingRepo;
         }
         public async Task<IActionResult> Index()
         {
-            var model = await _testMasterRepo.GetList(x => x.IsActive == 1);
-            return PartialView("~/Views/StudentOnlineTest/OnlineTestStudentPartial.cshtml", model);
+            try
+            {
+                var model = await _testMasterRepo.GetList(x => x.IsActive == 1);
+                return PartialView("~/Views/StudentOnlineTest/OnlineTestStudentPartial.cshtml", model);
+            }
+            catch (Exception ex)
+            {
+                string actionName = this.ControllerContext.RouteData.Values["action"].ToString();
+                string controllerName = this.ControllerContext.RouteData.Values["controller"].ToString();
+
+                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(actionName, controllerName, ex.Message, LoggingType.httpGet.ToString(), 0);
+                var exceptionResponse = await _exceptionLoggingRepo.CreateEntity(exceptionHelper);
+                return await Task.Run(() => PartialView("~/Views/Shared/Error.cshtml"));
+            }
+
         }
 
         public async Task<IActionResult> GetTestRuleAndRegulation(int testId)
         {
-            var userId = HttpContext.Session.GetInt32("UserId");
-            var model = await _testMasterRepo.GetSingle(x => x.Id == testId);
-            HttpContext.Session.SetString("TestLimit", model.TestTimeLimit);
-            var userTestDetail = await _userDetailRepo.GetSingle(x => x.TestId == testId && x.UserId == userId);
+            try
+            {
+                var userId = HttpContext.Session.GetInt32("UserId");
+                var model = await _testMasterRepo.GetSingle(x => x.Id == testId);
+                HttpContext.Session.SetString("TestLimit", model.TestTimeLimit);
+                var userTestDetail = await _userDetailRepo.GetSingle(x => x.TestId == testId && x.UserId == userId);
 
-            return PartialView("~/Views/StudentOnlineTest/OnlineExamRuleRegulationPartial.cshtml", model);
+                return PartialView("~/Views/StudentOnlineTest/OnlineExamRuleRegulationPartial.cshtml", model);
 
-            if (userTestDetail == null && string.IsNullOrEmpty(userTestDetail?.TestStatus))
-            {
-                return PartialView("~/Views/StudentOnlineTest/OnlineExamRuleRegulationPartial.cshtml", model);
+                if (userTestDetail == null && string.IsNullOrEmpty(userTestDetail?.TestStatus))
+                {
+                    return PartialView("~/Views/StudentOnlineTest/OnlineExamRuleRegulationPartial.cshtml", model);
+                }
+                if (userTestDetail.TestStatus.Trim().ToLower() == "started")
+                {
+                    return PartialView("~/Views/StudentOnlineTest/OnlineExamRuleRegulationPartial.cshtml", model);
+                }
+                else
+                {
+                    TestMaster testMaster = new TestMaster();
+                    testMaster.Regulation = "Test has been Expired.";
+                    return PartialView("~/Views/StudentOnlineTest/OnlineExamRuleRegulationPartial.cshtml", testMaster);
+                }
             }
-            if (userTestDetail.TestStatus.Trim().ToLower() == "started")
+            catch (Exception ex)
             {
-                return PartialView("~/Views/StudentOnlineTest/OnlineExamRuleRegulationPartial.cshtml", model);
+                string actionName = this.ControllerContext.RouteData.Values["action"].ToString();
+                string controllerName = this.ControllerContext.RouteData.Values["controller"].ToString();
+
+                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(actionName, controllerName, ex.Message, LoggingType.httpGet.ToString(), 0);
+                var exceptionResponse = await _exceptionLoggingRepo.CreateEntity(exceptionHelper);
+                return await Task.Run(() => PartialView("~/Views/Shared/Error.cshtml"));
             }
-            else
-            {
-                TestMaster testMaster = new TestMaster();
-                testMaster.Regulation = "Test has been Expired.";
-                return PartialView("~/Views/StudentOnlineTest/OnlineExamRuleRegulationPartial.cshtml", testMaster);
-            }
+
 
         }
 
         public async Task<IActionResult> TestQuestions(int testId)
         {
-
-            var onlineExamdetails = await GetQuestionByTest(testId);
-            var userId = HttpContext.Session.GetInt32("UserId");
-            HttpContext.Session.SetInt32("testId", testId);
-
-            var userTestModel = new UserTestDetailModel()
+            try
             {
-                TestId = testId,
-                UserId = Convert.ToInt32(userId),
-                DateOfExamination = DateTime.Now,
-                TestStatus = "Started"
+                var onlineExamdetails = await GetQuestionByTest(testId);
+                var userId = HttpContext.Session.GetInt32("UserId");
+                HttpContext.Session.SetInt32("testId", testId);
 
-            };
-            var response = await _userDetailRepo.CreateEntity(userTestModel);
-            var userDetailId = (await _userDetailRepo.GetList(x => x.IsActive == 1)).Max(x => x.Id);
-            HttpContext.Session.SetInt32("userTestId", userDetailId);
-            return PartialView("~/Views/StudentOnlineTest/_OnlineExamStartPartial.cshtml", onlineExamdetails);
+                var userTestModel = new UserTestDetailModel()
+                {
+                    TestId = testId,
+                    UserId = Convert.ToInt32(userId),
+                    DateOfExamination = DateTime.Now,
+                    TestStatus = "Started"
 
+                };
+                var response = await _userDetailRepo.CreateEntity(userTestModel);
+                var userDetailId = (await _userDetailRepo.GetList(x => x.IsActive == 1)).Max(x => x.Id);
+                HttpContext.Session.SetInt32("userTestId", userDetailId);
+                return PartialView("~/Views/StudentOnlineTest/_OnlineExamStartPartial.cshtml", onlineExamdetails);
+            }
+            catch (Exception ex)
+            {
+                string actionName = this.ControllerContext.RouteData.Values["action"].ToString();
+                string controllerName = this.ControllerContext.RouteData.Values["controller"].ToString();
+
+                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(actionName, controllerName, ex.Message, LoggingType.httpGet.ToString(), 0);
+                var exceptionResponse = await _exceptionLoggingRepo.CreateEntity(exceptionHelper);
+                return await Task.Run(() => PartialView("~/Views/Shared/Error.cshtml"));
+            }
         }
         [HttpPost]
         public async Task<IActionResult> SaveQuestion(int Question, string[] Option, int Sequence)
         {
-
-            var onlineExamdetails = await GetQuestionByTest(Convert.ToInt32(HttpContext.Session.GetInt32("testId")));
-            int lastSequence = onlineExamdetails.Max(x => x.Sequence);
-
-            if (Option.Count() > 0)
+            try
             {
-                var isUpdated = await CHeckQuestionAnsExists(Question);
+                var onlineExamdetails = await GetQuestionByTest(Convert.ToInt32(HttpContext.Session.GetInt32("testId")));
+                int lastSequence = onlineExamdetails.Max(x => x.Sequence);
 
-                if (HttpContext.Session.GetObject<List<string>>("questionIds") == null)
+                if (Option.Count() > 0)
                 {
-                    questions.Add(Question.ToString());
-                    HttpContext.Session.SetObject("questionIds", questions);
+                    var isUpdated = await CHeckQuestionAnsExists(Question);
+
+                    if (HttpContext.Session.GetObject<List<string>>("questionIds") == null)
+                    {
+                        questions.Add(Question.ToString());
+                        HttpContext.Session.SetObject("questionIds", questions);
+                    }
+                    else
+                    {
+                        questions = HttpContext.Session.GetObject<List<string>>("questionIds");
+                        questions.Add(Question.ToString());
+                        HttpContext.Session.SetObject("questionIds", questions);
+                    }
                 }
                 else
                 {
                     questions = HttpContext.Session.GetObject<List<string>>("questionIds");
-                    questions.Add(Question.ToString());
+                    questions.Remove(Question.ToString());
                     HttpContext.Session.SetObject("questionIds", questions);
                 }
-            }
-            else
-            {
-                questions = HttpContext.Session.GetObject<List<string>>("questionIds");
-                questions.Remove(Question.ToString());
-                HttpContext.Session.SetObject("questionIds", questions);
-            }
 
 
-            List<UserAnswereSheetModel> models = new List<UserAnswereSheetModel>();
-            for (int i = 0; i < Option.Count(); i++)
-            {
-                var userAnswereSheet = new UserAnswereSheetModel()
+                List<UserAnswereSheetModel> models = new List<UserAnswereSheetModel>();
+                for (int i = 0; i < Option.Count(); i++)
                 {
-                    ChooseOptionId = Convert.ToInt32(Option[i]),
-                    UserTestDetailId = Convert.ToInt32(HttpContext.Session.GetInt32("userTestId")),
-                    QuestionId = Question,
-                    IsAttempted = true
-                };
-                models.Add(userAnswereSheet);
-            }
+                    var userAnswereSheet = new UserAnswereSheetModel()
+                    {
+                        ChooseOptionId = Convert.ToInt32(Option[i]),
+                        UserTestDetailId = Convert.ToInt32(HttpContext.Session.GetInt32("userTestId")),
+                        QuestionId = Question,
+                        IsAttempted = true
+                    };
+                    models.Add(userAnswereSheet);
+                }
 
-            await _userAnswereSheetModelRepo.CreateNewContext();
-            var insertAnswereSheet = await _userAnswereSheetModelRepo.Add(models.ToArray());
+                await _userAnswereSheetModelRepo.CreateNewContext();
+                var insertAnswereSheet = await _userAnswereSheetModelRepo.Add(models.ToArray());
 
 
-            if (Sequence == lastSequence)
-            {
-                if (questions.Count >= lastSequence)
+                if (Sequence == lastSequence)
                 {
-                    int testId = Convert.ToInt32(HttpContext.Session.GetInt32("testId"));
-                    var userId = Convert.ToInt32(HttpContext.Session.GetInt32("UserId"));
-                    var model = await GetFinalSubmisionModel(userId, testId);
-                    return PartialView("~/Views/OnlineTest/_TestSubmissionPartialView.cshtml", model);
+                    if (questions.Count >= lastSequence)
+                    {
+                        int testId = Convert.ToInt32(HttpContext.Session.GetInt32("testId"));
+                        var userId = Convert.ToInt32(HttpContext.Session.GetInt32("UserId"));
+                        var model = await GetFinalSubmisionModel(userId, testId);
+                        return PartialView("~/Views/OnlineTest/_TestSubmissionPartialView.cshtml", model);
+                    }
+                    else
+                    {
+                        ModelState.Remove("QuestionId");
+                        ModelState.Remove("Id");
+                        ModelState.Remove("Sequence");
+                        ModelState.Remove("Question");
+                        Sequence = 1;
+                        var model = onlineExamdetails.Where(x => x.Sequence == Sequence).FirstOrDefault();
+                        int testId = Convert.ToInt32(HttpContext.Session.GetInt32("testId"));
+
+                        return await Task.Run(() => PartialView("~/Views/StudentOnlineTest/_ExamQuestionPartial.cshtml", model));
+                    }
+
                 }
                 else
                 {
@@ -154,27 +209,24 @@ namespace SERP.UI.Controllers.OnlineTest
                     ModelState.Remove("Id");
                     ModelState.Remove("Sequence");
                     ModelState.Remove("Question");
-                    Sequence = 1;
+                    Sequence++;
                     var model = onlineExamdetails.Where(x => x.Sequence == Sequence).FirstOrDefault();
                     int testId = Convert.ToInt32(HttpContext.Session.GetInt32("testId"));
 
                     return await Task.Run(() => PartialView("~/Views/StudentOnlineTest/_ExamQuestionPartial.cshtml", model));
+
                 }
-
             }
-            else
+            catch (Exception ex)
             {
-                ModelState.Remove("QuestionId");
-                ModelState.Remove("Id");
-                ModelState.Remove("Sequence");
-                ModelState.Remove("Question");
-                Sequence++;
-                var model = onlineExamdetails.Where(x => x.Sequence == Sequence).FirstOrDefault();
-                int testId = Convert.ToInt32(HttpContext.Session.GetInt32("testId"));
+                string actionName = this.ControllerContext.RouteData.Values["action"].ToString();
+                string controllerName = this.ControllerContext.RouteData.Values["controller"].ToString();
 
-                return await Task.Run(() => PartialView("~/Views/StudentOnlineTest/_ExamQuestionPartial.cshtml", model));
-
+                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(actionName, controllerName, ex.Message, LoggingType.httpGet.ToString(), 0);
+                var exceptionResponse = await _exceptionLoggingRepo.CreateEntity(exceptionHelper);
+                return await Task.Run(() => PartialView("~/Views/Shared/Error.cshtml"));
             }
+
         }
 
         private async Task<bool> CHeckQuestionAnsExists(int questionId)
@@ -211,12 +263,24 @@ namespace SERP.UI.Controllers.OnlineTest
 
         public async Task<IActionResult> GetQuestion(int questionId)
         {
-            int testId = Convert.ToInt32(HttpContext.Session.GetInt32("testId"));
-            var onlineExamdetails = await GetQuestionByTest(Convert.ToInt32(HttpContext.Session.GetInt32("testId")));
+            try
+            {
+                int testId = Convert.ToInt32(HttpContext.Session.GetInt32("testId"));
+                var onlineExamdetails = await GetQuestionByTest(Convert.ToInt32(HttpContext.Session.GetInt32("testId")));
 
-            await CheckUserSelectAnswere(testId, onlineExamdetails);
-            var model = onlineExamdetails.Where(x => x.QuestionId == questionId).FirstOrDefault();
-            return await Task.Run(() => PartialView("~/Views/StudentOnlineTest/_ExamQuestionPartial.cshtml", model));
+                await CheckUserSelectAnswere(testId, onlineExamdetails);
+                var model = onlineExamdetails.Where(x => x.QuestionId == questionId).FirstOrDefault();
+                return await Task.Run(() => PartialView("~/Views/StudentOnlineTest/_ExamQuestionPartial.cshtml", model));
+            }
+            catch (Exception ex)
+            {
+                string actionName = this.ControllerContext.RouteData.Values["action"].ToString();
+                string controllerName = this.ControllerContext.RouteData.Values["controller"].ToString();
+
+                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(actionName, controllerName, ex.Message, LoggingType.httpGet.ToString(), 0);
+                var exceptionResponse = await _exceptionLoggingRepo.CreateEntity(exceptionHelper);
+                return await Task.Run(() => PartialView("~/Views/Shared/Error.cshtml"));
+            }
         }
         private async Task<List<OnLineExamDetail>> GetQuestionByTest(int testId)
         {
@@ -312,17 +376,29 @@ namespace SERP.UI.Controllers.OnlineTest
 
         public async Task<IActionResult> SubmitTest()
         {
-            int testId = Convert.ToInt32(HttpContext.Session.GetInt32("testId"));
-            var userId = Convert.ToInt32(HttpContext.Session.GetInt32("UserId"));
-            var model = await GetFinalSubmisionModel(userId, testId);
-            model.Message = "The Test  " + model.TestName + " has been submitted";
+            try
+            {
+                int testId = Convert.ToInt32(HttpContext.Session.GetInt32("testId"));
+                var userId = Convert.ToInt32(HttpContext.Session.GetInt32("UserId"));
+                var model = await GetFinalSubmisionModel(userId, testId);
+                model.Message = "The Test  " + model.TestName + " has been submitted";
 
-            var testModel = await _userDetailRepo.GetSingle(x => x.TestId == testId && x.UserId == userId);
-            testModel.TestStatus = "User End Test";
-            await _userDetailRepo.CreateNewContext();
-            var response = await _userDetailRepo.Update(testModel);
+                var testModel = await _userDetailRepo.GetSingle(x => x.TestId == testId && x.UserId == userId);
+                testModel.TestStatus = "User End Test";
+                await _userDetailRepo.CreateNewContext();
+                var response = await _userDetailRepo.Update(testModel);
 
-            return PartialView("~/Views/OnlineTest/_TestSubmissionPartialView.cshtml", model);
+                return PartialView("~/Views/OnlineTest/_TestSubmissionPartialView.cshtml", model);
+            }
+            catch (Exception ex)
+            {
+                string actionName = this.ControllerContext.RouteData.Values["action"].ToString();
+                string controllerName = this.ControllerContext.RouteData.Values["controller"].ToString();
+
+                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(actionName, controllerName, ex.Message, LoggingType.httpGet.ToString(), 0);
+                var exceptionResponse = await _exceptionLoggingRepo.CreateEntity(exceptionHelper);
+                return await Task.Run(() => PartialView("~/Views/Shared/Error.cshtml"));
+            }
         }
 
 

@@ -2,7 +2,9 @@
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using SERP.Core.Entities.Entity.Core.HRModule;
+using SERP.Core.Entities.SERPExceptionLogging;
 using SERP.Infrastructure.Repository.Infrastructure.Repo;
+using SERP.Utilities.ExceptionHelper;
 using SERP.Utilities.ResponseMessage;
 
 namespace SERP.UI.Controllers.HRModule
@@ -10,14 +12,31 @@ namespace SERP.UI.Controllers.HRModule
     public class DepartmentController : Controller
     {
         private readonly IGenericRepository<DepartmentModel, int> _departmentRepo;
-        public DepartmentController(IGenericRepository<DepartmentModel, int> departmentRepo)
+        private readonly IGenericRepository<ExceptionLogging, int> _exceptionLoggingRepo;
+        public DepartmentController(IGenericRepository<DepartmentModel, int> departmentRepo,
+                                    IGenericRepository<ExceptionLogging, int> exceptionLoggingRepo
+            )
         {
             _departmentRepo = departmentRepo;
+            _exceptionLoggingRepo = exceptionLoggingRepo;
         }
         public async Task<IActionResult> Index(int id)
         {
-            var result = await _departmentRepo.GetSingle(x => x.Id == id);
-            return await Task.Run(() => PartialView("~/Views/HRModule/_DepartmentCreatePartial.cshtml",result));
+            try
+            {
+                var result = await _departmentRepo.GetSingle(x => x.Id == id);
+                return await Task.Run(() => PartialView("~/Views/HRModule/_DepartmentCreatePartial.cshtml", result));
+            }
+            catch (Exception ex)
+            {
+                string actionName = this.ControllerContext.RouteData.Values["action"].ToString();
+                string controllerName = this.ControllerContext.RouteData.Values["controller"].ToString();
+
+                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(actionName, controllerName, ex.Message, LoggingType.httpGet.ToString(), 0);
+                var exceptionResponse = await _exceptionLoggingRepo.CreateEntity(exceptionHelper);
+                return await Task.Run(() => PartialView("~/Views/Shared/Error.cshtml"));
+            }
+
         }
 
         [HttpPost]
@@ -39,8 +58,21 @@ namespace SERP.UI.Controllers.HRModule
 
         public async Task<IActionResult> GetDepartmentList()
         {
-            var result = await _departmentRepo.GetList(x => x.IsActive == 1 && x.IsDeleted == 0);
-            return PartialView("~/Views/HRModule/_DepartmentListPartial.cshtml", result);
+            try
+            {
+                var result = await _departmentRepo.GetList(x => x.IsActive == 1 && x.IsDeleted == 0);
+                return PartialView("~/Views/HRModule/_DepartmentListPartial.cshtml", result);
+            }
+            catch (Exception ex)
+            {
+                string actionName = this.ControllerContext.RouteData.Values["action"].ToString();
+                string controllerName = this.ControllerContext.RouteData.Values["controller"].ToString();
+
+                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(actionName, controllerName, ex.Message, LoggingType.httpGet.ToString(), 0);
+                var exceptionResponse = await _exceptionLoggingRepo.CreateEntity(exceptionHelper);
+                return await Task.Run(() => PartialView("~/Views/Shared/Error.cshtml"));
+            }
+
         }
 
         public async Task<IActionResult> DeleteDepartment(int id)

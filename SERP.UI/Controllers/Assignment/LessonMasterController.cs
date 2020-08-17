@@ -6,8 +6,10 @@ using Microsoft.AspNetCore.Mvc;
 using SERP.Core.Entities.Entity.Core.Master;
 using SERP.Core.Entities.Entity.Core.Transaction;
 using SERP.Core.Entities.LessionMaster;
+using SERP.Core.Entities.SERPExceptionLogging;
 using SERP.Core.Model.AssignmentHomeModel;
 using SERP.Infrastructure.Repository.Infrastructure.Repo;
+using SERP.Utilities.ExceptionHelper;
 using SERP.Utilities.ResponseMessage;
 
 namespace SERP.UI.Controllers.Assignment
@@ -17,8 +19,10 @@ namespace SERP.UI.Controllers.Assignment
         private readonly IGenericRepository<LessonMaster, int> _ILessonMasterRepo;
         private readonly IGenericRepository<CourseMaster, int> _ICourseMasterRepo;
         private readonly IGenericRepository<SubjectMaster, int> _ISubjectRepo;
+        private readonly IGenericRepository<ExceptionLogging, int> _exceptionLoggingRepo;
         public LessonMasterController(IGenericRepository<LessonMaster, int> lessonMasterRepo,
-                IGenericRepository<CourseMaster, int> courseMasterRepo, IGenericRepository<SubjectMaster, int> subjectRepo)
+                IGenericRepository<CourseMaster, int> courseMasterRepo, IGenericRepository<SubjectMaster, int> subjectRepo,
+                IGenericRepository<ExceptionLogging, int> exceptionLoggingRepo)
         {
             _ILessonMasterRepo = lessonMasterRepo;
             _ICourseMasterRepo = courseMasterRepo;
@@ -26,9 +30,21 @@ namespace SERP.UI.Controllers.Assignment
         }
         public async Task<IActionResult> CreateLesson(int id)
         {
-            var model = await _ILessonMasterRepo.GetSingle(x => x.Id == id);
-            ViewBag.ClassList = await _ICourseMasterRepo.GetList(x => x.IsActive == 1);
-            return PartialView("~/Views/AssignmentWork/_LessonMasterPartial.cshtml", model);
+            try
+            {
+                var model = await _ILessonMasterRepo.GetSingle(x => x.Id == id);
+                ViewBag.ClassList = await _ICourseMasterRepo.GetList(x => x.IsActive == 1);
+                return PartialView("~/Views/AssignmentWork/_LessonMasterPartial.cshtml", model);
+            }
+            catch (Exception ex)
+            {
+                string actionName = this.ControllerContext.RouteData.Values["action"].ToString();
+                string controllerName = this.ControllerContext.RouteData.Values["controller"].ToString();
+
+                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(actionName, controllerName, ex.Message, LoggingType.httpGet.ToString(), 0);
+                var exceptionResponse = await _exceptionLoggingRepo.CreateEntity(exceptionHelper);
+                return await Task.Run(() => PartialView("~/Views/Shared/Error.cshtml"));
+            }
         }
 
         [HttpPost]
@@ -50,24 +66,36 @@ namespace SERP.UI.Controllers.Assignment
 
         public async Task<IActionResult> GetLessonPlanning()
         {
-            var result = (from LM in await _ILessonMasterRepo.GetList(x => x.IsActive == 1)
-                          join SM in await _ISubjectRepo.GetList(x => x.IsActive == 1)
-                          on LM.SubjectId equals SM.Id
-                          select new LessonPlanningModel
-                          {
-                              LessonId = LM.Id,
-                              LessonMasterModel = new LessonMaster()
+            try
+            {
+                var result = (from LM in await _ILessonMasterRepo.GetList(x => x.IsActive == 1)
+                              join SM in await _ISubjectRepo.GetList(x => x.IsActive == 1)
+                              on LM.SubjectId equals SM.Id
+                              select new LessonPlanningModel
                               {
-                                  LessonName= LM.LessonName,
-                                  StartDate= LM.StartDate,
-                                  EndDate= LM.EndDate,
-                                  ClassTestDate= LM.ClassTestDate
-                              },
-                              SubjectName= SM.SubjectName
+                                  LessonId = LM.Id,
+                                  LessonMasterModel = new LessonMaster()
+                                  {
+                                      LessonName = LM.LessonName,
+                                      StartDate = LM.StartDate,
+                                      EndDate = LM.EndDate,
+                                      ClassTestDate = LM.ClassTestDate
+                                  },
+                                  SubjectName = SM.SubjectName
 
-                          }).ToList();
+                              }).ToList();
 
-            return PartialView("~/Views/AssignmentWork/_LessionDetailPartial.cshtml", result);
+                return PartialView("~/Views/AssignmentWork/_LessionDetailPartial.cshtml", result);
+            }
+            catch (Exception ex)
+            {
+                string actionName = this.ControllerContext.RouteData.Values["action"].ToString();
+                string controllerName = this.ControllerContext.RouteData.Values["controller"].ToString();
+
+                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(actionName, controllerName, ex.Message, LoggingType.httpGet.ToString(), 0);
+                var exceptionResponse = await _exceptionLoggingRepo.CreateEntity(exceptionHelper);
+                return await Task.Run(() => PartialView("~/Views/Shared/Error.cshtml"));
+            }
         }
 
         public async Task<IActionResult> GetSubjectList(int courseId)

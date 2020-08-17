@@ -51,10 +51,12 @@ namespace SERP.UI.Controllers.Account
             }
             catch (Exception ex)
             {
-                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(nameof(Index), nameof(AccountTransaction), ex.Message, LoggingType.httpGet.ToString(), 0);
+                string actionName = this.ControllerContext.RouteData.Values["action"].ToString();
+                string controllerName = this.ControllerContext.RouteData.Values["controller"].ToString();
+
+                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(actionName, controllerName, ex.Message, LoggingType.httpGet.ToString(), 0);
                 var exceptionResponse = await _exceptionLoggingRepo.CreateEntity(exceptionHelper);
                 return await Task.Run(() => PartialView("~/Views/Shared/Error.cshtml"));
-
             }
 
         }
@@ -90,10 +92,12 @@ namespace SERP.UI.Controllers.Account
             }
             catch (Exception ex)
             {
-                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(nameof(GetList), nameof(AccountTransaction), ex.Message, LoggingType.httpGet.ToString(), 0);
+                string actionName = this.ControllerContext.RouteData.Values["action"].ToString();
+                string controllerName = this.ControllerContext.RouteData.Values["controller"].ToString();
+
+                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(actionName, controllerName, ex.Message, LoggingType.httpGet.ToString(), 0);
                 var exceptionResponse = await _exceptionLoggingRepo.CreateEntity(exceptionHelper);
                 return await Task.Run(() => PartialView("~/Views/Shared/Error.cshtml"));
-
             }
 
 
@@ -124,12 +128,14 @@ namespace SERP.UI.Controllers.Account
             {
                 return PartialView("~/Views/Accounts/_AccountSummaryDetailPartial.cshtml", await _accountTransactionDetailRepo.GetAccountTransactionSummaryDetails());
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
-                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(nameof(AccountSummary),nameof(AccountTransaction), ex.Message, LoggingType.httpGet.ToString(), 0);
+                string actionName = this.ControllerContext.RouteData.Values["action"].ToString();
+                string controllerName = this.ControllerContext.RouteData.Values["controller"].ToString();
+
+                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(actionName, controllerName, ex.Message, LoggingType.httpGet.ToString(), 0);
                 var exceptionResponse = await _exceptionLoggingRepo.CreateEntity(exceptionHelper);
                 return await Task.Run(() => PartialView("~/Views/Shared/Error.cshtml"));
-
             }
 
         }

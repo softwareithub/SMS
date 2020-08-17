@@ -4,7 +4,9 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using SERP.Core.Entities.Entity.Core.HRModule;
+using SERP.Core.Entities.SERPExceptionLogging;
 using SERP.Infrastructure.Repository.Infrastructure.Repo;
+using SERP.Utilities.ExceptionHelper;
 using SERP.Utilities.ResponseMessage;
 
 namespace SERP.UI.Controllers.HRModule
@@ -12,14 +14,30 @@ namespace SERP.UI.Controllers.HRModule
     public class DesignationController : Controller
     {
         private readonly IGenericRepository<DesignationModel, int> _designationRepo;
-        public DesignationController(IGenericRepository<DesignationModel, int> deignationRepo)
+        private readonly IGenericRepository<ExceptionLogging, int> _exceptionLoggingRepo;
+        public DesignationController(IGenericRepository<DesignationModel, int> deignationRepo,
+            IGenericRepository<ExceptionLogging, int> exceptionLoggingRepo)
         {
             _designationRepo = deignationRepo;
+            _exceptionLoggingRepo = exceptionLoggingRepo;
         }
         public async Task<IActionResult> Index(int id)
         {
-            var result = await _designationRepo.GetSingle(x => x.Id == id);
-            return View("~/Views/HRModule/_DesignationCreatePartial.cshtml", result);
+            try
+            {
+                var result = await _designationRepo.GetSingle(x => x.Id == id);
+                return View("~/Views/HRModule/_DesignationCreatePartial.cshtml", result);
+            }
+            catch (Exception ex)
+            {
+                string actionName = this.ControllerContext.RouteData.Values["action"].ToString();
+                string controllerName = this.ControllerContext.RouteData.Values["controller"].ToString();
+
+                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(actionName, controllerName, ex.Message, LoggingType.httpGet.ToString(), 0);
+                var exceptionResponse = await _exceptionLoggingRepo.CreateEntity(exceptionHelper);
+                return await Task.Run(() => PartialView("~/Views/Shared/Error.cshtml"));
+            }
+
         }
         [HttpPost]
         public async Task<IActionResult> Create(DesignationModel model)
@@ -40,8 +58,21 @@ namespace SERP.UI.Controllers.HRModule
 
         public async Task<IActionResult> GetDesignation()
         {
-            var result = await _designationRepo.GetList(x => x.IsActive == 1 && x.IsDeleted == 0);
-            return PartialView("~/Views/HRModule/_DesignationListPartial.cshtml", result);
+            try
+            {
+                var result = await _designationRepo.GetList(x => x.IsActive == 1 && x.IsDeleted == 0);
+                return PartialView("~/Views/HRModule/_DesignationListPartial.cshtml", result);
+            }
+            catch (Exception ex)
+            {
+                string actionName = this.ControllerContext.RouteData.Values["action"].ToString();
+                string controllerName = this.ControllerContext.RouteData.Values["controller"].ToString();
+
+                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(actionName, controllerName, ex.Message, LoggingType.httpGet.ToString(), 0);
+                var exceptionResponse = await _exceptionLoggingRepo.CreateEntity(exceptionHelper);
+                return await Task.Run(() => PartialView("~/Views/Shared/Error.cshtml"));
+            }
+
         }
 
         public async Task<IActionResult> DeleteRecord(int id)

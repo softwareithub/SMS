@@ -6,8 +6,10 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using SERP.Core.Entities.Entity.Core.HRModule;
+using SERP.Core.Entities.SERPExceptionLogging;
 using SERP.Infrastructure.Repository.Infrastructure.Repo;
 using SERP.Utilities.BlobUtility;
+using SERP.Utilities.ExceptionHelper;
 using SERP.Utilities.ResponseMessage;
 
 namespace SERP.UI.Controllers.HRModule
@@ -16,16 +18,34 @@ namespace SERP.UI.Controllers.HRModule
     {
         private readonly IGenericRepository<BranchInfoModel, int> _branchRepo;
         private readonly IHostingEnvironment _hostingEnvironment;
+        private readonly IGenericRepository<ExceptionLogging, int> _exceptionLoggingRepo;
 
-        public BranchController(IGenericRepository<BranchInfoModel, int> branchRepo, IHostingEnvironment hostingEnvironment)
+        public BranchController(IGenericRepository<BranchInfoModel, int> branchRepo,
+            IHostingEnvironment hostingEnvironment,
+            IGenericRepository<ExceptionLogging, int> exceptionLoggingRepo
+            )
         {
             _branchRepo = branchRepo;
             _hostingEnvironment = hostingEnvironment;
+            _exceptionLoggingRepo = exceptionLoggingRepo;
         }
         public async Task<IActionResult> Index(int id)
         {
-            var result = await _branchRepo.GetSingle(x => x.Id==id);
-            return View("~/Views/HRModule/_BranchCreatePartial.cshtml", result);
+            try
+            {
+                var result = await _branchRepo.GetSingle(x => x.Id == id);
+                return View("~/Views/HRModule/_BranchCreatePartial.cshtml", result);
+            }
+            catch (Exception ex)
+            {
+                string actionName = this.ControllerContext.RouteData.Values["action"].ToString();
+                string controllerName = this.ControllerContext.RouteData.Values["controller"].ToString();
+
+                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(actionName, controllerName, ex.Message, LoggingType.httpGet.ToString(), 0);
+                var exceptionResponse = await _exceptionLoggingRepo.CreateEntity(exceptionHelper);
+                return await Task.Run(() => PartialView("~/Views/Shared/Error.cshtml"));
+            }
+
         }
         [HttpPost]
         public async Task<IActionResult> Create(BranchInfoModel model, IFormFile BranchLogo)
@@ -61,16 +81,43 @@ namespace SERP.UI.Controllers.HRModule
         [HttpGet]
         public async Task<IActionResult> GetBranchList()
         {
-            var result = await _branchRepo.GetList(x => x.IsActive == 1 && x.IsDeleted == 0);
-            return PartialView("~/Views/HRModule/_BranchMasterList.cshtml", result);
+            try
+            {
+                var result = await _branchRepo.GetList(x => x.IsActive == 1 && x.IsDeleted == 0);
+                return PartialView("~/Views/HRModule/_BranchMasterList.cshtml", result);
+            }
+            catch (Exception ex)
+            {
+                string actionName = this.ControllerContext.RouteData.Values["action"].ToString();
+                string controllerName = this.ControllerContext.RouteData.Values["controller"].ToString();
+
+                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(actionName, controllerName, ex.Message, LoggingType.httpGet.ToString(), 0);
+                var exceptionResponse = await _exceptionLoggingRepo.CreateEntity(exceptionHelper);
+                return await Task.Run(() => PartialView("~/Views/Shared/Error.cshtml"));
+            }
+
         }
         [HttpGet]
         public async Task<IActionResult> GetBranchInfo(int id)
         {
-            var result = await _branchRepo.GetSingle(x => x.Id == id);
-            //To Do Create the More Info page like student info
-            return PartialView("",result);
+            try
+            {
+                var result = await _branchRepo.GetSingle(x => x.Id == id);
+                //To Do Create the More Info page like student info
+                return PartialView("", result);
+            }
+            catch (Exception ex)
+            {
+                string actionName = this.ControllerContext.RouteData.Values["action"].ToString();
+                string controllerName = this.ControllerContext.RouteData.Values["controller"].ToString();
+
+                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(actionName, controllerName, ex.Message, LoggingType.httpGet.ToString(), 0);
+                var exceptionResponse = await _exceptionLoggingRepo.CreateEntity(exceptionHelper);
+                return await Task.Run(() => PartialView("~/Views/Shared/Error.cshtml"));
+            }
+
         }
+
         [HttpGet]
         public async Task<IActionResult> DeleteRecord(int id)
         {

@@ -5,24 +5,41 @@ using SERP.Infrastructure.Repository.Infrastructure.Repo;
 using System;
 using SERP.Utilities.ResponseMessage;
 using System.Threading;
+using SERP.Core.Entities.SERPExceptionLogging;
+using SERP.Utilities.ExceptionHelper;
 
 namespace SERP.UI.Controllers.Master
 {
     public class AcademicMasterController : Controller
     {
         private readonly IGenericRepository<AcademicMaster, int> _IGenericRepo;
-        public AcademicMasterController(IGenericRepository<AcademicMaster, int>  genericRepository)
+        private readonly IGenericRepository<ExceptionLogging, int> _exceptionLoggingRepo;
+        public AcademicMasterController(IGenericRepository<AcademicMaster, int>  genericRepository,
+                                        IGenericRepository<ExceptionLogging, int> exceptionLoggingRepo)
         {
             _IGenericRepo = genericRepository;
+            _exceptionLoggingRepo = exceptionLoggingRepo;
         }
         public async Task<IActionResult> Index(int id)
         {
-           
-            if (id==0)
-                return await Task.Run(() => PartialView("~/Views/AcademicMaster/Index.cshtml"));
+            try
+            {
+                if (id == 0)
+                    return await Task.Run(() => PartialView("~/Views/AcademicMaster/Index.cshtml"));
 
-            var result =await  _IGenericRepo.GetSingle(x => x.Id == id);
-            return PartialView("~/Views/AcademicMaster/Index.cshtml", result);
+                var result = await _IGenericRepo.GetSingle(x => x.Id == id);
+                return PartialView("~/Views/AcademicMaster/Index.cshtml", result);
+            }
+            catch (Exception ex)
+            {
+                string actionName = this.ControllerContext.RouteData.Values["action"].ToString();
+                string controllerName = this.ControllerContext.RouteData.Values["controller"].ToString();
+
+                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(actionName, controllerName, ex.Message, LoggingType.httpGet.ToString(), 0);
+                var exceptionResponse = await _exceptionLoggingRepo.CreateEntity(exceptionHelper);
+                return await Task.Run(() => PartialView("~/Views/Shared/Error.cshtml"));
+            }
+
         }
         [HttpPost]
         public async Task<IActionResult> Create(AcademicMaster model)
@@ -46,8 +63,21 @@ namespace SERP.UI.Controllers.Master
         [HttpGet]
         public async Task<IActionResult> GetAcademicList()
         {
-            var result = await _IGenericRepo.GetList(x => x.IsActive == 1 && x.IsDeleted == 0);
-            return PartialView("~/Views/AcademicMaster/_AcademicList.cshtml",result);
+            try
+            {
+                var result = await _IGenericRepo.GetList(x => x.IsActive == 1 && x.IsDeleted == 0);
+                return PartialView("~/Views/AcademicMaster/_AcademicList.cshtml", result);
+            }
+            catch (Exception ex)
+            {
+                string actionName = this.ControllerContext.RouteData.Values["action"].ToString();
+                string controllerName = this.ControllerContext.RouteData.Values["controller"].ToString();
+
+                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(actionName, controllerName, ex.Message, LoggingType.httpGet.ToString(), 0);
+                var exceptionResponse = await _exceptionLoggingRepo.CreateEntity(exceptionHelper);
+                return await Task.Run(() => PartialView("~/Views/Shared/Error.cshtml"));
+            }
+
         }
 
         [HttpGet]

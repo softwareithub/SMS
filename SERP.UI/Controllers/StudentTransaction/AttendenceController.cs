@@ -6,11 +6,13 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using SERP.Core.Entities.Entity.Core.Master;
 using SERP.Core.Entities.Entity.Core.Transaction;
+using SERP.Core.Entities.SERPExceptionLogging;
 using SERP.Core.Entities.StudentTransaction;
 using SERP.Core.Model.TransactionViewModel;
 using SERP.Infrastructure.Repository.Infrastructure.Repo;
 using SERP.UI.Extension;
 using SERP.Utilities.ResponseMessage;
+using SERP.Utilities.ExceptionHelper;
 
 namespace SERP.UI.Controllers.StudentTransaction
 {
@@ -21,21 +23,37 @@ namespace SERP.UI.Controllers.StudentTransaction
         private readonly IGenericRepository<StudentMaster, int> _IStudentMaster;
         public readonly IGenericRepository<StudentPromote, int> _IStudentPromote;
         public readonly IGenericRepository<StudentAttendenceModel, int> _IStudentAttendence;
+        private readonly IGenericRepository<ExceptionLogging, int> _exceptionLoggingRepo;
+
 
         public AttendenceController(ITimeSheetRepo timeSheetRepo,
             IGenericRepository<CourseMaster, int> courseRepo, IGenericRepository<StudentMaster, int> studentRepo,
-            IGenericRepository<StudentPromote, int> studentPromoteRepo, IGenericRepository<StudentAttendenceModel, int> _studentAttendenceRepo)
+            IGenericRepository<StudentPromote, int> studentPromoteRepo, IGenericRepository<StudentAttendenceModel, int> _studentAttendenceRepo,
+            IGenericRepository<ExceptionLogging, int> exceptionLoggingRepo)
         {
             _timeSheetRepo = timeSheetRepo;
             _ICourseRepo = courseRepo;
             _IStudentMaster = studentRepo;
             _IStudentPromote = studentPromoteRepo;
             _IStudentAttendence = _studentAttendenceRepo;
+            _exceptionLoggingRepo = exceptionLoggingRepo;
         }
         public async Task<IActionResult> Index()
         {
-            ViewBag.CourseList = await _ICourseRepo.GetList(x => x.IsActive == 1 && x.IsDeleted == 0);
-            return await Task.Run(() => PartialView("~/Views/StudentAttendence/_CreateStudentAttendencePartial.cshtml"));
+            try
+            {
+                ViewBag.CourseList = await _ICourseRepo.GetList(x => x.IsActive == 1 && x.IsDeleted == 0);
+                return await Task.Run(() => PartialView("~/Views/StudentAttendence/_CreateStudentAttendencePartial.cshtml"));
+            }
+            catch (Exception ex)
+            {
+                string actionName = this.ControllerContext.RouteData.Values["action"].ToString();
+                string controllerName = this.ControllerContext.RouteData.Values["controller"].ToString();
+
+                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(actionName, controllerName, ex.Message, LoggingType.httpGet.ToString(), 0);
+                var exceptionResponse = await _exceptionLoggingRepo.CreateEntity(exceptionHelper);
+                return await Task.Run(() => PartialView("~/Views/Shared/Error.cshtml"));
+            }
         }
 
         public async Task<IActionResult> chekAttendenceDependOnPeriod(int courseId, int batchId)
@@ -60,41 +78,53 @@ namespace SERP.UI.Controllers.StudentTransaction
 
         public async Task<IActionResult> StudentAttendence(int courseId, int batchId, DateTime attendenceDate, string period)
         {
-            HttpContext.Session.SetString("attendenceDate", attendenceDate.ToShortDateString());
-            HttpContext.Session.SetString("period", period?? "0");
-
-            var studentPromoteModels = await _IStudentPromote.GetList(x => x.IsActive == 1 && x.IsDeleted == 0
-             && x.CourseId == courseId && x.BatchId == batchId);
-            var studentMasterModels = await _IStudentMaster.GetList(x => x.IsDeleted == 0 && x.IsActive == 1);
-            var studentAttendence = await _IStudentAttendence.GetList(x => x.IsActive == 1 && x.IsDeleted == 0
-             && x.AttendenceDate == attendenceDate );
-
-            var attendenceType = (await _ICourseRepo.GetSingle(x => x.Id == courseId)).AttendenceType;
-
-            var studentAttVms = (from SP in studentPromoteModels
-                                 join SM in studentMasterModels
-                                 on SP.StudentId equals SM.Id
-                                 select new StudentAttendenceVm
-                                 {
-                                     StudentId = SP.StudentId,
-                                     Name = SM.Name,
-                                     RollCode = SM.RollCode,
-                                     RegistrationNumber = SM.RegistrationNumber,
-                                     StudentImage = SM.StudentPhoto,
-                                     AttendenceMarkType = attendenceType
-                                 }).ToList();
-            studentAttendence.ToList().ForEach(x =>
+            try
             {
-                studentAttVms.ForEach(item =>
+                HttpContext.Session.SetString("attendenceDate", attendenceDate.ToShortDateString());
+                HttpContext.Session.SetString("period", period ?? "0");
+
+                var studentPromoteModels = await _IStudentPromote.GetList(x => x.IsActive == 1 && x.IsDeleted == 0
+                 && x.CourseId == courseId && x.BatchId == batchId);
+                var studentMasterModels = await _IStudentMaster.GetList(x => x.IsDeleted == 0 && x.IsActive == 1);
+                var studentAttendence = await _IStudentAttendence.GetList(x => x.IsActive == 1 && x.IsDeleted == 0
+                 && x.AttendenceDate == attendenceDate);
+
+                var attendenceType = (await _ICourseRepo.GetSingle(x => x.Id == courseId)).AttendenceType;
+
+                var studentAttVms = (from SP in studentPromoteModels
+                                     join SM in studentMasterModels
+                                     on SP.StudentId equals SM.Id
+                                     select new StudentAttendenceVm
+                                     {
+                                         StudentId = SP.StudentId,
+                                         Name = SM.Name,
+                                         RollCode = SM.RollCode,
+                                         RegistrationNumber = SM.RegistrationNumber,
+                                         StudentImage = SM.StudentPhoto,
+                                         AttendenceMarkType = attendenceType
+                                     }).ToList();
+                studentAttendence.ToList().ForEach(x =>
                 {
-                    if (x.Student == item.StudentId)
+                    studentAttVms.ForEach(item =>
                     {
-                        item.AttendenceType = x.AttendenceType;
-                    }
+                        if (x.Student == item.StudentId)
+                        {
+                            item.AttendenceType = x.AttendenceType;
+                        }
+                    });
                 });
-            });
-            HttpContext.Session.SetString("attenType", studentAttVms.First().AttendenceMarkType);
-            return PartialView("~/Views/StudentAttendence/_StudentAttendencePartial.cshtml", studentAttVms);
+                HttpContext.Session.SetString("attenType", studentAttVms.First().AttendenceMarkType);
+                return PartialView("~/Views/StudentAttendence/_StudentAttendencePartial.cshtml", studentAttVms);
+            }
+            catch (Exception ex)
+            {
+                string actionName = this.ControllerContext.RouteData.Values["action"].ToString();
+                string controllerName = this.ControllerContext.RouteData.Values["controller"].ToString();
+
+                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(actionName, controllerName, ex.Message, LoggingType.httpGet.ToString(), 0);
+                var exceptionResponse = await _exceptionLoggingRepo.CreateEntity(exceptionHelper);
+                return await Task.Run(() => PartialView("~/Views/Shared/Error.cshtml"));
+            }
 
         }
 

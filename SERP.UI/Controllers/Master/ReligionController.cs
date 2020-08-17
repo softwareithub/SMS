@@ -4,7 +4,9 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using SERP.Core.Entities.Entity.Core.Master;
+using SERP.Core.Entities.SERPExceptionLogging;
 using SERP.Infrastructure.Repository.Infrastructure.Repo;
+using SERP.Utilities.ExceptionHelper;
 using SERP.Utilities.ResponseMessage;
 
 namespace SERP.UI.Controllers.Master
@@ -12,18 +14,34 @@ namespace SERP.UI.Controllers.Master
     public class ReligionController : Controller
     {
         private readonly IGenericRepository<ReligionMaster, int> _IReligionMaster;
+        private readonly IGenericRepository<ExceptionLogging, int> _exceptionLoggingRepo;
 
-        public ReligionController(IGenericRepository<ReligionMaster, int> religionMaster)
+        public ReligionController(IGenericRepository<ReligionMaster, int> religionMaster,
+                                  IGenericRepository<ExceptionLogging, int> exceptionLoggingRepo)
         {
             _IReligionMaster = religionMaster;
+            _exceptionLoggingRepo = exceptionLoggingRepo;
         }
         public async Task<IActionResult> CreateReligion(int id=0)
         {
-            if(id==0)
-                return await Task.Run(()=> PartialView("~/Views/ReligionMaster/_CreateReligionPartial.cshtml")) ;
+            try
+            {
+                if (id == 0)
+                    return await Task.Run(() => PartialView("~/Views/ReligionMaster/_CreateReligionPartial.cshtml"));
 
-            var modal =await _IReligionMaster.GetSingle(x => x.Id == id);
-            return  PartialView("~/Views/ReligionMaster/_CreateReligionPartial.cshtml", modal);
+                var modal = await _IReligionMaster.GetSingle(x => x.Id == id);
+                return PartialView("~/Views/ReligionMaster/_CreateReligionPartial.cshtml", modal);
+            }
+            catch (Exception ex)
+            {
+                string actionName = this.ControllerContext.RouteData.Values["action"].ToString();
+                string controllerName = this.ControllerContext.RouteData.Values["controller"].ToString();
+
+                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(actionName, controllerName, ex.Message, LoggingType.httpGet.ToString(), 0);
+                var exceptionResponse = await _exceptionLoggingRepo.CreateEntity(exceptionHelper);
+                return await Task.Run(() => PartialView("~/Views/Shared/Error.cshtml"));
+            }
+
         }
 
         [HttpPost]
@@ -43,8 +61,21 @@ namespace SERP.UI.Controllers.Master
         }
         public async Task<IActionResult> GetReligionMaster()
         {
-            var result =await _IReligionMaster.GetList(x => x.IsActive == 1 && x.IsDeleted == 0);
-            return PartialView("~/Views/ReligionMaster/_ReligionListPartial.cshtml", result);
+            try
+            {
+                var result = await _IReligionMaster.GetList(x => x.IsActive == 1 && x.IsDeleted == 0);
+                return PartialView("~/Views/ReligionMaster/_ReligionListPartial.cshtml", result);
+            }
+            catch (Exception ex)
+            {
+                string actionName = this.ControllerContext.RouteData.Values["action"].ToString();
+                string controllerName = this.ControllerContext.RouteData.Values["controller"].ToString();
+
+                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(actionName, controllerName, ex.Message, LoggingType.httpGet.ToString(), 0);
+                var exceptionResponse = await _exceptionLoggingRepo.CreateEntity(exceptionHelper);
+                return await Task.Run(() => PartialView("~/Views/Shared/Error.cshtml"));
+            }
+
         }
 
         public async Task<IActionResult>DeleteReligion(int id)

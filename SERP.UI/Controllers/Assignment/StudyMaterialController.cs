@@ -8,10 +8,12 @@ using Microsoft.AspNetCore.Mvc;
 using SERP.Core.Entities.Entity.Core.Master;
 using SERP.Core.Entities.Entity.Core.Transaction;
 using SERP.Core.Entities.HomeAssignment;
+using SERP.Core.Entities.SERPExceptionLogging;
 using SERP.Core.Model.AssignmentHomeModel;
 using SERP.Infrastructure.Repository.Infrastructure.Repo;
 using SERP.Utilities.BlobUtility;
 using SERP.Utilities.CommanHelper;
+using SERP.Utilities.ExceptionHelper;
 using SERP.Utilities.ResponseMessage;
 
 namespace SERP.UI.Controllers.Assignment
@@ -23,12 +25,14 @@ namespace SERP.UI.Controllers.Assignment
         private readonly IGenericRepository<SubjectMaster, int> _ISubjectRepo;
         private readonly IGenericRepository<StudyMaterial, int> _IStudyMaterialRepo;
         private readonly IHostingEnvironment _hostingEnviroment;
+        private readonly IGenericRepository<ExceptionLogging, int> _exceptionLoggingRepo;
 
         public  StudyMaterialController(IGenericRepository<CourseMaster, int> courseRepo,
                                                  IGenericRepository<BatchMaster, int> batchRepo,
                                                  IGenericRepository<SubjectMaster, int> subjectRepo,
                                                  IGenericRepository<StudyMaterial, int> studyRepo,
-                                                 IHostingEnvironment hostingEnviroment
+                                                 IHostingEnvironment hostingEnviroment,
+                                                 IGenericRepository<ExceptionLogging, int> exceptionLoggingRepo
                                                  )
         {
             _ICourseRepo = courseRepo;
@@ -36,11 +40,24 @@ namespace SERP.UI.Controllers.Assignment
             _IStudyMaterialRepo = studyRepo;
             _ISubjectRepo = subjectRepo;
             _hostingEnviroment = hostingEnviroment;
+            _exceptionLoggingRepo = exceptionLoggingRepo;
         }
         public async Task<IActionResult> Index(int id)
         {
-            ViewBag.CourseList = await _ICourseRepo.GetList(x => x.IsActive == 1);
-            return PartialView("~/Views/Documents/_StudyMaterialPartial.cshtml", await _IStudyMaterialRepo.GetSingle(x=>x.IsActive==1 && x.Id==id));
+            try
+            {
+                ViewBag.CourseList = await _ICourseRepo.GetList(x => x.IsActive == 1);
+                return PartialView("~/Views/Documents/_StudyMaterialPartial.cshtml", await _IStudyMaterialRepo.GetSingle(x => x.IsActive == 1 && x.Id == id));
+            }
+            catch (Exception ex)
+            {
+                string actionName = this.ControllerContext.RouteData.Values["action"].ToString();
+                string controllerName = this.ControllerContext.RouteData.Values["controller"].ToString();
+
+                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(actionName, controllerName, ex.Message, LoggingType.httpGet.ToString(), 0);
+                var exceptionResponse = await _exceptionLoggingRepo.CreateEntity(exceptionHelper);
+                return await Task.Run(() => PartialView("~/Views/Shared/Error.cshtml"));
+            }
         }
         [HttpPost]
         [RequestFormLimits(MultipartBodyLengthLimit = 999999999)]
@@ -73,27 +90,39 @@ namespace SERP.UI.Controllers.Assignment
         }
         public async Task<IActionResult> GetDocuments()
         {
-            var result = (from SM in await _IStudyMaterialRepo.GetList(x => x.IsActive == 1)
-                         join CM in await _ICourseRepo.GetList(x => x.IsActive == 1)
-                         on SM.CourseId equals CM.Id
-                         join BM in await _IBatchRepo.GetList(x => x.IsActive == 1)
-                         on SM.BatchId equals BM.Id
-                         join SB in await _ISubjectRepo.GetList(x=>x.IsActive==1)
-                         on SM.SubjectId equals SB.Id
-                         select new StudyMaterialModel
-                         { 
-                            Id= SM.Id,
-                            DocumentName= SM.MaterialName,
-                            Description= SM.MaterialDescription,
-                            CourseName= CM.Name,
-                            BatchName= BM.BatchName,
-                            SubjectName= SB.SubjectName,
-                            UploadType= SM.UploadType,
-                            Path= SM.MaterialPath,
-                            PublishDate= SM.PublishDate
-                         }).ToList();
+            try
+            {
+                var result = (from SM in await _IStudyMaterialRepo.GetList(x => x.IsActive == 1)
+                              join CM in await _ICourseRepo.GetList(x => x.IsActive == 1)
+                              on SM.CourseId equals CM.Id
+                              join BM in await _IBatchRepo.GetList(x => x.IsActive == 1)
+                              on SM.BatchId equals BM.Id
+                              join SB in await _ISubjectRepo.GetList(x => x.IsActive == 1)
+                              on SM.SubjectId equals SB.Id
+                              select new StudyMaterialModel
+                              {
+                                  Id = SM.Id,
+                                  DocumentName = SM.MaterialName,
+                                  Description = SM.MaterialDescription,
+                                  CourseName = CM.Name,
+                                  BatchName = BM.BatchName,
+                                  SubjectName = SB.SubjectName,
+                                  UploadType = SM.UploadType,
+                                  Path = SM.MaterialPath,
+                                  PublishDate = SM.PublishDate
+                              }).ToList();
 
-            return PartialView("~/Views/AssignmentWork/DocumentListPartial.cshtml", result);
+                return PartialView("~/Views/AssignmentWork/DocumentListPartial.cshtml", result);
+            }
+            catch (Exception ex)
+            {
+                string actionName = this.ControllerContext.RouteData.Values["action"].ToString();
+                string controllerName = this.ControllerContext.RouteData.Values["controller"].ToString();
+
+                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(actionName, controllerName, ex.Message, LoggingType.httpGet.ToString(), 0);
+                var exceptionResponse = await _exceptionLoggingRepo.CreateEntity(exceptionHelper);
+                return await Task.Run(() => PartialView("~/Views/Shared/Error.cshtml"));
+            }
         }
 
         public async Task<IActionResult> DeleteDocument(int id)

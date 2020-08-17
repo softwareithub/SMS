@@ -5,8 +5,10 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using SERP.Core.Entities.Entity.Core.Master;
 using SERP.Core.Entities.Entity.Core.Transaction;
+using SERP.Core.Entities.SERPExceptionLogging;
 using SERP.Infrastructure.Repository.Infrastructure.Repo;
 using SERP.Utilities.CommanHelper;
+using SERP.Utilities.ExceptionHelper;
 using SERP.Utilities.ResponseMessage;
 
 namespace SERP.UI.Controllers.Transaction.StudentTransaction
@@ -15,17 +17,35 @@ namespace SERP.UI.Controllers.Transaction.StudentTransaction
     {
         private readonly IGenericRepository<StudentMaster, int> _studentRepo;
         private readonly IGenericRepository<StudentEducationalDetail, int> _educationalRepo;
+        private readonly IGenericRepository<ExceptionLogging, int> _exceptionLoggingRepo;
 
-        public StudentEducationalController(IGenericRepository<StudentMaster, int> studentRepo, IGenericRepository<StudentEducationalDetail, int> educationalRepo)
+        public StudentEducationalController(IGenericRepository<StudentMaster, int> studentRepo, IGenericRepository<StudentEducationalDetail, int> educationalRepo, IGenericRepository<ExceptionLogging, int> exceptionLoggingRepo
+)
         {
             _studentRepo = studentRepo;
             _educationalRepo = educationalRepo;
+           _exceptionLoggingRepo = exceptionLoggingRepo;
+
         }
         public async Task<IActionResult> Index(int id)
         {
-            ViewBag.StudentList = await _studentRepo.GetList(x => x.IsActive == 1 && x.IsDeleted == 0);
-            var educationDetail = await _educationalRepo.GetSingle(x => x.Id == id);
-            return PartialView("~/Views/StudentMaster/_StudentEducationalPartial.cshtml",educationDetail);
+            try
+            {
+                ViewBag.StudentList = await _studentRepo.GetList(x => x.IsActive == 1 && x.IsDeleted == 0);
+                var educationDetail = await _educationalRepo.GetSingle(x => x.Id == id);
+                return PartialView("~/Views/StudentMaster/_StudentEducationalPartial.cshtml", educationDetail);
+            }
+            catch (Exception ex)
+            {
+                string actionName = this.ControllerContext.RouteData.Values["action"].ToString();
+                string controllerName = this.ControllerContext.RouteData.Values["controller"].ToString();
+
+                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(actionName, controllerName, ex.Message, LoggingType.httpGet.ToString(), 0);
+                var exceptionResponse = await _exceptionLoggingRepo.CreateEntity(exceptionHelper);
+                return await Task.Run(() => PartialView("~/Views/Shared/Error.cshtml"));
+            }
+
+
         }
 
         [HttpPost]
@@ -44,22 +64,36 @@ namespace SERP.UI.Controllers.Transaction.StudentTransaction
         }
         public async Task<IActionResult> EducationDetails()
         {
-            var models = (from SM in await _studentRepo.GetList(x => x.IsActive == 1)
-                          join ED in await _educationalRepo.GetList(x => x.IsActive == 1)
-                          on SM.Id equals ED.StudentId
-                          select new StudentEducationalDetail
-                          {
-                              Id= ED.Id,
-                              StudentName= SM.Name +" ("+SM.RegistrationNumber+") ",
-                              University= ED.University,
-                              CollegeName= ED.CollegeName,
-                              CourseName= ED.CourseName,
-                              YearOfJoining= ED.YearOfJoining,
-                              YearOfPassing= ED.YearOfPassing,
-                              EnrollmentNumber= ED.EnrollmentNumber
-                          }).ToList();
+            try
+            {
+                var models = (from SM in await _studentRepo.GetList(x => x.IsActive == 1)
+                              join ED in await _educationalRepo.GetList(x => x.IsActive == 1)
+                              on SM.Id equals ED.StudentId
+                              select new StudentEducationalDetail
+                              {
+                                  Id = ED.Id,
+                                  StudentName = SM.Name + " (" + SM.RegistrationNumber + ") ",
+                                  University = ED.University,
+                                  CollegeName = ED.CollegeName,
+                                  CourseName = ED.CourseName,
+                                  YearOfJoining = ED.YearOfJoining,
+                                  YearOfPassing = ED.YearOfPassing,
+                                  EnrollmentNumber = ED.EnrollmentNumber
+                              }).ToList();
 
-            return PartialView("~/Views/StudentMaster/_StudentEducationDetailPartial.cshtml", models);
+                return PartialView("~/Views/StudentMaster/_StudentEducationDetailPartial.cshtml", models);
+            }
+            catch (Exception ex)
+            {
+                string actionName = this.ControllerContext.RouteData.Values["action"].ToString();
+                string controllerName = this.ControllerContext.RouteData.Values["controller"].ToString();
+
+                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(actionName, controllerName, ex.Message, LoggingType.httpGet.ToString(), 0);
+                var exceptionResponse = await _exceptionLoggingRepo.CreateEntity(exceptionHelper);
+                return await Task.Run(() => PartialView("~/Views/Shared/Error.cshtml"));
+            }
+
+
         }
 
         public async Task<IActionResult> Delete(int id)

@@ -7,9 +7,11 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using SERP.Core.Entities.Entity.Core.Master;
 using SERP.Core.Entities.Entity.Core.Transaction;
+using SERP.Core.Entities.SERPExceptionLogging;
 using SERP.Infrastructure.Repository.Infrastructure.Repo;
 using SERP.Utilities.BlobUtility;
 using SERP.Utilities.CommanHelper;
+using SERP.Utilities.ExceptionHelper;
 using SERP.Utilities.ResponseMessage;
 
 namespace SERP.UI.Controllers.Master
@@ -19,39 +21,68 @@ namespace SERP.UI.Controllers.Master
         private readonly IGenericRepository<GuardianMaster, int> _IGuardianRepo;
         private readonly IGenericRepository<StudentMaster, int> _IStudentRepo;
         private readonly IHostingEnvironment _hostingEnviroment;
-
+        private readonly IGenericRepository<ExceptionLogging, int> _exceptionLoggingRepo;
 
         public GuardianController(IGenericRepository<GuardianMaster, int> guardianRepo, 
-            IGenericRepository<StudentMaster, int> studentRepo, IHostingEnvironment hostingEnviroment)
+                                  IGenericRepository<StudentMaster, int> studentRepo, 
+                                  IHostingEnvironment hostingEnviroment,
+                                  IGenericRepository<ExceptionLogging, int> exceptionLoggingRepo)
         {
             _IGuardianRepo = guardianRepo;
             _IStudentRepo = studentRepo;
             _hostingEnviroment = hostingEnviroment;
+            _exceptionLoggingRepo = exceptionLoggingRepo;
         }
 
         public async Task<IActionResult> Index(int id)
         {
-            ViewBag.Students = await _IStudentRepo.GetList(x => x.IsActive == 1);
-            var model = await _IGuardianRepo.GetSingle(z => z.Id == id);
-            return PartialView("~/Views/GuardianMaster/_GuardianInfo.cshtml", model);
+            try
+            {
+                ViewBag.Students = await _IStudentRepo.GetList(x => x.IsActive == 1);
+                var model = await _IGuardianRepo.GetSingle(z => z.Id == id);
+                return PartialView("~/Views/GuardianMaster/_GuardianInfo.cshtml", model);
+            }
+            catch (Exception ex)
+            {
+                string actionName = this.ControllerContext.RouteData.Values["action"].ToString();
+                string controllerName = this.ControllerContext.RouteData.Values["controller"].ToString();
+
+                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(actionName, controllerName, ex.Message, LoggingType.httpGet.ToString(), 0);
+                var exceptionResponse = await _exceptionLoggingRepo.CreateEntity(exceptionHelper);
+                return await Task.Run(() => PartialView("~/Views/Shared/Error.cshtml"));
+            }
+
         }
         public async Task<IActionResult> GuradianList()
         {
-            var models = (from GM in await _IGuardianRepo.GetList(x => x.IsActive == 1)
-                          join SM in await _IStudentRepo.GetList(x => x.IsActive == 1)
-                          on GM.StudentId equals SM.Id
-                          select new GuardianMaster
-                          {
-                              Id = GM.Id,
-                              StudentName = SM.Name,
-                              StudentId = GM.StudentId,
-                              GuradianName = GM.GuradianName,
-                              GuardianImage = GM.GuardianImage,
-                              Phone = GM.Phone,
-                              Email = GM.Email,
-                              IsVerified = GM.IsVerified
-                          }).ToList();
-            return PartialView("~/Views/GuardianMaster/_GuardianPartialList.cshtml",models);
+            try
+            {
+                var models = (from GM in await _IGuardianRepo.GetList(x => x.IsActive == 1)
+                              join SM in await _IStudentRepo.GetList(x => x.IsActive == 1)
+                              on GM.StudentId equals SM.Id
+                              select new GuardianMaster
+                              {
+                                  Id = GM.Id,
+                                  StudentName = SM.Name,
+                                  StudentId = GM.StudentId,
+                                  GuradianName = GM.GuradianName,
+                                  GuardianImage = GM.GuardianImage,
+                                  Phone = GM.Phone,
+                                  Email = GM.Email,
+                                  IsVerified = GM.IsVerified
+                              }).ToList();
+                return PartialView("~/Views/GuardianMaster/_GuardianPartialList.cshtml", models);
+            }
+            catch (Exception ex)
+            {
+                string actionName = this.ControllerContext.RouteData.Values["action"].ToString();
+                string controllerName = this.ControllerContext.RouteData.Values["controller"].ToString();
+
+                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(actionName, controllerName, ex.Message, LoggingType.httpGet.ToString(), 0);
+                var exceptionResponse = await _exceptionLoggingRepo.CreateEntity(exceptionHelper);
+                return await Task.Run(() => PartialView("~/Views/Shared/Error.cshtml"));
+            }
+
         }
 
         [HttpPost]

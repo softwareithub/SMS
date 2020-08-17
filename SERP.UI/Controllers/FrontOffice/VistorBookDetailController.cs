@@ -4,8 +4,10 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using SERP.Core.Entities.FrontOffice;
+using SERP.Core.Entities.SERPExceptionLogging;
 using SERP.Infrastructure.Repository.Infrastructure.Repo;
 using SERP.Utilities.CommanHelper;
+using SERP.Utilities.ExceptionHelper;
 using SERP.Utilities.ResponseMessage;
 
 namespace SERP.UI.Controllers.FrontOffice
@@ -13,15 +15,30 @@ namespace SERP.UI.Controllers.FrontOffice
     public class VistorBookDetailController : Controller
     {
         private readonly IGenericRepository<VisitorBook, int> _visitorBookRepo;
+        private readonly IGenericRepository<ExceptionLogging, int> _exceptionLoggingRepo;
 
-        public VistorBookDetailController(IGenericRepository<VisitorBook, int> visitorRepo)
+        public VistorBookDetailController(IGenericRepository<VisitorBook, int> visitorRepo,
+                                          IGenericRepository<ExceptionLogging, int> exceptionLoggingRepo)
         {
             _visitorBookRepo = visitorRepo;
+            _exceptionLoggingRepo = exceptionLoggingRepo;
         }
         public async Task<IActionResult> Index(int id)
         {
-            var model = await _visitorBookRepo.GetSingle(x => x.Id == id);
-            return PartialView("~/Views/FrontOffice/_VisitorBookPartial.cshtml",model);
+            try
+            {
+                var model = await _visitorBookRepo.GetSingle(x => x.Id == id);
+                return PartialView("~/Views/FrontOffice/_VisitorBookPartial.cshtml", model);
+            }
+            catch (Exception ex)
+            {
+                string actionName = this.ControllerContext.RouteData.Values["action"].ToString();
+                string controllerName = this.ControllerContext.RouteData.Values["controller"].ToString();
+
+                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(actionName, controllerName, ex.Message, LoggingType.httpGet.ToString(), 0);
+                var exceptionResponse = await _exceptionLoggingRepo.CreateEntity(exceptionHelper);
+                return await Task.Run(() => PartialView("~/Views/Shared/Error.cshtml"));
+            }
         }
 
         [HttpPost]
@@ -42,8 +59,20 @@ namespace SERP.UI.Controllers.FrontOffice
 
         public async Task<IActionResult> GetList()
         {
-            var models = await _visitorBookRepo.GetList(x => x.IsActive == 1);
-            return PartialView("~/Views/FrontOffice/_VisitorListPartial.cshtml", models);
+            try
+            {
+                var models = await _visitorBookRepo.GetList(x => x.IsActive == 1);
+                return PartialView("~/Views/FrontOffice/_VisitorListPartial.cshtml", models);
+            }
+            catch (Exception ex)
+            {
+                string actionName = this.ControllerContext.RouteData.Values["action"].ToString();
+                string controllerName = this.ControllerContext.RouteData.Values["controller"].ToString();
+
+                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(actionName, controllerName, ex.Message, LoggingType.httpGet.ToString(), 0);
+                var exceptionResponse = await _exceptionLoggingRepo.CreateEntity(exceptionHelper);
+                return await Task.Run(() => PartialView("~/Views/Shared/Error.cshtml"));
+            }
         }
 
         public async Task<IActionResult> Delete(int id)

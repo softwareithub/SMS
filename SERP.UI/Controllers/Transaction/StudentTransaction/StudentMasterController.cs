@@ -7,10 +7,12 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using SERP.Core.Entities.Entity.Core.Master;
 using SERP.Core.Entities.Entity.Core.Transaction;
+using SERP.Core.Entities.SERPExceptionLogging;
 using SERP.Core.Model.MasterViewModel;
 using SERP.Infrastructure.Repository.Infrastructure.Repo;
 using SERP.Utilities.BlobUtility;
 using SERP.Utilities.CommanHelper;
+using SERP.Utilities.ExceptionHelper;
 using SERP.Utilities.ResponseMessage;
 using SERP.Utilities.ResponseUtilities;
 
@@ -27,6 +29,8 @@ namespace SERP.UI.Controllers.Transaction.StudentTransaction
         public readonly IGenericRepository<StudentPromote, int> _IStudentPromote;
         private readonly IHostingEnvironment _hostingEnvironment;
         private readonly IGenericRepository<FeeDiscountModel, int> _IFeeDiscountRepo;
+        private readonly IGenericRepository<ExceptionLogging, int> _exceptionLoggingRepo;
+
 
         public StudentMasterController(IGenericRepository<StudentMaster, int> studentRepo,
            IGenericRepository<BatchMaster, int> batchRepo,
@@ -36,7 +40,8 @@ namespace SERP.UI.Controllers.Transaction.StudentTransaction
            IGenericRepository<AcademicMaster, int> academicRepo,
             IGenericRepository<StudentPromote, int> studentPromote,
             IHostingEnvironment hostingEnvironment,
-            IGenericRepository<FeeDiscountModel, int> feeDiscountRepo
+            IGenericRepository<FeeDiscountModel, int> feeDiscountRepo,
+            IGenericRepository<ExceptionLogging, int> exceptionLoggingRepo
            )
         {
             _IStudentMaster = studentRepo;
@@ -48,18 +53,33 @@ namespace SERP.UI.Controllers.Transaction.StudentTransaction
             _IStudentPromote = studentPromote;
             _hostingEnvironment = hostingEnvironment;
             _IFeeDiscountRepo = feeDiscountRepo;
+            _exceptionLoggingRepo = exceptionLoggingRepo;
+
         }
         public async Task<IActionResult> CreateStudent(int id = 0)
         {
-            await PopulateViewBag();
-            if (id == 0)
-                return await Task.Run(() => PartialView("~/Views/StudentMaster/_StudentMasterPartial.cshtml"));
+            try
+            {
+                await PopulateViewBag();
+                if (id == 0)
+                    return await Task.Run(() => PartialView("~/Views/StudentMaster/_StudentMasterPartial.cshtml"));
 
-            var studentPromote = await _IStudentPromote.GetSingle(x => x.StudentId == id);
-            await _IStudentPromote.CreateNewContext();
-            var studentModel = await _IStudentMaster.GetSingle(x => x.Id == studentPromote.StudentId);
+                var studentPromote = await _IStudentPromote.GetSingle(x => x.StudentId == id);
+                await _IStudentPromote.CreateNewContext();
+                var studentModel = await _IStudentMaster.GetSingle(x => x.Id == studentPromote.StudentId);
 
-            return PartialView("~/Views/StudentMaster/_StudentMasterPartial.cshtml", studentModel);
+                return PartialView("~/Views/StudentMaster/_StudentMasterPartial.cshtml", studentModel);
+            }
+            catch (Exception ex)
+            {
+                string actionName = this.ControllerContext.RouteData.Values["action"].ToString();
+                string controllerName = this.ControllerContext.RouteData.Values["controller"].ToString();
+
+                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(actionName, controllerName, ex.Message, LoggingType.httpGet.ToString(), 0);
+                var exceptionResponse = await _exceptionLoggingRepo.CreateEntity(exceptionHelper);
+                return await Task.Run(() => PartialView("~/Views/Shared/Error.cshtml"));
+            }
+
         }
 
         public async Task<IActionResult> GetBatchList(int courseId)
@@ -128,16 +148,42 @@ namespace SERP.UI.Controllers.Transaction.StudentTransaction
 
         public async Task<IActionResult> GetStudentList()
         {
-            List<StudentPartialInfoViewModel> studentViewModel = await GetStudentVm();
+            try
+            {
+                List<StudentPartialInfoViewModel> studentViewModel = await GetStudentVm();
 
-            return PartialView("~/Views/StudentMaster/_StudentlistPartial.cshtml", studentViewModel);
+                return PartialView("~/Views/StudentMaster/_StudentlistPartial.cshtml", studentViewModel);
+            }
+            catch (Exception ex)
+            {
+                string actionName = this.ControllerContext.RouteData.Values["action"].ToString();
+                string controllerName = this.ControllerContext.RouteData.Values["controller"].ToString();
+
+                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(actionName, controllerName, ex.Message, LoggingType.httpGet.ToString(), 0);
+                var exceptionResponse = await _exceptionLoggingRepo.CreateEntity(exceptionHelper);
+                return await Task.Run(() => PartialView("~/Views/Shared/Error.cshtml"));
+            }
+
         }
 
         public async Task<IActionResult> GetStudentCompleteList(int id)
         {
-            var result = await GetStudentVm();
-            var studentModel = result.FirstOrDefault(x => x.Id == id);
-            return PartialView("~/Views/StudentMaster/_StudentProfilePartial.cshtml", studentModel);
+            try
+            {
+                var result = await GetStudentVm();
+                var studentModel = result.FirstOrDefault(x => x.Id == id);
+                return PartialView("~/Views/StudentMaster/_StudentProfilePartial.cshtml", studentModel);
+            }
+            catch (Exception ex)
+            {
+                string actionName = this.ControllerContext.RouteData.Values["action"].ToString();
+                string controllerName = this.ControllerContext.RouteData.Values["controller"].ToString();
+
+                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(actionName, controllerName, ex.Message, LoggingType.httpGet.ToString(), 0);
+                var exceptionResponse = await _exceptionLoggingRepo.CreateEntity(exceptionHelper);
+                return await Task.Run(() => PartialView("~/Views/Shared/Error.cshtml"));
+            }
+
         }
 
         #region privateFields

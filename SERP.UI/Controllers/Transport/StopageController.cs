@@ -3,9 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using SERP.Core.Entities.SERPExceptionLogging;
 using SERP.Core.Entities.Transport;
 using SERP.Infrastructure.Repository.Infrastructure.Repo;
 using SERP.Utilities.CommanHelper;
+using SERP.Utilities.ExceptionHelper;
 using SERP.Utilities.ResponseMessage;
 
 namespace SERP.UI.Controllers.Transport
@@ -13,14 +15,30 @@ namespace SERP.UI.Controllers.Transport
     public class StopageController : Controller
     {
         private readonly IGenericRepository<StopageModel, int> _stopageRepository;
-        public StopageController(IGenericRepository<StopageModel, int> stopageRepository)
+        private readonly IGenericRepository<ExceptionLogging, int> _exceptionLoggingRepo;
+        
+        public StopageController(IGenericRepository<StopageModel, int> stopageRepository, IGenericRepository<ExceptionLogging, int> exceptionLoggingRepo)
         {
             _stopageRepository = stopageRepository;
+            _exceptionLoggingRepo = exceptionLoggingRepo;
         }
         public async Task<IActionResult> Index(int id)
         {
-            var responseData = await _stopageRepository.GetSingle(x => x.Id == id);
-            return PartialView("~/Views/Transport/_StopagePartial.cshtml",responseData);
+            try
+            {
+                var responseData = await _stopageRepository.GetSingle(x => x.Id == id);
+                return PartialView("~/Views/Transport/_StopagePartial.cshtml", responseData);
+            }
+            catch (Exception ex)
+            {
+                string actionName = this.ControllerContext.RouteData.Values["action"].ToString();
+                string controllerName = this.ControllerContext.RouteData.Values["controller"].ToString();
+
+                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(actionName, controllerName, ex.Message, LoggingType.httpGet.ToString(), 0);
+                var exceptionResponse = await _exceptionLoggingRepo.CreateEntity(exceptionHelper);
+                return await Task.Run(() => PartialView("~/Views/Shared/Error.cshtml"));
+            }
+
         }
 
         [HttpPost]
@@ -32,8 +50,21 @@ namespace SERP.UI.Controllers.Transport
 
         public async Task<IActionResult> GetStopageDetails()
         {
-            var responseData = await _stopageRepository.GetList(x => x.IsActive == 1);
-            return PartialView("~/Views/Transport/_StopageDetailPartial.cshtml", responseData);
+            try
+            {
+                var responseData = await _stopageRepository.GetList(x => x.IsActive == 1);
+                return PartialView("~/Views/Transport/_StopageDetailPartial.cshtml", responseData);
+            }
+            catch (Exception ex)
+            {
+                string actionName = this.ControllerContext.RouteData.Values["action"].ToString();
+                string controllerName = this.ControllerContext.RouteData.Values["controller"].ToString();
+
+                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(actionName, controllerName, ex.Message, LoggingType.httpGet.ToString(), 0);
+                var exceptionResponse = await _exceptionLoggingRepo.CreateEntity(exceptionHelper);
+                return await Task.Run(() => PartialView("~/Views/Shared/Error.cshtml"));
+            }
+
         }
         public async Task<IActionResult> Delete(int id)
         {

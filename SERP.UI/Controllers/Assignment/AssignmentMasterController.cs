@@ -90,31 +90,22 @@ namespace SERP.UI.Controllers.Assignment
             {
                 return PartialView("~/Views/AssignmentWork/_AssignmentList.cshtml", await GetAssignmentList());
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
-                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(nameof(AssignmentList),nameof(AssignmentMasterController), ex.Message,LoggingType.httpGet.ToString(), 0);
+                string actionName = this.ControllerContext.RouteData.Values["action"].ToString();
+                string controllerName = this.ControllerContext.RouteData.Values["controller"].ToString();
+
+                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(actionName, controllerName, ex.Message, LoggingType.httpGet.ToString(), 0);
                 var exceptionResponse = await _exceptionLoggingRepo.CreateEntity(exceptionHelper);
                 return await Task.Run(() => PartialView("~/Views/Shared/Error.cshtml"));
-
             }
 
         }
 
         public async Task<IActionResult> GetAssignDetails(int id)
         {
-            try
-            {
                 var result = await GetAssignmentList();
                 return Json(result.Find(x => x.AssignmentId == id).Assignment);
-            }
-            catch(Exception ex)
-            {
-                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(nameof(GetAssignDetails), nameof(AssignmentMasterController), ex.Message,LoggingType.httpGet.ToString(), 0);
-                var exceptionResponse = await _exceptionLoggingRepo.CreateEntity(exceptionHelper);
-                return await Task.Run(() => PartialView("~/Views/Shared/Error.cshtml"));
-
-            }
-
         }
         private async Task PopulateViewBag()
         {

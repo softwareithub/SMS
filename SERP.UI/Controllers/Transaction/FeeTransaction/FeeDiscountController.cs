@@ -5,10 +5,12 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Primitives;
 using SERP.Core.Entities.Entity.Core.Transaction;
+using SERP.Core.Entities.SERPExceptionLogging;
 using SERP.Core.Model.TransactionViewModel;
 using SERP.Infrastructure.Repository.Infrastructure.Repo;
 using SERP.UI.Helper;
 using SERP.Utilities.CommanHelper;
+using SERP.Utilities.ExceptionHelper;
 using SERP.Utilities.ResponseMessage;
 using SERP.Utilities.ResponseUtilities;
 
@@ -19,27 +21,43 @@ namespace SERP.UI.Controllers.Transaction.FeeTransaction
         private readonly IGenericRepository<FeeDiscountParticularWiseModel, int> _feeDiscountParticularRepo;
         private readonly IGenericRepository<FeeDiscountModel, int> _feeDsicountRepo;
         private readonly IGenericRepository<FeeCategory, int> _feeCategoryRepo;
+        private readonly IGenericRepository<ExceptionLogging, int> _exceptionLoggingRepo;
 
         public FeeDiscountController(IGenericRepository<FeeDiscountParticularWiseModel, int> feeDiscountParticularRepo,
-            IGenericRepository<FeeDiscountModel, int> feeDiscountRepo, IGenericRepository<FeeCategory, int> feeCategoryRepo)
+            IGenericRepository<FeeDiscountModel, int> feeDiscountRepo, IGenericRepository<FeeCategory, int> feeCategoryRepo,
+                    IGenericRepository<ExceptionLogging, int> exceptionLoggingRepo)
         {
             _feeDiscountParticularRepo = feeDiscountParticularRepo;
             _feeDsicountRepo = feeDiscountRepo;
             _feeCategoryRepo = feeCategoryRepo;
+            _exceptionLoggingRepo = exceptionLoggingRepo;
         }
         public async Task<IActionResult> Index(int id)
         {
-            if (id != 0)
+            try
             {
-                FeeDiscountViewModel model = new FeeDiscountViewModel();
-                var feeDiscountModel = await _feeDsicountRepo.GetSingle(x => x.IsActive == 1 && x.IsDeleted == 0 && x.Id == id);
-                model.FeeDiscountVm = feeDiscountModel;
-                var feeDiscountParticualVms = await _feeDiscountParticularRepo.GetList(x => x.IsDeleted == 0 && x.IsActive == 1 && x.FeeDiscountId == feeDiscountModel.Id);
-                model.FeeDiscountParticualVms = feeDiscountParticualVms.ToList();
-                return PartialView("~/Views/FeeTransaction/_FeeDiscountPartial.cshtml", model);
+                if (id != 0)
+                {
+                    FeeDiscountViewModel model = new FeeDiscountViewModel();
+                    var feeDiscountModel = await _feeDsicountRepo.GetSingle(x => x.IsActive == 1 && x.IsDeleted == 0 && x.Id == id);
+                    model.FeeDiscountVm = feeDiscountModel;
+                    var feeDiscountParticualVms = await _feeDiscountParticularRepo.GetList(x => x.IsDeleted == 0 && x.IsActive == 1 && x.FeeDiscountId == feeDiscountModel.Id);
+                    model.FeeDiscountParticualVms = feeDiscountParticualVms.ToList();
+                    return PartialView("~/Views/FeeTransaction/_FeeDiscountPartial.cshtml", model);
+                }
+
+                return await Task.Run(() => PartialView("~/Views/FeeTransaction/_FeeDiscountPartial.cshtml"));
+            }
+            catch (Exception ex)
+            {
+                string actionName = this.ControllerContext.RouteData.Values["action"].ToString();
+                string controllerName = this.ControllerContext.RouteData.Values["controller"].ToString();
+
+                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(actionName, controllerName, ex.Message, LoggingType.httpGet.ToString(), 0);
+                var exceptionResponse = await _exceptionLoggingRepo.CreateEntity(exceptionHelper);
+                return await Task.Run(() => PartialView("~/Views/Shared/Error.cshtml"));
             }
 
-            return await Task.Run(() => PartialView("~/Views/FeeTransaction/_FeeDiscountPartial.cshtml"));
         }
 
         public async Task<JsonResult> GetParticularList(int id)
@@ -77,34 +95,60 @@ namespace SERP.UI.Controllers.Transaction.FeeTransaction
         [HttpPost]
         public async Task<IActionResult> CreatePerticularDiscount(FeeDiscountViewModel model)
         {
-            var perticularDiscountType = Request.Form["ParticularDiscountType"].ToString().Split(',');
-            var particularDiscountValue = Request.Form["PerticularDiscountValue"].ToString().Split(',');
-            particularDiscountValue.ToList().ForEach(item =>
+            try
             {
-                if (string.IsNullOrEmpty(item))
+                var perticularDiscountType = Request.Form["ParticularDiscountType"].ToString().Split(',');
+                var particularDiscountValue = Request.Form["PerticularDiscountValue"].ToString().Split(',');
+                particularDiscountValue.ToList().ForEach(item =>
                 {
-                    item = "0.0";
+                    if (string.IsNullOrEmpty(item))
+                    {
+                        item = "0.0";
+                    }
+
+                });
+                var particularDescription = Request.Form["PerticularDescription"].ToString().Split(',');
+                var categoriesId = Request.Form["CategoryId"];
+                var discountPerticularId = Request.Form["discountPertId"];
+
+
+                if (model.FeeDiscountVm.Id == 0)
+                    return await CreateFeeDiscount(model, perticularDiscountType, particularDiscountValue, particularDescription, categoriesId);
+                else
+                {
+
+                    return await UpdateFeeDiscount(model, perticularDiscountType, particularDiscountValue, particularDescription, categoriesId, discountPerticularId);
                 }
-
-            });
-            var particularDescription = Request.Form["PerticularDescription"].ToString().Split(',');
-            var categoriesId = Request.Form["CategoryId"];
-            var discountPerticularId = Request.Form["discountPertId"];
-
-
-            if (model.FeeDiscountVm.Id == 0)
-                return await CreateFeeDiscount(model, perticularDiscountType, particularDiscountValue, particularDescription, categoriesId);
-            else
+            }
+            catch (Exception ex)
             {
-                
-                return await UpdateFeeDiscount(model, perticularDiscountType, particularDiscountValue, particularDescription, categoriesId, discountPerticularId);
+                string actionName = this.ControllerContext.RouteData.Values["action"].ToString();
+                string controllerName = this.ControllerContext.RouteData.Values["controller"].ToString();
+
+                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(actionName, controllerName, ex.Message, LoggingType.httpGet.ToString(), 0);
+                var exceptionResponse = await _exceptionLoggingRepo.CreateEntity(exceptionHelper);
+                return await Task.Run(() => PartialView("~/Views/Shared/Error.cshtml"));
             }
 
         }
         public async Task<IActionResult> GetDiscontList()
         {
-            var result = await _feeDsicountRepo.GetList(x => x.IsActive == 1 && x.IsDeleted == 0);
-            return PartialView("~/Views/FeeTransaction/_FeeDiscountListPartial.cshtml", result);
+            try
+            {
+                var result = await _feeDsicountRepo.GetList(x => x.IsActive == 1 && x.IsDeleted == 0);
+                return PartialView("~/Views/FeeTransaction/_FeeDiscountListPartial.cshtml", result);
+            }
+            catch (Exception ex)
+            {
+                string actionName = this.ControllerContext.RouteData.Values["action"].ToString();
+                string controllerName = this.ControllerContext.RouteData.Values["controller"].ToString();
+
+                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(actionName, controllerName, ex.Message, LoggingType.httpGet.ToString(), 0);
+                var exceptionResponse = await _exceptionLoggingRepo.CreateEntity(exceptionHelper);
+                return await Task.Run(() => PartialView("~/Views/Shared/Error.cshtml"));
+            }
+
+
         }
 
         public async Task<IActionResult> Delete(int id)

@@ -4,8 +4,10 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using SERP.Core.Entities.Entity.Core.ExamDetail;
+using SERP.Core.Entities.SERPExceptionLogging;
 using SERP.Infrastructure.Repository.Infrastructure.Repo;
 using SERP.Utilities.CommanHelper;
+using SERP.Utilities.ExceptionHelper;
 using SERP.Utilities.ResponseMessage;
 
 namespace SERP.UI.Controllers.ExamMaster
@@ -13,21 +15,50 @@ namespace SERP.UI.Controllers.ExamMaster
     public class GradeMasterController : Controller
     {
         private readonly IGenericRepository<GradeMaster, int> _IGradeMasterRepo;
+        private readonly IGenericRepository<ExceptionLogging, int> _exceptionLoggingRepo;
 
-        public GradeMasterController(IGenericRepository<GradeMaster, int> _gradeMasterRepo)
+        public GradeMasterController(IGenericRepository<GradeMaster, int> _gradeMasterRepo,
+                                     IGenericRepository<ExceptionLogging, int> exceptionLoggingRepo)
         {
             _IGradeMasterRepo = _gradeMasterRepo;
+            _exceptionLoggingRepo = exceptionLoggingRepo;
         }
         public async Task<IActionResult> GradeList()
         {
-            var result = await _IGradeMasterRepo.GetList(x => x.IsActive == 1);
-            return PartialView("~/Views/ExamMaster/_GradeMasterPartial.cshtml",result);
+            try
+            {
+                var result = await _IGradeMasterRepo.GetList(x => x.IsActive == 1);
+                return PartialView("~/Views/ExamMaster/_GradeMasterPartial.cshtml", result);
+            }
+            catch (Exception ex)
+            {
+                string actionName = this.ControllerContext.RouteData.Values["action"].ToString();
+                string controllerName = this.ControllerContext.RouteData.Values["controller"].ToString();
+
+                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(actionName, controllerName, ex.Message, LoggingType.httpGet.ToString(), 0);
+                var exceptionResponse = await _exceptionLoggingRepo.CreateEntity(exceptionHelper);
+                return await Task.Run(() => PartialView("~/Views/Shared/Error.cshtml"));
+            }
+
         }
 
         public async Task<IActionResult> CreateGrade(int id )
         {
-            var response = await _IGradeMasterRepo.GetSingle(x => x.Id == id);
-            return PartialView("~/Views/ExamMaster/_CreateGradeMasterPartial.cshtml", response);
+            try
+            {
+                var response = await _IGradeMasterRepo.GetSingle(x => x.Id == id);
+                return PartialView("~/Views/ExamMaster/_CreateGradeMasterPartial.cshtml", response);
+            }
+            catch (Exception ex)
+            {
+                string actionName = this.ControllerContext.RouteData.Values["action"].ToString();
+                string controllerName = this.ControllerContext.RouteData.Values["controller"].ToString();
+
+                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(actionName, controllerName, ex.Message, LoggingType.httpGet.ToString(), 0);
+                var exceptionResponse = await _exceptionLoggingRepo.CreateEntity(exceptionHelper);
+                return await Task.Run(() => PartialView("~/Views/Shared/Error.cshtml"));
+            }
+
         }
 
         [HttpPost]

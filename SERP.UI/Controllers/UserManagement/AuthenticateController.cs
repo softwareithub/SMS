@@ -8,11 +8,13 @@ using Microsoft.AspNetCore.Mvc;
 using SERP.Core.Entities.Entity.Core.HRModule;
 using SERP.Core.Entities.Entity.Core.Master;
 using SERP.Core.Entities.Entity.Core.Transaction;
+using SERP.Core.Entities.SERPExceptionLogging;
 using SERP.Core.Entities.UserManagement;
 using SERP.Core.Model.UserManagement;
 using SERP.Infrastructure.Repository.Infrastructure.Repo;
 using SERP.UI.Extension;
 using SERP.Utilities.EmailHelper;
+using SERP.Utilities.ExceptionHelper;
 
 namespace SERP.UI.Controllers.UserManagement
 {
@@ -29,6 +31,8 @@ namespace SERP.UI.Controllers.UserManagement
         private readonly IGenericRepository<BatchMaster, int> _batchRepo;
         private readonly IGenericRepository<EmployeeBasicInfoModel, int> _employeeRepo;
         private readonly IGenericRepository<AcademicMaster, int> _sessionRepo;
+        private readonly IGenericRepository<ExceptionLogging, int> _exceptionLoggingRepo;
+        
         public AuthenticateController(IGenericRepository<Authenticate, int> authenticateRepo,
             IGenericRepository<ModuleMaster, int> moduleRepo,
             IGenericRepository<SubModuleMaster, int> subModuleRepo,
@@ -39,7 +43,8 @@ namespace SERP.UI.Controllers.UserManagement
             IGenericRepository<CourseMaster, int> courseRepo,
             IGenericRepository<BatchMaster, int> batchRepo, 
             IGenericRepository<EmployeeBasicInfoModel, int> employeeRepo,
-            IGenericRepository<AcademicMaster, int> sessionRepo
+            IGenericRepository<AcademicMaster, int> sessionRepo,
+            IGenericRepository<ExceptionLogging, int> exceptionLoggingRepo
             )
         {
             _IAuthenticateRepo = authenticateRepo;
@@ -53,20 +58,34 @@ namespace SERP.UI.Controllers.UserManagement
             _batchRepo = batchRepo;
             _employeeRepo = employeeRepo;
             _sessionRepo = sessionRepo;
+            _exceptionLoggingRepo = exceptionLoggingRepo;
         }
 
         [AllowAnonymous]
         public async Task<IActionResult> Login(string message, string returnUrl)
         {
-            ViewBag.message = message;
-            var instituteModel = await _IInstituteRepo.GetSingle(x => x.IsActive == 1);
-            ViewBag.Logo = instituteModel.InstituteLogo;
-            ViewBag.Name = instituteModel.Name;
-            ViewBag.Rythum = instituteModel.Rythum;
-            HttpContext.Session.SetString("InstituteName", instituteModel.Name);
-            HttpContext.Session.SetString("InstituteLogo", instituteModel.InstituteLogo);
-            ViewBag.SessionList = await _sessionRepo.GetAll(x => x.IsActive == 1);
-            return await Task.Run(() => View("~/Views/UserManagement/_LoginPartial.cshtml"));
+            try
+            {
+                ViewBag.message = message;
+                var instituteModel = await _IInstituteRepo.GetSingle(x => x.IsActive == 1);
+                ViewBag.Logo = instituteModel.InstituteLogo;
+                ViewBag.Name = instituteModel.Name;
+                ViewBag.Rythum = instituteModel.Rythum;
+                HttpContext.Session.SetString("InstituteName", instituteModel.Name);
+                HttpContext.Session.SetString("InstituteLogo", instituteModel.InstituteLogo);
+                ViewBag.SessionList = await _sessionRepo.GetAll(x => x.IsActive == 1);
+                return await Task.Run(() => View("~/Views/UserManagement/_LoginPartial.cshtml"));
+            }
+            catch (Exception ex)
+            {
+                string actionName = this.ControllerContext.RouteData.Values["action"].ToString();
+                string controllerName = this.ControllerContext.RouteData.Values["controller"].ToString();
+
+                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(actionName, controllerName, ex.Message, LoggingType.httpGet.ToString(), 0);
+                var exceptionResponse = await _exceptionLoggingRepo.CreateEntity(exceptionHelper);
+                return await Task.Run(() => PartialView("~/Views/Shared/Error.cshtml"));
+            }
+
         }
 
         [HttpPost]

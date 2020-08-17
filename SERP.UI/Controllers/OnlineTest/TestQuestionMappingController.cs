@@ -10,10 +10,12 @@ using SERP.Core.Entities.Entity.Core.ExamDetail;
 using SERP.Core.Entities.Entity.Core.Master;
 using SERP.Core.Entities.Entity.Core.Transaction;
 using SERP.Core.Entities.OnlineTest;
+using SERP.Core.Entities.SERPExceptionLogging;
 using SERP.Core.Model.ExamModel;
 using SERP.Core.Model.OnlineTest;
 using SERP.Infrastructure.Repository.Infrastructure.Repo;
 using SERP.Utilities.EmailHelper;
+using SERP.Utilities.ExceptionHelper;
 using SERP.Utilities.ResponseMessage;
 using SERP.Utilities.ResponseUtilities;
 using IHostingEnvironment = Microsoft.AspNetCore.Hosting.IHostingEnvironment;
@@ -31,8 +33,9 @@ namespace SERP.UI.Controllers.OnlineTest
         private readonly IGenericRepository<StudentPromote, int> _studentPromoteRepo;
         private readonly IGenericRepository<StudentMaster, int> _studentMasterRepo;
         private readonly IHostingEnvironment _hostingEnviroment;
+        private readonly IGenericRepository<ExceptionLogging, int> _exceptionLoggingRepo;
 
-        public TestQuestionMappingController(IGenericRepository<QuestionModel, int> questionRepo, IGenericRepository<SubjectMaster, int> subjectReo, IGenericRepository<CourseMaster, int> courseRepo, IGenericRepository<TestMaster, int> testRepo, IGenericRepository<TestQuestionMapping, int> testQuestionRepo, IGenericRepository<SMSTemplateModel, int> smsTemplateRepo, IGenericRepository<StudentPromote, int> studentPromoteRepo, IGenericRepository<StudentMaster, int>  studentMasterRepo, IHostingEnvironment hostingEnviroment)
+        public TestQuestionMappingController(IGenericRepository<QuestionModel, int> questionRepo, IGenericRepository<SubjectMaster, int> subjectReo, IGenericRepository<CourseMaster, int> courseRepo, IGenericRepository<TestMaster, int> testRepo, IGenericRepository<TestQuestionMapping, int> testQuestionRepo, IGenericRepository<SMSTemplateModel, int> smsTemplateRepo, IGenericRepository<StudentPromote, int> studentPromoteRepo, IGenericRepository<StudentMaster, int>  studentMasterRepo, IHostingEnvironment hostingEnviroment, IGenericRepository<ExceptionLogging, int> exceptionLoggingRepo)
         {
             _IQuestionRepo = questionRepo;
             _ISubjectMasterRepo = subjectReo;
@@ -43,35 +46,49 @@ namespace SERP.UI.Controllers.OnlineTest
             _studentPromoteRepo = studentPromoteRepo;
             _studentMasterRepo = studentMasterRepo;
             _hostingEnviroment = hostingEnviroment;
+            _exceptionLoggingRepo = exceptionLoggingRepo;
         }
         public async Task<IActionResult> Index()
         {
-            var courseDetails = await _ICourseRepo.GetList(x => x.IsActive == 1);
-            var subjectDetails = await _ISubjectMasterRepo.GetList(x => x.IsActive == 1);
-            var testDetails = await _ITestRepo.GetList(x => x.IsActive == 1);
-            var questionDetails = await _IQuestionRepo.GetList(x => x.IsActive == 1);
+            try
+            {
+                var courseDetails = await _ICourseRepo.GetList(x => x.IsActive == 1);
+                var subjectDetails = await _ISubjectMasterRepo.GetList(x => x.IsActive == 1);
+                var testDetails = await _ITestRepo.GetList(x => x.IsActive == 1);
+                var questionDetails = await _IQuestionRepo.GetList(x => x.IsActive == 1);
 
-            var response = (from QM in questionDetails
-                            join CM in courseDetails
-                            on QM.CourseId equals CM.Id
-                            join SM in subjectDetails
-                            on QM.SubjectId equals SM.Id
-                            select new TestQuestionModel
-                            {
-                                QuestionId = QM.Id,
-                                TestId = 0,
-                                CourseName = CM.Name,
-                                SubjectName = SM.SubjectName,
-                                Question = QM.Question,
-                                QuestionPoint = QM.QuestionPoint
+                var response = (from QM in questionDetails
+                                join CM in courseDetails
+                                on QM.CourseId equals CM.Id
+                                join SM in subjectDetails
+                                on QM.SubjectId equals SM.Id
+                                select new TestQuestionModel
+                                {
+                                    QuestionId = QM.Id,
+                                    TestId = 0,
+                                    CourseName = CM.Name,
+                                    SubjectName = SM.SubjectName,
+                                    Question = QM.Question,
+                                    QuestionPoint = QM.QuestionPoint
 
-                            }).ToList();
+                                }).ToList();
 
-            ViewBag.CourseDetail = courseDetails;
+                ViewBag.CourseDetail = courseDetails;
 
-            ViewBag.TestDetail = testDetails;
+                ViewBag.TestDetail = testDetails;
 
-            return PartialView("~/Views/OnlineTest/_TestQuestionMappingPartial.cshtml", response);
+                return PartialView("~/Views/OnlineTest/_TestQuestionMappingPartial.cshtml", response);
+            }
+            catch (Exception ex)
+            {
+                string actionName = this.ControllerContext.RouteData.Values["action"].ToString();
+                string controllerName = this.ControllerContext.RouteData.Values["controller"].ToString();
+
+                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(actionName, controllerName, ex.Message, LoggingType.httpGet.ToString(), 0);
+                var exceptionResponse = await _exceptionLoggingRepo.CreateEntity(exceptionHelper);
+                return await Task.Run(() => PartialView("~/Views/Shared/Error.cshtml"));
+            }
+
         }
 
         public async Task<IActionResult> GetSubjectDetail(int courseId)
@@ -118,24 +135,37 @@ namespace SERP.UI.Controllers.OnlineTest
 
         public async Task<IActionResult> GetTestDetail()
         {
-            List<TestQuestionVm> model = new List<TestQuestionVm>();
+            try
+            {
+                List<TestQuestionVm> model = new List<TestQuestionVm>();
 
-            model = (from TM in await _ITestQuestionRepo.GetList(x => x.IsActive == 1)
-                     join QM in await _IQuestionRepo.GetList(x => x.IsActive == 1)
-                     on TM.QuestionId equals QM.Id
-                     join TTM in await _ITestRepo.GetList(x => x.IsActive == 1)
-                     on TM.TestId equals TTM.Id
-                     select new TestQuestionVm
-                     {
-                         TestId=TTM.Id,
-                         TestName= TTM.TestName,
-                         Question= QM.Question,
-                         QuestionId= QM.Id,
-                         QuestionMark= QM.QuestionPoint,
-                         TimeLimit= TTM.TestTimeLimit
-                     }).ToList();
+                model = (from TM in await _ITestQuestionRepo.GetList(x => x.IsActive == 1)
+                         join QM in await _IQuestionRepo.GetList(x => x.IsActive == 1)
+                         on TM.QuestionId equals QM.Id
+                         join TTM in await _ITestRepo.GetList(x => x.IsActive == 1)
+                         on TM.TestId equals TTM.Id
+                         select new TestQuestionVm
+                         {
+                             TestId = TTM.Id,
+                             TestName = TTM.TestName,
+                             Question = QM.Question,
+                             QuestionId = QM.Id,
+                             QuestionMark = QM.QuestionPoint,
+                             TimeLimit = TTM.TestTimeLimit
+                         }).ToList();
 
-            return PartialView("~/Views/OnlineTest/TestQuestionMappingPartial.cshtml",model);
+                return PartialView("~/Views/OnlineTest/TestQuestionMappingPartial.cshtml", model);
+            }
+            catch (Exception ex)
+            {
+                string actionName = this.ControllerContext.RouteData.Values["action"].ToString();
+                string controllerName = this.ControllerContext.RouteData.Values["controller"].ToString();
+
+                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(actionName, controllerName, ex.Message, LoggingType.httpGet.ToString(), 0);
+                var exceptionResponse = await _exceptionLoggingRepo.CreateEntity(exceptionHelper);
+                return await Task.Run(() => PartialView("~/Views/Shared/Error.cshtml"));
+            }
+
         }
 
         public async Task<IActionResult> PublishTest(string dateTime, int testId, int templateId)

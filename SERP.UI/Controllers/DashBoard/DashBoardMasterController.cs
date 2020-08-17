@@ -4,20 +4,25 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using SERP.Core.Entities.SERPExceptionLogging;
 using SERP.Core.Model.DashBoardModel;
 using SERP.Core.Model.UserManagement;
 using SERP.Infrastructure.Repository.Infrastructure.Repo;
 using SERP.UI.Extension;
+using SERP.Utilities.ExceptionHelper;
 
 namespace SERP.UI.Controllers.DashBoard
 {
     public class DashBoardMasterController : Controller
     {
         private readonly IDashBoardGraphRepo _IDashBoardRepo;
-
-        public DashBoardMasterController(IDashBoardGraphRepo dashBoardRepo)
+        private readonly IGenericRepository<ExceptionLogging, int> _exceptionLoggingRepo;
+        public DashBoardMasterController(IDashBoardGraphRepo dashBoardRepo,
+                                         IGenericRepository<ExceptionLogging, int> exceptionLoggingRepo
+                                            )
         {
             _IDashBoardRepo = dashBoardRepo;
+            _exceptionLoggingRepo = exceptionLoggingRepo;
         }
         public async Task<IActionResult> GetStudentCourseBatchStrenght()
         {
@@ -43,12 +48,36 @@ namespace SERP.UI.Controllers.DashBoard
 
         public async Task<IActionResult> MenuSubMenuDetails()
         {
-            var menuSubMenuDetails = HttpContext.Session.GetObject<List<MenuSubMenuVm>>("menuSubMenu");
-            return await Task.Run(()=> PartialView("~/Views/DashBoard/_MenuSubMenuDetails.cshtml", menuSubMenuDetails));
+            try
+            {
+                var menuSubMenuDetails = HttpContext.Session.GetObject<List<MenuSubMenuVm>>("menuSubMenu");
+                return await Task.Run(() => PartialView("~/Views/DashBoard/_MenuSubMenuDetails.cshtml", menuSubMenuDetails));
+            }
+            catch (Exception ex)
+            {
+                string actionName = this.ControllerContext.RouteData.Values["action"].ToString();
+                string controllerName = this.ControllerContext.RouteData.Values["controller"].ToString();
+
+                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(actionName, controllerName, ex.Message, LoggingType.httpGet.ToString(), 0);
+                var exceptionResponse = await _exceptionLoggingRepo.CreateEntity(exceptionHelper);
+                return await Task.Run(() => PartialView("~/Views/Shared/Error.cshtml"));
+            }
         }
         public async Task<IActionResult> GetMenuDescription()
         {
-            return await Task.Run(() => PartialView("~/Views/Shared/_SubMenuDescriptionPartial.cshtml"));
+            try
+            {
+                return await Task.Run(() => PartialView("~/Views/Shared/_SubMenuDescriptionPartial.cshtml"));
+            }
+            catch (Exception ex)
+            {
+                string actionName = this.ControllerContext.RouteData.Values["action"].ToString();
+                string controllerName = this.ControllerContext.RouteData.Values["controller"].ToString();
+
+                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(actionName, controllerName, ex.Message, LoggingType.httpGet.ToString(), 0);
+                var exceptionResponse = await _exceptionLoggingRepo.CreateEntity(exceptionHelper);
+                return await Task.Run(() => PartialView("~/Views/Shared/Error.cshtml"));
+            }
         }
 
         public async Task<IActionResult> GetFeeDetailReport()

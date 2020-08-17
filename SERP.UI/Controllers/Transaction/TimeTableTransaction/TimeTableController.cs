@@ -8,8 +8,10 @@ using Microsoft.AspNetCore.Mvc;
 using SERP.Core.Entities.Entity.Core.HRModule;
 using SERP.Core.Entities.Entity.Core.Master;
 using SERP.Core.Entities.Entity.Core.Transaction;
+using SERP.Core.Entities.SERPExceptionLogging;
 using SERP.Core.Model.TransactionViewModel;
 using SERP.Infrastructure.Repository.Infrastructure.Repo;
+using SERP.Utilities.ExceptionHelper;
 using SERP.Utilities.ResponseMessage;
 
 namespace SERP.UI.Controllers.Transaction.TimeTableTransaction
@@ -22,15 +24,17 @@ namespace SERP.UI.Controllers.Transaction.TimeTableTransaction
         private readonly IGenericRepository<EmployeeBasicInfoModel, int> _employeeRepo;
         private readonly IGenericRepository<TimeTableMasterModel, int> _timeTableMasterRepo;
         private readonly ITimeSheetRepo _timeSheetRepo;
-
         private readonly IGenericRepository<TimeTableAssignSubjTeacherModel, int> _timeTableAssignRepo;
+        private readonly IGenericRepository<ExceptionLogging, int> _exceptionLoggingRepo;
+        
         public TimeTableController(IGenericRepository<BatchMaster, int> batchRepo,
             IGenericRepository<CourseMaster, int> courseRepo,
             IGenericRepository<SubjectMaster, int> subjectRepo,
             IGenericRepository<EmployeeBasicInfoModel, int> employeeRepo,
             IGenericRepository<TimeTableMasterModel, int> timeTableMasterRepo,
             IGenericRepository<TimeTableAssignSubjTeacherModel, int> timeTableAssignRepo,
-            ITimeSheetRepo timeSheetRepo
+            ITimeSheetRepo timeSheetRepo,
+            IGenericRepository<ExceptionLogging, int> exceptionLoggingRepo
             )
         {
             _IBatchMaster = batchRepo;
@@ -40,30 +44,55 @@ namespace SERP.UI.Controllers.Transaction.TimeTableTransaction
             _timeTableMasterRepo = timeTableMasterRepo;
             _timeTableAssignRepo = timeTableAssignRepo;
             _timeSheetRepo = timeSheetRepo;
+            _exceptionLoggingRepo = exceptionLoggingRepo;
         }
 
         public async Task<IActionResult> Index()
         {
-            Assembly a = Assembly.Load("SERP.Core.Entities");
-            Type t = a.GetType(a.GetExportedTypes()[1].Name);
-            ViewBag.CourseList = await _ICourseMaster.GetList(x => x.IsActive == 1 && x.IsDeleted == 0);
-            ViewBag.BatchList = await _IBatchMaster.GetList(x => x.IsDeleted == 0 && x.IsActive == 1);
-            return PartialView("~/Views/TimeTable/_TimeTableIndexPartial.cshtml");
+            try
+            {
+                Assembly a = Assembly.Load("SERP.Core.Entities");
+                Type t = a.GetType(a.GetExportedTypes()[1].Name);
+                ViewBag.CourseList = await _ICourseMaster.GetList(x => x.IsActive == 1 && x.IsDeleted == 0);
+                ViewBag.BatchList = await _IBatchMaster.GetList(x => x.IsDeleted == 0 && x.IsActive == 1);
+                return PartialView("~/Views/TimeTable/_TimeTableIndexPartial.cshtml");
+            }
+            catch (Exception ex)
+            {
+                string actionName = this.ControllerContext.RouteData.Values["action"].ToString();
+                string controllerName = this.ControllerContext.RouteData.Values["controller"].ToString();
+
+                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(actionName, controllerName, ex.Message, LoggingType.httpGet.ToString(), 0);
+                var exceptionResponse = await _exceptionLoggingRepo.CreateEntity(exceptionHelper);
+                return await Task.Run(() => PartialView("~/Views/Shared/Error.cshtml"));
+            }
         }
 
         public async Task<IActionResult> GetTimeTable(TimeTableMasterModel model)
         {
-            ViewBag.SubjectList = await _subjectRepo.GetList(x => x.IsActive == 1 && x.IsDeleted == 0);
-            ViewBag.EmployeeList = await _employeeRepo.GetList(x => x.IsActive == 1 && x.IsDeleted == 0);
-
-            var isRecordExists = (await _timeTableMasterRepo.GetList(x => x.CourseId == model.CourseId && x.BatchId == model.BatchId && x.IsActive == 1 && x.IsDeleted == 0)).Count();
-            if (isRecordExists> 0)
+            try
             {
-                var result = await GetTimeSheetVm(model.CourseId, model.BatchId);
-                return PartialView("~/Views/TimeTable/_TimeTableListPartial.cshtml", result);
-            }
+                ViewBag.SubjectList = await _subjectRepo.GetList(x => x.IsActive == 1 && x.IsDeleted == 0);
+                ViewBag.EmployeeList = await _employeeRepo.GetList(x => x.IsActive == 1 && x.IsDeleted == 0);
 
-            return CreateNewTimeSheet(model);
+                var isRecordExists = (await _timeTableMasterRepo.GetList(x => x.CourseId == model.CourseId && x.BatchId == model.BatchId && x.IsActive == 1 && x.IsDeleted == 0)).Count();
+                if (isRecordExists > 0)
+                {
+                    var result = await GetTimeSheetVm(model.CourseId, model.BatchId);
+                    return PartialView("~/Views/TimeTable/_TimeTableListPartial.cshtml", result);
+                }
+
+                return CreateNewTimeSheet(model);
+            }
+            catch (Exception ex)
+            {
+                string actionName = this.ControllerContext.RouteData.Values["action"].ToString();
+                string controllerName = this.ControllerContext.RouteData.Values["controller"].ToString();
+
+                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(actionName, controllerName, ex.Message, LoggingType.httpGet.ToString(), 0);
+                var exceptionResponse = await _exceptionLoggingRepo.CreateEntity(exceptionHelper);
+                return await Task.Run(() => PartialView("~/Views/Shared/Error.cshtml"));
+            }
         }
 
         [HttpPost]
@@ -108,33 +137,81 @@ namespace SERP.UI.Controllers.Transaction.TimeTableTransaction
 
         public async Task<IActionResult> GetTimeSheetDetail(int courseId, int batchId)
         {
-            ViewBag.SubjectList = await _subjectRepo.GetList(x => x.IsActive == 1 && x.IsDeleted == 0);
-            ViewBag.EmployeeList = await _employeeRepo.GetList(x => x.IsActive == 1 && x.IsDeleted == 0);
-            var result = await GetTimeSheetVm(courseId, batchId);
-            HttpContext.Session.SetInt32("CourseId", courseId);
-            HttpContext.Session.SetInt32("BatchId", batchId);
-            return PartialView("~/Views/TimeTable/_TimeTableListPartial.cshtml", result);
+            try
+            {
+                ViewBag.SubjectList = await _subjectRepo.GetList(x => x.IsActive == 1 && x.IsDeleted == 0);
+                ViewBag.EmployeeList = await _employeeRepo.GetList(x => x.IsActive == 1 && x.IsDeleted == 0);
+                var result = await GetTimeSheetVm(courseId, batchId);
+                HttpContext.Session.SetInt32("CourseId", courseId);
+                HttpContext.Session.SetInt32("BatchId", batchId);
+                return PartialView("~/Views/TimeTable/_TimeTableListPartial.cshtml", result);
+            }
+            catch (Exception ex)
+            {
+                string actionName = this.ControllerContext.RouteData.Values["action"].ToString();
+                string controllerName = this.ControllerContext.RouteData.Values["controller"].ToString();
+
+                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(actionName, controllerName, ex.Message, LoggingType.httpGet.ToString(), 0);
+                var exceptionResponse = await _exceptionLoggingRepo.CreateEntity(exceptionHelper);
+                return await Task.Run(() => PartialView("~/Views/Shared/Error.cshtml"));
+            }
         }
 
         public async Task<IActionResult> GetTimeSheet(int courseId, int batchId)
         {
-            var result = await _timeSheetRepo.GetTimeSheetDetailsByCourseIdBatchId(courseId, batchId);
-            return PartialView("~/Views/TimeTable/_CourseBatchTimeSheetPartial.cshtml", result);
+            try
+            {
+                var result = await _timeSheetRepo.GetTimeSheetDetailsByCourseIdBatchId(courseId, batchId);
+                return PartialView("~/Views/TimeTable/_CourseBatchTimeSheetPartial.cshtml", result);
+            }
+            catch (Exception ex)
+            {
+                string actionName = this.ControllerContext.RouteData.Values["action"].ToString();
+                string controllerName = this.ControllerContext.RouteData.Values["controller"].ToString();
+
+                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(actionName, controllerName, ex.Message, LoggingType.httpGet.ToString(), 0);
+                var exceptionResponse = await _exceptionLoggingRepo.CreateEntity(exceptionHelper);
+                return await Task.Run(() => PartialView("~/Views/Shared/Error.cshtml"));
+            }
         }
 
         public async Task<IActionResult> GetTimeSheetDetails()
         {
-            ViewBag.CourseList = await _ICourseMaster.GetList(x => x.IsActive == 1 && x.IsDeleted == 0);
-            return PartialView("~/Views/TimeTable/TimeSheetDetailPartial.cshtml");
+            try
+            {
+                ViewBag.CourseList = await _ICourseMaster.GetList(x => x.IsActive == 1 && x.IsDeleted == 0);
+                return PartialView("~/Views/TimeTable/TimeSheetDetailPartial.cshtml");
+            }
+            catch (Exception ex)
+            {
+                string actionName = this.ControllerContext.RouteData.Values["action"].ToString();
+                string controllerName = this.ControllerContext.RouteData.Values["controller"].ToString();
+
+                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(actionName, controllerName, ex.Message, LoggingType.httpGet.ToString(), 0);
+                var exceptionResponse = await _exceptionLoggingRepo.CreateEntity(exceptionHelper);
+                return await Task.Run(() => PartialView("~/Views/Shared/Error.cshtml"));
+            }
         }
 
         public async Task<IActionResult> AssignEmployee(int timeTableId, string fromTime, string toTime)
         {
-            HttpContext.Session.SetInt32("TimeTableId", timeTableId);
-            TimeSpan.TryParse(fromTime, out TimeSpan outFromTime);
-            TimeSpan.TryParse(toTime, out TimeSpan outToTime);
-            var response = await _timeSheetRepo.AssignTeacherTemp(outFromTime, outToTime);
-            return PartialView("~/Views/TimeTable/_AssignEmployee.cshtml",response);
+            try
+            {
+                HttpContext.Session.SetInt32("TimeTableId", timeTableId);
+                TimeSpan.TryParse(fromTime, out TimeSpan outFromTime);
+                TimeSpan.TryParse(toTime, out TimeSpan outToTime);
+                var response = await _timeSheetRepo.AssignTeacherTemp(outFromTime, outToTime);
+                return PartialView("~/Views/TimeTable/_AssignEmployee.cshtml", response);
+            }
+            catch (Exception ex)
+            {
+                string actionName = this.ControllerContext.RouteData.Values["action"].ToString();
+                string controllerName = this.ControllerContext.RouteData.Values["controller"].ToString();
+
+                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(actionName, controllerName, ex.Message, LoggingType.httpGet.ToString(), 0);
+                var exceptionResponse = await _exceptionLoggingRepo.CreateEntity(exceptionHelper);
+                return await Task.Run(() => PartialView("~/Views/Shared/Error.cshtml"));
+            }
         }
 
         #region PribateFields

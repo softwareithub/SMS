@@ -4,8 +4,10 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using SERP.Core.Entities.Entity.Core.Master;
+using SERP.Core.Entities.SERPExceptionLogging;
 using SERP.Core.Model.MasterViewModel;
 using SERP.Infrastructure.Repository.Infrastructure.Repo;
+using SERP.Utilities.ExceptionHelper;
 using SERP.Utilities.ResponseMessage;
 using SERP.Utilities.ResponseUtilities;
 
@@ -15,20 +17,36 @@ namespace SERP.UI.Controllers.Master
     {
         private readonly IGenericRepository<CourseMaster, int> _IClassRepo;
         private readonly IGenericRepository<BatchMaster, int> _IBatchRepo;
+        private readonly IGenericRepository<ExceptionLogging, int> _exceptionLoggingRepo;
 
         public BatchMasterController(IGenericRepository<CourseMaster, int> classRepo,
-                            IGenericRepository<BatchMaster, int> batchRepo)
+                            IGenericRepository<BatchMaster, int> batchRepo,
+                            IGenericRepository<ExceptionLogging, int> exceptionLoggingRepo)
         {
             _IClassRepo = classRepo;
             _IBatchRepo = batchRepo;
+            _exceptionLoggingRepo = exceptionLoggingRepo;
         }
         public async Task<IActionResult> Index(int id = 0)
         {
-            await PopulateDefault();
-            if (id == 0)
-                return PartialView("~/Views/BatchMaster/_CreateBatchPartial.cshtml");
+            try
+            {
+                await PopulateDefault();
+                if (id == 0)
+                    return PartialView("~/Views/BatchMaster/_CreateBatchPartial.cshtml");
 
-            return PartialView("~/Views/BatchMaster/_CreateBatchPartial.cshtml", await GetBatchMasterById(id));
+                return PartialView("~/Views/BatchMaster/_CreateBatchPartial.cshtml", await GetBatchMasterById(id));
+            }
+            catch (Exception ex)
+            {
+                string actionName = this.ControllerContext.RouteData.Values["action"].ToString();
+                string controllerName = this.ControllerContext.RouteData.Values["controller"].ToString();
+
+                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(actionName, controllerName, ex.Message, LoggingType.httpGet.ToString(), 0);
+                var exceptionResponse = await _exceptionLoggingRepo.CreateEntity(exceptionHelper);
+                return await Task.Run(() => PartialView("~/Views/Shared/Error.cshtml"));
+            }
+
         }
         [HttpPost]
         public async Task<IActionResult> CreateBatch(BatchMaster model)
@@ -38,13 +56,26 @@ namespace SERP.UI.Controllers.Master
         }
         public async Task<IActionResult> GetBatchMasterList()
         {
-            var batchResult = await _IBatchRepo.GetList(x => x.IsActive == 1 && x.IsDeleted == 0);
-            await _IClassRepo.CreateNewContext();
-            var courseResult = await _IClassRepo.GetList(x => x.IsActive == 1 && x.IsDeleted == 0);
+            try
+            {
+                var batchResult = await _IBatchRepo.GetList(x => x.IsActive == 1 && x.IsDeleted == 0);
+                await _IClassRepo.CreateNewContext();
+                var courseResult = await _IClassRepo.GetList(x => x.IsActive == 1 && x.IsDeleted == 0);
 
-            var batchMasterList = GetBatchMasterList(batchResult, courseResult);
+                var batchMasterList = GetBatchMasterList(batchResult, courseResult);
 
-            return PartialView("~/Views/BatchMaster/_BatchListPartial.cshtml", batchMasterList);
+                return PartialView("~/Views/BatchMaster/_BatchListPartial.cshtml", batchMasterList);
+            }
+            catch (Exception ex)
+            {
+                string actionName = this.ControllerContext.RouteData.Values["action"].ToString();
+                string controllerName = this.ControllerContext.RouteData.Values["controller"].ToString();
+
+                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(actionName, controllerName, ex.Message, LoggingType.httpGet.ToString(), 0);
+                var exceptionResponse = await _exceptionLoggingRepo.CreateEntity(exceptionHelper);
+                return await Task.Run(() => PartialView("~/Views/Shared/Error.cshtml"));
+            }
+
         }
         public async Task<IActionResult> DeleteBatch(int Id)
         {

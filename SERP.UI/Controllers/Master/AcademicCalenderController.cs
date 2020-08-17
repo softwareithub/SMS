@@ -6,8 +6,10 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.VisualBasic;
 using SERP.Core.Entities.Entity.Core.Master;
+using SERP.Core.Entities.SERPExceptionLogging;
 using SERP.Infrastructure.Repository.Infrastructure.Repo;
 using SERP.Utilities.CommanHelper;
+using SERP.Utilities.ExceptionHelper;
 using SERP.Utilities.ResponseUtilities;
 
 namespace SERP.UI.Controllers.Master
@@ -16,17 +18,34 @@ namespace SERP.UI.Controllers.Master
     {
         private readonly IGenericRepository<AcademicCalender, int> _IAcademicCalenderRepo;
         private readonly IGenericRepository<AcademicMaster, int> _academicMasterRepo;
+        private readonly IGenericRepository<ExceptionLogging, int> _exceptionLoggingRepo;
 
-        public AcademicCalenderController(IGenericRepository<AcademicCalender, int> academiCalenderRepo, IGenericRepository<AcademicMaster, int> academicMasterRepo)
+        public AcademicCalenderController(IGenericRepository<AcademicCalender, int> academiCalenderRepo, 
+                                          IGenericRepository<AcademicMaster, int> academicMasterRepo,
+                                          IGenericRepository<ExceptionLogging, int> exceptionLoggingRepo
+                                          )
         {
             _IAcademicCalenderRepo = academiCalenderRepo;
             _academicMasterRepo = academicMasterRepo;
+            _exceptionLoggingRepo = exceptionLoggingRepo;
         }
         public async Task<IActionResult> AcademicCalender(int id)
         {
-            ViewBag.AcademicList = await _academicMasterRepo.GetList(x => x.IsActive == 1);
-            var responseData = await _IAcademicCalenderRepo.GetSingle(x => x.Id == id);
-            return PartialView("~/Views/AcademicCalender/_AcademicCalenderPartial.cshtml", responseData);
+            try
+            {
+                ViewBag.AcademicList = await _academicMasterRepo.GetList(x => x.IsActive == 1);
+                var responseData = await _IAcademicCalenderRepo.GetSingle(x => x.Id == id);
+                return PartialView("~/Views/AcademicCalender/_AcademicCalenderPartial.cshtml", responseData);
+            }
+            catch (Exception ex)
+            {
+                string actionName = this.ControllerContext.RouteData.Values["action"].ToString();
+                string controllerName = this.ControllerContext.RouteData.Values["controller"].ToString();
+
+                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(actionName, controllerName, ex.Message, LoggingType.httpGet.ToString(), 0);
+                var exceptionResponse = await _exceptionLoggingRepo.CreateEntity(exceptionHelper);
+                return await Task.Run(() => PartialView("~/Views/Shared/Error.cshtml"));
+            }
         }
 
         [HttpPost]
@@ -49,7 +68,19 @@ namespace SERP.UI.Controllers.Master
 
         public async Task<IActionResult> GetAcademicCalender()
         {
-            return PartialView("~/Views/AcademicCalender/_AcademicCalenderListPartial.cshtml", await _IAcademicCalenderRepo.GetList(x => x.IsActive == 1));
+            try
+            {
+                return PartialView("~/Views/AcademicCalender/_AcademicCalenderListPartial.cshtml", await _IAcademicCalenderRepo.GetList(x => x.IsActive == 1));
+            }
+            catch (Exception ex)
+            {
+                string actionName = this.ControllerContext.RouteData.Values["action"].ToString();
+                string controllerName = this.ControllerContext.RouteData.Values["controller"].ToString();
+
+                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(actionName, controllerName, ex.Message, LoggingType.httpGet.ToString(), 0);
+                var exceptionResponse = await _exceptionLoggingRepo.CreateEntity(exceptionHelper);
+                return await Task.Run(() => PartialView("~/Views/Shared/Error.cshtml"));
+            }
         }
              
     }

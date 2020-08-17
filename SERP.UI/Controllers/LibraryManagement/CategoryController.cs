@@ -4,8 +4,10 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using SERP.Core.Entities.LibraryManagement;
+using SERP.Core.Entities.SERPExceptionLogging;
 using SERP.Infrastructure.Repository.Infrastructure.Repo;
 using SERP.Utilities.CommanHelper;
+using SERP.Utilities.ExceptionHelper;
 using SERP.Utilities.ResponseMessage;
 
 namespace SERP.UI.Controllers.LibraryManagement
@@ -13,14 +15,30 @@ namespace SERP.UI.Controllers.LibraryManagement
     public class CategoryController : Controller
     {
         private readonly IGenericRepository<CategoryMaster, int> _categoryRepo;
-        public CategoryController(IGenericRepository<CategoryMaster, int> categoryRepo)
+        private readonly IGenericRepository<ExceptionLogging, int> _exceptionLoggingRepo;
+        public CategoryController(IGenericRepository<CategoryMaster, int> categoryRepo,
+                                  IGenericRepository<ExceptionLogging, int> exceptionLoggingRepo)
         {
             _categoryRepo = categoryRepo;
+            _exceptionLoggingRepo = exceptionLoggingRepo;
         }
         public async Task<IActionResult> Index(int id)
         {
-            var response = await _categoryRepo.GetSingle(x => x.Id == id);
-            return PartialView("~/Views/LibraryManagement/Category/_CategoryCreatePartial.cshtml", response);
+            try
+            {
+                var response = await _categoryRepo.GetSingle(x => x.Id == id);
+                return PartialView("~/Views/LibraryManagement/Category/_CategoryCreatePartial.cshtml", response);
+            }
+            catch (Exception ex)
+            {
+                string actionName = this.ControllerContext.RouteData.Values["action"].ToString();
+                string controllerName = this.ControllerContext.RouteData.Values["controller"].ToString();
+
+                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(actionName, controllerName, ex.Message, LoggingType.httpGet.ToString(), 0);
+                var exceptionResponse = await _exceptionLoggingRepo.CreateEntity(exceptionHelper);
+                return await Task.Run(() => PartialView("~/Views/Shared/Error.cshtml"));
+            }
+
         }
 
         [HttpPost]
@@ -40,8 +58,21 @@ namespace SERP.UI.Controllers.LibraryManagement
 
         public async Task<IActionResult> GetCategoryList()
         {
-            var responseData = await _categoryRepo.GetList(x => x.IsActive == 1);
-            return PartialView("~/Views/LibraryManagement/Category/_CategoryListPartial.cshtml", responseData);
+            try
+            {
+                var responseData = await _categoryRepo.GetList(x => x.IsActive == 1);
+                return PartialView("~/Views/LibraryManagement/Category/_CategoryListPartial.cshtml", responseData);
+            }
+            catch (Exception ex)
+            {
+                string actionName = this.ControllerContext.RouteData.Values["action"].ToString();
+                string controllerName = this.ControllerContext.RouteData.Values["controller"].ToString();
+
+                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(actionName, controllerName, ex.Message, LoggingType.httpGet.ToString(), 0);
+                var exceptionResponse = await _exceptionLoggingRepo.CreateEntity(exceptionHelper);
+                return await Task.Run(() => PartialView("~/Views/Shared/Error.cshtml"));
+            }
+
         }
 
         public async Task<IActionResult> Delete(int id)

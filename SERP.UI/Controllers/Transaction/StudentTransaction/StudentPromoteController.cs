@@ -5,9 +5,11 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using SERP.Core.Entities.Entity.Core.Master;
 using SERP.Core.Entities.Entity.Core.Transaction;
+using SERP.Core.Entities.SERPExceptionLogging;
 using SERP.Core.Model.TransactionViewModel;
 using SERP.Infrastructure.Repository.Infrastructure.Repo;
 using SERP.UI.Models;
+using SERP.Utilities.ExceptionHelper;
 using SERP.Utilities.ResponseMessage;
 
 namespace SERP.UI.Controllers.Transaction.StudentTransaction
@@ -18,22 +20,38 @@ namespace SERP.UI.Controllers.Transaction.StudentTransaction
         public readonly IGenericRepository<StudentMaster, int> _IStudentMasterRepo;
         public readonly IGenericRepository<CourseMaster, int> _ICourseMasterRepo;
         public readonly IGenericRepository<BatchMaster, int> _IBatchMasterRepo;
+        private readonly IGenericRepository<ExceptionLogging, int> _exceptionLoggingRepo;
+
 
         public StudentPromoteController(IGenericRepository<StudentPromote, int> studentRepo,
             IGenericRepository<StudentMaster, int> studentMasterRepo, IGenericRepository<CourseMaster, int> courseRepo,
-             IGenericRepository<BatchMaster, int> batchRepo
+            IGenericRepository<BatchMaster, int> batchRepo,
+            IGenericRepository<ExceptionLogging, int> exceptionLoggingRepo
             )
         {
             _IStudentMasterRepo = studentMasterRepo;
             _IStudentPromoteRepo = studentRepo;
             _ICourseMasterRepo = courseRepo;
             _IBatchMasterRepo = batchRepo;
+            _exceptionLoggingRepo = exceptionLoggingRepo;
         }
         public async Task<IActionResult> PromoteStudent()
         {
-            ViewBag.CourseList = await _ICourseMasterRepo.GetList(x => x.IsActive == 1 && x.IsDeleted == 0);
-            ViewBag.BatchList = await _IBatchMasterRepo.GetList(x => x.IsDeleted == 0 && x.IsActive == 1);
-            return PartialView("~/Views/StudentPromote/_StudentPromotePartial.cshtml");
+            try
+            {
+                ViewBag.CourseList = await _ICourseMasterRepo.GetList(x => x.IsActive == 1 && x.IsDeleted == 0);
+                ViewBag.BatchList = await _IBatchMasterRepo.GetList(x => x.IsDeleted == 0 && x.IsActive == 1);
+                return PartialView("~/Views/StudentPromote/_StudentPromotePartial.cshtml");
+            }
+            catch (Exception ex)
+            {
+                string actionName = this.ControllerContext.RouteData.Values["action"].ToString();
+                string controllerName = this.ControllerContext.RouteData.Values["controller"].ToString();
+
+                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(actionName, controllerName, ex.Message, LoggingType.httpGet.ToString(), 0);
+                var exceptionResponse = await _exceptionLoggingRepo.CreateEntity(exceptionHelper);
+                return await Task.Run(() => PartialView("~/Views/Shared/Error.cshtml"));
+            }
         }
 
         public async Task<IActionResult> GetStudentList(int courseId, int batchId)

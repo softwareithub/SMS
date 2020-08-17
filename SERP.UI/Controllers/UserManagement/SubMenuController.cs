@@ -3,10 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using SERP.Core.Entities.SERPExceptionLogging;
 using SERP.Core.Entities.UserManagement;
 using SERP.Core.Model.UserManagement;
 using SERP.Infrastructure.Repository.Infrastructure.Repo;
 using SERP.Utilities.CommanHelper;
+using SERP.Utilities.ExceptionHelper;
 using SERP.Utilities.ResponseMessage;
 
 namespace SERP.UI.Controllers.UserManagement
@@ -15,18 +17,36 @@ namespace SERP.UI.Controllers.UserManagement
     {
         private readonly IGenericRepository<SubModuleMaster, int> _ISubModuleRepo;
         private readonly IGenericRepository<ModuleMaster, int> _IModuleRepo;
+        private readonly IGenericRepository<ExceptionLogging, int> _exceptionLoggingRepo;
+
 
         public SubMenuController(IGenericRepository<SubModuleMaster, int> subModuleRepo,
-            IGenericRepository<ModuleMaster, int> moduleRepo)
+                                 IGenericRepository<ModuleMaster, int> moduleRepo,
+                                  IGenericRepository<ExceptionLogging, int> exceptionLoggingRepo)
         {
             _ISubModuleRepo = subModuleRepo;
             _IModuleRepo = moduleRepo;
+            _exceptionLoggingRepo = exceptionLoggingRepo;
+
         }
         public async Task<IActionResult> Index(int id)
         {
-            ViewBag.Modules = await _IModuleRepo.GetList(x => x.IsActive == 1);
-            var model = await _ISubModuleRepo.GetSingle(x => x.Id == id);
-            return PartialView("~/Views/UserManagement/SubModulePartial.cshtml", model);
+            try
+            {
+                ViewBag.Modules = await _IModuleRepo.GetList(x => x.IsActive == 1);
+                var model = await _ISubModuleRepo.GetSingle(x => x.Id == id);
+                return PartialView("~/Views/UserManagement/SubModulePartial.cshtml", model);
+            }
+            catch (Exception ex)
+            {
+                string actionName = this.ControllerContext.RouteData.Values["action"].ToString();
+                string controllerName = this.ControllerContext.RouteData.Values["controller"].ToString();
+
+                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(actionName, controllerName, ex.Message, LoggingType.httpGet.ToString(), 0);
+                var exceptionResponse = await _exceptionLoggingRepo.CreateEntity(exceptionHelper);
+                return await Task.Run(() => PartialView("~/Views/Shared/Error.cshtml"));
+            }
+
         }
 
         public async Task<IActionResult> CreateSubModule(SubModuleMaster model)
@@ -47,19 +67,32 @@ namespace SERP.UI.Controllers.UserManagement
 
         public async Task<IActionResult> SubModuleList()
         {
-            var result = (from MM in await _IModuleRepo.GetList(x => x.IsActive == 1)
-                          join SM in await _ISubModuleRepo.GetList(x => x.IsActive == 1)
-                          on MM.Id equals SM.ModuleId
-                          select new UserAccessRightModel
-                          {
-                              ModuleId = MM.Id,
-                              SubModuleId = SM.Id,
-                              ModuleName = MM.ModuleName,
-                              SubModuleName = SM.SubModuleName,
-                              ControllerName= SM.ControllerName,
-                              ActionName=SM.ActionName,
-                          }).ToList();
-            return PartialView("~/Views/UserManagement/_SubModuleListPartial.cshtml", result);
+            try
+            {
+                var result = (from MM in await _IModuleRepo.GetList(x => x.IsActive == 1)
+                              join SM in await _ISubModuleRepo.GetList(x => x.IsActive == 1)
+                              on MM.Id equals SM.ModuleId
+                              select new UserAccessRightModel
+                              {
+                                  ModuleId = MM.Id,
+                                  SubModuleId = SM.Id,
+                                  ModuleName = MM.ModuleName,
+                                  SubModuleName = SM.SubModuleName,
+                                  ControllerName = SM.ControllerName,
+                                  ActionName = SM.ActionName,
+                              }).ToList();
+                return PartialView("~/Views/UserManagement/_SubModuleListPartial.cshtml", result);
+            }
+            catch (Exception ex)
+            {
+                string actionName = this.ControllerContext.RouteData.Values["action"].ToString();
+                string controllerName = this.ControllerContext.RouteData.Values["controller"].ToString();
+
+                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(actionName, controllerName, ex.Message, LoggingType.httpGet.ToString(), 0);
+                var exceptionResponse = await _exceptionLoggingRepo.CreateEntity(exceptionHelper);
+                return await Task.Run(() => PartialView("~/Views/Shared/Error.cshtml"));
+            }
+
         }
 
         public async Task<IActionResult> Delete(int id)

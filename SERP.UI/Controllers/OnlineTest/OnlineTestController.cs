@@ -5,9 +5,11 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using SERP.Core.Entities.Entity.Core.ExamDetail;
 using SERP.Core.Entities.Entity.Core.Master;
+using SERP.Core.Entities.SERPExceptionLogging;
 using SERP.Infrastructure.Repository.Infrastructure.Repo;
 using SERP.UI.Models;
 using SERP.Utilities.CommanHelper;
+using SERP.Utilities.ExceptionHelper;
 using SERP.Utilities.ResponseMessage;
 
 namespace SERP.UI.Controllers.OnlineTest
@@ -19,10 +21,12 @@ namespace SERP.UI.Controllers.OnlineTest
         private readonly IGenericRepository<CourseMaster, int> _ICourseRepo;
         private readonly ISubjectMasterRepo _ISubjectRepo;
         private readonly IGenericRepository<SMSTemplateModel, int> _smsTemplateRepo;
+        private readonly IGenericRepository<ExceptionLogging, int> _exceptionLoggingRepo;
 
         public OnlineTestController(IGenericRepository<QuestionModel, int> QuestionRepo, IGenericRepository<OptionMaster, int> optionRepo,
              IGenericRepository<CourseMaster, int> courseRepo, ISubjectMasterRepo subjectRepo,
-             IGenericRepository<SMSTemplateModel, int> smsTemplateRepo
+             IGenericRepository<SMSTemplateModel, int> smsTemplateRepo,
+             IGenericRepository<ExceptionLogging, int> exceptionLoggingRepo
             )
         {
             _QuestionRepo = QuestionRepo;
@@ -30,12 +34,26 @@ namespace SERP.UI.Controllers.OnlineTest
             _ICourseRepo = courseRepo;
             _ISubjectRepo = subjectRepo;
             _smsTemplateRepo = smsTemplateRepo;
+            _exceptionLoggingRepo = exceptionLoggingRepo;
         }
         public async Task<IActionResult> Index(int id)
         {
-            ViewBag.CourseList = await _ICourseRepo.GetAll(x => x.IsActive == 1);
-            var questionModel = await _QuestionRepo.GetSingle(x => x.Id == id);
-            return PartialView("~/Views/ExamMaster/_QuestionBankPartial.cshtml", questionModel);
+            try
+            {
+                ViewBag.CourseList = await _ICourseRepo.GetAll(x => x.IsActive == 1);
+                var questionModel = await _QuestionRepo.GetSingle(x => x.Id == id);
+                return PartialView("~/Views/ExamMaster/_QuestionBankPartial.cshtml", questionModel);
+            }
+            catch (Exception ex)
+            {
+                string actionName = this.ControllerContext.RouteData.Values["action"].ToString();
+                string controllerName = this.ControllerContext.RouteData.Values["controller"].ToString();
+
+                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(actionName, controllerName, ex.Message, LoggingType.httpGet.ToString(), 0);
+                var exceptionResponse = await _exceptionLoggingRepo.CreateEntity(exceptionHelper);
+                return await Task.Run(() => PartialView("~/Views/Shared/Error.cshtml"));
+            }
+
         }
 
         [HttpPost]
@@ -68,9 +86,22 @@ namespace SERP.UI.Controllers.OnlineTest
 
         public async Task<IActionResult> GetList()
         {
-            var questionModels = await _QuestionRepo.GetList(x => x.IsActive == 1);
+            try
+            {
+                var questionModels = await _QuestionRepo.GetList(x => x.IsActive == 1);
 
-            return PartialView("~/Views/ExamMaster/_QuestionDetailPartial.cshtml", questionModels);
+                return PartialView("~/Views/ExamMaster/_QuestionDetailPartial.cshtml", questionModels);
+            }
+            catch (Exception ex)
+            {
+                string actionName = this.ControllerContext.RouteData.Values["action"].ToString();
+                string controllerName = this.ControllerContext.RouteData.Values["controller"].ToString();
+
+                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(actionName, controllerName, ex.Message, LoggingType.httpGet.ToString(), 0);
+                var exceptionResponse = await _exceptionLoggingRepo.CreateEntity(exceptionHelper);
+                return await Task.Run(() => PartialView("~/Views/Shared/Error.cshtml"));
+            }
+
         }
 
         public async Task<IActionResult> GetSMSEmailTemplate(string notificationType)
@@ -81,9 +112,22 @@ namespace SERP.UI.Controllers.OnlineTest
 
         public async Task<IActionResult> AddOptions(int id)
         {
-            ViewBag.QuestionList = await _QuestionRepo.GetList(x => x.IsActive == 1);
-            var model = await _OptionRepo.GetSingle(x => x.Id == id);
-            return await Task.Run(() => View("~/Views/ExamMaster/_AddOptionToQuestion.cshtml", model));
+            try
+            {
+                ViewBag.QuestionList = await _QuestionRepo.GetList(x => x.IsActive == 1);
+                var model = await _OptionRepo.GetSingle(x => x.Id == id);
+                return await Task.Run(() => View("~/Views/ExamMaster/_AddOptionToQuestion.cshtml", model));
+            }
+            catch (Exception ex)
+            {
+                string actionName = this.ControllerContext.RouteData.Values["action"].ToString();
+                string controllerName = this.ControllerContext.RouteData.Values["controller"].ToString();
+
+                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(actionName, controllerName, ex.Message, LoggingType.httpGet.ToString(), 0);
+                var exceptionResponse = await _exceptionLoggingRepo.CreateEntity(exceptionHelper);
+                return await Task.Run(() => PartialView("~/Views/Shared/Error.cshtml"));
+            }
+
         }
 
         [HttpPost]
@@ -96,8 +140,21 @@ namespace SERP.UI.Controllers.OnlineTest
 
         public async Task<IActionResult> GetQuestionOptionList(int questId)
         {
-            var models = await _OptionRepo.GetList(x => x.QuestionId == questId && x.IsActive == 1);
-            return PartialView("~/Views/ExamMaster/_QuestionOptionPartial.cshtml", models.OrderBy(x=>x.SortOrder));
+            try
+            {
+                var models = await _OptionRepo.GetList(x => x.QuestionId == questId && x.IsActive == 1);
+                return PartialView("~/Views/ExamMaster/_QuestionOptionPartial.cshtml", models.OrderBy(x => x.SortOrder));
+            }
+            catch (Exception ex)
+            {
+                string actionName = this.ControllerContext.RouteData.Values["action"].ToString();
+                string controllerName = this.ControllerContext.RouteData.Values["controller"].ToString();
+
+                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(actionName, controllerName, ex.Message, LoggingType.httpGet.ToString(), 0);
+                var exceptionResponse = await _exceptionLoggingRepo.CreateEntity(exceptionHelper);
+                return await Task.Run(() => PartialView("~/Views/Shared/Error.cshtml"));
+            }
+
         }
 
         public async Task<IActionResult> UpdateOptionCorrect(int id, int correctOption)

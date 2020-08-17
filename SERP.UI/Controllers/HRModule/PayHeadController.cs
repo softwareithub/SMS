@@ -4,7 +4,9 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using SERP.Core.Entities.Entity.Core.HRModule;
+using SERP.Core.Entities.SERPExceptionLogging;
 using SERP.Infrastructure.Repository.Infrastructure.Repo;
+using SERP.Utilities.ExceptionHelper;
 using SERP.Utilities.ResponseMessage;
 
 namespace SERP.UI.Controllers.HRModule
@@ -12,22 +14,38 @@ namespace SERP.UI.Controllers.HRModule
     public class PayHeadController : Controller
     {
         private readonly IGenericRepository<PayHeadesModel, int> _payHeadRepo;
+        private readonly IGenericRepository<ExceptionLogging, int> _exceptionLoggingRepo;
 
-        public PayHeadController(IGenericRepository<PayHeadesModel, int> payHeadRepo)
+        public PayHeadController(IGenericRepository<PayHeadesModel, int> payHeadRepo,
+                                 IGenericRepository<ExceptionLogging, int> exceptionLoggingRepo)
         {
             _payHeadRepo = payHeadRepo;
+            _exceptionLoggingRepo = exceptionLoggingRepo;
         }
         public async Task<IActionResult> Index(int id)
         {
-            if (id == 0)
+            try
             {
-                return await Task.Run(() => PartialView("~/Views/HRModule/_PayHeadCreatePartial.cshtml"));
+                if (id == 0)
+                {
+                    return await Task.Run(() => PartialView("~/Views/HRModule/_PayHeadCreatePartial.cshtml"));
+                }
+                else
+                {
+                    var result = await _payHeadRepo.GetSingle(x => x.Id == id);
+                    return await Task.Run(() => PartialView("~/Views/HRModule/_PayHeadCreatePartial.cshtml", result));
+                }
             }
-            else
+            catch (Exception ex)
             {
-                var result = await _payHeadRepo.GetSingle(x => x.Id == id);
-                return await Task.Run(() => PartialView("~/Views/HRModule/_PayHeadCreatePartial.cshtml", result));
+                string actionName = this.ControllerContext.RouteData.Values["action"].ToString();
+                string controllerName = this.ControllerContext.RouteData.Values["controller"].ToString();
+
+                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(actionName, controllerName, ex.Message, LoggingType.httpGet.ToString(), 0);
+                var exceptionResponse = await _exceptionLoggingRepo.CreateEntity(exceptionHelper);
+                return await Task.Run(() => PartialView("~/Views/Shared/Error.cshtml"));
             }
+
         }
         [HttpPost]
         public async Task<IActionResult> CreatePayHead(PayHeadesModel model)
@@ -48,8 +66,21 @@ namespace SERP.UI.Controllers.HRModule
 
         public async Task<IActionResult> GetPayHeadDetail()
         {
-            var result = await _payHeadRepo.GetList(x => x.IsActive == 1 && x.IsDeleted == 0);
-            return PartialView("~/Views/HRModule/_PayHeadListPartial.cshtml", result);
+            try
+            {
+                var result = await _payHeadRepo.GetList(x => x.IsActive == 1 && x.IsDeleted == 0);
+                return PartialView("~/Views/HRModule/_PayHeadListPartial.cshtml", result);
+            }
+             catch (Exception ex)
+            {
+                string actionName = this.ControllerContext.RouteData.Values["action"].ToString();
+                string controllerName = this.ControllerContext.RouteData.Values["controller"].ToString();
+
+                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(actionName, controllerName, ex.Message, LoggingType.httpGet.ToString(), 0);
+                var exceptionResponse = await _exceptionLoggingRepo.CreateEntity(exceptionHelper);
+                return await Task.Run(() => PartialView("~/Views/Shared/Error.cshtml"));
+            }
+
         }
 
         public async Task<IActionResult> DeleteRecord(int id)

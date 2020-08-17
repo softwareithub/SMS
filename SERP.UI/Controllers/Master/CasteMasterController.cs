@@ -4,7 +4,9 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using SERP.Core.Entities.Entity.Core.Master;
+using SERP.Core.Entities.SERPExceptionLogging;
 using SERP.Infrastructure.Repository.Infrastructure.Repo;
+using SERP.Utilities.ExceptionHelper;
 using SERP.Utilities.ResponseMessage;
 using SERP.Utilities.ResponseUtilities;
 
@@ -13,17 +15,33 @@ namespace SERP.UI.Controllers.Master
     public class CasteMasterController : Controller
     {
         private readonly IGenericRepository<CasteMaster, int> _ICasteRespo;
+        private readonly IGenericRepository<ExceptionLogging, int> _exceptionLoggingRepo;
 
-        public CasteMasterController(IGenericRepository<CasteMaster, int> casteRepo)
+        public CasteMasterController(IGenericRepository<CasteMaster, int> casteRepo,
+                                     IGenericRepository<ExceptionLogging, int> exceptionLoggingRepo)
         {
             _ICasteRespo = casteRepo;
+            _exceptionLoggingRepo = exceptionLoggingRepo;
         }
         public async Task<IActionResult> CasteMaster(int id=0)
         {
-            if(id==0)
-                return await Task.Run(() => PartialView("~/Views/CasteMaster/_CasteMasterPartial.cshtml"));
+            try
+            {
+                if (id == 0)
+                    return await Task.Run(() => PartialView("~/Views/CasteMaster/_CasteMasterPartial.cshtml"));
 
-            return PartialView("~/Views/CasteMaster/_CasteMasterPartial.cshtml",await _ICasteRespo.GetSingle(x=>x.Id==id));
+                return PartialView("~/Views/CasteMaster/_CasteMasterPartial.cshtml", await _ICasteRespo.GetSingle(x => x.Id == id));
+            }
+            catch (Exception ex)
+            {
+                string actionName = this.ControllerContext.RouteData.Values["action"].ToString();
+                string controllerName = this.ControllerContext.RouteData.Values["controller"].ToString();
+
+                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(actionName, controllerName, ex.Message, LoggingType.httpGet.ToString(), 0);
+                var exceptionResponse = await _exceptionLoggingRepo.CreateEntity(exceptionHelper);
+                return await Task.Run(() => PartialView("~/Views/Shared/Error.cshtml"));
+            }
+
         }
 
         [HttpPost]
@@ -36,8 +54,21 @@ namespace SERP.UI.Controllers.Master
 
         public async Task<IActionResult> GetCasteList()
         {
-            var result =await _ICasteRespo.GetList(x => x.IsActive == 1 && x.IsDeleted == 0);
-            return PartialView("~/Views/CasteMaster/_CasteMasterList.cshtml", result);
+            try
+            {
+                var result = await _ICasteRespo.GetList(x => x.IsActive == 1 && x.IsDeleted == 0);
+                return PartialView("~/Views/CasteMaster/_CasteMasterList.cshtml", result);
+            }
+            catch (Exception ex)
+            {
+                string actionName = this.ControllerContext.RouteData.Values["action"].ToString();
+                string controllerName = this.ControllerContext.RouteData.Values["controller"].ToString();
+
+                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(actionName, controllerName, ex.Message, LoggingType.httpGet.ToString(), 0);
+                var exceptionResponse = await _exceptionLoggingRepo.CreateEntity(exceptionHelper);
+                return await Task.Run(() => PartialView("~/Views/Shared/Error.cshtml"));
+            }
+
         }
 
         public async Task<IActionResult> DeleteCaste(int id)

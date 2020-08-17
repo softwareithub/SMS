@@ -5,7 +5,9 @@ using System.Net.WebSockets;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using SERP.Core.Entities.Entity.Core.ExamDetail;
+using SERP.Core.Entities.SERPExceptionLogging;
 using SERP.Infrastructure.Repository.Infrastructure.Repo;
+using SERP.Utilities.ExceptionHelper;
 using SERP.Utilities.ResponseMessage;
 
 namespace SERP.UI.Controllers.ExamMaster
@@ -13,15 +15,30 @@ namespace SERP.UI.Controllers.ExamMaster
     public class ExamUdpateController : Controller
     {
         private readonly IGenericRepository<ExamUpdate, int> _IExamUpdateRepo;
+        private readonly IGenericRepository<ExceptionLogging, int> _exceptionLoggingRepo;
 
-        public ExamUdpateController (IGenericRepository<ExamUpdate, int> examUpdateRepo)
+        public ExamUdpateController (IGenericRepository<ExamUpdate, int> examUpdateRepo,
+                                     IGenericRepository<ExceptionLogging, int> exceptionLoggingRepo)
         {
             _IExamUpdateRepo = examUpdateRepo;
+            _exceptionLoggingRepo = exceptionLoggingRepo;
         }
         public async Task<IActionResult> Index(int id)
         {
-            var response =await  _IExamUpdateRepo.GetSingle(x => x.Id == id);
-            return PartialView("~/Views/ExamMaster/_ExamUpdatePartial.cshtml",response);
+            try
+            {
+                var response = await _IExamUpdateRepo.GetSingle(x => x.Id == id);
+                return PartialView("~/Views/ExamMaster/_ExamUpdatePartial.cshtml", response);
+            }
+            catch (Exception ex)
+            {
+                string actionName = this.ControllerContext.RouteData.Values["action"].ToString();
+                string controllerName = this.ControllerContext.RouteData.Values["controller"].ToString();
+
+                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(actionName, controllerName, ex.Message, LoggingType.httpGet.ToString(), 0);
+                var exceptionResponse = await _exceptionLoggingRepo.CreateEntity(exceptionHelper);
+                return await Task.Run(() => PartialView("~/Views/Shared/Error.cshtml"));
+            }
         }
         [HttpPost]
         public async Task<IActionResult> CreateEvent(ExamUpdate model)
@@ -40,8 +57,20 @@ namespace SERP.UI.Controllers.ExamMaster
         [HttpGet]
         public async Task<IActionResult> GetEventDetails()
         {
-            var responseDetails = await _IExamUpdateRepo.GetList(x => x.IsActive == 1);
-            return PartialView("~/Views/ExamMaster/_ExamEventDetails.cshtml", responseDetails);
+            try
+            {
+                var responseDetails = await _IExamUpdateRepo.GetList(x => x.IsActive == 1);
+                return PartialView("~/Views/ExamMaster/_ExamEventDetails.cshtml", responseDetails);
+            }
+            catch (Exception ex)
+            {
+                string actionName = this.ControllerContext.RouteData.Values["action"].ToString();
+                string controllerName = this.ControllerContext.RouteData.Values["controller"].ToString();
+
+                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(actionName, controllerName, ex.Message, LoggingType.httpGet.ToString(), 0);
+                var exceptionResponse = await _exceptionLoggingRepo.CreateEntity(exceptionHelper);
+                return await Task.Run(() => PartialView("~/Views/Shared/Error.cshtml"));
+            }
         }
 
         [HttpGet]

@@ -38,11 +38,14 @@ namespace SERP.UI.Controllers.UserManagement
             }
             catch (Exception ex)
             {
+                string actionName = this.ControllerContext.RouteData.Values["action"].ToString();
+                string controllerName = this.ControllerContext.RouteData.Values["controller"].ToString();
 
-                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(nameof(Index), nameof(QuickLinkController), ex.Message, LoggingType.httpGet.ToString(), 0);
+                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(actionName, controllerName, ex.Message, LoggingType.httpGet.ToString(), 0);
                 var exceptionResponse = await _exceptionLoggingRepo.CreateEntity(exceptionHelper);
                 return await Task.Run(() => PartialView("~/Views/Shared/Error.cshtml"));
             }
+
         }
 
         public async Task<IActionResult> GetSubModuleDetails(int moduleId)
@@ -89,10 +92,14 @@ namespace SERP.UI.Controllers.UserManagement
             }
             catch (Exception ex)
             {
-                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(nameof(GetSubModuleDetails), nameof(QuickLinkController), ex.Message, LoggingType.httpDelete.ToString(), 0);
+                string actionName = this.ControllerContext.RouteData.Values["action"].ToString();
+                string controllerName = this.ControllerContext.RouteData.Values["controller"].ToString();
+
+                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(actionName, controllerName, ex.Message, LoggingType.httpGet.ToString(), 0);
                 var exceptionResponse = await _exceptionLoggingRepo.CreateEntity(exceptionHelper);
-                return Json(ResponseData.Instance.GenericResponse(ResponseStatus.ServerError));
+                return await Task.Run(() => PartialView("~/Views/Shared/Error.cshtml"));
             }
+
 
         }
 
@@ -119,10 +126,14 @@ namespace SERP.UI.Controllers.UserManagement
             }
             catch (Exception ex)
             {
-                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(nameof(SaveSubModuleLinks), nameof(QuickLinkController), ex.Message, LoggingType.httpDelete.ToString(), 0);
+                string actionName = this.ControllerContext.RouteData.Values["action"].ToString();
+                string controllerName = this.ControllerContext.RouteData.Values["controller"].ToString();
+
+                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(actionName, controllerName, ex.Message, LoggingType.httpGet.ToString(), 0);
                 var exceptionResponse = await _exceptionLoggingRepo.CreateEntity(exceptionHelper);
-                return Json(ResponseData.Instance.GenericResponse(ResponseStatus.ServerError));
+                return await Task.Run(() => PartialView("~/Views/Shared/Error.cshtml"));
             }
+
         }
 
 

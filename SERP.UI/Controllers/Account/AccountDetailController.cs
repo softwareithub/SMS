@@ -24,13 +24,16 @@ namespace SERP.UI.Controllers.Account
         {
             try
             {
+                throw new Exception();
                 var model = await _accountRepo.GetSingle(x => x.Id == id);
                 return PartialView("~/Views/Accounts/_CreateAccountPartial.cshtml", model);
             }
             catch (Exception ex)
             {
+                string actionName = this.ControllerContext.RouteData.Values["action"].ToString();
+                string controllerName = this.ControllerContext.RouteData.Values["controller"].ToString();
 
-                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj("Index", "AccountDetail", ex.Message, LoggingType.httpGet.ToString(), 0);
+                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(actionName, controllerName, ex.Message, LoggingType.httpGet.ToString(), 0);
                 var exceptionResponse = await _exceptionLoggingRepo.CreateEntity(exceptionHelper);
                 return await Task.Run(() => PartialView("~/Views/Shared/Error.cshtml"));
             }
@@ -52,7 +55,10 @@ namespace SERP.UI.Controllers.Account
             }
             catch (Exception ex)
             {
-                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj("Create", "AccountDetail", ex.Message, LoggingType.httpPost.ToString(), 0);
+                string actionName = this.ControllerContext.RouteData.Values["action"].ToString();
+                string controllerName = this.ControllerContext.RouteData.Values["controller"].ToString();
+
+                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(actionName, controllerName, ex.Message, LoggingType.httpDelete.ToString(), 0);
                 var exceptionResponse = await _exceptionLoggingRepo.CreateEntity(exceptionHelper);
                 return Json(ResponseData.Instance.GenericResponse(ResponseStatus.ServerError));
             }
@@ -62,12 +68,15 @@ namespace SERP.UI.Controllers.Account
         public async Task<IActionResult> GetList()
         {
             try
-            {
+            {                
                 return PartialView("~/Views/Accounts/_AccountDetailPartial.cshtml", await _accountRepo.GetList(x => x.IsActive == 1));
             }
             catch (Exception ex)
             {
-                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj("GetList", "AccountDetail", ex.Message, LoggingType.httpGet.ToString(), 0);
+                string actionName = this.ControllerContext.RouteData.Values["action"].ToString();
+                string controllerName = this.ControllerContext.RouteData.Values["controller"].ToString();
+
+                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(actionName, controllerName, ex.Message, LoggingType.httpGet.ToString(), 0);
                 var exceptionResponse = await _exceptionLoggingRepo.CreateEntity(exceptionHelper);
                 return await Task.Run(() => PartialView("~/Views/Shared/Error.cshtml"));
             }

@@ -5,8 +5,10 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using SERP.Core.Entities.Entity.Core.Transaction;
+using SERP.Core.Entities.SERPExceptionLogging;
 using SERP.Core.Entities.Transport;
 using SERP.Infrastructure.Repository.Infrastructure.Repo;
+using SERP.Utilities.ExceptionHelper;
 using SERP.Utilities.ResponseMessage;
 
 namespace SERP.UI.Controllers.Transport
@@ -18,18 +20,36 @@ namespace SERP.UI.Controllers.Transport
         private readonly IGenericRepository<RouteStopageModel, int> _routeStopageRepo;
         private readonly IGenericRepository<StudentMaster, int> _studentMasterRepo;
         private readonly IGenericRepository<StopageModel, int> _stopageRepo;
-        public RouteStudentMappingController(IGenericRepository<RouteStudentMapping, int> routeStudentRepo, IGenericRepository<RouteMaster, int> routeRepo, IGenericRepository<RouteStopageModel, int> routeStopageRepo, IGenericRepository<StudentMaster, int> studentMasterRepo, IGenericRepository<StopageModel, int> stopageRepo)
+        private readonly IGenericRepository<ExceptionLogging, int> _exceptionLoggingRepo;
+        
+        public RouteStudentMappingController(IGenericRepository<RouteStudentMapping, int> routeStudentRepo, IGenericRepository<RouteMaster, int> routeRepo, 
+            IGenericRepository<RouteStopageModel, int> routeStopageRepo, IGenericRepository<StudentMaster, int> studentMasterRepo,
+            IGenericRepository<StopageModel, int> stopageRepo, IGenericRepository<ExceptionLogging, int> exceptionLoggingRepo)
         {
             this._routeStudentMappingRepo = routeStudentRepo;
             this._routeRepo = routeRepo;
             this._routeStopageRepo = routeStopageRepo;
             this._studentMasterRepo = studentMasterRepo;
             this._stopageRepo = stopageRepo;
+            this._exceptionLoggingRepo = exceptionLoggingRepo;
         }
         public async Task<IActionResult> Index()
         {
-            ViewBag.RouteDetails = await _routeRepo.GetList(x => x.IsActive == 1);
-            return PartialView("~/Views/Transport/_RouteStudentMappingPartial.cshtml");
+            try
+            {
+                ViewBag.RouteDetails = await _routeRepo.GetList(x => x.IsActive == 1);
+                return PartialView("~/Views/Transport/_RouteStudentMappingPartial.cshtml");
+            }
+            catch (Exception ex)
+            {
+                string actionName = this.ControllerContext.RouteData.Values["action"].ToString();
+                string controllerName = this.ControllerContext.RouteData.Values["controller"].ToString();
+
+                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(actionName, controllerName, ex.Message, LoggingType.httpGet.ToString(), 0);
+                var exceptionResponse = await _exceptionLoggingRepo.CreateEntity(exceptionHelper);
+                return await Task.Run(() => PartialView("~/Views/Shared/Error.cshtml"));
+            }
+
         }
 
         public async Task<IActionResult> GetStopageDetails(int routeId)
@@ -52,34 +72,60 @@ namespace SERP.UI.Controllers.Transport
 
         public async Task<IActionResult> RouteStudents()
         {
-            return await Task.Run(() => PartialView("~/Views/Transport/RouteStudentSearchPartial.cshtml"));
+            try
+            {
+                return await Task.Run(() => PartialView("~/Views/Transport/RouteStudentSearchPartial.cshtml"));
+            }
+            catch (Exception ex)
+            {
+                string actionName = this.ControllerContext.RouteData.Values["action"].ToString();
+                string controllerName = this.ControllerContext.RouteData.Values["controller"].ToString();
+
+                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(actionName, controllerName, ex.Message, LoggingType.httpGet.ToString(), 0);
+                var exceptionResponse = await _exceptionLoggingRepo.CreateEntity(exceptionHelper);
+                return await Task.Run(() => PartialView("~/Views/Shared/Error.cshtml"));
+            }
+
         }
 
         public async Task<IActionResult> GetStudentList(string name, string rollCode, string fatherName, string motherName, string registrationNUmber)
         {
-            var studentModels = await _studentMasterRepo.GetList(x => x.IsActive == 1);
-            if (!string.IsNullOrEmpty(name))
+            try
             {
-                studentModels = studentModels.Where(x => x.Name.Trim().ToLower() == name.Trim().ToLower()).ToList();
+                var studentModels = await _studentMasterRepo.GetList(x => x.IsActive == 1);
+                if (!string.IsNullOrEmpty(name))
+                {
+                    studentModels = studentModels.Where(x => x.Name.Trim().ToLower() == name.Trim().ToLower()).ToList();
+                }
+                if (!string.IsNullOrEmpty(rollCode))
+                {
+                    studentModels = studentModels.Where(x => x.RollCode.Trim().ToLower() == rollCode.Trim().ToLower()).ToList();
+                }
+                if (!string.IsNullOrEmpty(fatherName))
+                {
+                    studentModels = studentModels.Where(x => x.FatherName.Trim().ToLower() == fatherName.ToLower().Trim()).ToList();
+                }
+                if (!string.IsNullOrEmpty(motherName))
+                {
+                    studentModels = studentModels.Where(x => x.MotherName.Trim().ToLower() == motherName.ToLower().Trim()).ToList();
+                }
+                if (!string.IsNullOrEmpty(registrationNUmber))
+                {
+                    studentModels = studentModels.Where(x => x.RegistrationNumber.Trim().ToLower() == registrationNUmber.ToLower().Trim()).ToList();
+                }
+
+                return PartialView("~/Views/Transport/StudentSearchPartial.cshtml", studentModels);
             }
-            if (!string.IsNullOrEmpty(rollCode))
+            catch (Exception ex)
             {
-                studentModels = studentModels.Where(x => x.RollCode.Trim().ToLower() == rollCode.Trim().ToLower()).ToList();
-            }
-            if (!string.IsNullOrEmpty(fatherName))
-            {
-                studentModels = studentModels.Where(x => x.FatherName.Trim().ToLower() == fatherName.ToLower().Trim()).ToList();
-            }
-            if (!string.IsNullOrEmpty(motherName))
-            {
-                studentModels = studentModels.Where(x => x.MotherName.Trim().ToLower() == motherName.ToLower().Trim()).ToList();
-            }
-            if (!string.IsNullOrEmpty(registrationNUmber))
-            {
-                studentModels = studentModels.Where(x => x.RegistrationNumber.Trim().ToLower() == registrationNUmber.ToLower().Trim()).ToList();
+                string actionName = this.ControllerContext.RouteData.Values["action"].ToString();
+                string controllerName = this.ControllerContext.RouteData.Values["controller"].ToString();
+
+                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(actionName, controllerName, ex.Message, LoggingType.httpGet.ToString(), 0);
+                var exceptionResponse = await _exceptionLoggingRepo.CreateEntity(exceptionHelper);
+                return await Task.Run(() => PartialView("~/Views/Shared/Error.cshtml"));
             }
 
-            return PartialView("~/Views/Transport/StudentSearchPartial.cshtml", studentModels);
         }
 
         [HttpPost]
@@ -112,21 +158,34 @@ namespace SERP.UI.Controllers.Transport
 
         public async Task<IActionResult> GetMappedStudent(int routeId, int stopageId)
         {
-            var mappedStudentModels = await _routeStudentMappingRepo.GetList(x => x.IsActive == 1 && x.RouteId == routeId && x.StopageId == stopageId);
-            var studentModels = await _studentMasterRepo.GetList(x => x.IsActive == 1);
-            List<StudentMaster> models = new List<StudentMaster>();
-            studentModels.ToList().ForEach(item =>
+            try
             {
-                mappedStudentModels.ToList().ForEach(x =>
+                var mappedStudentModels = await _routeStudentMappingRepo.GetList(x => x.IsActive == 1 && x.RouteId == routeId && x.StopageId == stopageId);
+                var studentModels = await _studentMasterRepo.GetList(x => x.IsActive == 1);
+                List<StudentMaster> models = new List<StudentMaster>();
+                studentModels.ToList().ForEach(item =>
                 {
-                    if(item.Id==x.StudentId)
+                    mappedStudentModels.ToList().ForEach(x =>
                     {
-                        models.Add(item);
-                    }
+                        if (item.Id == x.StudentId)
+                        {
+                            models.Add(item);
+                        }
+                    });
                 });
-            });
 
-            return PartialView("~/Views/Transport/AllocatedStudentRoute.cshtml", models);
+                return PartialView("~/Views/Transport/AllocatedStudentRoute.cshtml", models);
+            }
+            catch (Exception ex)
+            {
+                string actionName = this.ControllerContext.RouteData.Values["action"].ToString();
+                string controllerName = this.ControllerContext.RouteData.Values["controller"].ToString();
+
+                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(actionName, controllerName, ex.Message, LoggingType.httpGet.ToString(), 0);
+                var exceptionResponse = await _exceptionLoggingRepo.CreateEntity(exceptionHelper);
+                return await Task.Run(() => PartialView("~/Views/Shared/Error.cshtml"));
+            }
+
         }
     }
 }
