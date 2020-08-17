@@ -11,6 +11,7 @@ namespace SERP.Core.Entities.Entity.Core.ExamDetail
         public int QuestionId { get; set; } = default;
         public string OptionData { get; set; } = string.Empty;
         public int IsCorrectAnswere { get; set; } = default;
+        public int SortOrder { get; set; }
         public int SessionId { get; set; }
     }
 }

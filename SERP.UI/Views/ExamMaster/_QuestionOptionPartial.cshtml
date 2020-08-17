@@ -26,6 +26,9 @@
                 Change Correct
             </th>
             <th>
+                Sort Order
+            </th>
+            <th>
                 Action
             </th>
         </tr>
@@ -53,6 +56,9 @@
                         <option value="0">No</option>
                         <option value="1">Yes</option>
                     </select>
+                </td>
+                <td>
+                    <input type="text" onblur="changeSortOrder(this,@data.Id)" asp-for="@data.SortOrder" />
                 </td>
                 <td>
                     <a onclick="DeleteOption(@data.Id)">

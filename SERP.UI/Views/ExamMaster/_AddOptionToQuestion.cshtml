@@ -167,6 +167,11 @@
         })
     }
 
+    function changeSortOrder(eval, id) {
+        $.get("/OnlineTest/UpdateSortOrder", { id: id, sortOrder: eval.value }, function (data) {
+            GetOptionDetail();
+        })
+    }
 
     function DeleteOption(id) {
         alertify.confirm("Are you sure want to delete the Option ?", function () {

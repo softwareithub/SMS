@@ -54,6 +54,7 @@ namespace SERP.UI.Controllers.OnlineTest
                 OptionMaster optionMaster = new OptionMaster();
                 optionMaster.QuestionId = questionId;
                 optionMaster.OptionData = optionText;
+                optionMaster.SortOrder = i+1;
                 optionMasters.Add(optionMaster);
 
             }
@@ -96,13 +97,22 @@ namespace SERP.UI.Controllers.OnlineTest
         public async Task<IActionResult> GetQuestionOptionList(int questId)
         {
             var models = await _OptionRepo.GetList(x => x.QuestionId == questId && x.IsActive == 1);
-            return PartialView("~/Views/ExamMaster/_QuestionOptionPartial.cshtml", models);
+            return PartialView("~/Views/ExamMaster/_QuestionOptionPartial.cshtml", models.OrderBy(x=>x.SortOrder));
         }
 
         public async Task<IActionResult> UpdateOptionCorrect(int id, int correctOption)
         {
             var model = await _OptionRepo.GetSingle(x => x.Id == id);
             model.IsCorrectAnswere = correctOption;
+            await _OptionRepo.CreateNewContext();
+            var updateResponse = await _OptionRepo.Update(model);
+            return Json(ResponseData.Instance.GenericResponse(updateResponse));
+        }
+
+        public async Task<IActionResult> UpdateSortOrder(int id, int sortOrder)
+        {
+            var model = await _OptionRepo.GetSingle(x => x.Id == id);
+            model.SortOrder = sortOrder;
             await _OptionRepo.CreateNewContext();
             var updateResponse = await _OptionRepo.Update(model);
             return Json(ResponseData.Instance.GenericResponse(updateResponse));
