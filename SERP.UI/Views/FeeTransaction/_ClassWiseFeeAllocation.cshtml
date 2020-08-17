@@ -40,6 +40,7 @@
                                    data-content="You can select multiple class for Fee Allocation"></i>
                             </label>
                             <select id="modal-example" class="form-control" onchange="GetParticular()">
+                                <option value="">Select</option>
                                 @foreach (var data in (IEnumerable<SERP.Core.Entities.Entity.Core.Master.CourseMaster>)ViewBag.CourseList)
                                 {
                                     var mapped = string.Empty;
@@ -51,6 +52,15 @@
                                 }
                             </select>
                             <span asp-validation-for="ClassId" class="text-danger"></span>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label asp-for="AcademicYear">Academic Year</label>
+                            <select asp-for="AcademicYear" class="form-control" asp-items="@(new SelectList(ViewBag.AcademicList ,"Id","Name"))">
+                                <option value="">Select Academic Name</option>
+                            </select>
+                            <span asp-validation-for="AcademicYear" class="text-danger"></span>
                         </div>
                     </div>
 
