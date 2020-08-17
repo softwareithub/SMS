@@ -6,71 +6,99 @@
 <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.js"></script>
 <link href="https://cdn.datatables.net/1.10.20/css/jquery.dataTables.min.css" rel="stylesheet" />
 <script src="https://cdn.datatables.net/1.10.20/js/jquery.dataTables.min.js"></script>
+
+<section class="content-header">
+    <h1>
+        Lesson Topic
+    </h1>
+    <ol class="breadcrumb">
+        <li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
+        <li><a href="#">Forms</a></li>
+        <li class="active">General Elements</li>
+    </ol>
+</section>
 <section class="content">
     <div class="row">
 
         <div class="col-md-12">
             <!-- general form elements -->
             <div class="box box-primary">
+                <div class="box-header with-border">
+                    <h3 class="box-title">Lesson Topic</h3>
+                    <div class="col-md-12">
+                        <div class="col-md-10">
+                            <a class="btn btn-primary pull-right" onclick="">
+                                <i class="fa fa-list-ul"></i>
+                            </a>
+                        </div>
+                    </div>
+
+                </div>
                 <form id="form" method="post" data-ajax="true" data-ajax-method="post"
                       asp-action="PostLessonTopic" asp-controller="LessonTopic" data-ajax-success="Success"
-                      data-ajax-begin="CustomFormSubmitBegin" data-ajax-complete="CustomFormSubmitComplete" enctype="multipart/form-data">
+                      data-ajax-begin="CustomFormSubmitBegin" data-ajax-complete="CustomFormSubmitComplete" enctype="multipart/form-data">                    
+                        <div class="box-body">
+
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="classId">Select Course</label>
+                                    <select class="form-control" onchange="GetSubjectDetails()" id="classId">
+                                        <option value="0" selected>Please select Course</option>
+                                        @foreach (var data in (List<SERP.Core.Entities.Entity.Core.Master.CourseMaster>)ViewBag.ClassList)
+                                        {
+                                            <option value="@data.Id">@data.Name</option>
+                                        }
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="SubjectId">Select Subject</label>
+                                    <select for="SubjectId" id="SubjectId" onchange="GetLessonDetails()" class="form-control">
+                                    </select>
+                                    <span class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="LessonName">Chapter/Lesson</label>
+                                    <select for="LessonName" class="form-control" id="ddlLesson">
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <input type="hidden" asp-for="Id" />
+                                    <input type="hidden" asp-for="CreatedBy" />
+                                    <input type="hidden" asp-for="CreatedDate" />
+                                    <label asp-for="TopicName">Topic Name</label>
+                                    <input asp-for="TopicName" class="form-control">
+                                    <span asp-validation-for="TopicName" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label asp-for="TopicDescription">Description</label>
+                                    <input asp-for="TopicDescription" class="form-control">
+                                    <span asp-validation-for="TopicDescription" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label asp-for="ExpectedClass">Class Expected</label>
+                                    <input asp-for="ExpectedClass" type="number" class="form-control">
+                                    <span asp-validation-for="ExpectedClass" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-12">
+                                <input type="button" onclick="AddTopicToLesson()" class="btn btn-primary pull-right" value="Add" />
+                            </div>
+                        </div>
+                    
                     <div class="box-body">
-
-                        <div class="col-md-4">
-                            <div class="form-group">
-                                <label for="classId">Select Course</label>
-                                <select class="form-control" onchange="GetSubjectDetails()" id="classId">
-                                    <option value="0" selected>Please select Course</option>
-                                    @foreach (var data in (List<SERP.Core.Entities.Entity.Core.Master.CourseMaster>)ViewBag.ClassList)
-                                    {
-                                        <option value="@data.Id">@data.Name</option>
-                                    }
-                                </select>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="form-group">
-                                <label for="SubjectId">Select Subject</label>
-                                <select for="SubjectId" id="SubjectId" onchange="GetLessonDetails()" class="form-control">
-                                </select>
-                                <span class="text-danger"></span>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="form-group">
-                                <label for="LessonName">Chapter/Lesson</label>
-                                <select for="LessonName" class="form-control" id="ddlLesson">
-                                </select>
-                            </div>
-                        </div>
-
-                        <div class="col-md-4">
-                            <div class="form-group">
-                                <input type="hidden" asp-for="Id" />
-                                <input type="hidden" asp-for="CreatedBy" />
-                                <input type="hidden" asp-for="CreatedDate" />
-                                <label asp-for="TopicName">Topic Name</label>
-                                <input asp-for="TopicName" class="form-control">
-                                <span asp-validation-for="TopicName" class="text-danger"></span>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="form-group">
-                                <label asp-for="TopicDescription">Description</label>
-                                <input asp-for="TopicDescription" class="form-control">
-                                <span asp-validation-for="TopicDescription" class="text-danger"></span>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="form-group">
-                                <label asp-for="ExpectedClass">Class Expected</label>
-                                <input asp-for="ExpectedClass" type="number" class="form-control">
-                                <span asp-validation-for="ExpectedClass" class="text-danger"></span>
-                            </div>
-                        </div>
-                        <div class="col-md-12">
-                            <table class="table table_hove">
+                        <div class="col-md-12  tblAddOptions">
+                            <table class="table-responsive-md table-striped table-bordered dataTable no-footer">
                                 <thead>
                                     <tr>
                                         <th>
@@ -89,25 +117,20 @@
                                 </tbody>
                             </table>
                         </div>
-
-                        <div class="col-md-12">
-                            <input type="button" onclick="AddTopicToLesson()" class="btn btn-primary" value="Add" />
-                        </div>
                     </div>
                     <!-- /.box-body -->
 
-                    <div class="box-footer">
-                        <div class="col-md-4">
+                    <div class="box-footer dvAddOptionBtn">
+                        
+                        <div class="col-md-8">
                             @Html.SERPButton("btn btn-primary pull-right btnSubmit", Model == null ? 0 : Model.Id)
                             <button class="buttonload" style="display:none">
                                 <i class="fa fa-refresh fa-spin"></i>Loading
                             </button>
                         </div>
-                        <div class="col-md-4">
-                            <button type="reset" class="btn btn-danger pull-left">Cancel</button>
-
-
-                        </div>
+                                <div class="col-md-4">
+                                    <button type="reset" class="btn btn-danger pull-left">Cancel</button>
+                                </div>
                     </div>
                 </form>
             </div>
@@ -122,6 +145,10 @@
 </style>
 
 <script>
+    $(document).ready(function () {
+        $('.tblAddOptions').hide();
+        $('.dvAddOptionBtn').hide();
+    });
     function AddTopicToLesson() {
         var isValid = true;
         var topicName = $("#TopicName").val();
@@ -144,7 +171,9 @@
             html += '<td><input type="hidden" name="classExpected" value=' + expectedClass + ' />' + expectedClass + '</td>';
         html += '<td><a class="btn btn-outline-danger pull-right" onclick="rowDelete(this)" data-loading-text="<i class="fa fa - circle - o - notch fa - spin"  style="color:#DD4B39"></i> <i class="fa fa-trash" style="color:#DD4B39"></i></a></td>"';
         html += '</tr>';
-        $("#tblbodyTopic").append(html);
+            $("#tblbodyTopic").append(html);
+            $('.tblAddOptions').show();
+            $('.dvAddOptionBtn').show();
         }
     }
 
