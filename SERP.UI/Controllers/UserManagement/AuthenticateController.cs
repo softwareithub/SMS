@@ -9,6 +9,7 @@ using SERP.Core.Entities.UserManagement;
 using SERP.Core.Model.UserManagement;
 using SERP.Infrastructure.Repository.Infrastructure.Repo;
 using SERP.UI.Extension;
+using SERP.Utilities.CommanHelper;
 using SERP.Utilities.EmailHelper;
 using SERP.Utilities.ExceptionHelper;
 using SERP.Utilities.ResponseMessage;
@@ -98,6 +99,7 @@ namespace SERP.UI.Controllers.UserManagement
             && x.Password == model.Password && x.IsActive == 1 && x.IsExpired == 0 && x.IsLocked == 0);
 
             string responseMessage = string.Empty;
+            SessionData.SessionValue = model.SessionId;
 
             if (response != null)
             {

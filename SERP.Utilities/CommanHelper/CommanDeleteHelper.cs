@@ -7,8 +7,25 @@ namespace SERP.Utilities.CommanHelper
 {
     public static class CommanDeleteHelper
     {
+
+        public static T CommanCreateCode<T>(T entity, int userId)
+        {
+
+            Type modelType = entity.GetType();
+            PropertyInfo[] pinfos = modelType.GetProperties();
+            foreach (var prop in pinfos)
+            {
+                if (prop.Name == "SessionId")
+                {
+                    prop.SetValue(entity, SessionData.SessionValue);
+                }
+            }
+            return entity;
+        }
+
         public static T CommanDeleteCode<T>(T entity, int userId)
         {
+
             Type modelType = entity.GetType();
             PropertyInfo[] pinfos = modelType.GetProperties();
             foreach (var prop in pinfos)
@@ -29,6 +46,10 @@ namespace SERP.Utilities.CommanHelper
                 {
                     prop.SetValue(entity, DateTime.Now.Date, null);
                 }
+                else if (prop.Name == "SessionId")
+                {
+                    prop.SetValue(entity, SessionData.SessionValue);
+                }
             }
             return entity;
         }
@@ -39,14 +60,18 @@ namespace SERP.Utilities.CommanHelper
             PropertyInfo[] pinfos = modelType.GetProperties();
             foreach (var prop in pinfos)
             {
-              
-                 if (prop.Name == "UpdatedBy")
+
+                if (prop.Name == "UpdatedBy")
                 {
                     prop.SetValue(entity, userId, null);
                 }
                 else if (prop.Name == "UpdatedDate")
                 {
                     prop.SetValue(entity, DateTime.Now.Date, null);
+                }
+                else if (prop.Name == "SessionId")
+                {
+                    prop.SetValue(entity, SessionData.SessionValue);
                 }
             }
             return entity;

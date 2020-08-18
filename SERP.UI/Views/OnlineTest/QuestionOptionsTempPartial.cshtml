@@ -1,0 +1,38 @@
+﻿@model SERP.Core.Model.OnlineTest.QuestionOptions
+
+<table class="table table-responsive">
+    <thead>
+        <tr>
+            <th>
+                Question
+            </th>
+            <th>
+                Option
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var data in Model.Options)
+        {
+            <tr>
+                <td>
+                    @Html.Raw(Model.Question)
+                </td>
+                <td>
+                    @Html.Raw(data)
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+<script type="text/javascript"
+        src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+<script type="text/javascript">
+    if (window.MathJax) {
+        MathJax.Hub.Queue(
+            ["resetEquationNumbers", MathJax.InputJax.TeX],
+            ["Typeset", MathJax.Hub]
+        );
+    }
+</script>

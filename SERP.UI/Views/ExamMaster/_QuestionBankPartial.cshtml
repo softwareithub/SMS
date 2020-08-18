@@ -3,7 +3,7 @@
     Layout = null;
 
 }
-@model  SERP.UI.Models.QuestionVm
+@model SERP.UI.Models.QuestionVm
 
 <script src="~/lib/jquery-validation/dist/jquery.validate.js"></script>
 <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.js"></script>
@@ -15,7 +15,7 @@
 <script src="~/ckeditor/plugins/dialogui/"></script>
 
 <script type="text/x-mathjax-config">
-  
+
 </script>
 <script type='text/javascript' src='http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML'></script>
 
@@ -107,19 +107,8 @@
                             </div>
                         </div>
 
-                        <div class="col-md-12">
-                            <table class="table table-responsive">
-                                <thead>
-                                    <tr>
-                                        <th>Question</th>
-                                        <th>Options</th>
-                                        <th>Action</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="tblBody">
-
-                                </tbody>
-                            </table>
+                        <div class="col-md-12" id="divOptions">
+                            
                         </div>
                     </div>
                     <div class="box-footer">
@@ -144,7 +133,7 @@
         @await Html.PartialAsync("~/Views/Shared/_CommanModalPartial.cshtml")
 
 
-        
+
 
     </div>
 </section>
@@ -165,18 +154,18 @@
 
 
     function CheckThis(eData) {
-        
+
         $('input:checkbox').removeAttr('checked');
 
     }
     function GetSubjectList() {
-        
+
         var courseId = $("#CourseId").val();
         $("#SubjectId").empty()
         $("#SubjectId").append('<option value="0">Select</option>');
         $.get("/CommanDataForJson/SubjectJson", { courseId: courseId }, function (responseData) {
             for (var i = 0; i < responseData.length; i++) {
-                
+
                 var html = '<option value=' + responseData[i].id + '>' + responseData[i].subjectName + '</option>'
                 $("#SubjectId").append(html);
             }
@@ -200,23 +189,12 @@
     }
 
     function fn_AddOptions() {
-        
+
         var question = CKEDITOR.instances['QuestionModel_Question'].getData();
         var options = CKEDITOR.instances['OptionMasters_OptionData'].getData();
-        var html = "<tr>";
-        html += "<td>" + question + "</td>";
-        html += "<td>" + options + "</td>";
-        html += "</tr>";
-        $("#tblBody").append(html);
-
-        setTimeout(function () {
-            MathJax.Hub.Config({
-                tex2jax: { inlineMath: [['$', '$'], ['\\(', '\\)']] },
-                "HTML-CSS": {
-                    linebreaks: { automatic: true, width: "container" }
-                }
-            });
-        }, 500);
+        $.get("/OnlineTest/AddOptionTemp", { question: question, option: options }, function (data) {
+            $("#divOptions").html(data);
+        })
     }
 
 
@@ -289,6 +267,6 @@
             // Update the ACF configuration with MathML syntax.
             extraAllowedContent: mathElements.join(' ') + '(*)[*]{*};img[data-mathml,data-custom-editor,role](Wirisformula)'
         });
-       
+
     }());
 </script>

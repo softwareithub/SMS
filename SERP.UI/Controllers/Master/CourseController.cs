@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using SERP.Core.Entities.Entity.Core.Master;
 using SERP.Core.Entities.SERPExceptionLogging;
 using SERP.Infrastructure.Repository.Infrastructure.Repo;
+using SERP.Utilities.CommanHelper;
 using SERP.Utilities.ExceptionHelper;
 using SERP.Utilities.ResponseMessage;
 using SERP.Utilities.ResponseUtilities;
@@ -52,8 +53,7 @@ namespace SERP.UI.Controllers.Master
             {
                 if (model.Id == 0)
                 {
-                    model.CreatedBy = 1;
-                    model.CreatedDate = DateTime.Now.Date;
+                    var createModel = CommanDeleteHelper.CommanCreateCode<CourseMaster>(model,1);
                     var result = await _IGenericRepo.CreateEntity(model);
                     return Json(ResponseData.Instance.GenericResponse(result));
                 }

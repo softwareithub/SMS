@@ -6,7 +6,9 @@ using Microsoft.AspNetCore.Mvc;
 using SERP.Core.Entities.Entity.Core.ExamDetail;
 using SERP.Core.Entities.Entity.Core.Master;
 using SERP.Core.Entities.SERPExceptionLogging;
+using SERP.Core.Model.OnlineTest;
 using SERP.Infrastructure.Repository.Infrastructure.Repo;
+using SERP.UI.Extension;
 using SERP.UI.Models;
 using SERP.Utilities.CommanHelper;
 using SERP.Utilities.ExceptionHelper;
@@ -62,23 +64,21 @@ namespace SERP.UI.Controllers.OnlineTest
         {
             try
             {
+                QuestionOptions optmodel = HttpContext.Session.GetObject<QuestionOptions>("questOptions");
                 var response = await _QuestionRepo.CreateEntity(model.QuestionModel);
                 await _QuestionRepo.CreateNewContext();
-                List<OptionMaster> optionMasters = new List<OptionMaster>();
                 var questionId = Convert.ToInt32((await _QuestionRepo.GetList(x => x.IsActive == 1)).Max(x => x.Id));
+                List<OptionMaster> optionMasters = new List<OptionMaster>();
 
-
-                string[] arr = model.OptionMasters.OptionData.Replace("<p><math xmlns=\"http://www.w3.org/1998/Math/MathML\">", "").Replace("</p>", "").Split(new[] { "<mi" }, StringSplitOptions.RemoveEmptyEntries);
-                for (int i = 0; i < arr.Length; i++)
+                optmodel.Options.ForEach(item =>
                 {
-                    var optionText = "<p><math xmlns='http://www.w3.org/1998/Math/MathML'><mi" + arr[i] + "</p>";
                     OptionMaster optionMaster = new OptionMaster();
                     optionMaster.QuestionId = questionId;
-                    optionMaster.OptionData = optionText;
-                    optionMaster.SortOrder = i + 1;
+                    optionMaster.OptionData = item;
+                    optionMaster.SortOrder = 0;
                     optionMasters.Add(optionMaster);
 
-                }
+                });
 
                 var optionResponse = await _OptionRepo.Add(optionMasters.ToArray());
 
@@ -252,6 +252,32 @@ namespace SERP.UI.Controllers.OnlineTest
                 var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(actionName, controllerName, ex.Message, LoggingType.httpDelete.ToString(), 0);
                 var exceptionResponse = await _exceptionLoggingRepo.CreateEntity(exceptionHelper);
                 return Json(ResponseData.Instance.GenericResponse(ResponseStatus.ServerError));
+            }
+        }
+
+        public async Task<IActionResult> AddOptionTemp(string question, string option)
+        {
+
+            if (HttpContext.Session.GetObject<QuestionOptions>("questOptions") == null)
+            {
+                List<string> options = new List<string>();
+                QuestionOptions model = new QuestionOptions();
+                model.Question = question;
+                options.Add(option);
+                model.Options = options;
+
+                HttpContext.Session.SetObject("questOptions", model);
+
+                return PartialView("~/Views/OnlineTest/QuestionOptionsTempPartial.cshtml", model);
+            }
+            else
+            {
+                QuestionOptions model = HttpContext.Session.GetObject<QuestionOptions>("questOptions");
+                model.Options.Add(option);
+                HttpContext.Session.Remove("questOptions");
+                HttpContext.Session.SetObject("questOptions", model);
+
+                return PartialView("~/Views/OnlineTest/QuestionOptionsTempPartial.cshtml", model);
             }
         }
     }
