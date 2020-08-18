@@ -54,7 +54,7 @@
 
                     </i>
                 </div>
-                <form id="form" method="post" data-ajax="true" data-ajax-method="post"
+                <form id="form" method="post" data-ajax="true" data-ajax-method="post" data-ajax-confirm="Are you sure want to save the Question? If you want to add more options to the question, Please cancel and proceed or else click Ok to save the question with Options"
                       asp-action="CreateQuestion" asp-controller="OnlineTest" data-ajax-success="Success"
                       data-ajax-begin="CustomFormSubmitBegin" data-ajax-complete="CustomFormSubmitComplete">
                     <div class="box-body">
@@ -120,18 +120,21 @@
                         </div>
                     </div>
                     <div class="box-footer">
-                        <div class="col-md-12">
-                            <input type="button" class="btn btn-success" onclick="fn_AddOptions()" value="Add Options" />
-                        </div>
-                        <div class="col-md-8">
-                            @Html.SERPButton("btn btn-primary pull-right btnSubmit", Model == null ? 0 : Model.QuestionModel.Id)
-                            <button class="buttonload" style="display:none">
-                                <i class="fa fa-refresh fa-spin"></i>Loading
-                            </button>
-                        </div>
                         <div class="col-md-4">
-                            <button type="reset" class="btn btn-danger pull-left">Cancel</button>
+                            <input type="button" class="btn btn-success pull-right" onclick="fn_AddOptions()" value="Add Options" />
                         </div>
+                        <div id="divCancelSubmit" style="display:none">
+                            <div class="col-md-4">
+                                @Html.SERPButton("btn btn-primary pull-right btnSubmit", Model == null ? 0 : Model.QuestionModel.Id)
+                                <button class="buttonload" style="display:none">
+                                    <i class="fa fa-refresh fa-spin"></i>Loading
+                                </button>
+                            </div>
+                            <div class="col-md-4">
+                                <button type="reset" class="btn btn-danger pull-left">Cancel</button>
+                            </div>
+                        </div>
+
 
                     </div>
                 </form>
@@ -209,15 +212,19 @@
     }
 
     function fn_AddOptions() {
-
         var question = CKEDITOR.instances['QuestionModel_Question'].getData();
         var options = CKEDITOR.instances['OptionMasters_OptionData'].getData();
-        $.get("/OnlineTest/AddOptionTemp", { question: question, option: options }, function (data) {
+        var model = { question: question, options: options }
+        $.post("/OnlineTest/AddOptionTemp", { model: model }, function (data) {
             $("#divOptions").html(data);
-        })
+        }).done(function () {
+            $("#divCancelSubmit").removeAttr("style")
+        });
     }
 
-
+    function ConfirmQuestion() {
+        alertify.confirm("Are you sure want to save the Question? If you want to add more options to the question, Please cancel and proceed or else click Ok to save the question with Options")
+    }
 </script>
 
 <script>

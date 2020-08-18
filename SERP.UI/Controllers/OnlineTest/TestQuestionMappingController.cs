@@ -34,8 +34,9 @@ namespace SERP.UI.Controllers.OnlineTest
         private readonly IGenericRepository<StudentMaster, int> _studentMasterRepo;
         private readonly IHostingEnvironment _hostingEnviroment;
         private readonly IGenericRepository<ExceptionLogging, int> _exceptionLoggingRepo;
+        private readonly IGenericRepository<Options, int> _optionMasterrepo;
 
-        public TestQuestionMappingController(IGenericRepository<QuestionModel, int> questionRepo, IGenericRepository<SubjectMaster, int> subjectReo, IGenericRepository<CourseMaster, int> courseRepo, IGenericRepository<TestMaster, int> testRepo, IGenericRepository<TestQuestionMapping, int> testQuestionRepo, IGenericRepository<SMSTemplateModel, int> smsTemplateRepo, IGenericRepository<StudentPromote, int> studentPromoteRepo, IGenericRepository<StudentMaster, int>  studentMasterRepo, IHostingEnvironment hostingEnviroment, IGenericRepository<ExceptionLogging, int> exceptionLoggingRepo)
+        public TestQuestionMappingController(IGenericRepository<QuestionModel, int> questionRepo, IGenericRepository<SubjectMaster, int> subjectReo, IGenericRepository<CourseMaster, int> courseRepo, IGenericRepository<TestMaster, int> testRepo, IGenericRepository<TestQuestionMapping, int> testQuestionRepo, IGenericRepository<SMSTemplateModel, int> smsTemplateRepo, IGenericRepository<StudentPromote, int> studentPromoteRepo, IGenericRepository<StudentMaster, int>  studentMasterRepo, IHostingEnvironment hostingEnviroment, IGenericRepository<ExceptionLogging, int> exceptionLoggingRepo, IGenericRepository<Options, int> optionsMasterRepo)
         {
             _IQuestionRepo = questionRepo;
             _ISubjectMasterRepo = subjectReo;
@@ -56,6 +57,7 @@ namespace SERP.UI.Controllers.OnlineTest
                 var subjectDetails = await _ISubjectMasterRepo.GetList(x => x.IsActive == 1);
                 var testDetails = await _ITestRepo.GetList(x => x.IsActive == 1);
                 var questionDetails = await _IQuestionRepo.GetList(x => x.IsActive == 1);
+                var options= await _
 
                 var response = (from QM in questionDetails
                                 join CM in courseDetails

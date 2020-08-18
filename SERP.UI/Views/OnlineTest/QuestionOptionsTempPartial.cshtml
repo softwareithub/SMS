@@ -1,4 +1,4 @@
-﻿@model SERP.Core.Model.OnlineTest.QuestionOptions
+﻿@model IEnumerable<SERP.Core.Model.OnlineTest.QuestionOptions>
 
 <table class="table table-responsive">
     <thead>
@@ -11,15 +11,15 @@
             </th>
         </tr>
     </thead>
-    <tbody>
-        @foreach (var data in Model.Options)
+    <tbody id="tblTempQuestion">
+        @foreach (var data in Model)
         {
             <tr>
                 <td>
-                    @Html.Raw(Model.Question)
+                    @Html.Raw(data.Question)
                 </td>
                 <td>
-                    @Html.Raw(data)
+                    @Html.Raw(data.Options)
                 </td>
             </tr>
         }
