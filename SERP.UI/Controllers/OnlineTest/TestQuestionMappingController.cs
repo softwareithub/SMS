@@ -98,7 +98,7 @@ namespace SERP.UI.Controllers.OnlineTest
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateQuestion(int TestId, int[] QuestionId,int questionMark)
+        public async Task<IActionResult> CreateQuestion(int TestId, int[] QuestionId,string[] questionMark, string [] NegativeMark)
         {
             try
             {
@@ -121,6 +121,8 @@ namespace SERP.UI.Controllers.OnlineTest
                     {
                         TestQuestionMapping model = new TestQuestionMapping();
                         model.QuestionId = QuestionId[i];
+                        model.QuestionMark = Convert.ToInt32(questionMark[i]);
+                        model.NegativeMark = Convert.ToDecimal(NegativeMark[i]);
                         model.TestId = TestId;
                         models.Add(model);
                     }
