@@ -257,7 +257,7 @@
                     <!-- /.box-body -->
 
                     <div class="box-footer">
-                        <button type="submit" class="btn btn-primary pull-right" onclick="ValidateForm(this)">Submit</button>
+                        <button type="submit" id="btnAdmissionSubmit" class="btn btn-primary pull-right" onclick="ValidateForm(this)">Submit</button>
                     </div>
                 </form>
             </div>
@@ -269,7 +269,7 @@
                 <div class="modal-content">
                     <div class="modal-header">
                         <button type="button" class="close TopMar16" data-dismiss="modal">&times;</button>
-                        <h4 class="modal-title" style="text-align:center">Student List</h4>
+                        <h4 class="modal-title">Student List</h4>
                     </div><!--modal-header end-->
 
                     <div class="modal-body">
@@ -342,6 +342,13 @@
     }
 
     $(document).ready(function () {
+        var checkStudentId = $('#Id').val();
+        if (checkStudentId >0 ) {
+            $("#btnAdmissionSubmit").text("Update");
+        }
+        else {
+            $("#btnAdmissionSubmit").text("Submit");
+        }
         GetBatchList();
         setTimeout(function () {
             $("#Batch").val($("#_hidenBatchId").val());
@@ -383,7 +390,7 @@
             $("#divSERP").html(response);
             $("#divModalPop").modal('hide');
             $('.modal-backdrop').remove();
-            $("#divSerpBody").removeClass('modal-open');    
+            $("#divSerpBody").removeClass('modal-open');
         });
     }
 
