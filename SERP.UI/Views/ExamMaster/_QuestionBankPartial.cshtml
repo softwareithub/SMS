@@ -15,9 +15,7 @@
 <script src="~/ckeditor/plugins/dialogui/"></script>
 
 <script type="text/x-mathjax-config">
-    MathJax.Hub.Config({
-    tex2jax: { inlineMath: [['$','$'],['\\(','\\)']] }
-    });
+  
 </script>
 <script type='text/javascript' src='http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML'></script>
 
@@ -108,10 +106,26 @@
                                 <span asp-validation-for="OptionMasters.OptionData" class="text-danger"></span>
                             </div>
                         </div>
-                    </div>
-                    <!-- /.box-body -->
 
+                        <div class="col-md-12">
+                            <table class="table table-responsive">
+                                <thead>
+                                    <tr>
+                                        <th>Question</th>
+                                        <th>Options</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tblBody">
+
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
                     <div class="box-footer">
+                        <div class="col-md-12">
+                            <input type="button" class="btn btn-success" onclick="fn_AddOptions()" value="Add Options" />
+                        </div>
                         <div class="col-md-8">
                             @Html.SERPButton("btn btn-primary pull-right btnSubmit", Model == null ? 0 : Model.QuestionModel.Id)
                             <button class="buttonload" style="display:none">
@@ -183,6 +197,26 @@
             $("#divOptionDetails").html(data);
             $("#OptionModel").modal('show');
         })
+    }
+
+    function fn_AddOptions() {
+        
+        var question = CKEDITOR.instances['QuestionModel_Question'].getData();
+        var options = CKEDITOR.instances['OptionMasters_OptionData'].getData();
+        var html = "<tr>";
+        html += "<td>" + question + "</td>";
+        html += "<td>" + options + "</td>";
+        html += "</tr>";
+        $("#tblBody").append(html);
+
+        setTimeout(function () {
+            MathJax.Hub.Config({
+                tex2jax: { inlineMath: [['$', '$'], ['\\(', '\\)']] },
+                "HTML-CSS": {
+                    linebreaks: { automatic: true, width: "container" }
+                }
+            });
+        }, 500);
     }
 
 
