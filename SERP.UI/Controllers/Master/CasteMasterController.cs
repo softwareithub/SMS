@@ -47,9 +47,21 @@ namespace SERP.UI.Controllers.Master
         [HttpPost]
         public async Task<IActionResult> CreateCaste(CasteMaster model)
         {
-            model.IsActive = 1; model.IsDeleted = 0;
-            var result= model.Id == 0 ?await  InsertCaste(model) :await  UpdateCaste(model);
-            return Json(result);
+            try
+            {
+                model.IsActive = 1; model.IsDeleted = 0;
+                var result = model.Id == 0 ? await InsertCaste(model) : await UpdateCaste(model);
+                return Json(result);
+            }
+            catch (Exception ex)
+            {
+                string actionName = this.ControllerContext.RouteData.Values["action"].ToString();
+                string controllerName = this.ControllerContext.RouteData.Values["controller"].ToString();
+
+                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(actionName, controllerName, ex.Message, LoggingType.httpDelete.ToString(), 0);
+                var exceptionResponse = await _exceptionLoggingRepo.CreateEntity(exceptionHelper);
+                return Json(ResponseData.Instance.GenericResponse(ResponseStatus.ServerError));
+            }
         }
 
         public async Task<IActionResult> GetCasteList()
@@ -73,11 +85,24 @@ namespace SERP.UI.Controllers.Master
 
         public async Task<IActionResult> DeleteCaste(int id)
         {
-            var model = await _ICasteRespo.GetSingle(x => x.Id == id);
-            await _ICasteRespo.CreateNewContext();
-            model.IsActive = 0; model.IsDeleted = 1; model.UpdatedBy = 1; model.UpdatedDate = DateTime.Now.Date;
-            var deleteResult = await _ICasteRespo.Delete(model);
-            return Json(ResponseData.Instance.GenericResponse(deleteResult));
+            try
+            {
+                var model = await _ICasteRespo.GetSingle(x => x.Id == id);
+                await _ICasteRespo.CreateNewContext();
+                model.IsActive = 0; model.IsDeleted = 1; model.UpdatedBy = 1; model.UpdatedDate = DateTime.Now.Date;
+                var deleteResult = await _ICasteRespo.Delete(model);
+                return Json(ResponseData.Instance.GenericResponse(deleteResult));
+            }
+            catch (Exception ex)
+            {
+                string actionName = this.ControllerContext.RouteData.Values["action"].ToString();
+                string controllerName = this.ControllerContext.RouteData.Values["controller"].ToString();
+
+                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(actionName, controllerName, ex.Message, LoggingType.httpDelete.ToString(), 0);
+                var exceptionResponse = await _exceptionLoggingRepo.CreateEntity(exceptionHelper);
+                return Json(ResponseData.Instance.GenericResponse(ResponseStatus.ServerError));
+            }
+
         }
 
         #region Private

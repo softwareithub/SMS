@@ -1,14 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using SERP.Core.Entities.SERPExceptionLogging;
 using SERP.Core.Entities.Transport;
 using SERP.Infrastructure.Repository.Infrastructure.Repo;
 using SERP.Utilities.CommanHelper;
 using SERP.Utilities.ExceptionHelper;
 using SERP.Utilities.ResponseMessage;
+using SERP.Utilities.ResponseUtilities;
+using System;
+using System.Threading.Tasks;
 
 namespace SERP.UI.Controllers.Transport
 {
@@ -44,8 +43,20 @@ namespace SERP.UI.Controllers.Transport
         [HttpPost]
         public async Task<IActionResult> CreateStopage(StopageModel model)
         {
-            var response = await _stopageRepository.CreateEntity(model);
-            return Json(ResponseData.Instance.GenericResponse(response));
+            try
+            {
+                var response = await _stopageRepository.CreateEntity(model);
+                return Json(ResponseData.Instance.GenericResponse(response));
+            }
+            catch (Exception ex)
+            {
+                string actionName = this.ControllerContext.RouteData.Values["action"].ToString();
+                string controllerName = this.ControllerContext.RouteData.Values["controller"].ToString();
+
+                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(actionName, controllerName, ex.Message, LoggingType.httpDelete.ToString(), 0);
+                var exceptionResponse = await _exceptionLoggingRepo.CreateEntity(exceptionHelper);
+                return Json(ResponseData.Instance.GenericResponse(ResponseStatus.ServerError));
+            }
         }
 
         public async Task<IActionResult> GetStopageDetails()
@@ -68,11 +79,23 @@ namespace SERP.UI.Controllers.Transport
         }
         public async Task<IActionResult> Delete(int id)
         {
-            var model = await _stopageRepository.GetSingle(x => x.Id == id);
-            var deleteModel = CommanDeleteHelper.CommanDeleteCode<StopageModel>(model, 1);
-            await _stopageRepository.CreateNewContext();
-            var response = await _stopageRepository.Update(deleteModel);
-            return Json(ResponseData.Instance.GenericResponse(response));
+            try
+            {
+                var model = await _stopageRepository.GetSingle(x => x.Id == id);
+                var deleteModel = CommanDeleteHelper.CommanDeleteCode<StopageModel>(model, 1);
+                await _stopageRepository.CreateNewContext();
+                var response = await _stopageRepository.Update(deleteModel);
+                return Json(ResponseData.Instance.GenericResponse(response));
+            }
+            catch (Exception ex)
+            {
+                string actionName = this.ControllerContext.RouteData.Values["action"].ToString();
+                string controllerName = this.ControllerContext.RouteData.Values["controller"].ToString();
+
+                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(actionName, controllerName, ex.Message, LoggingType.httpDelete.ToString(), 0);
+                var exceptionResponse = await _exceptionLoggingRepo.CreateEntity(exceptionHelper);
+                return Json(ResponseData.Instance.GenericResponse(ResponseStatus.ServerError));
+            }
         }
     }
 }

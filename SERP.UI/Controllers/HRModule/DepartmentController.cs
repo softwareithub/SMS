@@ -6,6 +6,7 @@ using SERP.Core.Entities.SERPExceptionLogging;
 using SERP.Infrastructure.Repository.Infrastructure.Repo;
 using SERP.Utilities.ExceptionHelper;
 using SERP.Utilities.ResponseMessage;
+using SERP.Utilities.ResponseUtilities;
 
 namespace SERP.UI.Controllers.HRModule
 {
@@ -42,17 +43,29 @@ namespace SERP.UI.Controllers.HRModule
         [HttpPost]
         public async Task<IActionResult> CreateDepartment(DepartmentModel model)
         {
-            if (model.Id == 0)
+            try
             {
-                var result = await _departmentRepo.CreateEntity(model);
-                return Json(ResponseData.Instance.GenericResponse(result));
+                if (model.Id == 0)
+                {
+                    var result = await _departmentRepo.CreateEntity(model);
+                    return Json(ResponseData.Instance.GenericResponse(result));
+                }
+                else
+                {
+                    model.UpdatedBy = 1;
+                    model.UpdatedDate = DateTime.Now.Date;
+                    var result = await _departmentRepo.Update(model);
+                    return Json(ResponseData.Instance.GenericResponse(result));
+                }
             }
-            else
+            catch (Exception ex)
             {
-                model.UpdatedBy = 1;
-                model.UpdatedDate = DateTime.Now.Date;
-                var result = await _departmentRepo.Update(model);
-                return Json(ResponseData.Instance.GenericResponse(result));
+                string actionName = this.ControllerContext.RouteData.Values["action"].ToString();
+                string controllerName = this.ControllerContext.RouteData.Values["controller"].ToString();
+
+                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(actionName, controllerName, ex.Message, LoggingType.httpDelete.ToString(), 0);
+                var exceptionResponse = await _exceptionLoggingRepo.CreateEntity(exceptionHelper);
+                return Json(ResponseData.Instance.GenericResponse(ResponseStatus.ServerError));
             }
         }
 
@@ -77,17 +90,29 @@ namespace SERP.UI.Controllers.HRModule
 
         public async Task<IActionResult> DeleteDepartment(int id)
         {
-            var departmentModel = await _departmentRepo.GetSingle(x => x.Id == id);
-            departmentModel.IsActive = 0;
-            departmentModel.IsDeleted = 1;
-            departmentModel.UpdatedBy = 1;
-            departmentModel.UpdatedDate = DateTime.Now.Date;
+            try
+            {
+                var departmentModel = await _departmentRepo.GetSingle(x => x.Id == id);
+                departmentModel.IsActive = 0;
+                departmentModel.IsDeleted = 1;
+                departmentModel.UpdatedBy = 1;
+                departmentModel.UpdatedDate = DateTime.Now.Date;
 
-            await _departmentRepo.CreateNewContext();
+                await _departmentRepo.CreateNewContext();
 
-            var result = await _departmentRepo.Delete(departmentModel);
+                var result = await _departmentRepo.Delete(departmentModel);
 
-            return Json(ResponseData.Instance.GenericResponse(result));
+                return Json(ResponseData.Instance.GenericResponse(result));
+            }
+            catch (Exception ex)
+            {
+                string actionName = this.ControllerContext.RouteData.Values["action"].ToString();
+                string controllerName = this.ControllerContext.RouteData.Values["controller"].ToString();
+
+                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(actionName, controllerName, ex.Message, LoggingType.httpDelete.ToString(), 0);
+                var exceptionResponse = await _exceptionLoggingRepo.CreateEntity(exceptionHelper);
+                return Json(ResponseData.Instance.GenericResponse(ResponseStatus.ServerError));
+            }
         }
     }
 }

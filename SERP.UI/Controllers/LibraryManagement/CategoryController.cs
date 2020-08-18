@@ -9,6 +9,7 @@ using SERP.Infrastructure.Repository.Infrastructure.Repo;
 using SERP.Utilities.CommanHelper;
 using SERP.Utilities.ExceptionHelper;
 using SERP.Utilities.ResponseMessage;
+using SERP.Utilities.ResponseUtilities;
 
 namespace SERP.UI.Controllers.LibraryManagement
 {
@@ -44,15 +45,27 @@ namespace SERP.UI.Controllers.LibraryManagement
         [HttpPost]
         public async Task<IActionResult> Create(CategoryMaster model)
         {
-            if (model.Id == 0)
+            try
             {
-                var response = await _categoryRepo.CreateEntity(model);
-                return Json(ResponseData.Instance.GenericResponse(response));
+                if (model.Id == 0)
+                {
+                    var response = await _categoryRepo.CreateEntity(model);
+                    return Json(ResponseData.Instance.GenericResponse(response));
+                }
+                else
+                {
+                    var updateModel = CommanDeleteHelper.CommanUpdateCode<CategoryMaster>(model, 1);
+                    return Json(ResponseData.Instance.GenericResponse(await _categoryRepo.Update(updateModel)));
+                }
             }
-            else
+            catch (Exception ex)
             {
-                var updateModel = CommanDeleteHelper.CommanUpdateCode<CategoryMaster>(model,1);
-                return Json(ResponseData.Instance.GenericResponse(await _categoryRepo.Update(updateModel)));
+                string actionName = this.ControllerContext.RouteData.Values["action"].ToString();
+                string controllerName = this.ControllerContext.RouteData.Values["controller"].ToString();
+
+                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(actionName, controllerName, ex.Message, LoggingType.httpDelete.ToString(), 0);
+                var exceptionResponse = await _exceptionLoggingRepo.CreateEntity(exceptionHelper);
+                return Json(ResponseData.Instance.GenericResponse(ResponseStatus.ServerError));
             }
         }
 
@@ -77,10 +90,22 @@ namespace SERP.UI.Controllers.LibraryManagement
 
         public async Task<IActionResult> Delete(int id)
         {
-            var model = await _categoryRepo.GetSingle(x => x.Id == id);
-            var deleteModel = CommanDeleteHelper.CommanDeleteCode<CategoryMaster>(model,1);
-            await _categoryRepo.CreateNewContext();
-            return Json(ResponseData.Instance.GenericResponse(await _categoryRepo.Update(deleteModel)));
+            try
+            {
+                var model = await _categoryRepo.GetSingle(x => x.Id == id);
+                var deleteModel = CommanDeleteHelper.CommanDeleteCode<CategoryMaster>(model, 1);
+                await _categoryRepo.CreateNewContext();
+                return Json(ResponseData.Instance.GenericResponse(await _categoryRepo.Update(deleteModel)));
+            }
+            catch (Exception ex)
+            {
+                string actionName = this.ControllerContext.RouteData.Values["action"].ToString();
+                string controllerName = this.ControllerContext.RouteData.Values["controller"].ToString();
+
+                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(actionName, controllerName, ex.Message, LoggingType.httpDelete.ToString(), 0);
+                var exceptionResponse = await _exceptionLoggingRepo.CreateEntity(exceptionHelper);
+                return Json(ResponseData.Instance.GenericResponse(ResponseStatus.ServerError));
+            }
         }
     }
 }

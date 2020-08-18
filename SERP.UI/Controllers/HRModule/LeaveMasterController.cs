@@ -8,6 +8,7 @@ using SERP.Core.Entities.SERPExceptionLogging;
 using SERP.Infrastructure.Repository.Infrastructure.Repo;
 using SERP.Utilities.ExceptionHelper;
 using SERP.Utilities.ResponseMessage;
+using SERP.Utilities.ResponseUtilities;
 
 namespace SERP.UI.Controllers.HRModule
 {
@@ -75,12 +76,24 @@ namespace SERP.UI.Controllers.HRModule
 
         public async  Task<IActionResult> DeleteLeave(int id)
         {
-            var leave = await _ILeaveMasterRepo.GetSingle(x => x.Id == id);
-            leave.IsActive = 0;
-            leave.IsDeleted = 1;
-            await _ILeaveMasterRepo.CreateNewContext();
-            var response = await _ILeaveMasterRepo.Update(leave);
-            return Json(ResponseData.Instance.GenericResponse(response));
+            try
+            {
+                var leave = await _ILeaveMasterRepo.GetSingle(x => x.Id == id);
+                leave.IsActive = 0;
+                leave.IsDeleted = 1;
+                await _ILeaveMasterRepo.CreateNewContext();
+                var response = await _ILeaveMasterRepo.Update(leave);
+                return Json(ResponseData.Instance.GenericResponse(response));
+            }
+            catch (Exception ex)
+            {
+                string actionName = this.ControllerContext.RouteData.Values["action"].ToString();
+                string controllerName = this.ControllerContext.RouteData.Values["controller"].ToString();
+
+                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(actionName, controllerName, ex.Message, LoggingType.httpDelete.ToString(), 0);
+                var exceptionResponse = await _exceptionLoggingRepo.CreateEntity(exceptionHelper);
+                return Json(ResponseData.Instance.GenericResponse(ResponseStatus.ServerError));
+            }
         }
     }
 }

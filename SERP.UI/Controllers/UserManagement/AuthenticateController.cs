@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using SERP.Core.Entities.Entity.Core.HRModule;
@@ -15,6 +11,12 @@ using SERP.Infrastructure.Repository.Infrastructure.Repo;
 using SERP.UI.Extension;
 using SERP.Utilities.EmailHelper;
 using SERP.Utilities.ExceptionHelper;
+using SERP.Utilities.ResponseMessage;
+using SERP.Utilities.ResponseUtilities;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace SERP.UI.Controllers.UserManagement
 {
@@ -213,31 +215,44 @@ namespace SERP.UI.Controllers.UserManagement
 
         public async Task<IActionResult> SendLoginCredential(string userName)
         {
-            if(string.IsNullOrEmpty(userName))
+            try
             {
-                return Json("User name does not exists.");
+                if (string.IsNullOrEmpty(userName))
+                {
+                    return Json("User name does not exists.");
+                }
+                var model = await _IAuthenticateRepo.GetSingle(x => x.UserName.Trim().ToLower() == userName.ToLower().Trim());
+                string email = string.Empty;
+                if (model == null)
+                {
+                    return Json("User name does not exists.");
+                }
+                if (model.StudentId > 0)
+                {
+                    email = (await _studentMasterRepo.GetSingle(x => x.Id == model.StudentId)).StudentEmail;
+                }
+                else if (model.EmployeeId > 0)
+                {
+                    email = (await _employeeRepo.GetSingle(x => x.Id == model.EmployeeId)).Email;
+                }
+                if (!string.IsNullOrEmpty(email))
+                {
+                    new SendEmailNotification().SendCustomEmail(userName, email, "Password reset request for SERP Portal", await GetHtmlHelperEmail(userName, model.Password));
+                    return Json("Password has been reset.Please check your email.");
+                }
+                else
+                {
+                    return Json("User name does not exists.");
+                }
             }
-            var model = await _IAuthenticateRepo.GetSingle(x => x.UserName.Trim().ToLower() == userName.ToLower().Trim());
-            string email = string.Empty;
-            if(model==null)
+            catch (Exception ex)
             {
-                return Json("User name does not exists.");
-            }
-            if(model.StudentId>0)
-            {
-                email = (await _studentMasterRepo.GetSingle(x => x.Id == model.StudentId)).StudentEmail;
-            }
-            else if(model.EmployeeId>0)
-            {
-                email = (await _employeeRepo.GetSingle(x => x.Id == model.EmployeeId)).Email;
-            }
-            if (!string.IsNullOrEmpty(email))
-            {
-                new SendEmailNotification().SendCustomEmail(userName, email, "Password reset request for SERP Portal", await GetHtmlHelperEmail(userName, model.Password));
-                return Json("Password has been reset.Please check your email.");
-            }
-            else {
-                return Json("User name does not exists.");
+                string actionName = this.ControllerContext.RouteData.Values["action"].ToString();
+                string controllerName = this.ControllerContext.RouteData.Values["controller"].ToString();
+
+                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(actionName, controllerName, ex.Message, LoggingType.httpDelete.ToString(), 0);
+                var exceptionResponse = await _exceptionLoggingRepo.CreateEntity(exceptionHelper);
+                return Json(ResponseData.Instance.GenericResponse(ResponseStatus.ServerError));
             }
 
         }

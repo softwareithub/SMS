@@ -13,6 +13,7 @@ using SERP.Core.Model.AssignmentHomeModel;
 using SERP.Infrastructure.Repository.Infrastructure.Repo;
 using SERP.Utilities.ExceptionHelper;
 using SERP.Utilities.ResponseMessage;
+using SERP.Utilities.ResponseUtilities;
 
 namespace SERP.UI.Controllers.Assignment
 {
@@ -159,24 +160,36 @@ namespace SERP.UI.Controllers.Assignment
         [HttpPost]
         public async Task<IActionResult> PostStudentMark(string submissionDate,string grades,string complains, string studentIds)
         {
-            List<StudentHomeWork> models = new List<StudentHomeWork>();
-            int homeWorkId = Convert.ToInt32(HttpContext.Session.GetInt32("homeWorkId"));
-            for (int i = 0; i < studentIds.Split(',').Count(); i++)
+            try
             {
-                StudentHomeWork model = new StudentHomeWork();
-                model.StudentId = Convert.ToInt32(studentIds.Split(',')[i]);
-                model.Grade = grades.Split(',')[i];
-                model.Reason = complains.Split(',')[i];
-                model.SubmissionDate = Convert.ToDateTime(string.IsNullOrEmpty(submissionDate.Split(',')[i])? DateTime.Now.ToString(): submissionDate.Split(',')[i]);
-                model.HomeWorkId = homeWorkId;
-                model.IsActive = 1;
-                model.CreatedBy = 1;
-                model.CreatedDate = DateTime.Now.Date;
-                models.Add(model);
+                List<StudentHomeWork> models = new List<StudentHomeWork>();
+                int homeWorkId = Convert.ToInt32(HttpContext.Session.GetInt32("homeWorkId"));
+                for (int i = 0; i < studentIds.Split(',').Count(); i++)
+                {
+                    StudentHomeWork model = new StudentHomeWork();
+                    model.StudentId = Convert.ToInt32(studentIds.Split(',')[i]);
+                    model.Grade = grades.Split(',')[i];
+                    model.Reason = complains.Split(',')[i];
+                    model.SubmissionDate = Convert.ToDateTime(string.IsNullOrEmpty(submissionDate.Split(',')[i]) ? DateTime.Now.ToString() : submissionDate.Split(',')[i]);
+                    model.HomeWorkId = homeWorkId;
+                    model.IsActive = 1;
+                    model.CreatedBy = 1;
+                    model.CreatedDate = DateTime.Now.Date;
+                    models.Add(model);
+                }
+                await InActivePreviousData(homeWorkId);
+                var response = await _IStudentHomeWorkRepo.Add(models.ToArray());
+                return Json(ResponseData.Instance.GenericResponse(response));
             }
-            await InActivePreviousData(homeWorkId);
-            var response = await _IStudentHomeWorkRepo.Add(models.ToArray());
-            return Json(ResponseData.Instance.GenericResponse(response));
+            catch (Exception ex)
+            {
+                string actionName = this.ControllerContext.RouteData.Values["action"].ToString();
+                string controllerName = this.ControllerContext.RouteData.Values["controller"].ToString();
+
+                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(actionName, controllerName, ex.Message, LoggingType.httpDelete.ToString(), 0);
+                var exceptionResponse = await _exceptionLoggingRepo.CreateEntity(exceptionHelper);
+                return Json(ResponseData.Instance.GenericResponse(ResponseStatus.ServerError));
+            }
         }
 
         private async Task InActivePreviousData(int homeWorkId)
@@ -199,19 +212,55 @@ namespace SERP.UI.Controllers.Assignment
 
         public async Task<IActionResult> GetBatchList(int id)
         {
-            var data = await _IBatchRepo.GetList(z => z.CourseId == id);
-            return Json(data);
+            try
+            {
+                var data = await _IBatchRepo.GetList(z => z.CourseId == id);
+                return Json(data);
+            }
+            catch (Exception ex)
+            {
+                string actionName = this.ControllerContext.RouteData.Values["action"].ToString();
+                string controllerName = this.ControllerContext.RouteData.Values["controller"].ToString();
+
+                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(actionName, controllerName, ex.Message, LoggingType.httpDelete.ToString(), 0);
+                var exceptionResponse = await _exceptionLoggingRepo.CreateEntity(exceptionHelper);
+                return Json(ResponseData.Instance.GenericResponse(ResponseStatus.ServerError));
+            }
         }
         public async Task<IActionResult> GetSubjectList(int id)
         {
-            var data = await _ISubjectRepo.GetList(z => z.CourseId == id);
-            return Json(data);
+            try
+            {
+                var data = await _ISubjectRepo.GetList(z => z.CourseId == id);
+                return Json(data);
+            }
+            catch (Exception ex)
+            {
+                string actionName = this.ControllerContext.RouteData.Values["action"].ToString();
+                string controllerName = this.ControllerContext.RouteData.Values["controller"].ToString();
+
+                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(actionName, controllerName, ex.Message, LoggingType.httpDelete.ToString(), 0);
+                var exceptionResponse = await _exceptionLoggingRepo.CreateEntity(exceptionHelper);
+                return Json(ResponseData.Instance.GenericResponse(ResponseStatus.ServerError));
+            }
         }
 
         public async Task<IActionResult> GetTeachers(int courseId)
         {
-            var models = await _IEmployeeRepo.GetList(x => x.IsActive == 1);
-            return Json(models);
+            try
+            {
+                var models = await _IEmployeeRepo.GetList(x => x.IsActive == 1);
+                return Json(models);
+            }
+            catch (Exception ex)
+            {
+                string actionName = this.ControllerContext.RouteData.Values["action"].ToString();
+                string controllerName = this.ControllerContext.RouteData.Values["controller"].ToString();
+
+                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(actionName, controllerName, ex.Message, LoggingType.httpDelete.ToString(), 0);
+                var exceptionResponse = await _exceptionLoggingRepo.CreateEntity(exceptionHelper);
+                return Json(ResponseData.Instance.GenericResponse(ResponseStatus.ServerError));
+            }
         }
     }
 }

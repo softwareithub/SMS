@@ -9,6 +9,7 @@ using SERP.Infrastructure.Repository.Infrastructure.Repo;
 using SERP.Utilities.CommanHelper;
 using SERP.Utilities.ExceptionHelper;
 using SERP.Utilities.ResponseMessage;
+using SERP.Utilities.ResponseUtilities;
 
 namespace SERP.UI.Controllers.ExamMaster
 {
@@ -64,30 +65,53 @@ namespace SERP.UI.Controllers.ExamMaster
         [HttpPost]
         public async Task<IActionResult> CreateGrade(GradeMaster model)
         {
-            if (model.Id > 0)
+            try
             {
-                model.IsActive = 1;
-                model.IsDeleted = 0;
-                model.UpdatedBy = 1;
-                model.UpdatedDate = DateTime.Now;
-                var response = await _IGradeMasterRepo.Update(model);
-                return Json(ResponseData.Instance.GenericResponse(response));
+                if (model.Id > 0)
+                {
+                    model.IsActive = 1;
+                    model.IsDeleted = 0;
+                    model.UpdatedBy = 1;
+                    model.UpdatedDate = DateTime.Now;
+                    var response = await _IGradeMasterRepo.Update(model);
+                    return Json(ResponseData.Instance.GenericResponse(response));
 
+                }
+                else
+                {
+                    var response = await _IGradeMasterRepo.CreateEntity(model);
+                    return Json(ResponseData.Instance.GenericResponse(response));
+                }
             }
-            else
+            catch (Exception ex)
             {
-                var response = await _IGradeMasterRepo.CreateEntity(model);
-                return Json(ResponseData.Instance.GenericResponse(response));
+                string actionName = this.ControllerContext.RouteData.Values["action"].ToString();
+                string controllerName = this.ControllerContext.RouteData.Values["controller"].ToString();
+
+                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(actionName, controllerName, ex.Message, LoggingType.httpDelete.ToString(), 0);
+                var exceptionResponse = await _exceptionLoggingRepo.CreateEntity(exceptionHelper);
+                return Json(ResponseData.Instance.GenericResponse(ResponseStatus.ServerError));
             }
         }
         public async Task<IActionResult> DeleteGrade(int id)
         {
-            var response = await _IGradeMasterRepo.GetSingle(x => x.Id == id);
-            var deleteModel = CommanDeleteHelper.CommanDeleteCode<GradeMaster>(response,1);
-            await _IGradeMasterRepo.CreateNewContext();
-            var responseData = await _IGradeMasterRepo.Update(deleteModel);
-            return Json(ResponseData.Instance.GenericResponse(responseData));
+            try
+            {
+                var response = await _IGradeMasterRepo.GetSingle(x => x.Id == id);
+                var deleteModel = CommanDeleteHelper.CommanDeleteCode<GradeMaster>(response, 1);
+                await _IGradeMasterRepo.CreateNewContext();
+                var responseData = await _IGradeMasterRepo.Update(deleteModel);
+                return Json(ResponseData.Instance.GenericResponse(responseData));
+            }
+            catch (Exception ex)
+            {
+                string actionName = this.ControllerContext.RouteData.Values["action"].ToString();
+                string controllerName = this.ControllerContext.RouteData.Values["controller"].ToString();
 
+                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(actionName, controllerName, ex.Message, LoggingType.httpDelete.ToString(), 0);
+                var exceptionResponse = await _exceptionLoggingRepo.CreateEntity(exceptionHelper);
+                return Json(ResponseData.Instance.GenericResponse(ResponseStatus.ServerError));
+            }
         }
     }
 

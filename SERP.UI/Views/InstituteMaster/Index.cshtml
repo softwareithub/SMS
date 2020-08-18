@@ -101,9 +101,9 @@
                             </div>
                             <div class="col-md-4">
                                 <div class="form-group">
-                                 
+
                                     <label asp-for="InstituteLogo">Institute Logo</label>
-                                    <input asp-for="InstituteLogo" type="file" class="form-control">
+                                    <input asp-for="InstituteLogo" type="file" class="form-control" onchange="previewImage(this,'')">
                                     <span asp-validation-for="InstituteLogo" class="text-danger"></span>
                                 </div>
                             </div>
@@ -126,7 +126,15 @@
                                 <input type="hidden" asp-for="InstituteLogo" />
                                 <input type="hidden" asp-for="CreatedDate" />
                                 <input type="hidden" asp-for="CreatedBy" />
-                                <img src="@Model.InstituteLogo" style="width:100px;height:100px;" />
+                                @if (Model == null)
+                                {
+                                    @Html.SerpImageHelper(null, 125, 125, "insLogo")
+                                }
+                                else
+                                {
+                                    <input type="hidden" asp-for="InstituteLogo" />
+                                    @Html.SerpImageHelper(Model.InstituteLogo, 125, 125, "insLogo")
+                                }
                             }
 
                         </div>
@@ -143,3 +151,17 @@
 </section>
 
 
+<script>
+    function previewImage(input, type) {
+        if (input.files && input.files[0]) {
+            var reader = new FileReader();
+
+            reader.onload = function (e) {
+               
+                    $('#insLogo').attr('src', e.target.result);
+               
+            }
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+</script>

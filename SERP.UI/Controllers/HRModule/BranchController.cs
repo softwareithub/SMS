@@ -11,6 +11,7 @@ using SERP.Infrastructure.Repository.Infrastructure.Repo;
 using SERP.Utilities.BlobUtility;
 using SERP.Utilities.ExceptionHelper;
 using SERP.Utilities.ResponseMessage;
+using SERP.Utilities.ResponseUtilities;
 
 namespace SERP.UI.Controllers.HRModule
 {
@@ -50,31 +51,43 @@ namespace SERP.UI.Controllers.HRModule
         [HttpPost]
         public async Task<IActionResult> Create(BranchInfoModel model, IFormFile BranchLogo)
         {
-            List<IFormFile> formFiles = new List<IFormFile>();
-            formFiles.Add(BranchLogo);
+            try
+            {
+                List<IFormFile> formFiles = new List<IFormFile>();
+                formFiles.Add(BranchLogo);
 
-            var imagePaths = await UploadImage.UploadImageOnFolder(formFiles, _hostingEnvironment);
+                var imagePaths = await UploadImage.UploadImageOnFolder(formFiles, _hostingEnvironment);
 
-            if (imagePaths.Count() == 0)
-            {
-                model.BranchLogo = string.Empty;
-                model.BranchLogo = string.Empty;
-            }
-            else
-            {
-                model.BranchLogo = string.IsNullOrEmpty(model.BranchLogo) ? imagePaths[0] : model.BranchLogo;
-                model.BranchLogo = string.IsNullOrEmpty(model.BranchLogo) ? imagePaths[1] : model.BranchLogo;
-            }
+                if (imagePaths.Count() == 0)
+                {
+                    model.BranchLogo = string.Empty;
+                    model.BranchLogo = string.Empty;
+                }
+                else
+                {
+                    model.BranchLogo = string.IsNullOrEmpty(model.BranchLogo) ? imagePaths[0] : model.BranchLogo;
+                    model.BranchLogo = string.IsNullOrEmpty(model.BranchLogo) ? imagePaths[1] : model.BranchLogo;
+                }
 
-            if(model.Id>0)
-            {
-                var result = await _branchRepo.Update(model);
-                return Json(ResponseData.Instance.GenericResponse(result));
+                if (model.Id > 0)
+                {
+                    var result = await _branchRepo.Update(model);
+                    return Json(ResponseData.Instance.GenericResponse(result));
+                }
+                else
+                {
+                    var result = await _branchRepo.CreateEntity(model);
+                    return Json(ResponseData.Instance.GenericResponse(result));
+                }
             }
-            else
+            catch (Exception ex)
             {
-                var result = await _branchRepo.CreateEntity(model);
-                return Json(ResponseData.Instance.GenericResponse(result));
+                string actionName = this.ControllerContext.RouteData.Values["action"].ToString();
+                string controllerName = this.ControllerContext.RouteData.Values["controller"].ToString();
+
+                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(actionName, controllerName, ex.Message, LoggingType.httpDelete.ToString(), 0);
+                var exceptionResponse = await _exceptionLoggingRepo.CreateEntity(exceptionHelper);
+                return Json(ResponseData.Instance.GenericResponse(ResponseStatus.ServerError));
             }
         }
 
@@ -121,16 +134,28 @@ namespace SERP.UI.Controllers.HRModule
         [HttpGet]
         public async Task<IActionResult> DeleteRecord(int id)
         {
-            var model =await _branchRepo.GetSingle(x => x.Id == id);
-            model.IsActive = 0;
-            model.IsDeleted = 1;
-            model.UpdatedBy = 1;
-            model.UpdatedDate = DateTime.Now.Date;
+            try
+            {
+                var model = await _branchRepo.GetSingle(x => x.Id == id);
+                model.IsActive = 0;
+                model.IsDeleted = 1;
+                model.UpdatedBy = 1;
+                model.UpdatedDate = DateTime.Now.Date;
 
-            await _branchRepo.CreateNewContext();
+                await _branchRepo.CreateNewContext();
 
-            var result = await _branchRepo.Delete(model);
-            return Json(ResponseData.Instance.GenericResponse(result));
+                var result = await _branchRepo.Delete(model);
+                return Json(ResponseData.Instance.GenericResponse(result));
+            }
+            catch (Exception ex)
+            {
+                string actionName = this.ControllerContext.RouteData.Values["action"].ToString();
+                string controllerName = this.ControllerContext.RouteData.Values["controller"].ToString();
+
+                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(actionName, controllerName, ex.Message, LoggingType.httpDelete.ToString(), 0);
+                var exceptionResponse = await _exceptionLoggingRepo.CreateEntity(exceptionHelper);
+                return Json(ResponseData.Instance.GenericResponse(ResponseStatus.ServerError));
+            }
         }
     }
 }

@@ -10,6 +10,7 @@ using SERP.Core.Entities.Transport;
 using SERP.Infrastructure.Repository.Infrastructure.Repo;
 using SERP.Utilities.ExceptionHelper;
 using SERP.Utilities.ResponseMessage;
+using SERP.Utilities.ResponseUtilities;
 
 namespace SERP.UI.Controllers.Transport
 {
@@ -54,20 +55,32 @@ namespace SERP.UI.Controllers.Transport
 
         public async Task<IActionResult> GetStopageDetails(int routeId)
         {
-            List<StopageModel> models = new List<StopageModel>();
-            var routestopageModels = await _routeStopageRepo.GetList(x => x.IsActive == 1);
-            var stopageModel = await _stopageRepo.GetList(x => x.IsActive == 1);
-            models = (from RS in routestopageModels
-                      join SM in stopageModel
-                      on RS.StopageId equals SM.Id
-                      where RS.RouteId == routeId
-                      select new StopageModel
-                      {
-                          Id = SM.Id,
-                          StopageName = SM.StopageName
-                      }).ToList();
+            try
+            {
+                List<StopageModel> models = new List<StopageModel>();
+                var routestopageModels = await _routeStopageRepo.GetList(x => x.IsActive == 1);
+                var stopageModel = await _stopageRepo.GetList(x => x.IsActive == 1);
+                models = (from RS in routestopageModels
+                          join SM in stopageModel
+                          on RS.StopageId equals SM.Id
+                          where RS.RouteId == routeId
+                          select new StopageModel
+                          {
+                              Id = SM.Id,
+                              StopageName = SM.StopageName
+                          }).ToList();
 
-            return Json(models);
+                return Json(models);
+            }
+            catch (Exception ex)
+            {
+                string actionName = this.ControllerContext.RouteData.Values["action"].ToString();
+                string controllerName = this.ControllerContext.RouteData.Values["controller"].ToString();
+
+                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(actionName, controllerName, ex.Message, LoggingType.httpDelete.ToString(), 0);
+                var exceptionResponse = await _exceptionLoggingRepo.CreateEntity(exceptionHelper);
+                return Json(ResponseData.Instance.GenericResponse(ResponseStatus.ServerError));
+            }
         }
 
         public async Task<IActionResult> RouteStudents()
@@ -131,29 +144,39 @@ namespace SERP.UI.Controllers.Transport
         [HttpPost]
         public async Task<IActionResult> StudentRouteMapp(string RouteName, string Stopage, string[] StudentId)
         {
-            if (RouteName != "0" || Stopage != "0")
+            try
             {
-                List<RouteStudentMapping> models = new List<RouteStudentMapping>();
-                for (int i = 0; i < StudentId.Count(); i++)
+                if (RouteName != "0" || Stopage != "0")
                 {
-                    RouteStudentMapping model = new RouteStudentMapping()
+                    List<RouteStudentMapping> models = new List<RouteStudentMapping>();
+                    for (int i = 0; i < StudentId.Count(); i++)
                     {
-                        StopageId = Convert.ToInt32(Stopage),
-                        RouteId = Convert.ToInt32(RouteName),
-                        StudentId = Convert.ToInt32(StudentId[i]),
-                        CreatedBy = 1,
-                        CreatedDate = DateTime.Now.Date
-                    };
-                    models.Add(model);
+                        RouteStudentMapping model = new RouteStudentMapping()
+                        {
+                            StopageId = Convert.ToInt32(Stopage),
+                            RouteId = Convert.ToInt32(RouteName),
+                            StudentId = Convert.ToInt32(StudentId[i]),
+                            CreatedBy = 1,
+                            CreatedDate = DateTime.Now.Date
+                        };
+                        models.Add(model);
+                    }
+                    return Json(ResponseData.Instance.GenericResponse(await _routeStudentMappingRepo.Add(models.ToArray())));
                 }
-                return Json(ResponseData.Instance.GenericResponse(await _routeStudentMappingRepo.Add(models.ToArray())));
+                else
+                {
+                    return Json("Route Or Stopage are not selected.Please select or route.");
+                }
             }
-            else
+            catch (Exception ex)
             {
-                return Json("Route Or Stopage are not selected.Please select or route.");
+                string actionName = this.ControllerContext.RouteData.Values["action"].ToString();
+                string controllerName = this.ControllerContext.RouteData.Values["controller"].ToString();
+
+                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(actionName, controllerName, ex.Message, LoggingType.httpDelete.ToString(), 0);
+                var exceptionResponse = await _exceptionLoggingRepo.CreateEntity(exceptionHelper);
+                return Json(ResponseData.Instance.GenericResponse(ResponseStatus.ServerError));
             }
-
-
         }
 
         public async Task<IActionResult> GetMappedStudent(int routeId, int stopageId)

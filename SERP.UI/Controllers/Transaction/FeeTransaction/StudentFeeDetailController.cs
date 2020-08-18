@@ -9,6 +9,8 @@ using SERP.Core.Entities.SERPExceptionLogging;
 using SERP.Core.Model.FeeDetails;
 using SERP.Infrastructure.Repository.Infrastructure.Repo;
 using SERP.Utilities.ExceptionHelper;
+using SERP.Utilities.ResponseMessage;
+using SERP.Utilities.ResponseUtilities;
 
 namespace SERP.UI.Controllers.Transaction.FeeTransaction
 {
@@ -64,18 +66,28 @@ namespace SERP.UI.Controllers.Transaction.FeeTransaction
 
         public async Task<IActionResult> GetStudentDetail(int courseId, int batchId)
         {
+            try
+            {
+                List<StudentMaster> modelList = (from SP in await _IStudentPromote.GetList(x => x.CourseId == courseId && x.BatchId == batchId && x.IsActive == 1 && x.IsDeleted == 0)
+                                                 join SM
+                                                 in await _studentMasterRepo.GetList(x => x.IsDeleted == 0 && x.IsActive == 1)
+                                                 on SP.StudentId equals SM.Id
+                                                 select new StudentMaster
+                                                 {
+                                                     Id = SM.Id,
+                                                     Name = SM.Name
+                                                 }).ToList();
+                return Json(modelList);
+            }
+            catch (Exception ex)
+            {
+                string actionName = this.ControllerContext.RouteData.Values["action"].ToString();
+                string controllerName = this.ControllerContext.RouteData.Values["controller"].ToString();
 
-
-            List<StudentMaster> modelList = (from SP in await _IStudentPromote.GetList(x => x.CourseId == courseId && x.BatchId == batchId && x.IsActive == 1 && x.IsDeleted == 0)
-                                             join SM 
-                                             in await _studentMasterRepo.GetList(x => x.IsDeleted == 0 && x.IsActive == 1)
-                                             on SP.StudentId equals SM.Id
-                                             select new StudentMaster
-                                             {
-                                                 Id=SM.Id,
-                                                 Name= SM.Name
-                                             }).ToList();
-            return Json(modelList);
+                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(actionName, controllerName, ex.Message, LoggingType.httpDelete.ToString(), 0);
+                var exceptionResponse = await _exceptionLoggingRepo.CreateEntity(exceptionHelper);
+                return Json(ResponseData.Instance.GenericResponse(ResponseStatus.ServerError));
+            }
         }
 
         public async Task<IActionResult> GetFeeDetail(int studentId)

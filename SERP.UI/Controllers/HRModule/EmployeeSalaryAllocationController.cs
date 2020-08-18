@@ -9,6 +9,7 @@ using SERP.Core.Model.HRModel;
 using SERP.Infrastructure.Repository.Infrastructure.Repo;
 using SERP.Utilities.ExceptionHelper;
 using SERP.Utilities.ResponseMessage;
+using SERP.Utilities.ResponseUtilities;
 
 namespace SERP.UI.Controllers.HRModule
 {
@@ -91,19 +92,31 @@ namespace SERP.UI.Controllers.HRModule
         [HttpPost]
         public async Task<IActionResult> CreateEmployeeSalary(string[] Amount, string[] HeadId, int employeeId)
         {
-            List<EmployeeSalaryModel> salModels = new List<EmployeeSalaryModel>();
-            var models = await _employeeSalaryRepo.GetList(x => x.EmployeeId == employeeId && x.IsActive==1 && x.IsDeleted==0);
-            for (int i = 0; i < HeadId.Count(); i++)
+            try
             {
-                EmployeeSalaryModel model = new EmployeeSalaryModel();
-                model = models.ToList().Where(x => x.HeadId == Convert.ToInt32(HeadId[i])).FirstOrDefault();
-                model.Amount = Convert.ToDecimal(Amount[i]);
-                salModels.Add(model);
+                List<EmployeeSalaryModel> salModels = new List<EmployeeSalaryModel>();
+                var models = await _employeeSalaryRepo.GetList(x => x.EmployeeId == employeeId && x.IsActive == 1 && x.IsDeleted == 0);
+                for (int i = 0; i < HeadId.Count(); i++)
+                {
+                    EmployeeSalaryModel model = new EmployeeSalaryModel();
+                    model = models.ToList().Where(x => x.HeadId == Convert.ToInt32(HeadId[i])).FirstOrDefault();
+                    model.Amount = Convert.ToDecimal(Amount[i]);
+                    salModels.Add(model);
 
+                }
+                await _employeeSalaryRepo.CreateNewContext();
+                var response = await _employeeSalaryRepo.Update(salModels.ToArray());
+                return Json(ResponseData.Instance.GenericResponse(response));
             }
-            await _employeeSalaryRepo.CreateNewContext();
-            var response = await _employeeSalaryRepo.Update(salModels.ToArray());
-            return Json(ResponseData.Instance.GenericResponse(response));
+            catch (Exception ex)
+            {
+                string actionName = this.ControllerContext.RouteData.Values["action"].ToString();
+                string controllerName = this.ControllerContext.RouteData.Values["controller"].ToString();
+
+                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(actionName, controllerName, ex.Message, LoggingType.httpDelete.ToString(), 0);
+                var exceptionResponse = await _exceptionLoggingRepo.CreateEntity(exceptionHelper);
+                return Json(ResponseData.Instance.GenericResponse(ResponseStatus.ServerError));
+            }
         }
     }
 }

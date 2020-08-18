@@ -13,6 +13,7 @@ using SERP.Infrastructure.Repository.Infrastructure.Repo;
 using SERP.UI.Extension;
 using SERP.Utilities.ResponseMessage;
 using SERP.Utilities.ExceptionHelper;
+using SERP.Utilities.ResponseUtilities;
 
 namespace SERP.UI.Controllers.StudentTransaction
 {
@@ -58,22 +59,34 @@ namespace SERP.UI.Controllers.StudentTransaction
 
         public async Task<IActionResult> chekAttendenceDependOnPeriod(int courseId, int batchId)
         {
-            List<string> periodsData = new List<string>();
-            var courseModel = await _ICourseRepo.GetSingle(x => x.IsActive == 1 && x.IsDeleted == 0 && x.Id == courseId);
-            if (courseModel.AttendenceType.Trim().ToLower() != "daily")
+            try
             {
-                var periods = await _timeSheetRepo.GetAllIncludeTimeSheetDetails(courseId, batchId);
-                periods.TimeTableModels.ForEach(item =>
+                List<string> periodsData = new List<string>();
+                var courseModel = await _ICourseRepo.GetSingle(x => x.IsActive == 1 && x.IsDeleted == 0 && x.Id == courseId);
+                if (courseModel.AttendenceType.Trim().ToLower() != "daily")
                 {
-                    item.PeriodModels.ForEach(data =>
+                    var periods = await _timeSheetRepo.GetAllIncludeTimeSheetDetails(courseId, batchId);
+                    periods.TimeTableModels.ForEach(item =>
                     {
-                        periodsData.Add(data.Period);
-                    });
+                        item.PeriodModels.ForEach(data =>
+                        {
+                            periodsData.Add(data.Period);
+                        });
 
-                });
-                return Json(periodsData.Distinct());
+                    });
+                    return Json(periodsData.Distinct());
+                }
+                return Json("0");
             }
-            return Json("0");
+            catch (Exception ex)
+            {
+                string actionName = this.ControllerContext.RouteData.Values["action"].ToString();
+                string controllerName = this.ControllerContext.RouteData.Values["controller"].ToString();
+
+                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(actionName, controllerName, ex.Message, LoggingType.httpDelete.ToString(), 0);
+                var exceptionResponse = await _exceptionLoggingRepo.CreateEntity(exceptionHelper);
+                return Json(ResponseData.Instance.GenericResponse(ResponseStatus.ServerError));
+            }
         }
 
         public async Task<IActionResult> StudentAttendence(int courseId, int batchId, DateTime attendenceDate, string period)
@@ -131,42 +144,54 @@ namespace SERP.UI.Controllers.StudentTransaction
         [HttpPost]
         public async Task<IActionResult> UpSertAttendence()
         {
-            var attendType = HttpContext.Session.GetString("attenType");
-            var periodId = attendType.Trim().ToLower() == "sw" ? HttpContext.Session.GetString("period") : "All" ;
-
-            var studentIds = (Request.Form["studentId"].ToString().Split(',')).Select(x => Int32.Parse(x)).ToList();
-            var attendenceType = Request.Form["AttendType"].ToString().Split(',');
-            var date = Convert.ToDateTime(HttpContext.Session.GetString("attendenceDate"));
-
-            var attendenceModels = await _IStudentAttendence.GetList(x => x.AttendenceDate == date
-             && x.IsActive == 1 && x.IsDeleted == 0 && studentIds.Contains(x.Student) && x.PeriodId== periodId);
-
-            attendenceModels.ToList().ForEach(x =>
+            try
             {
-                x.IsActive = 0;
-                x.IsDeleted = 1;
-            });
-            if (attendenceModels.Count() > 0)
-            {
+                var attendType = HttpContext.Session.GetString("attenType");
+                var periodId = attendType.Trim().ToLower() == "sw" ? HttpContext.Session.GetString("period") : "All";
+
+                var studentIds = (Request.Form["studentId"].ToString().Split(',')).Select(x => Int32.Parse(x)).ToList();
+                var attendenceType = Request.Form["AttendType"].ToString().Split(',');
+                var date = Convert.ToDateTime(HttpContext.Session.GetString("attendenceDate"));
+
+                var attendenceModels = await _IStudentAttendence.GetList(x => x.AttendenceDate == date
+                 && x.IsActive == 1 && x.IsDeleted == 0 && studentIds.Contains(x.Student) && x.PeriodId == periodId);
+
+                attendenceModels.ToList().ForEach(x =>
+                {
+                    x.IsActive = 0;
+                    x.IsDeleted = 1;
+                });
+                if (attendenceModels.Count() > 0)
+                {
+                    await _IStudentAttendence.CreateNewContext();
+                    var updateResult = await _IStudentAttendence.Update(attendenceModels.ToArray());
+
+                }
                 await _IStudentAttendence.CreateNewContext();
-                var updateResult = await _IStudentAttendence.Update(attendenceModels.ToArray());
+                List<StudentAttendenceModel> models = new List<StudentAttendenceModel>();
 
+                for (int i = 0; i < studentIds.Count(); i++)
+                {
+                    StudentAttendenceModel model = new StudentAttendenceModel();
+                    model.Student = studentIds[i];
+                    model.AttendenceDate = date;
+                    model.AttendenceType = attendenceType[i];
+                    model.PeriodId = periodId;
+                    models.Add(model);
+                }
+                var result = await _IStudentAttendence.Add(models.ToArray());
+
+                return Json(ResponseData.Instance.GenericResponse(result));
             }
-            await _IStudentAttendence.CreateNewContext();
-            List<StudentAttendenceModel> models = new List<StudentAttendenceModel>();
-
-            for (int i = 0; i < studentIds.Count(); i++)
+            catch (Exception ex)
             {
-                StudentAttendenceModel model = new StudentAttendenceModel();
-                model.Student = studentIds[i];
-                model.AttendenceDate = date;
-                model.AttendenceType = attendenceType[i];
-                model.PeriodId = periodId;
-                models.Add(model);
-            }
-            var result = await _IStudentAttendence.Add(models.ToArray());
+                string actionName = this.ControllerContext.RouteData.Values["action"].ToString();
+                string controllerName = this.ControllerContext.RouteData.Values["controller"].ToString();
 
-            return Json(ResponseData.Instance.GenericResponse(result));
+                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(actionName, controllerName, ex.Message, LoggingType.httpDelete.ToString(), 0);
+                var exceptionResponse = await _exceptionLoggingRepo.CreateEntity(exceptionHelper);
+                return Json(ResponseData.Instance.GenericResponse(ResponseStatus.ServerError));
+            }
         }
     }
 }

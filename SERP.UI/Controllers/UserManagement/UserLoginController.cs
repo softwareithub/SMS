@@ -12,6 +12,7 @@ using SERP.Core.Model.UserManagement;
 using SERP.Infrastructure.Repository.Infrastructure.Repo;
 using SERP.Utilities.ExceptionHelper;
 using SERP.Utilities.ResponseMessage;
+using SERP.Utilities.ResponseUtilities;
 
 namespace SERP.UI.Controllers.UserManagement
 {
@@ -60,23 +61,35 @@ namespace SERP.UI.Controllers.UserManagement
         [HttpPost]
         public async Task<IActionResult> CreateLogin(Authenticate model)
         {
-            if (model.Id > 0)
+            try
             {
-                model.UpdatedBy = 1;
-                model.UpdatedDate = DateTime.Now.Date;
-                model.LastLoginDateTime = DateTime.Now;
-                var response = await _IAuthenticate.Update(model);
-                return Json(ResponseData.Instance.GenericResponse(response));
+                if (model.Id > 0)
+                {
+                    model.UpdatedBy = 1;
+                    model.UpdatedDate = DateTime.Now.Date;
+                    model.LastLoginDateTime = DateTime.Now;
+                    var response = await _IAuthenticate.Update(model);
+                    return Json(ResponseData.Instance.GenericResponse(response));
+                }
+                else
+                {
+                    model.CreatedBy = 1;
+                    model.CreatedDate = DateTime.Now.Date;
+                    model.UpdatedBy = 1;
+                    model.UpdatedDate = DateTime.Now.Date;
+                    model.LastLoginDateTime = DateTime.Now;
+                    var response = await _IAuthenticate.CreateEntity(model);
+                    return Json(ResponseData.Instance.GenericResponse(response));
+                }
             }
-            else
+            catch (Exception ex)
             {
-                model.CreatedBy = 1;
-                model.CreatedDate = DateTime.Now.Date;
-                model.UpdatedBy = 1;
-                model.UpdatedDate = DateTime.Now.Date;
-                model.LastLoginDateTime = DateTime.Now;
-                var response = await _IAuthenticate.CreateEntity(model);
-                return Json(ResponseData.Instance.GenericResponse(response));
+                string actionName = this.ControllerContext.RouteData.Values["action"].ToString();
+                string controllerName = this.ControllerContext.RouteData.Values["controller"].ToString();
+
+                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(actionName, controllerName, ex.Message, LoggingType.httpDelete.ToString(), 0);
+                var exceptionResponse = await _exceptionLoggingRepo.CreateEntity(exceptionHelper);
+                return Json(ResponseData.Instance.GenericResponse(ResponseStatus.ServerError));
             }
         }
 
@@ -138,11 +151,23 @@ namespace SERP.UI.Controllers.UserManagement
 
         public async Task<IActionResult> Delete(int id)
         {
-            var model = await _IAuthenticate.GetSingle(x => x.Id == id);
-            var deleteModel = Utilities.CommanHelper.CommanDeleteHelper.CommanDeleteCode(model, 1);
-            await _IAuthenticate.CreateNewContext();
-            var response = await _IAuthenticate.Update(deleteModel);
-            return Json(ResponseData.Instance.GenericResponse(response));
+            try
+            {
+                var model = await _IAuthenticate.GetSingle(x => x.Id == id);
+                var deleteModel = Utilities.CommanHelper.CommanDeleteHelper.CommanDeleteCode(model, 1);
+                await _IAuthenticate.CreateNewContext();
+                var response = await _IAuthenticate.Update(deleteModel);
+                return Json(ResponseData.Instance.GenericResponse(response));
+            }
+            catch (Exception ex)
+            {
+                string actionName = this.ControllerContext.RouteData.Values["action"].ToString();
+                string controllerName = this.ControllerContext.RouteData.Values["controller"].ToString();
+
+                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(actionName, controllerName, ex.Message, LoggingType.httpDelete.ToString(), 0);
+                var exceptionResponse = await _exceptionLoggingRepo.CreateEntity(exceptionHelper);
+                return Json(ResponseData.Instance.GenericResponse(ResponseStatus.ServerError));
+            }
         }
     }
 }

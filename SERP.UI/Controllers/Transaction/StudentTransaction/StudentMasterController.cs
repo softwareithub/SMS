@@ -84,66 +84,89 @@ namespace SERP.UI.Controllers.Transaction.StudentTransaction
 
         public async Task<IActionResult> GetBatchList(int courseId)
         {
-            var batchList = await _IBatchMaster.GetList(x => x.IsActive == 1 && x.IsDeleted == 0 && x.CourseId == courseId);
-            return Json(batchList);
+            try
+            {
+                var batchList = await _IBatchMaster.GetList(x => x.IsActive == 1 && x.IsDeleted == 0 && x.CourseId == courseId);
+                return Json(batchList);
+            }
+            catch (Exception ex)
+            {
+                string actionName = this.ControllerContext.RouteData.Values["action"].ToString();
+                string controllerName = this.ControllerContext.RouteData.Values["controller"].ToString();
+
+                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(actionName, controllerName, ex.Message, LoggingType.httpDelete.ToString(), 0);
+                var exceptionResponse = await _exceptionLoggingRepo.CreateEntity(exceptionHelper);
+                return Json(ResponseData.Instance.GenericResponse(ResponseStatus.ServerError));
+            }
         }
 
         [HttpPost]
         public async Task<IActionResult> CreateStudent(StudentMaster model, IFormFile StudentPhoto, IFormFile ParentsPhoto)
         {
-            List<IFormFile> formFiles = new List<IFormFile>();
-            formFiles.Add(StudentPhoto);
-            formFiles.Add(ParentsPhoto);
-            var imagePaths = await UploadImage.UploadImageOnFolder(formFiles, _hostingEnvironment);
-            if (imagePaths.Count() == 0)
+            try
             {
-                model.ParentsPhoto = string.Empty;
-                model.StudentPhoto = string.Empty;
-            }
-            else
-            {
-                if (imagePaths.Count() == 1)
+                List<IFormFile> formFiles = new List<IFormFile>();
+                formFiles.Add(StudentPhoto);
+                formFiles.Add(ParentsPhoto);
+                var imagePaths = await UploadImage.UploadImageOnFolder(formFiles, _hostingEnvironment);
+                if (imagePaths.Count() == 0)
                 {
-                    model.StudentPhoto = string.IsNullOrEmpty(model.StudentPhoto) ? imagePaths[0] : model?.StudentPhoto;
                     model.ParentsPhoto = string.Empty;
-                }
-                else if(imagePaths.Count()==2)
-                {
-                    model.StudentPhoto = string.IsNullOrEmpty(model.StudentPhoto) ? imagePaths[0] : model?.StudentPhoto;
-                    model.ParentsPhoto = string.IsNullOrEmpty(model.ParentsPhoto) ? imagePaths[1] : model?.ParentsPhoto;
-                }
-            
-               
-            }
-
-
-            if (model.Id == 0)
-            {
-                model.CreatedBy = 1;
-                return await CreateStudentEntity(model);
-            }
-            else
-            {
-                model.UpdatedBy = 1;
-                model.UpdatedDate = DateTime.Now.Date;
-                var result = await _IStudentMaster.Update(model);
-                if (result != ResponseStatus.UpdatedSuccessFully)
-                {
-                    return Json(ResponseData.Instance.GenericResponse(result));
+                    model.StudentPhoto = string.Empty;
                 }
                 else
                 {
-                    var studentPromote = await _IStudentPromote.GetSingle(x => x.IsActive == 1 && x.IsDeleted == 0 && x.StudentId == model.Id);
-                    studentPromote.CourseId = model.CourseId;
-                    studentPromote.BatchId = model.BatchId;
-                    studentPromote.UpdatedBy = 1;
-                    studentPromote.UpdatedDate = DateTime.Now.Date;
-                    await _IStudentPromote.CreateNewContext();
-                    var studentPromoteResult = await _IStudentPromote.Update(studentPromote);
-                    return Json(ResponseData.Instance.GenericResponse(studentPromoteResult));
+                    if (imagePaths.Count() == 1)
+                    {
+                        model.StudentPhoto = string.IsNullOrEmpty(model.StudentPhoto) ? imagePaths[0] : model?.StudentPhoto;
+                        model.ParentsPhoto = string.Empty;
+                    }
+                    else if (imagePaths.Count() == 2)
+                    {
+                        model.StudentPhoto = string.IsNullOrEmpty(model.StudentPhoto) ? imagePaths[0] : model?.StudentPhoto;
+                        model.ParentsPhoto = string.IsNullOrEmpty(model.ParentsPhoto) ? imagePaths[1] : model?.ParentsPhoto;
+                    }
+
+
+                }
+
+
+                if (model.Id == 0)
+                {
+                    model.CreatedBy = 1;
+                    return await CreateStudentEntity(model);
+                }
+                else
+                {
+                    model.UpdatedBy = 1;
+                    model.UpdatedDate = DateTime.Now.Date;
+                    var result = await _IStudentMaster.Update(model);
+                    if (result != ResponseStatus.UpdatedSuccessFully)
+                    {
+                        return Json(ResponseData.Instance.GenericResponse(result));
+                    }
+                    else
+                    {
+                        var studentPromote = await _IStudentPromote.GetSingle(x => x.IsActive == 1 && x.IsDeleted == 0 && x.StudentId == model.Id);
+                        studentPromote.CourseId = model.CourseId;
+                        studentPromote.BatchId = model.BatchId;
+                        studentPromote.UpdatedBy = 1;
+                        studentPromote.UpdatedDate = DateTime.Now.Date;
+                        await _IStudentPromote.CreateNewContext();
+                        var studentPromoteResult = await _IStudentPromote.Update(studentPromote);
+                        return Json(ResponseData.Instance.GenericResponse(studentPromoteResult));
+                    }
                 }
             }
+            catch (Exception ex)
+            {
+                string actionName = this.ControllerContext.RouteData.Values["action"].ToString();
+                string controllerName = this.ControllerContext.RouteData.Values["controller"].ToString();
 
+                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(actionName, controllerName, ex.Message, LoggingType.httpDelete.ToString(), 0);
+                var exceptionResponse = await _exceptionLoggingRepo.CreateEntity(exceptionHelper);
+                return Json(ResponseData.Instance.GenericResponse(ResponseStatus.ServerError));
+            }
         }
 
         public async Task<IActionResult> GetStudentList()
@@ -247,53 +270,88 @@ namespace SERP.UI.Controllers.Transaction.StudentTransaction
 
         public async Task<IActionResult> ValidateStudentRegistratioNumber(string registration)
         {
-            if(!string.IsNullOrEmpty(registration))
+            try
             {
-                var studentModel = await _IStudentMaster.GetList(x => x.IsActive == 1 && x.RegistrationNumber.Trim().ToLower() == registration.Trim().ToLower());
-                if (studentModel.Count() == 0)
+                if (!string.IsNullOrEmpty(registration))
                 {
-                    return Json("0");
+                    var studentModel = await _IStudentMaster.GetList(x => x.IsActive == 1 && x.RegistrationNumber.Trim().ToLower() == registration.Trim().ToLower());
+                    if (studentModel.Count() == 0)
+                    {
+                        return Json("0");
+                    }
+                    else
+                    {
+                        return Json("1");
+                    }
                 }
-                else
-                {
-                    return Json("1");
-                }
+                return Json("0");
             }
-            return Json("0");
+            catch (Exception ex)
+            {
+                string actionName = this.ControllerContext.RouteData.Values["action"].ToString();
+                string controllerName = this.ControllerContext.RouteData.Values["controller"].ToString();
 
+                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(actionName, controllerName, ex.Message, LoggingType.httpDelete.ToString(), 0);
+                var exceptionResponse = await _exceptionLoggingRepo.CreateEntity(exceptionHelper);
+                return Json(ResponseData.Instance.GenericResponse(ResponseStatus.ServerError));
+            }
         }
 
         public async Task<IActionResult> DeleteStudent(int id)
         {
-            var model = await _IStudentMaster.GetSingle(x => x.Id == id);
-            var deleteModel = CommanDeleteHelper.CommanDeleteCode<StudentMaster>(model, 1);
-            await _IStudentMaster.CreateNewContext();
-            var response = await _IStudentMaster.Update(deleteModel);
-            return Json(ResponseData.Instance.GenericResponse(response));
+            try
+            {
+                var model = await _IStudentMaster.GetSingle(x => x.Id == id);
+                var deleteModel = CommanDeleteHelper.CommanDeleteCode<StudentMaster>(model, 1);
+                await _IStudentMaster.CreateNewContext();
+                var response = await _IStudentMaster.Update(deleteModel);
+                return Json(ResponseData.Instance.GenericResponse(response));
+            }
+            catch (Exception ex)
+            {
+                string actionName = this.ControllerContext.RouteData.Values["action"].ToString();
+                string controllerName = this.ControllerContext.RouteData.Values["controller"].ToString();
+
+                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(actionName, controllerName, ex.Message, LoggingType.httpDelete.ToString(), 0);
+                var exceptionResponse = await _exceptionLoggingRepo.CreateEntity(exceptionHelper);
+                return Json(ResponseData.Instance.GenericResponse(ResponseStatus.ServerError));
+            }
         }
 
         private async Task<IActionResult> CreateStudentEntity(StudentMaster model)
         {
-            var result = await _IStudentMaster.CreateEntity(model);
-
-            if (result != ResponseStatus.AddedSuccessfully)
-                return Json(ResponseData.Instance.GenericResponse(result));
-
-            var students = await _IStudentMaster.GetList(x => x.IsActive == 1 && x.IsDeleted == 0);
-
-            var studentId = students.Max(x=>x.Id);
-
-            StudentPromote studentPromote = new StudentPromote()
+            try 
             {
-                CourseId = model.CourseId,
-                BatchId = model.BatchId,
-                PromotionDate = DateTime.Now.Date,
-                StudentId = studentId,
-                CreatedDate = DateTime.Now.Date
-            };
-            var studentResult = await _IStudentPromote.CreateEntity(studentPromote);
+                var result = await _IStudentMaster.CreateEntity(model);
 
-            return Json(ResponseData.Instance.GenericResponse(studentResult));
+                if (result != ResponseStatus.AddedSuccessfully)
+                    return Json(ResponseData.Instance.GenericResponse(result));
+
+                var students = await _IStudentMaster.GetList(x => x.IsActive == 1 && x.IsDeleted == 0);
+
+                var studentId = students.Max(x => x.Id);
+
+                StudentPromote studentPromote = new StudentPromote()
+                {
+                    CourseId = model.CourseId,
+                    BatchId = model.BatchId,
+                    PromotionDate = DateTime.Now.Date,
+                    StudentId = studentId,
+                    CreatedDate = DateTime.Now.Date
+                };
+                var studentResult = await _IStudentPromote.CreateEntity(studentPromote);
+
+                return Json(ResponseData.Instance.GenericResponse(studentResult));
+            }
+            catch (Exception ex)
+            {
+                string actionName = this.ControllerContext.RouteData.Values["action"].ToString();
+                string controllerName = this.ControllerContext.RouteData.Values["controller"].ToString();
+
+                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(actionName, controllerName, ex.Message, LoggingType.httpDelete.ToString(), 0);
+                var exceptionResponse = await _exceptionLoggingRepo.CreateEntity(exceptionHelper);
+                return Json(ResponseData.Instance.GenericResponse(ResponseStatus.ServerError));
+            }
         }
         #endregion
     }

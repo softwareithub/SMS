@@ -107,49 +107,61 @@ namespace SERP.UI.Controllers.HRModule
         [HttpPost]
         public async Task<IActionResult> Create(EmployeeInfoVm model, IFormFile employeePhoto)
         {
-            if(model.EmployeeBasicInfoModel.Id==0)
+            try
             {
+                if (model.EmployeeBasicInfoModel.Id == 0)
+                {
 
-                List<IFormFile> formFiles = new List<IFormFile>();
-                if(employeePhoto!=null && employeePhoto.Length>0)
-                {
-                    formFiles.Add(employeePhoto);
-                    var imagePaths = await UploadImage.UploadImageOnFolder(formFiles, _hostingEnvironment);
-                    model.EmployeeBasicInfoModel.Photo = imagePaths.First();
-                }
-                model.EmployeeBasicInfoModel.Photo = "/Images/UserLogo.jpg"; 
-               
-                //Insert data into employeeBasic Information
-                var basicInfoResponse = await _basicInfoRepo.CreateEntity(model.EmployeeBasicInfoModel);
-                //Create new Context
-                await _basicInfoRepo.CreateNewContext();
-                //Get Last Inserted Employee
-                var employeeId = (await _basicInfoRepo.GetList(x => x.IsActive == 1)).Max(x => x.Id);
-                //Check employee inserted successfully
-                if (basicInfoResponse == Utilities.ResponseUtilities.ResponseStatus.AddedSuccessfully)
-                {
-                    List<EmployeeSalaryModel> salaryModels = new List<EmployeeSalaryModel>();
-                    model.EmployeeSalaryModels.ToList().ForEach(item =>
+                    List<IFormFile> formFiles = new List<IFormFile>();
+                    if (employeePhoto != null && employeePhoto.Length > 0)
                     {
-                        EmployeeSalaryModel salaryModel = new EmployeeSalaryModel();
-                        salaryModel.Amount = item.Amount;
-                        salaryModel.HeadId = item.HeadId;
-                        salaryModel.EmployeeId = employeeId;
-                        salaryModels.Add(salaryModel);
-                    });
-                    var salaryResponse = await _employeeSalaryRepo.Add(salaryModels.ToArray());
-                    return Json(ResponseData.Instance.GenericResponse(salaryResponse));
+                        formFiles.Add(employeePhoto);
+                        var imagePaths = await UploadImage.UploadImageOnFolder(formFiles, _hostingEnvironment);
+                        model.EmployeeBasicInfoModel.Photo = imagePaths.First();
+                    }
+                    model.EmployeeBasicInfoModel.Photo = "/Images/UserLogo.jpg";
+
+                    //Insert data into employeeBasic Information
+                    var basicInfoResponse = await _basicInfoRepo.CreateEntity(model.EmployeeBasicInfoModel);
+                    //Create new Context
+                    await _basicInfoRepo.CreateNewContext();
+                    //Get Last Inserted Employee
+                    var employeeId = (await _basicInfoRepo.GetList(x => x.IsActive == 1)).Max(x => x.Id);
+                    //Check employee inserted successfully
+                    if (basicInfoResponse == Utilities.ResponseUtilities.ResponseStatus.AddedSuccessfully)
+                    {
+                        List<EmployeeSalaryModel> salaryModels = new List<EmployeeSalaryModel>();
+                        model.EmployeeSalaryModels.ToList().ForEach(item =>
+                        {
+                            EmployeeSalaryModel salaryModel = new EmployeeSalaryModel();
+                            salaryModel.Amount = item.Amount;
+                            salaryModel.HeadId = item.HeadId;
+                            salaryModel.EmployeeId = employeeId;
+                            salaryModels.Add(salaryModel);
+                        });
+                        var salaryResponse = await _employeeSalaryRepo.Add(salaryModels.ToArray());
+                        return Json(ResponseData.Instance.GenericResponse(salaryResponse));
+                    }
                 }
-            }
-            else
-            {
-                model.EmployeeBasicInfoModel.EmergencyPhone = string.Empty;
-                model.EmployeeBasicInfoModel.Photo = model.EmployeeBasicInfoModel.Photo == string.Empty ? string.Empty : model.EmployeeBasicInfoModel.Photo;
-                var response = await UpdateEmplolyeeInfo(model, employeePhoto);
-                return Json(ResponseData.Instance.GenericResponse(response));
+                else
+                {
+                    model.EmployeeBasicInfoModel.EmergencyPhone = string.Empty;
+                    model.EmployeeBasicInfoModel.Photo = model.EmployeeBasicInfoModel.Photo == string.Empty ? string.Empty : model.EmployeeBasicInfoModel.Photo;
+                    var response = await UpdateEmplolyeeInfo(model, employeePhoto);
+                    return Json(ResponseData.Instance.GenericResponse(response));
+                }
+                return Json("Error in employee creation Please contact admin department.");
             }
 
-            return Json("Error in employee creation Please contact admin department.");
+            catch (Exception ex)
+            {
+                string actionName = this.ControllerContext.RouteData.Values["action"].ToString();
+                string controllerName = this.ControllerContext.RouteData.Values["controller"].ToString();
+
+                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(actionName, controllerName, ex.Message, LoggingType.httpDelete.ToString(), 0);
+                var exceptionResponse = await _exceptionLoggingRepo.CreateEntity(exceptionHelper);
+                return Json(ResponseData.Instance.GenericResponse(ResponseStatus.ServerError));
+            }
         }
 
         [HttpGet]
@@ -175,25 +187,38 @@ namespace SERP.UI.Controllers.HRModule
         [HttpGet]
         public async Task<IActionResult> DeleteRecord(int id)
         {
-            // Get employee detail by id
-            // sey
-            var employeeDetail = await _basicInfoRepo.GetSingle(x => x.Id == id);
-            employeeDetail.IsActive = 0;
-            employeeDetail.IsDeleted = 1;
+            try
+            {
+                // Get employee detail by id
+                // sey
+                var employeeDetail = await _basicInfoRepo.GetSingle(x => x.Id == id);
+                employeeDetail.IsActive = 0;
+                employeeDetail.IsDeleted = 1;
 
-            await _basicInfoRepo.CreateNewContext();
-            var responseBasicInfo = await _basicInfoRepo.Update(employeeDetail);
-            var salaryDetails = await _employeeSalaryRepo.GetList(x => x.EmployeeId == id);
+                await _basicInfoRepo.CreateNewContext();
+                var responseBasicInfo = await _basicInfoRepo.Update(employeeDetail);
+                var salaryDetails = await _employeeSalaryRepo.GetList(x => x.EmployeeId == id);
 
-            salaryDetails.ToList().ForEach(item => {
-                item.IsActive = 0;
-                item.IsDeleted = 1;
-            });
+                salaryDetails.ToList().ForEach(item =>
+                {
+                    item.IsActive = 0;
+                    item.IsDeleted = 1;
+                });
 
-            await _employeeSalaryRepo.CreateNewContext();
+                await _employeeSalaryRepo.CreateNewContext();
 
-            var deleteSalaryResponse = await _employeeSalaryRepo.Update(salaryDetails.ToArray());
-            return Json(ResponseData.Instance.GenericResponse(deleteSalaryResponse));
+                var deleteSalaryResponse = await _employeeSalaryRepo.Update(salaryDetails.ToArray());
+                return Json(ResponseData.Instance.GenericResponse(deleteSalaryResponse));
+            }
+            catch (Exception ex)
+            {
+                string actionName = this.ControllerContext.RouteData.Values["action"].ToString();
+                string controllerName = this.ControllerContext.RouteData.Values["controller"].ToString();
+
+                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(actionName, controllerName, ex.Message, LoggingType.httpDelete.ToString(), 0);
+                var exceptionResponse = await _exceptionLoggingRepo.CreateEntity(exceptionHelper);
+                return Json(ResponseData.Instance.GenericResponse(ResponseStatus.ServerError));
+            }
         }
         [HttpGet]
         public async Task<IActionResult> GetEmployeeSalaryInfo(int empId)

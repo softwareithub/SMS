@@ -53,16 +53,28 @@ namespace SERP.UI.Controllers.OnlineVideoFee
         [HttpPost]
         public async Task<IActionResult> CreateOnlineFee(OnlineVideoFeeDetail model)
         {
-            if (model.Id > 0)
+            try
             {
-                var updateModel = CommanDeleteHelper.CommanUpdateCode<OnlineVideoFeeDetail>(model, 1);
-                var response = await _IOnlineVideoFeeRepo.Update(updateModel);
-                return Json(ResponseData.Instance.GenericResponse(response));
+                if (model.Id > 0)
+                {
+                    var updateModel = CommanDeleteHelper.CommanUpdateCode<OnlineVideoFeeDetail>(model, 1);
+                    var response = await _IOnlineVideoFeeRepo.Update(updateModel);
+                    return Json(ResponseData.Instance.GenericResponse(response));
+                }
+                else
+                {
+                    var response = await _IOnlineVideoFeeRepo.CreateEntity(model);
+                    return Json(ResponseData.Instance.GenericResponse(response));
+                }
             }
-            else
+            catch (Exception ex)
             {
-                var response = await _IOnlineVideoFeeRepo.CreateEntity(model);
-                return Json(ResponseData.Instance.GenericResponse(response));
+                string actionName = this.ControllerContext.RouteData.Values["action"].ToString();
+                string controllerName = this.ControllerContext.RouteData.Values["controller"].ToString();
+
+                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(actionName, controllerName, ex.Message, LoggingType.httpDelete.ToString(), 0);
+                var exceptionResponse = await _exceptionLoggingRepo.CreateEntity(exceptionHelper);
+                return Json(ResponseData.Instance.GenericResponse(ResponseStatus.ServerError));
             }
         }
 
@@ -111,11 +123,23 @@ namespace SERP.UI.Controllers.OnlineVideoFee
 
         public async Task<IActionResult> Delete(int id)
         {
-            var model = await _IOnlineVideoFeeRepo.GetSingle(x => x.Id == id);
-            var deleteModel = CommanDeleteHelper.CommanDeleteCode<OnlineVideoFeeDetail>(model, 1);
-            await _IOnlineVideoFeeRepo.CreateNewContext();
-            var response = await _IOnlineVideoFeeRepo.Update(deleteModel);
-            return Json(ResponseData.Instance.GenericResponse(response));
+            try
+            {
+                var model = await _IOnlineVideoFeeRepo.GetSingle(x => x.Id == id);
+                var deleteModel = CommanDeleteHelper.CommanDeleteCode<OnlineVideoFeeDetail>(model, 1);
+                await _IOnlineVideoFeeRepo.CreateNewContext();
+                var response = await _IOnlineVideoFeeRepo.Update(deleteModel);
+                return Json(ResponseData.Instance.GenericResponse(response));
+            }
+            catch (Exception ex)
+            {
+                string actionName = this.ControllerContext.RouteData.Values["action"].ToString();
+                string controllerName = this.ControllerContext.RouteData.Values["controller"].ToString();
+
+                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(actionName, controllerName, ex.Message, LoggingType.httpDelete.ToString(), 0);
+                var exceptionResponse = await _exceptionLoggingRepo.CreateEntity(exceptionHelper);
+                return Json(ResponseData.Instance.GenericResponse(ResponseStatus.ServerError));
+            }
         }
     }
 }

@@ -53,9 +53,12 @@ namespace SERP.UI.Controllers.Account
                 }
                 return Json(ResponseData.Instance.GenericResponse(await _expenseHeadRepo.CreateEntity(model)));
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
-                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(nameof(Create), nameof(ExpenseHead), ex.Message, LoggingType.httpPost.ToString(), 0);
+                string actionName = this.ControllerContext.RouteData.Values["action"].ToString();
+                string controllerName = this.ControllerContext.RouteData.Values["controller"].ToString();
+
+                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(actionName, controllerName, ex.Message, LoggingType.httpDelete.ToString(), 0);
                 var exceptionResponse = await _exceptionLoggingRepo.CreateEntity(exceptionHelper);
                 return Json(ResponseData.Instance.GenericResponse(ResponseStatus.ServerError));
             }
@@ -90,9 +93,12 @@ namespace SERP.UI.Controllers.Account
                 await _expenseHeadRepo.CreateNewContext();
                 return Json(ResponseData.Instance.GenericResponse(await _expenseHeadRepo.Update(deleteModel)));
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
-                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(nameof(Delete), nameof(ExpenseHead), ex.Message, LoggingType.httpDelete.ToString(), 0);
+                string actionName = this.ControllerContext.RouteData.Values["action"].ToString();
+                string controllerName = this.ControllerContext.RouteData.Values["controller"].ToString();
+
+                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(actionName, controllerName, ex.Message, LoggingType.httpDelete.ToString(), 0);
                 var exceptionResponse = await _exceptionLoggingRepo.CreateEntity(exceptionHelper);
                 return Json(ResponseData.Instance.GenericResponse(ResponseStatus.ServerError));
             }

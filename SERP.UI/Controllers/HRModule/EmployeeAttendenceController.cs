@@ -9,6 +9,7 @@ using SERP.Core.Model.TransactionViewModel;
 using SERP.Infrastructure.Repository.Infrastructure.Repo;
 using SERP.Utilities.ExceptionHelper;
 using SERP.Utilities.ResponseMessage;
+using SERP.Utilities.ResponseUtilities;
 
 namespace SERP.UI.Controllers.HRModule
 {
@@ -92,82 +93,118 @@ namespace SERP.UI.Controllers.HRModule
         [HttpPost]
         public async Task<IActionResult> CreateEmployeeAttendence(EmployeeAttendenceVm model)
         {
-            if (model.LongLeaveType == "S")
+            try
             {
-                return await CreateShortAttendence(model);
+                if (model.LongLeaveType == "S")
+                {
+                    return await CreateShortAttendence(model);
+                }
+                else
+                {
+                    return await CreateLongVacationLeave(model);
+                }
             }
-            else
+            catch (Exception ex)
             {
-                return await CreateLongVacationLeave(model);
+                string actionName = this.ControllerContext.RouteData.Values["action"].ToString();
+                string controllerName = this.ControllerContext.RouteData.Values["controller"].ToString();
+
+                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(actionName, controllerName, ex.Message, LoggingType.httpDelete.ToString(), 0);
+                var exceptionResponse = await _exceptionLoggingRepo.CreateEntity(exceptionHelper);
+                return Json(ResponseData.Instance.GenericResponse(ResponseStatus.ServerError));
             }
         }
 
         private async Task<IActionResult> CreateLongVacationLeave(EmployeeAttendenceVm model)
         {
-            var employeeIds = Request.Form["empId"];
-            var AttendType = Request.Form["AttendType"];
-
-            List<DateTime> allDates = new List<DateTime>();
-            for (DateTime date = model.AttendenceDate; date <= model.ToAttendenceDate; date = date.AddDays(1))
-                allDates.Add(date);
-
-            var models = await _employeeAttendenceRepo.GetList(x => x.IsActive == 1 && x.IsDeleted == 0);
-
-            var employees = models.Where(item => allDates.Contains(item.AttendenceDate) &&
-              (Array.ConvertAll<string, int>(employeeIds, new Converter<string, int>(Convert.ToInt32))).ToList().Contains(item.EmployeeId));
-
-            employees.ToList().ForEach(x =>
+            try
             {
-                x.IsActive = 0;
-                x.IsDeleted = 1;
-                x.UpdatedBy = 1;
-                x.UpdatedDate = DateTime.Now.Date;
-            });
-            await _employeeAttendenceRepo.CreateNewContext();
-            var deleteResult = await _employeeAttendenceRepo.Delete(employees.ToArray());
-            await _employeeAttendenceRepo.CreateNewContext();
+                var employeeIds = Request.Form["empId"];
+                var AttendType = Request.Form["AttendType"];
 
-            List<EmployeeAttendenceModel> empAttendenceModels = new List<EmployeeAttendenceModel>();
+                List<DateTime> allDates = new List<DateTime>();
+                for (DateTime date = model.AttendenceDate; date <= model.ToAttendenceDate; date = date.AddDays(1))
+                    allDates.Add(date);
 
-            allDates.ForEach(date =>
-            {
-                for (int i = 0; i < employeeIds.Count(); i++)
+                var models = await _employeeAttendenceRepo.GetList(x => x.IsActive == 1 && x.IsDeleted == 0);
+
+                var employees = models.Where(item => allDates.Contains(item.AttendenceDate) &&
+                  (Array.ConvertAll<string, int>(employeeIds, new Converter<string, int>(Convert.ToInt32))).ToList().Contains(item.EmployeeId));
+
+                employees.ToList().ForEach(x =>
                 {
-                    EmployeeAttendenceModel attmodel = new EmployeeAttendenceModel()
-                    {
-                        AttendenceDate = date,
-                        AttendenceType = model.LongLeaveType,
-                        EmployeeId = Convert.ToInt32(employeeIds[i]),
-                    };
-                    empAttendenceModels.Add(attmodel);
-                }
-            });
+                    x.IsActive = 0;
+                    x.IsDeleted = 1;
+                    x.UpdatedBy = 1;
+                    x.UpdatedDate = DateTime.Now.Date;
+                });
+                await _employeeAttendenceRepo.CreateNewContext();
+                var deleteResult = await _employeeAttendenceRepo.Delete(employees.ToArray());
+                await _employeeAttendenceRepo.CreateNewContext();
 
-            var result = await _employeeAttendenceRepo.Add(empAttendenceModels.ToArray());
-            return Json(ResponseData.Instance.GenericResponse(result));
+                List<EmployeeAttendenceModel> empAttendenceModels = new List<EmployeeAttendenceModel>();
+
+                allDates.ForEach(date =>
+                {
+                    for (int i = 0; i < employeeIds.Count(); i++)
+                    {
+                        EmployeeAttendenceModel attmodel = new EmployeeAttendenceModel()
+                        {
+                            AttendenceDate = date,
+                            AttendenceType = model.LongLeaveType,
+                            EmployeeId = Convert.ToInt32(employeeIds[i]),
+                        };
+                        empAttendenceModels.Add(attmodel);
+                    }
+                });
+
+                var result = await _employeeAttendenceRepo.Add(empAttendenceModels.ToArray());
+                return Json(ResponseData.Instance.GenericResponse(result));
+            }
+            catch (Exception ex)
+            {
+                string actionName = this.ControllerContext.RouteData.Values["action"].ToString();
+                string controllerName = this.ControllerContext.RouteData.Values["controller"].ToString();
+
+                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(actionName, controllerName, ex.Message, LoggingType.httpDelete.ToString(), 0);
+                var exceptionResponse = await _exceptionLoggingRepo.CreateEntity(exceptionHelper);
+                return Json(ResponseData.Instance.GenericResponse(ResponseStatus.ServerError));
+            }
         }
 
         private async Task<IActionResult> CreateShortAttendence(EmployeeAttendenceVm model)
         {
-            var employeeIds = Request.Form["empId"];
-            var AttendType = Request.Form["AttendType"];
-
-            List<EmployeeAttendenceModel> models = new List<EmployeeAttendenceModel>();
-
-            await DeleteEmployeeAttendence((Array.ConvertAll<string, int>(employeeIds, new Converter<string, int>(Convert.ToInt32))).ToList(), model.AttendenceDate.Date);
-
-            for (int i = 0; i < employeeIds.Count(); i++)
+            try
             {
-                EmployeeAttendenceModel dataModel = new EmployeeAttendenceModel();
-                dataModel.AttendenceDate = model.AttendenceDate;
-                dataModel.EmployeeId = Convert.ToInt32(employeeIds[i]);
-                dataModel.AttendenceType = AttendType[i].ToString();
-                models.Add(dataModel);
-            }
+                var employeeIds = Request.Form["empId"];
+                var AttendType = Request.Form["AttendType"];
 
-            await _employeeAttendenceRepo.CreateNewContext();
-            var result = await _employeeAttendenceRepo.Add(models.ToArray());
-            return Json(ResponseData.Instance.GenericResponse(result));
+                List<EmployeeAttendenceModel> models = new List<EmployeeAttendenceModel>();
+
+                await DeleteEmployeeAttendence((Array.ConvertAll<string, int>(employeeIds, new Converter<string, int>(Convert.ToInt32))).ToList(), model.AttendenceDate.Date);
+
+                for (int i = 0; i < employeeIds.Count(); i++)
+                {
+                    EmployeeAttendenceModel dataModel = new EmployeeAttendenceModel();
+                    dataModel.AttendenceDate = model.AttendenceDate;
+                    dataModel.EmployeeId = Convert.ToInt32(employeeIds[i]);
+                    dataModel.AttendenceType = AttendType[i].ToString();
+                    models.Add(dataModel);
+                }
+
+                await _employeeAttendenceRepo.CreateNewContext();
+                var result = await _employeeAttendenceRepo.Add(models.ToArray());
+                return Json(ResponseData.Instance.GenericResponse(result));
+            }
+            catch (Exception ex)
+            {			
+                string actionName = this.ControllerContext.RouteData.Values["action"].ToString();
+                string controllerName = this.ControllerContext.RouteData.Values["controller"].ToString();
+				
+                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(actionName, controllerName, ex.Message, LoggingType.httpDelete.ToString(), 0);
+                var exceptionResponse = await _exceptionLoggingRepo.CreateEntity(exceptionHelper);
+                return Json(ResponseData.Instance.GenericResponse(ResponseStatus.ServerError));
+            }
         }
 
         private async Task DeleteEmployeeAttendence(List<int> employeeIds, DateTime attendenceDate)

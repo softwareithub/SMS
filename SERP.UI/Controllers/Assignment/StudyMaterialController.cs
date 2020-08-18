@@ -15,6 +15,7 @@ using SERP.Utilities.BlobUtility;
 using SERP.Utilities.CommanHelper;
 using SERP.Utilities.ExceptionHelper;
 using SERP.Utilities.ResponseMessage;
+using SERP.Utilities.ResponseUtilities;
 
 namespace SERP.UI.Controllers.Assignment
 {
@@ -65,26 +66,40 @@ namespace SERP.UI.Controllers.Assignment
 
         public async Task<IActionResult> UploadDocument(StudyMaterial model,IFormFile MaterialPath)
         {
-            List<IFormFile> formFiles = new List<IFormFile>();
-            if (MaterialPath != null && MaterialPath.Length > 0)
+            try
             {
-                formFiles.Add(MaterialPath);
-                var imagePaths =await UploadImage.UploadImageOnFolder(formFiles, _hostingEnviroment);
-                model.MaterialPath = imagePaths.First();
+                List<IFormFile> formFiles = new List<IFormFile>();
+                if (MaterialPath != null && MaterialPath.Length > 0)
+                {
+                    formFiles.Add(MaterialPath);
+                    var imagePaths = await UploadImage.UploadImageOnFolder(formFiles, _hostingEnviroment);
+                    model.MaterialPath = imagePaths.First();
+                }
+                else
+                {
+                    model.MaterialPath = string.Empty;
+                }
+                if (model.Id > 0)
+                {
+                    model.UpdatedBy = 1;
+                    model.UpdatedDate = DateTime.Now.Date;
+                    var response = await _IStudyMaterialRepo.Update(model);
+                    return Json(ResponseData.Instance.GenericResponse(response));
+                }
+                else
+                {
+                    var response = await _IStudyMaterialRepo.CreateEntity(model);
+                    return Json(ResponseData.Instance.GenericResponse(response));
+                }
             }
-            else {
-                model.MaterialPath = string.Empty;
-            }
-            if (model.Id > 0)
+            catch (Exception ex)
             {
-                model.UpdatedBy = 1;
-                model.UpdatedDate = DateTime.Now.Date;
-                var response=await _IStudyMaterialRepo.Update(model);
-                return Json(ResponseData.Instance.GenericResponse(response));
-            }
-            else {
-                var response = await _IStudyMaterialRepo.CreateEntity(model);
-                return Json(ResponseData.Instance.GenericResponse(response));
+                string actionName = this.ControllerContext.RouteData.Values["action"].ToString();
+                string controllerName = this.ControllerContext.RouteData.Values["controller"].ToString();
+
+                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(actionName, controllerName, ex.Message, LoggingType.httpDelete.ToString(), 0);
+                var exceptionResponse = await _exceptionLoggingRepo.CreateEntity(exceptionHelper);
+                return Json(ResponseData.Instance.GenericResponse(ResponseStatus.ServerError));
             }
 
         }
@@ -127,11 +142,23 @@ namespace SERP.UI.Controllers.Assignment
 
         public async Task<IActionResult> DeleteDocument(int id)
         {
-            var model = await _IStudyMaterialRepo.GetSingle(x => x.Id == id);
-            var deleteModel = CommanDeleteHelper.CommanDeleteCode(model, 1);
-            await _IStudyMaterialRepo.CreateNewContext();
-            var response = await _IStudyMaterialRepo.Update(deleteModel);
-            return Json(ResponseData.Instance.GenericResponse(response));
+            try
+            {
+                var model = await _IStudyMaterialRepo.GetSingle(x => x.Id == id);
+                var deleteModel = CommanDeleteHelper.CommanDeleteCode(model, 1);
+                await _IStudyMaterialRepo.CreateNewContext();
+                var response = await _IStudyMaterialRepo.Update(deleteModel);
+                return Json(ResponseData.Instance.GenericResponse(response));
+            }
+            catch (Exception ex)
+            {
+                string actionName = this.ControllerContext.RouteData.Values["action"].ToString();
+                string controllerName = this.ControllerContext.RouteData.Values["controller"].ToString();
+
+                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(actionName, controllerName, ex.Message, LoggingType.httpDelete.ToString(), 0);
+                var exceptionResponse = await _exceptionLoggingRepo.CreateEntity(exceptionHelper);
+                return Json(ResponseData.Instance.GenericResponse(ResponseStatus.ServerError));
+            }
         }
     }
 }
