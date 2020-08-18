@@ -9,6 +9,7 @@ using SERP.Core.Entities.SERPExceptionLogging;
 using SERP.Infrastructure.Repository.Infrastructure.Repo;
 using SERP.Utilities.ExceptionHelper;
 using SERP.Utilities.ResponseMessage;
+using SERP.Utilities.ResponseUtilities;
 
 namespace SERP.UI.Controllers.ExamMaster
 {
@@ -43,15 +44,27 @@ namespace SERP.UI.Controllers.ExamMaster
         [HttpPost]
         public async Task<IActionResult> CreateEvent(ExamUpdate model)
         {
-            if (model.Id == 0)
+            try
             {
-                var result = await _IExamUpdateRepo.CreateEntity(model);
-                return Json(ResponseData.Instance.GenericResponse(result));
+                if (model.Id == 0)
+                {
+                    var result = await _IExamUpdateRepo.CreateEntity(model);
+                    return Json(ResponseData.Instance.GenericResponse(result));
+                }
+                else
+                {
+                    var result = await _IExamUpdateRepo.Update(model);
+                    return Json(ResponseData.Instance.GenericResponse(result));
+                }
             }
-            else
+            catch (Exception ex)
             {
-                var result = await _IExamUpdateRepo.Update(model);
-                return Json(ResponseData.Instance.GenericResponse(result));
+                string actionName = this.ControllerContext.RouteData.Values["action"].ToString();
+                string controllerName = this.ControllerContext.RouteData.Values["controller"].ToString();
+
+                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(actionName, controllerName, ex.Message, LoggingType.httpDelete.ToString(), 0);
+                var exceptionResponse = await _exceptionLoggingRepo.CreateEntity(exceptionHelper);
+                return Json(ResponseData.Instance.GenericResponse(ResponseStatus.ServerError));
             }
         }
         [HttpGet]
@@ -76,12 +89,24 @@ namespace SERP.UI.Controllers.ExamMaster
         [HttpGet]
         public async Task<IActionResult> DeleteEvent(int id)
         {
-            var responseData = await _IExamUpdateRepo.GetSingle(x => x.Id == id);
-            responseData.IsActive = 0;
-            responseData.IsDeleted = 1;
-            await _IExamUpdateRepo.CreateNewContext();
-            var response = await _IExamUpdateRepo.Update(responseData);
-            return Json(ResponseData.Instance.GenericResponse(response));
+            try
+            {
+                var responseData = await _IExamUpdateRepo.GetSingle(x => x.Id == id);
+                responseData.IsActive = 0;
+                responseData.IsDeleted = 1;
+                await _IExamUpdateRepo.CreateNewContext();
+                var response = await _IExamUpdateRepo.Update(responseData);
+                return Json(ResponseData.Instance.GenericResponse(response));
+            }
+            catch (Exception ex)
+            {
+                string actionName = this.ControllerContext.RouteData.Values["action"].ToString();
+                string controllerName = this.ControllerContext.RouteData.Values["controller"].ToString();
+
+                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(actionName, controllerName, ex.Message, LoggingType.httpDelete.ToString(), 0);
+                var exceptionResponse = await _exceptionLoggingRepo.CreateEntity(exceptionHelper);
+                return Json(ResponseData.Instance.GenericResponse(ResponseStatus.ServerError));
+            }
         }
     }
 }

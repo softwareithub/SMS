@@ -95,9 +95,9 @@ namespace SERP.UI.Controllers.UserManagement
                 string actionName = this.ControllerContext.RouteData.Values["action"].ToString();
                 string controllerName = this.ControllerContext.RouteData.Values["controller"].ToString();
 
-                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(actionName, controllerName, ex.Message, LoggingType.httpGet.ToString(), 0);
+                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(actionName, controllerName, ex.Message, LoggingType.httpDelete.ToString(), 0);
                 var exceptionResponse = await _exceptionLoggingRepo.CreateEntity(exceptionHelper);
-                return await Task.Run(() => PartialView("~/Views/Shared/Error.cshtml"));
+                return Json(ResponseData.Instance.GenericResponse(ResponseStatus.ServerError));
             }
 
 
@@ -129,9 +129,9 @@ namespace SERP.UI.Controllers.UserManagement
                 string actionName = this.ControllerContext.RouteData.Values["action"].ToString();
                 string controllerName = this.ControllerContext.RouteData.Values["controller"].ToString();
 
-                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(actionName, controllerName, ex.Message, LoggingType.httpGet.ToString(), 0);
+                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(actionName, controllerName, ex.Message, LoggingType.httpDelete.ToString(), 0);
                 var exceptionResponse = await _exceptionLoggingRepo.CreateEntity(exceptionHelper);
-                return await Task.Run(() => PartialView("~/Views/Shared/Error.cshtml"));
+                return Json(ResponseData.Instance.GenericResponse(ResponseStatus.ServerError));
             }
 
         }

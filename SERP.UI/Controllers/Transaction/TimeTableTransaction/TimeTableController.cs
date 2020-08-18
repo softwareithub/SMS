@@ -13,6 +13,7 @@ using SERP.Core.Model.TransactionViewModel;
 using SERP.Infrastructure.Repository.Infrastructure.Repo;
 using SERP.Utilities.ExceptionHelper;
 using SERP.Utilities.ResponseMessage;
+using SERP.Utilities.ResponseUtilities;
 
 namespace SERP.UI.Controllers.Transaction.TimeTableTransaction
 {
@@ -98,41 +99,77 @@ namespace SERP.UI.Controllers.Transaction.TimeTableTransaction
         [HttpPost]
         public async Task<IActionResult> CreateTimeTable(TimeSheetVm model)
         {
-            int courseId = Convert.ToInt32(HttpContext.Session.GetInt32("CourseId"));
-            int batchId = Convert.ToInt32(HttpContext.Session.GetInt32("BatchId"));
-
-            var isRecordExists = (await _timeTableMasterRepo.GetList(x => x.CourseId == courseId && x.BatchId == batchId
-            && x.IsActive == 1 && x.IsDeleted == 0)).Count();
-
-            if (isRecordExists > 0)
+            try
             {
-                await _timeSheetRepo.DeactivateTimeSheet(courseId, batchId);
-                await _timeTableMasterRepo.CreateNewContext();
-                await CreateTimeTable(model, courseId, batchId);
-                return Json("Time Table Updated Successfully");
+                int courseId = Convert.ToInt32(HttpContext.Session.GetInt32("CourseId"));
+                int batchId = Convert.ToInt32(HttpContext.Session.GetInt32("BatchId"));
+
+                var isRecordExists = (await _timeTableMasterRepo.GetList(x => x.CourseId == courseId && x.BatchId == batchId
+                && x.IsActive == 1 && x.IsDeleted == 0)).Count();
+
+                if (isRecordExists > 0)
+                {
+                    await _timeSheetRepo.DeactivateTimeSheet(courseId, batchId);
+                    await _timeTableMasterRepo.CreateNewContext();
+                    await CreateTimeTable(model, courseId, batchId);
+                    return Json("Time Table Updated Successfully");
+                }
+                else
+                {
+                    await _timeTableMasterRepo.CreateNewContext();
+                    return await CreateTimeTable(model, courseId, batchId);
+                }
             }
-            else
+            catch (Exception ex)
             {
-                await _timeTableMasterRepo.CreateNewContext();
-                return await CreateTimeTable(model, courseId, batchId);
+                string actionName = this.ControllerContext.RouteData.Values["action"].ToString();
+                string controllerName = this.ControllerContext.RouteData.Values["controller"].ToString();
+
+                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(actionName, controllerName, ex.Message, LoggingType.httpDelete.ToString(), 0);
+                var exceptionResponse = await _exceptionLoggingRepo.CreateEntity(exceptionHelper);
+                return Json(ResponseData.Instance.GenericResponse(ResponseStatus.ServerError));
             }
         }
 
         public async Task<IActionResult> CheckTimeSheetAvailable(int courseId, int batchId)
         {
-            var result = await _timeTableMasterRepo.GetList(x => x.IsActive == 1 && x.IsDeleted == 0 &&
-                     x.CourseId == courseId && x.BatchId == batchId);
-            if(result.Count()>0)
+            try
             {
-                return Json("There is already Active TimeSheet for this course and Batch Do you want to delete and Create new TimeSheet After clicking Ok your previous timesheet de-activated ?");
+                var result = await _timeTableMasterRepo.GetList(x => x.IsActive == 1 && x.IsDeleted == 0 &&
+                         x.CourseId == courseId && x.BatchId == batchId);
+                if (result.Count() > 0)
+                {
+                    return Json("There is already Active TimeSheet for this course and Batch Do you want to delete and Create new TimeSheet After clicking Ok your previous timesheet de-activated ?");
+                }
+                return Json("0");
             }
-            return Json("0");
+            catch (Exception ex)
+            {
+                string actionName = this.ControllerContext.RouteData.Values["action"].ToString();
+                string controllerName = this.ControllerContext.RouteData.Values["controller"].ToString();
+
+                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(actionName, controllerName, ex.Message, LoggingType.httpDelete.ToString(), 0);
+                var exceptionResponse = await _exceptionLoggingRepo.CreateEntity(exceptionHelper);
+                return Json(ResponseData.Instance.GenericResponse(ResponseStatus.ServerError));
+            }
         }
 
         public async Task<IActionResult> DeActivateTimeSheet(int courseId, int batchId)
         {
-            var result = await _timeSheetRepo.DeactivateTimeSheet(courseId, batchId);
-            return Json("");
+            try
+            {
+                var result = await _timeSheetRepo.DeactivateTimeSheet(courseId, batchId);
+                return Json("");
+            }
+            catch (Exception ex)
+            {
+                string actionName = this.ControllerContext.RouteData.Values["action"].ToString();
+                string controllerName = this.ControllerContext.RouteData.Values["controller"].ToString();
+
+                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(actionName, controllerName, ex.Message, LoggingType.httpDelete.ToString(), 0);
+                var exceptionResponse = await _exceptionLoggingRepo.CreateEntity(exceptionHelper);
+                return Json(ResponseData.Instance.GenericResponse(ResponseStatus.ServerError));
+            }
         }
 
         public async Task<IActionResult> GetTimeSheetDetail(int courseId, int batchId)
@@ -214,7 +251,7 @@ namespace SERP.UI.Controllers.Transaction.TimeTableTransaction
             }
         }
 
-        #region PribateFields
+        #region PrivateFields
         private IActionResult CreateNewTimeSheet(TimeTableMasterModel model)
         {
             List<string> days = new List<string>();
@@ -270,38 +307,48 @@ namespace SERP.UI.Controllers.Transaction.TimeTableTransaction
 
         private async Task<IActionResult> CreateTimeTable(TimeSheetVm model, int courseId, int batchId)
         {
-            //var daysName = TempData["Days"].ToString().Split(',');
-
-            List<TimeTableMasterModel> masterModels = new List<TimeTableMasterModel>();
-
-            model.TimeTableModels.ForEach(item =>
+            try
             {
-                TimeTableMasterModel masterModel = new TimeTableMasterModel();
-                masterModel.BatchId = batchId;
-                masterModel.CourseId = courseId;
-                masterModel.Name = item.DayName;
+                List<TimeTableMasterModel> masterModels = new List<TimeTableMasterModel>();
 
-                List<TimeTableAssignSubjTeacherModel> assignSubjectModels = new List<TimeTableAssignSubjTeacherModel>();
-
-                item.PeriodModels.ForEach(data =>
+                model.TimeTableModels.ForEach(item =>
                 {
-                    TimeTableAssignSubjTeacherModel assignModel = new TimeTableAssignSubjTeacherModel();
-                    assignModel.PeriodName = data.Period;
-                    assignModel.SubjecId = data.SubjectId;
-                    assignModel.TeacherId = data.EmployeeId;
-                    assignModel.FromTime = data.FromTime;
-                    assignModel.ToTime = data.ToTime;
+                    TimeTableMasterModel masterModel = new TimeTableMasterModel();
+                    masterModel.BatchId = batchId;
+                    masterModel.CourseId = courseId;
+                    masterModel.Name = item.DayName;
 
-                    assignSubjectModels.Add(assignModel);
+                    List<TimeTableAssignSubjTeacherModel> assignSubjectModels = new List<TimeTableAssignSubjTeacherModel>();
+
+                    item.PeriodModels.ForEach(data =>
+                    {
+                        TimeTableAssignSubjTeacherModel assignModel = new TimeTableAssignSubjTeacherModel();
+                        assignModel.PeriodName = data.Period;
+                        assignModel.SubjecId = data.SubjectId;
+                        assignModel.TeacherId = data.EmployeeId;
+                        assignModel.FromTime = data.FromTime;
+                        assignModel.ToTime = data.ToTime;
+
+                        assignSubjectModels.Add(assignModel);
+                    });
+
+                    masterModel.TimeTableAssignSubjTeacherModels = assignSubjectModels;
+                    masterModels.Add(masterModel);
+
                 });
 
-                masterModel.TimeTableAssignSubjTeacherModels = assignSubjectModels;
-                masterModels.Add(masterModel);
+                var result = await _timeTableMasterRepo.Add(masterModels.ToArray());
+                return Json("Time Table Created");
+            }
+            catch (Exception ex)
+            {
+                string actionName = this.ControllerContext.RouteData.Values["action"].ToString();
+                string controllerName = this.ControllerContext.RouteData.Values["controller"].ToString();
 
-            });
-
-            var result = await _timeTableMasterRepo.Add(masterModels.ToArray());
-            return Json("Time Table Created");
+                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(actionName, controllerName, ex.Message, LoggingType.httpDelete.ToString(), 0);
+                var exceptionResponse = await _exceptionLoggingRepo.CreateEntity(exceptionHelper);
+                return Json(ResponseData.Instance.GenericResponse(ResponseStatus.ServerError));
+            }
         }
         #endregion
     }

@@ -13,6 +13,7 @@ using SERP.Infrastructure.Repository.Infrastructure.Repo;
 using SERP.Utilities.CommanHelper;
 using SERP.Utilities.ExceptionHelper;
 using SERP.Utilities.ResponseMessage;
+using SERP.Utilities.ResponseUtilities;
 
 namespace SERP.UI.Controllers.Assignment
 {
@@ -67,29 +68,54 @@ namespace SERP.UI.Controllers.Assignment
         [HttpPost]
         public async Task<IActionResult> Create(HomeWorkModel model)
         {
-            if (model.Id > 0)
+            try
             {
-                model.UpdatedBy = 1;
-                model.UpdatedDate = DateTime.Now.Date;
-                var response = await _IHomeWorkRepo.Update(model);
-                return Json(ResponseData.Instance.GenericResponse(response));
+                if (model.Id > 0)
+                {
+                    model.UpdatedBy = 1;
+                    model.UpdatedDate = DateTime.Now.Date;
+                    var response = await _IHomeWorkRepo.Update(model);
+                    return Json(ResponseData.Instance.GenericResponse(response));
+                }
+                else
+                {
+                    model.CreatedBy = 1;
+                    model.CreatedDate = DateTime.Now.Date;
+                    var response = await _IHomeWorkRepo.CreateEntity(model);
+                    return Json(ResponseData.Instance.GenericResponse(response));
+                }
             }
-            else {
-                model.CreatedBy = 1;
-                model.CreatedDate = DateTime.Now.Date;
-                var response = await _IHomeWorkRepo.CreateEntity(model);
-                return Json(ResponseData.Instance.GenericResponse(response));
+            catch (Exception ex)
+            {
+                string actionName = this.ControllerContext.RouteData.Values["action"].ToString();
+                string controllerName = this.ControllerContext.RouteData.Values["controller"].ToString();
+
+                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(actionName, controllerName, ex.Message, LoggingType.httpDelete.ToString(), 0);
+                var exceptionResponse = await _exceptionLoggingRepo.CreateEntity(exceptionHelper);
+                return Json(ResponseData.Instance.GenericResponse(ResponseStatus.ServerError));
             }
-            
+
         }
 
         public async Task<IActionResult> Delete(int id)
         {
-            var model = await _IHomeWorkRepo.GetSingle(x => x.Id == id);
-            var deleteModel = CommanDeleteHelper.CommanDeleteCode(model,1);
-            await _IHomeWorkRepo.CreateNewContext();
-            var response = await _IHomeWorkRepo.Update(deleteModel);
-            return Json(ResponseData.Instance.GenericResponse(response));
+            try
+            {
+                var model = await _IHomeWorkRepo.GetSingle(x => x.Id == id);
+                var deleteModel = CommanDeleteHelper.CommanDeleteCode(model, 1);
+                await _IHomeWorkRepo.CreateNewContext();
+                var response = await _IHomeWorkRepo.Update(deleteModel);
+                return Json(ResponseData.Instance.GenericResponse(response));
+            }
+            catch (Exception ex)
+            {
+                string actionName = this.ControllerContext.RouteData.Values["action"].ToString();
+                string controllerName = this.ControllerContext.RouteData.Values["controller"].ToString();
+
+                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(actionName, controllerName, ex.Message, LoggingType.httpDelete.ToString(), 0);
+                var exceptionResponse = await _exceptionLoggingRepo.CreateEntity(exceptionHelper);
+                return Json(ResponseData.Instance.GenericResponse(ResponseStatus.ServerError));
+            }
         }
 
         public async Task<IActionResult> GetList()
@@ -133,24 +159,72 @@ namespace SERP.UI.Controllers.Assignment
         
         public async Task<IActionResult> GetDetail(int id)
         {
-            var response = await _IHomeWorkRepo.GetSingle(x => x.Id == id);
-            return Json(response.HomeWork);
+            try
+            {
+                var response = await _IHomeWorkRepo.GetSingle(x => x.Id == id);
+                return Json(response.HomeWork);
+            }
+            catch (Exception ex)
+            {
+                string actionName = this.ControllerContext.RouteData.Values["action"].ToString();
+                string controllerName = this.ControllerContext.RouteData.Values["controller"].ToString();
+
+                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(actionName, controllerName, ex.Message, LoggingType.httpDelete.ToString(), 0);
+                var exceptionResponse = await _exceptionLoggingRepo.CreateEntity(exceptionHelper);
+                return Json(ResponseData.Instance.GenericResponse(ResponseStatus.ServerError));
+            }
         }
         public async Task<IActionResult> GetBatchList(int id)
         {
-            var data = await _IBatchRepo.GetList(z => z.CourseId == id);
-            return Json(data);
+            try
+            {
+                var data = await _IBatchRepo.GetList(z => z.CourseId == id);
+                return Json(data);
+            }
+            catch (Exception ex)
+            {
+                string actionName = this.ControllerContext.RouteData.Values["action"].ToString();
+                string controllerName = this.ControllerContext.RouteData.Values["controller"].ToString();
+
+                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(actionName, controllerName, ex.Message, LoggingType.httpDelete.ToString(), 0);
+                var exceptionResponse = await _exceptionLoggingRepo.CreateEntity(exceptionHelper);
+                return Json(ResponseData.Instance.GenericResponse(ResponseStatus.ServerError));
+            }
         }
         public async Task<IActionResult> GetSubjectList(int id)
         {
-            var data = await _ISubjectRepo.GetList(z => z.CourseId == id);
-            return Json(data);
+            try
+            {
+                var data = await _ISubjectRepo.GetList(z => z.CourseId == id);
+                return Json(data);
+            }
+            catch (Exception ex)
+            {
+                string actionName = this.ControllerContext.RouteData.Values["action"].ToString();
+                string controllerName = this.ControllerContext.RouteData.Values["controller"].ToString();
+
+                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(actionName, controllerName, ex.Message, LoggingType.httpDelete.ToString(), 0);
+                var exceptionResponse = await _exceptionLoggingRepo.CreateEntity(exceptionHelper);
+                return Json(ResponseData.Instance.GenericResponse(ResponseStatus.ServerError));
+            }
         }
 
         public async Task<IActionResult> GetTeachers(int courseId)
         {
-            var models = await _IEmployeeRepo.GetList(x => x.IsActive == 1);
-            return Json(models);
+            try
+            {
+                var models = await _IEmployeeRepo.GetList(x => x.IsActive == 1);
+                return Json(models);
+            }
+            catch (Exception ex)
+            {
+                string actionName = this.ControllerContext.RouteData.Values["action"].ToString();
+                string controllerName = this.ControllerContext.RouteData.Values["controller"].ToString();
+
+                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(actionName, controllerName, ex.Message, LoggingType.httpDelete.ToString(), 0);
+                var exceptionResponse = await _exceptionLoggingRepo.CreateEntity(exceptionHelper);
+                return Json(ResponseData.Instance.GenericResponse(ResponseStatus.ServerError));
+            }
         }
     }
 }

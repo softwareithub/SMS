@@ -89,20 +89,31 @@ namespace SERP.UI.Controllers.HRModule
         [HttpPost]
         public async Task<IActionResult> ApplyLeaveEmployee(LeaveTransactionModel model)
         {
-            int employeeId = Convert.ToInt32(HttpContext.Session.GetInt32("EmployeeId"));
-            model.EmployeeId = employeeId;
-            if (model.Id == 0)
+            try
             {
-                model.LeaveStatus = "Pending";
-                var response = await _ILeaveTransactionRepo.CreateEntity(model);
-                return Json(ResponseData.Instance.GenericResponse(response));
+                int employeeId = Convert.ToInt32(HttpContext.Session.GetInt32("EmployeeId"));
+                model.EmployeeId = employeeId;
+                if (model.Id == 0)
+                {
+                    model.LeaveStatus = "Pending";
+                    var response = await _ILeaveTransactionRepo.CreateEntity(model);
+                    return Json(ResponseData.Instance.GenericResponse(response));
+                }
+                else
+                {
+                    var updateModel = CommanDeleteHelper.CommanUpdateCode<LeaveTransactionModel>(model, employeeId);
+                    var response = await _ILeaveTransactionRepo.Update(updateModel);
+                    return Json(ResponseData.Instance.GenericResponse(response));
+                }
             }
-            else
+            catch (Exception ex)
             {
-                var updateModel = CommanDeleteHelper.CommanUpdateCode<LeaveTransactionModel>(model, employeeId);
-                var response = await _ILeaveTransactionRepo.Update(updateModel);
-                return Json(ResponseData.Instance.GenericResponse(response));
-                
+                string actionName = this.ControllerContext.RouteData.Values["action"].ToString();
+                string controllerName = this.ControllerContext.RouteData.Values["controller"].ToString();
+
+                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(actionName, controllerName, ex.Message, LoggingType.httpDelete.ToString(), 0);
+                var exceptionResponse = await _exceptionLoggingRepo.CreateEntity(exceptionHelper);
+                return Json(ResponseData.Instance.GenericResponse(ResponseStatus.ServerError));
             }
         }
     }

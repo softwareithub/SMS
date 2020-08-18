@@ -61,36 +61,47 @@ namespace SERP.UI.Controllers.LibraryManagement
         [HttpPost]
         public async Task<IActionResult> ReturnBook(BookIssueDetailModel model)
         {
-
-            if (model.ActualReturnDate.Year == 1)
+            try
             {
-                return Json("Return Date is not valid.Please select valid Date");
-            }
-            else
-            {
-                var bookTransactionModel = await _bookTransactionRepo.GetSingle(x => x.Id == model.Id);
-
-                bookTransactionModel.ActualReturnDate = model.ActualReturnDate;
-                bookTransactionModel.FineAmount = model.FineAmount;
-                bookTransactionModel.FineReason = model.FineReason;
-                bookTransactionModel.DiscountReason = model.DiscountReason;
-                bookTransactionModel.FineDiscountAmount = model.DiscountAmount;
-
-                await _bookTransactionRepo.CreateNewContext();
-                var response = await _bookTransactionRepo.Update(bookTransactionModel);
-
-                if (response == Utilities.ResponseUtilities.ResponseStatus.UpdatedSuccessFully)
+                if (model.ActualReturnDate.Year == 1)
                 {
-                    var booItemModel = await _bookItemRepo.GetSingle(x => x.Id == model.BookItemId);
-                    booItemModel.BookStatus = model.BookCondition==4?2: model.BookCondition;
-
-                    await _bookItemRepo.CreateNewContext();
-
-                    var bookItemResponse = await _bookItemRepo.Update(booItemModel);
-                    return Json(ResponseData.Instance.GenericResponse(bookItemResponse));
+                    return Json("Return Date is not valid.Please select valid Date");
                 }
+                else
+                {
+                    var bookTransactionModel = await _bookTransactionRepo.GetSingle(x => x.Id == model.Id);
 
-                return Json(ResponseData.Instance.GenericResponse(response));
+                    bookTransactionModel.ActualReturnDate = model.ActualReturnDate;
+                    bookTransactionModel.FineAmount = model.FineAmount;
+                    bookTransactionModel.FineReason = model.FineReason;
+                    bookTransactionModel.DiscountReason = model.DiscountReason;
+                    bookTransactionModel.FineDiscountAmount = model.DiscountAmount;
+
+                    await _bookTransactionRepo.CreateNewContext();
+                    var response = await _bookTransactionRepo.Update(bookTransactionModel);
+
+                    if (response == Utilities.ResponseUtilities.ResponseStatus.UpdatedSuccessFully)
+                    {
+                        var booItemModel = await _bookItemRepo.GetSingle(x => x.Id == model.BookItemId);
+                        booItemModel.BookStatus = model.BookCondition == 4 ? 2 : model.BookCondition;
+
+                        await _bookItemRepo.CreateNewContext();
+
+                        var bookItemResponse = await _bookItemRepo.Update(booItemModel);
+                        return Json(ResponseData.Instance.GenericResponse(bookItemResponse));
+                    }
+
+                    return Json(ResponseData.Instance.GenericResponse(response));
+                }
+            }
+            catch (Exception ex)
+            {
+                string actionName = this.ControllerContext.RouteData.Values["action"].ToString();
+                string controllerName = this.ControllerContext.RouteData.Values["controller"].ToString();
+
+                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(actionName, controllerName, ex.Message, LoggingType.httpDelete.ToString(), 0);
+                var exceptionResponse = await _exceptionLoggingRepo.CreateEntity(exceptionHelper);
+                return Json(ResponseData.Instance.GenericResponse(ResponseStatus.ServerError));
             }
 
         }

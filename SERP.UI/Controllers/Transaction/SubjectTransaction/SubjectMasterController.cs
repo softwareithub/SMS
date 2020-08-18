@@ -75,18 +75,30 @@ namespace SERP.UI.Controllers.Transaction.SubjectTransaction
         [HttpPost]
         public async Task<IActionResult> PostAddSubject(SubjectMaster model)
         {
-            //Delete Records
-            if (model.Id > 0)
+            try
             {
-                model.UpdatedBy = 1;
-                model.UpdatedDate = DateTime.Now.Date;
-                var result = await _ISubjectRepo.Update(model);
-                return Json(ResponseData.Instance.GenericResponse(result));
+                //Delete Records
+                if (model.Id > 0)
+                {
+                    model.UpdatedBy = 1;
+                    model.UpdatedDate = DateTime.Now.Date;
+                    var result = await _ISubjectRepo.Update(model);
+                    return Json(ResponseData.Instance.GenericResponse(result));
+                }
+                else
+                {
+                    var result = await _ISubjectRepo.CreateEntity(model);
+                    return Json(ResponseData.Instance.GenericResponse(result));
+                }
             }
-            else
+            catch (Exception ex)
             {
-                var result = await _ISubjectRepo.CreateEntity(model);
-                return Json(ResponseData.Instance.GenericResponse(result));
+                string actionName = this.ControllerContext.RouteData.Values["action"].ToString();
+                string controllerName = this.ControllerContext.RouteData.Values["controller"].ToString();
+
+                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(actionName, controllerName, ex.Message, LoggingType.httpDelete.ToString(), 0);
+                var exceptionResponse = await _exceptionLoggingRepo.CreateEntity(exceptionHelper);
+                return Json(ResponseData.Instance.GenericResponse(ResponseStatus.ServerError));
             }
         }
 
@@ -129,14 +141,26 @@ namespace SERP.UI.Controllers.Transaction.SubjectTransaction
         #region PrivateFields
         public async Task<IActionResult> DeleteSubject(int id)
         {
-            var subjectModel = await _ISubjectRepo.GetSingle(x => x.Id == id);
-            subjectModel.IsActive = 0;
-            subjectModel.IsDeleted = 1;
-            subjectModel.UpdatedBy = 1;
-            subjectModel.UpdatedDate = DateTime.Now.Date;
-            await _ISubjectRepo.CreateNewContext();
-            var result = await _ISubjectRepo.Delete(subjectModel);
-            return Json(ResponseData.Instance.GenericResponse(result));
+            try
+            {
+                var subjectModel = await _ISubjectRepo.GetSingle(x => x.Id == id);
+                subjectModel.IsActive = 0;
+                subjectModel.IsDeleted = 1;
+                subjectModel.UpdatedBy = 1;
+                subjectModel.UpdatedDate = DateTime.Now.Date;
+                await _ISubjectRepo.CreateNewContext();
+                var result = await _ISubjectRepo.Delete(subjectModel);
+                return Json(ResponseData.Instance.GenericResponse(result));
+            }
+            catch (Exception ex)
+            {
+                string actionName = this.ControllerContext.RouteData.Values["action"].ToString();
+                string controllerName = this.ControllerContext.RouteData.Values["controller"].ToString();
+
+                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(actionName, controllerName, ex.Message, LoggingType.httpDelete.ToString(), 0);
+                var exceptionResponse = await _exceptionLoggingRepo.CreateEntity(exceptionHelper);
+                return Json(ResponseData.Instance.GenericResponse(ResponseStatus.ServerError));
+            }
         }
         #endregion
 

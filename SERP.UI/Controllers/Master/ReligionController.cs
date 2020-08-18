@@ -8,6 +8,7 @@ using SERP.Core.Entities.SERPExceptionLogging;
 using SERP.Infrastructure.Repository.Infrastructure.Repo;
 using SERP.Utilities.ExceptionHelper;
 using SERP.Utilities.ResponseMessage;
+using SERP.Utilities.ResponseUtilities;
 
 namespace SERP.UI.Controllers.Master
 {
@@ -47,17 +48,29 @@ namespace SERP.UI.Controllers.Master
         [HttpPost]
         public async Task<IActionResult> Create(ReligionMaster modal)
         {
-            if (modal.Id == 0)
+            try
             {
-                var result = await _IReligionMaster.CreateEntity(modal);
-                return Json(ResponseData.Instance.GenericResponse(result));
+                if (modal.Id == 0)
+                {
+                    var result = await _IReligionMaster.CreateEntity(modal);
+                    return Json(ResponseData.Instance.GenericResponse(result));
+                }
+                else
+                {
+                    var result = await _IReligionMaster.Update(modal);
+                    return Json(ResponseData.Instance.GenericResponse(result));
+                }
             }
-            else
+            catch (Exception ex)
             {
-                var result = await _IReligionMaster.Update(modal);
-                return Json(ResponseData.Instance.GenericResponse(result));
+                string actionName = this.ControllerContext.RouteData.Values["action"].ToString();
+                string controllerName = this.ControllerContext.RouteData.Values["controller"].ToString();
+
+                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(actionName, controllerName, ex.Message, LoggingType.httpDelete.ToString(), 0);
+                var exceptionResponse = await _exceptionLoggingRepo.CreateEntity(exceptionHelper);
+                return Json(ResponseData.Instance.GenericResponse(ResponseStatus.ServerError));
             }
-           
+
         }
         public async Task<IActionResult> GetReligionMaster()
         {
@@ -80,13 +93,24 @@ namespace SERP.UI.Controllers.Master
 
         public async Task<IActionResult>DeleteReligion(int id)
         {
-            var model = await _IReligionMaster.GetSingle(x => x.Id == id);
-            await _IReligionMaster.CreateNewContext();
-            model.IsActive = 0; model.IsDeleted = 1;
-            model.UpdatedBy = 1; model.UpdatedDate = DateTime.Now.Date;
-            var result = await _IReligionMaster.Delete(model);
-            return Json(ResponseData.Instance.GenericResponse(result));
+            try
+            {
+                var model = await _IReligionMaster.GetSingle(x => x.Id == id);
+                await _IReligionMaster.CreateNewContext();
+                model.IsActive = 0; model.IsDeleted = 1;
+                model.UpdatedBy = 1; model.UpdatedDate = DateTime.Now.Date;
+                var result = await _IReligionMaster.Delete(model);
+                return Json(ResponseData.Instance.GenericResponse(result));
+            }
+            catch (Exception ex)
+            {
+                string actionName = this.ControllerContext.RouteData.Values["action"].ToString();
+                string controllerName = this.ControllerContext.RouteData.Values["controller"].ToString();
 
+                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(actionName, controllerName, ex.Message, LoggingType.httpDelete.ToString(), 0);
+                var exceptionResponse = await _exceptionLoggingRepo.CreateEntity(exceptionHelper);
+                return Json(ResponseData.Instance.GenericResponse(ResponseStatus.ServerError));
+            }
         }
     }
 }

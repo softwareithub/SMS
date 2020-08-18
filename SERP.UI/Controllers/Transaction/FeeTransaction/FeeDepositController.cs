@@ -13,6 +13,7 @@ using SERP.Infrastructure.Repository.Infrastructure.Repo;
 using SERP.UI.Helper;
 using SERP.Utilities.ExceptionHelper;
 using SERP.Utilities.ResponseMessage;
+using SERP.Utilities.ResponseUtilities;
 
 namespace SERP.UI.Controllers.Transaction.FeeTransaction
 {
@@ -183,24 +184,36 @@ namespace SERP.UI.Controllers.Transaction.FeeTransaction
         [HttpPost]
         public async Task<IActionResult> FeeSubmit()
         {
-
-            List<StudentFeeDepositParticular> fdParticulars = new List<StudentFeeDepositParticular>();
-            var maxDepositId = await InsertFeeDeposit();
-
-            var categories = Request.Form["CategoryId"];
-
-            for (int i = 0; i < categories.Count(); i++)
+            try
             {
-                StudentFeeDepositParticular model = new StudentFeeDepositParticular();
-                model.StudentFeeDepositId = maxDepositId;
-                model.ParticularId = Convert.ToInt32(categories[i]);
-                model.PaymentFor = Request.Form[categories[i].ToString()];
-                fdParticulars.Add(model);
+
+                List<StudentFeeDepositParticular> fdParticulars = new List<StudentFeeDepositParticular>();
+                var maxDepositId = await InsertFeeDeposit();
+
+                var categories = Request.Form["CategoryId"];
+
+                for (int i = 0; i < categories.Count(); i++)
+                {
+                    StudentFeeDepositParticular model = new StudentFeeDepositParticular();
+                    model.StudentFeeDepositId = maxDepositId;
+                    model.ParticularId = Convert.ToInt32(categories[i]);
+                    model.PaymentFor = Request.Form[categories[i].ToString()];
+                    fdParticulars.Add(model);
+                }
+
+                var result = await _feeDepositParticularRepo.Add(fdParticulars.ToArray());
+
+                return Json(ResponseData.Instance.GenericResponse(result));
             }
+            catch (Exception ex)
+            {
+                string actionName = this.ControllerContext.RouteData.Values["action"].ToString();
+                string controllerName = this.ControllerContext.RouteData.Values["controller"].ToString();
 
-            var result = await _feeDepositParticularRepo.Add(fdParticulars.ToArray());
-
-            return Json(ResponseData.Instance.GenericResponse(result));
+                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(actionName, controllerName, ex.Message, LoggingType.httpDelete.ToString(), 0);
+                var exceptionResponse = await _exceptionLoggingRepo.CreateEntity(exceptionHelper);
+                return Json(ResponseData.Instance.GenericResponse(ResponseStatus.ServerError));
+            }
         }
 
         private async Task<int> InsertFeeDeposit()

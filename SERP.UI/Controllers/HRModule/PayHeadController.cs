@@ -8,6 +8,7 @@ using SERP.Core.Entities.SERPExceptionLogging;
 using SERP.Infrastructure.Repository.Infrastructure.Repo;
 using SERP.Utilities.ExceptionHelper;
 using SERP.Utilities.ResponseMessage;
+using SERP.Utilities.ResponseUtilities;
 
 namespace SERP.UI.Controllers.HRModule
 {
@@ -50,17 +51,29 @@ namespace SERP.UI.Controllers.HRModule
         [HttpPost]
         public async Task<IActionResult> CreatePayHead(PayHeadesModel model)
         {
-            if (model.Id > 0)
+            try
             {
-                model.UpdatedBy = 1;
-                model.UpdatedDate = DateTime.Now.Date;
-                var result = await _payHeadRepo.Update(model);
-                return Json(ResponseData.Instance.GenericResponse(result));
+                if (model.Id > 0)
+                {
+                    model.UpdatedBy = 1;
+                    model.UpdatedDate = DateTime.Now.Date;
+                    var result = await _payHeadRepo.Update(model);
+                    return Json(ResponseData.Instance.GenericResponse(result));
+                }
+                else
+                {
+                    var result = await _payHeadRepo.CreateEntity(model);
+                    return Json(ResponseData.Instance.GenericResponse(result));
+                }
             }
-            else
+            catch (Exception ex)
             {
-                var result = await _payHeadRepo.CreateEntity(model);
-                return Json(ResponseData.Instance.GenericResponse(result));
+                string actionName = this.ControllerContext.RouteData.Values["action"].ToString();
+                string controllerName = this.ControllerContext.RouteData.Values["controller"].ToString();
+
+                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(actionName, controllerName, ex.Message, LoggingType.httpDelete.ToString(), 0);
+                var exceptionResponse = await _exceptionLoggingRepo.CreateEntity(exceptionHelper);
+                return Json(ResponseData.Instance.GenericResponse(ResponseStatus.ServerError));
             }
         }
 
@@ -85,13 +98,25 @@ namespace SERP.UI.Controllers.HRModule
 
         public async Task<IActionResult> DeleteRecord(int id)
         {
-            var payHeadModel =await _payHeadRepo.GetSingle(x => x.Id == id);
-            payHeadModel.IsActive = 0;
-            payHeadModel.IsDeleted = 1;
+            try
+            {
+                var payHeadModel = await _payHeadRepo.GetSingle(x => x.Id == id);
+                payHeadModel.IsActive = 0;
+                payHeadModel.IsDeleted = 1;
 
-            await _payHeadRepo.CreateNewContext();
-            var result = await _payHeadRepo.Delete(payHeadModel);
-            return Json(ResponseData.Instance.GenericResponse(result));
+                await _payHeadRepo.CreateNewContext();
+                var result = await _payHeadRepo.Delete(payHeadModel);
+                return Json(ResponseData.Instance.GenericResponse(result));
+            }
+            catch (Exception ex)
+            {
+                string actionName = this.ControllerContext.RouteData.Values["action"].ToString();
+                string controllerName = this.ControllerContext.RouteData.Values["controller"].ToString();
+
+                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(actionName, controllerName, ex.Message, LoggingType.httpDelete.ToString(), 0);
+                var exceptionResponse = await _exceptionLoggingRepo.CreateEntity(exceptionHelper);
+                return Json(ResponseData.Instance.GenericResponse(ResponseStatus.ServerError));
+            }
         }
     }
 }

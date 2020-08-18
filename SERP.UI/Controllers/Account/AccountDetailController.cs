@@ -24,7 +24,6 @@ namespace SERP.UI.Controllers.Account
         {
             try
             {
-                throw new Exception();
                 var model = await _accountRepo.GetSingle(x => x.Id == id);
                 return PartialView("~/Views/Accounts/_CreateAccountPartial.cshtml", model);
             }
@@ -93,7 +92,10 @@ namespace SERP.UI.Controllers.Account
             }
             catch (Exception ex)
             {
-                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(nameof(Delete), nameof(AccountDetail), ex.Message, LoggingType.httpDelete.ToString(), 0);
+                string actionName = this.ControllerContext.RouteData.Values["action"].ToString();
+                string controllerName = this.ControllerContext.RouteData.Values["controller"].ToString();
+
+                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(actionName, controllerName, ex.Message, LoggingType.httpDelete.ToString(), 0);
                 var exceptionResponse = await _exceptionLoggingRepo.CreateEntity(exceptionHelper);
                 return Json(ResponseData.Instance.GenericResponse(ResponseStatus.ServerError));
             }

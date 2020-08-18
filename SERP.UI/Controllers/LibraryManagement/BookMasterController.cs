@@ -78,50 +78,61 @@ namespace SERP.UI.Controllers.LibraryManagement
         [HttpPost]
         public async Task<IActionResult> UpsertBook(BookMasterModel model, IFormFile ImagePath)
         {
-            if (model.Id == 0)
+            try
             {
-                string imagePath = string.Empty;
-                
-                if (ImagePath!=null && ImagePath.Length > 0)
+                if (model.Id == 0)
                 {
-                    imagePath = (await UploadImage.UploadImageOnFolder(new List<IFormFile>() { ImagePath }, _hostingEnviroment)).First();
-                }
-                model.ImagePath = imagePath;
-                var response = await _IBookRepo.CreateEntity(model);
-                await _IBookRepo.CreateNewContext();
-                var bookId = (await _IBookRepo.GetList(x => x.IsActive == 1)).Max(x => x.Id);
-                if (response == Utilities.ResponseUtilities.ResponseStatus.AddedSuccessfully)
-                {
-                    ResponseStatus bookItemResponse = await InsertBookItems(model, bookId);
-                    return Json(ResponseData.Instance.GenericResponse(bookItemResponse));
-                }
-            }
-            else
-            {
-                string imagePath = model.ImagePath;
-                if (ImagePath.Length > 0)
-                {
-                    imagePath = (await UploadImage.UploadImageOnFolder(new List<IFormFile>() { ImagePath }, _hostingEnviroment)).First();
-                }
-                var updateModel = CommanDeleteHelper.CommanUpdateCode<BookMasterModel>(model, 1);
-                var updateResponse = await _IBookRepo.Update(model);
-                if (updateResponse == ResponseStatus.UpdatedSuccessFully)
-                {
-                    var bookItemModels = await _bookItemRepo.GetList(x => x.IsActive == 1 && x.BookId == model.Id);
-                    await _bookItemRepo.CreateNewContext();
-                    bookItemModels.ToList().ForEach(item =>
+                    string imagePath = string.Empty;
+
+                    if (ImagePath != null && ImagePath.Length > 0)
                     {
-                        item.IsActive = 0;
-                        item.IsDeleted = 1;
-                        item.BookStatus = 2;
-                    });
-                    var deleteResponse = await _bookItemRepo.Update(bookItemModels.ToArray());
-                    await _bookItemRepo.CreateNewContext();
-                    var response = await InsertBookItems(model, model.TotalBookCount);
-                    return Json(ResponseData.Instance.GenericResponse(response));
+                        imagePath = (await UploadImage.UploadImageOnFolder(new List<IFormFile>() { ImagePath }, _hostingEnviroment)).First();
+                    }
+                    model.ImagePath = imagePath;
+                    var response = await _IBookRepo.CreateEntity(model);
+                    await _IBookRepo.CreateNewContext();
+                    var bookId = (await _IBookRepo.GetList(x => x.IsActive == 1)).Max(x => x.Id);
+                    if (response == Utilities.ResponseUtilities.ResponseStatus.AddedSuccessfully)
+                    {
+                        ResponseStatus bookItemResponse = await InsertBookItems(model, bookId);
+                        return Json(ResponseData.Instance.GenericResponse(bookItemResponse));
+                    }
+                }
+                else
+                {
+                    string imagePath = model.ImagePath;
+                    if (ImagePath.Length > 0)
+                    {
+                        imagePath = (await UploadImage.UploadImageOnFolder(new List<IFormFile>() { ImagePath }, _hostingEnviroment)).First();
+                    }
+                    var updateModel = CommanDeleteHelper.CommanUpdateCode<BookMasterModel>(model, 1);
+                    var updateResponse = await _IBookRepo.Update(model);
+                    if (updateResponse == ResponseStatus.UpdatedSuccessFully)
+                    {
+                        var bookItemModels = await _bookItemRepo.GetList(x => x.IsActive == 1 && x.BookId == model.Id);
+                        await _bookItemRepo.CreateNewContext();
+                        bookItemModels.ToList().ForEach(item =>
+                        {
+                            item.IsActive = 0;
+                            item.IsDeleted = 1;
+                            item.BookStatus = 2;
+                        });
+                        var deleteResponse = await _bookItemRepo.Update(bookItemModels.ToArray());
+                        await _bookItemRepo.CreateNewContext();
+                        var response = await InsertBookItems(model, model.TotalBookCount);
+                        return Json(ResponseData.Instance.GenericResponse(response));
+                    }
                 }
             }
-            return Json("Error in book creation please contact admin!");
+            catch (Exception ex)
+            {
+                string actionName = this.ControllerContext.RouteData.Values["action"].ToString();
+                string controllerName = this.ControllerContext.RouteData.Values["controller"].ToString();
+
+                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(actionName, controllerName, ex.Message, LoggingType.httpDelete.ToString(), 0);
+                var exceptionResponse = await _exceptionLoggingRepo.CreateEntity(exceptionHelper);
+                return Json(ResponseData.Instance.GenericResponse(ResponseStatus.ServerError));
+            }
         }
 
         private async Task<ResponseStatus> InsertBookItems(BookMasterModel model, int bookId)
@@ -214,18 +225,30 @@ namespace SERP.UI.Controllers.LibraryManagement
         [HttpPost]
         public async Task<IActionResult> UpsertBookItems()
         {
-            string[] bookItemId = Request.Form["bookItemId"];
-            var isbn = Request.Form["ISBN"];
-            int[] itemIds = Array.ConvertAll(bookItemId, s => int.Parse(s));
-            var bookIitems = await _bookItemRepo.GetList(x => x.Id.Equals(itemIds.ToList()));
-            var bin = Request.Form["BIN"];
-            for(int i=0; i<bookItemId.Count(); i++)
+            try
             {
-                var  model = bookIitems.Where(x=>x.Id==ToInt32(bookItemId[i])).FirstOrDefault();
-                model.ISBNNumber = isbn[i];
-                model.BINShelf = bin[i];
+                string[] bookItemId = Request.Form["bookItemId"];
+                var isbn = Request.Form["ISBN"];
+                int[] itemIds = Array.ConvertAll(bookItemId, s => int.Parse(s));
+                var bookIitems = await _bookItemRepo.GetList(x => x.Id.Equals(itemIds.ToList()));
+                var bin = Request.Form["BIN"];
+                for (int i = 0; i < bookItemId.Count(); i++)
+                {
+                    var model = bookIitems.Where(x => x.Id == ToInt32(bookItemId[i])).FirstOrDefault();
+                    model.ISBNNumber = isbn[i];
+                    model.BINShelf = bin[i];
+                }
+                return Json(ResponseData.Instance.GenericResponse(await _bookItemRepo.Update(bookIitems.ToArray())));
             }
-            return Json(ResponseData.Instance.GenericResponse(await _bookItemRepo.Update(bookIitems.ToArray())));
+            catch (Exception ex)
+            {
+                string actionName = this.ControllerContext.RouteData.Values["action"].ToString();
+                string controllerName = this.ControllerContext.RouteData.Values["controller"].ToString();
+
+                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(actionName, controllerName, ex.Message, LoggingType.httpDelete.ToString(), 0);
+                var exceptionResponse = await _exceptionLoggingRepo.CreateEntity(exceptionHelper);
+                return Json(ResponseData.Instance.GenericResponse(ResponseStatus.ServerError));
+            }
         }
     }
 }

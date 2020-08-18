@@ -10,6 +10,7 @@ using SERP.Core.Entities.SERPExceptionLogging;
 using SERP.Infrastructure.Repository.Infrastructure.Repo;
 using SERP.Utilities.CommanHelper;
 using SERP.Utilities.ExceptionHelper;
+using SERP.Utilities.ResponseMessage;
 using SERP.Utilities.ResponseUtilities;
 
 namespace SERP.UI.Controllers.Master
@@ -51,19 +52,43 @@ namespace SERP.UI.Controllers.Master
         [HttpPost]
         public async Task<IActionResult> CreateAcademicCalender(AcademicCalender model)
         {
-            if (model.Id > 0)
+            try
             {
-                var response = await _IAcademicCalenderRepo.Update(CommanDeleteHelper.CommanUpdateCode<AcademicCalender>(model, 1));
-                return Json(Utilities.ResponseMessage.ResponseData.Instance.GenericResponse(response));
+                if (model.Id > 0)
+                {
+                    var response = await _IAcademicCalenderRepo.Update(CommanDeleteHelper.CommanUpdateCode<AcademicCalender>(model, 1));
+                    return Json(Utilities.ResponseMessage.ResponseData.Instance.GenericResponse(response));
+                }
+                return Json(Utilities.ResponseMessage.ResponseData.Instance.GenericResponse(await _IAcademicCalenderRepo.CreateEntity(model)));
             }
-            return Json(Utilities.ResponseMessage.ResponseData.Instance.GenericResponse(await _IAcademicCalenderRepo.CreateEntity(model)));
+            catch (Exception ex)
+            {
+                string actionName = this.ControllerContext.RouteData.Values["action"].ToString();
+                string controllerName = this.ControllerContext.RouteData.Values["controller"].ToString();
+
+                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(actionName, controllerName, ex.Message, LoggingType.httpDelete.ToString(), 0);
+                var exceptionResponse = await _exceptionLoggingRepo.CreateEntity(exceptionHelper);
+                return Json(ResponseData.Instance.GenericResponse(ResponseStatus.ServerError));
+            }
         }
 
         public async Task<IActionResult> Delete(int id)
         {
-            var deleteModel = CommanDeleteHelper.CommanDeleteCode<AcademicCalender>(await _IAcademicCalenderRepo.GetSingle(x => x.Id == id), 1);
-            await _IAcademicCalenderRepo.CreateNewContext();
-            return Json(Utilities.ResponseMessage.ResponseData.Instance.GenericResponse(await _IAcademicCalenderRepo.Update(deleteModel)));
+            try
+            {
+                var deleteModel = CommanDeleteHelper.CommanDeleteCode<AcademicCalender>(await _IAcademicCalenderRepo.GetSingle(x => x.Id == id), 1);
+                await _IAcademicCalenderRepo.CreateNewContext();
+                return Json(Utilities.ResponseMessage.ResponseData.Instance.GenericResponse(await _IAcademicCalenderRepo.Update(deleteModel)));
+            }
+            catch (Exception ex)
+            {
+                string actionName = this.ControllerContext.RouteData.Values["action"].ToString();
+                string controllerName = this.ControllerContext.RouteData.Values["controller"].ToString();
+
+                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(actionName, controllerName, ex.Message, LoggingType.httpDelete.ToString(), 0);
+                var exceptionResponse = await _exceptionLoggingRepo.CreateEntity(exceptionHelper);
+                return Json(ResponseData.Instance.GenericResponse(ResponseStatus.ServerError));
+            }
         }
 
         public async Task<IActionResult> GetAcademicCalender()

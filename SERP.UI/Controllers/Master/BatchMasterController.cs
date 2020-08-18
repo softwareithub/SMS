@@ -51,8 +51,20 @@ namespace SERP.UI.Controllers.Master
         [HttpPost]
         public async Task<IActionResult> CreateBatch(BatchMaster model)
         {
-            var result=await UpSertBatchMaster(model);
-            return Json(result);
+            try
+            {
+                var result = await UpSertBatchMaster(model);
+                return Json(result);
+            }
+            catch (Exception ex)
+            {
+                string actionName = this.ControllerContext.RouteData.Values["action"].ToString();
+                string controllerName = this.ControllerContext.RouteData.Values["controller"].ToString();
+
+                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(actionName, controllerName, ex.Message, LoggingType.httpDelete.ToString(), 0);
+                var exceptionResponse = await _exceptionLoggingRepo.CreateEntity(exceptionHelper);
+                return Json(ResponseData.Instance.GenericResponse(ResponseStatus.ServerError));
+            }
         }
         public async Task<IActionResult> GetBatchMasterList()
         {
@@ -79,17 +91,29 @@ namespace SERP.UI.Controllers.Master
         }
         public async Task<IActionResult> DeleteBatch(int Id)
         {
-            var batchData = await _IBatchRepo.GetSingle(x => x.Id == Id);
-            batchData.IsActive = 0;
-            batchData.IsDeleted = 1;
-            batchData.UpdatedBy = 1;
-            batchData.UpdatedDate = DateTime.Now.Date;
+            try
+            {
+                var batchData = await _IBatchRepo.GetSingle(x => x.Id == Id);
+                batchData.IsActive = 0;
+                batchData.IsDeleted = 1;
+                batchData.UpdatedBy = 1;
+                batchData.UpdatedDate = DateTime.Now.Date;
 
-            await _IBatchRepo.CreateNewContext();
+                await _IBatchRepo.CreateNewContext();
 
-            var result = await _IBatchRepo.Delete(batchData);
+                var result = await _IBatchRepo.Delete(batchData);
 
-            return Json("Batch deleted successfully.");
+                return Json("Batch deleted successfully.");
+            }
+            catch (Exception ex)
+            {
+                string actionName = this.ControllerContext.RouteData.Values["action"].ToString();
+                string controllerName = this.ControllerContext.RouteData.Values["controller"].ToString();
+
+                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(actionName, controllerName, ex.Message, LoggingType.httpDelete.ToString(), 0);
+                var exceptionResponse = await _exceptionLoggingRepo.CreateEntity(exceptionHelper);
+                return Json(ResponseData.Instance.GenericResponse(ResponseStatus.ServerError));
+            }
         }
         public async Task<BatchMaster> GetBatchMasterById(int Id)
         {

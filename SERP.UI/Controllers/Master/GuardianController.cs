@@ -13,6 +13,7 @@ using SERP.Utilities.BlobUtility;
 using SERP.Utilities.CommanHelper;
 using SERP.Utilities.ExceptionHelper;
 using SERP.Utilities.ResponseMessage;
+using SERP.Utilities.ResponseUtilities;
 
 namespace SERP.UI.Controllers.Master
 {
@@ -88,35 +89,59 @@ namespace SERP.UI.Controllers.Master
         [HttpPost]
         public async Task<IActionResult> Create(GuardianMaster model, IFormFile GuardianImage)
         {
-            List<IFormFile> formFiles = new List<IFormFile>
+            try
+            {
+                List<IFormFile> formFiles = new List<IFormFile>
             {
                 GuardianImage
             };
 
-            var uploadImages = await UploadImage.UploadImageOnFolder(formFiles, _hostingEnviroment);
-            if(uploadImages.Count > 0)
-            model.GuardianImage = uploadImages.First();
-                
-            if (model.Id > 0)
-            {
-                model.UpdatedBy = 1;
-                model.UpdatedDate = DateTime.Now.Date;
-                var response = await _IGuardianRepo.Update(model);
-                return Json(ResponseData.Instance.GenericResponse(response));
+                var uploadImages = await UploadImage.UploadImageOnFolder(formFiles, _hostingEnviroment);
+                if (uploadImages.Count > 0)
+                    model.GuardianImage = uploadImages.First();
+
+                if (model.Id > 0)
+                {
+                    model.UpdatedBy = 1;
+                    model.UpdatedDate = DateTime.Now.Date;
+                    var response = await _IGuardianRepo.Update(model);
+                    return Json(ResponseData.Instance.GenericResponse(response));
+                }
+                else
+                {
+                    var response = await _IGuardianRepo.CreateEntity(model);
+                    return Json(ResponseData.Instance.GenericResponse(response));
+                }
             }
-            else
+            catch (Exception ex)
             {
-                var response = await _IGuardianRepo.CreateEntity(model);
-                return Json(ResponseData.Instance.GenericResponse(response));
+                string actionName = this.ControllerContext.RouteData.Values["action"].ToString();
+                string controllerName = this.ControllerContext.RouteData.Values["controller"].ToString();
+
+                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(actionName, controllerName, ex.Message, LoggingType.httpDelete.ToString(), 0);
+                var exceptionResponse = await _exceptionLoggingRepo.CreateEntity(exceptionHelper);
+                return Json(ResponseData.Instance.GenericResponse(ResponseStatus.ServerError));
             }
         }
         public async Task<IActionResult> Delete(int id)
         {
-            var model = await _IGuardianRepo.GetSingle(x => x.Id == id);
-            var deleteModel=CommanDeleteHelper.CommanDeleteCode(model, 1);
-            await _IGuardianRepo.CreateNewContext();
-            var response = await _IGuardianRepo.Update(deleteModel);
-            return Json(ResponseData.Instance.GenericResponse(response));
+            try
+            {
+                var model = await _IGuardianRepo.GetSingle(x => x.Id == id);
+                var deleteModel = CommanDeleteHelper.CommanDeleteCode(model, 1);
+                await _IGuardianRepo.CreateNewContext();
+                var response = await _IGuardianRepo.Update(deleteModel);
+                return Json(ResponseData.Instance.GenericResponse(response));
+            }
+            catch (Exception ex)
+            {
+                string actionName = this.ControllerContext.RouteData.Values["action"].ToString();
+                string controllerName = this.ControllerContext.RouteData.Values["controller"].ToString();
+
+                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(actionName, controllerName, ex.Message, LoggingType.httpDelete.ToString(), 0);
+                var exceptionResponse = await _exceptionLoggingRepo.CreateEntity(exceptionHelper);
+                return Json(ResponseData.Instance.GenericResponse(ResponseStatus.ServerError));
+            }
         }
     }
 }

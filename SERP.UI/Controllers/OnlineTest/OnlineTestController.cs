@@ -11,6 +11,7 @@ using SERP.UI.Models;
 using SERP.Utilities.CommanHelper;
 using SERP.Utilities.ExceptionHelper;
 using SERP.Utilities.ResponseMessage;
+using SERP.Utilities.ResponseUtilities;
 
 namespace SERP.UI.Controllers.OnlineTest
 {
@@ -59,29 +60,39 @@ namespace SERP.UI.Controllers.OnlineTest
         [HttpPost]
         public async Task<IActionResult> CreateQuestion(QuestionVm model)
         {
-            var response = await _QuestionRepo.CreateEntity(model.QuestionModel);
-            await _QuestionRepo.CreateNewContext();
-            List<OptionMaster> optionMasters = new List<OptionMaster>();
-            var questionId = Convert.ToInt32((await _QuestionRepo.GetList(x => x.IsActive == 1)).Max(x => x.Id));
-
-
-            string[] arr = model.OptionMasters.OptionData.Replace("<p><math xmlns=\"http://www.w3.org/1998/Math/MathML\">", "").Replace("</p>", "").Split(new[] { "<mi" }, StringSplitOptions.RemoveEmptyEntries);
-            for (int i = 0; i < arr.Length; i++)
+            try
             {
-                var optionText = "<p><math xmlns='http://www.w3.org/1998/Math/MathML'><mi" + arr[i] + "</p>";
-                OptionMaster optionMaster = new OptionMaster();
-                optionMaster.QuestionId = questionId;
-                optionMaster.OptionData = optionText;
-                optionMaster.SortOrder = i+1;
-                optionMasters.Add(optionMaster);
+                var response = await _QuestionRepo.CreateEntity(model.QuestionModel);
+                await _QuestionRepo.CreateNewContext();
+                List<OptionMaster> optionMasters = new List<OptionMaster>();
+                var questionId = Convert.ToInt32((await _QuestionRepo.GetList(x => x.IsActive == 1)).Max(x => x.Id));
 
+
+                string[] arr = model.OptionMasters.OptionData.Replace("<p><math xmlns=\"http://www.w3.org/1998/Math/MathML\">", "").Replace("</p>", "").Split(new[] { "<mi" }, StringSplitOptions.RemoveEmptyEntries);
+                for (int i = 0; i < arr.Length; i++)
+                {
+                    var optionText = "<p><math xmlns='http://www.w3.org/1998/Math/MathML'><mi" + arr[i] + "</p>";
+                    OptionMaster optionMaster = new OptionMaster();
+                    optionMaster.QuestionId = questionId;
+                    optionMaster.OptionData = optionText;
+                    optionMaster.SortOrder = i + 1;
+                    optionMasters.Add(optionMaster);
+
+                }
+
+                var optionResponse = await _OptionRepo.Add(optionMasters.ToArray());
+
+                return Json(ResponseData.Instance.GenericResponse(response));
             }
+            catch (Exception ex)
+            {
+                string actionName = this.ControllerContext.RouteData.Values["action"].ToString();
+                string controllerName = this.ControllerContext.RouteData.Values["controller"].ToString();
 
-            var optionResponse = await _OptionRepo.Add(optionMasters.ToArray());
-
-            return Json(ResponseData.Instance.GenericResponse(response));
-
-
+                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(actionName, controllerName, ex.Message, LoggingType.httpDelete.ToString(), 0);
+                var exceptionResponse = await _exceptionLoggingRepo.CreateEntity(exceptionHelper);
+                return Json(ResponseData.Instance.GenericResponse(ResponseStatus.ServerError));
+            }
         }
 
         public async Task<IActionResult> GetList()
@@ -106,8 +117,20 @@ namespace SERP.UI.Controllers.OnlineTest
 
         public async Task<IActionResult> GetSMSEmailTemplate(string notificationType)
         {
-            var model = await _smsTemplateRepo.GetList(x => x.TemplateType == notificationType);
-            return Json(model);
+            try
+            {
+                var model = await _smsTemplateRepo.GetList(x => x.TemplateType == notificationType);
+                return Json(model);
+            }
+            catch (Exception ex)
+            {
+                string actionName = this.ControllerContext.RouteData.Values["action"].ToString();
+                string controllerName = this.ControllerContext.RouteData.Values["controller"].ToString();
+
+                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(actionName, controllerName, ex.Message, LoggingType.httpDelete.ToString(), 0);
+                var exceptionResponse = await _exceptionLoggingRepo.CreateEntity(exceptionHelper);
+                return Json(ResponseData.Instance.GenericResponse(ResponseStatus.ServerError));
+            }
         }
 
         public async Task<IActionResult> AddOptions(int id)
@@ -133,8 +156,20 @@ namespace SERP.UI.Controllers.OnlineTest
         [HttpPost]
         public async Task<IActionResult> CreateOptions(OptionMaster optionMaster)
         {
-            var response = await _OptionRepo.CreateEntity(optionMaster);
-            return Json(ResponseData.Instance.GenericResponse(response));
+            try
+            {
+                var response = await _OptionRepo.CreateEntity(optionMaster);
+                return Json(ResponseData.Instance.GenericResponse(response));
+            }
+            catch (Exception ex)
+            {
+                string actionName = this.ControllerContext.RouteData.Values["action"].ToString();
+                string controllerName = this.ControllerContext.RouteData.Values["controller"].ToString();
+
+                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(actionName, controllerName, ex.Message, LoggingType.httpDelete.ToString(), 0);
+                var exceptionResponse = await _exceptionLoggingRepo.CreateEntity(exceptionHelper);
+                return Json(ResponseData.Instance.GenericResponse(ResponseStatus.ServerError));
+            }
         }
 
 
@@ -159,29 +194,65 @@ namespace SERP.UI.Controllers.OnlineTest
 
         public async Task<IActionResult> UpdateOptionCorrect(int id, int correctOption)
         {
-            var model = await _OptionRepo.GetSingle(x => x.Id == id);
-            model.IsCorrectAnswere = correctOption;
-            await _OptionRepo.CreateNewContext();
-            var updateResponse = await _OptionRepo.Update(model);
-            return Json(ResponseData.Instance.GenericResponse(updateResponse));
+            try
+            {
+                var model = await _OptionRepo.GetSingle(x => x.Id == id);
+                model.IsCorrectAnswere = correctOption;
+                await _OptionRepo.CreateNewContext();
+                var updateResponse = await _OptionRepo.Update(model);
+                return Json(ResponseData.Instance.GenericResponse(updateResponse));
+            }
+            catch (Exception ex)
+            {
+                string actionName = this.ControllerContext.RouteData.Values["action"].ToString();
+                string controllerName = this.ControllerContext.RouteData.Values["controller"].ToString();
+
+                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(actionName, controllerName, ex.Message, LoggingType.httpDelete.ToString(), 0);
+                var exceptionResponse = await _exceptionLoggingRepo.CreateEntity(exceptionHelper);
+                return Json(ResponseData.Instance.GenericResponse(ResponseStatus.ServerError));
+            }
         }
 
         public async Task<IActionResult> UpdateSortOrder(int id, int sortOrder)
         {
-            var model = await _OptionRepo.GetSingle(x => x.Id == id);
-            model.SortOrder = sortOrder;
-            await _OptionRepo.CreateNewContext();
-            var updateResponse = await _OptionRepo.Update(model);
-            return Json(ResponseData.Instance.GenericResponse(updateResponse));
+            try
+            {
+                var model = await _OptionRepo.GetSingle(x => x.Id == id);
+                model.SortOrder = sortOrder;
+                await _OptionRepo.CreateNewContext();
+                var updateResponse = await _OptionRepo.Update(model);
+                return Json(ResponseData.Instance.GenericResponse(updateResponse));
+            }
+            catch (Exception ex)
+            {
+                string actionName = this.ControllerContext.RouteData.Values["action"].ToString();
+                string controllerName = this.ControllerContext.RouteData.Values["controller"].ToString();
+
+                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(actionName, controllerName, ex.Message, LoggingType.httpDelete.ToString(), 0);
+                var exceptionResponse = await _exceptionLoggingRepo.CreateEntity(exceptionHelper);
+                return Json(ResponseData.Instance.GenericResponse(ResponseStatus.ServerError));
+            }
         }
 
         public async Task<IActionResult> DeleteOption(int id)
         {
-            var model = await _OptionRepo.GetSingle(x => x.Id == id);
-            var deleteModel = CommanDeleteHelper.CommanDeleteCode<OptionMaster>(model, 1);
-            await _OptionRepo.CreateNewContext();
-            var response = await _OptionRepo.Update(deleteModel);
-            return Json(ResponseData.Instance.GenericResponse(response));
+            try
+            {
+                var model = await _OptionRepo.GetSingle(x => x.Id == id);
+                var deleteModel = CommanDeleteHelper.CommanDeleteCode<OptionMaster>(model, 1);
+                await _OptionRepo.CreateNewContext();
+                var response = await _OptionRepo.Update(deleteModel);
+                return Json(ResponseData.Instance.GenericResponse(response));
+            }
+            catch (Exception ex)
+            {
+                string actionName = this.ControllerContext.RouteData.Values["action"].ToString();
+                string controllerName = this.ControllerContext.RouteData.Values["controller"].ToString();
+
+                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(actionName, controllerName, ex.Message, LoggingType.httpDelete.ToString(), 0);
+                var exceptionResponse = await _exceptionLoggingRepo.CreateEntity(exceptionHelper);
+                return Json(ResponseData.Instance.GenericResponse(ResponseStatus.ServerError));
+            }
         }
     }
 }

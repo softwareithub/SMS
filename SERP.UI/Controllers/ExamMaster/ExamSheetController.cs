@@ -11,6 +11,7 @@ using SERP.Core.Model.ExamModel;
 using SERP.Infrastructure.Repository.Infrastructure.Repo;
 using SERP.Utilities.ExceptionHelper;
 using SERP.Utilities.ResponseMessage;
+using SERP.Utilities.ResponseUtilities;
 
 namespace SERP.UI.Controllers.ExamMaster
 {
@@ -62,17 +63,28 @@ namespace SERP.UI.Controllers.ExamMaster
 
         public async Task<IActionResult> CreateTimeSheet(ExamSheet model)
         {
-            if (model.Id == 0)
+            try
             {
-                var result = await _IExamSheetRepo.CreateEntity(model);
-                return Json(ResponseData.Instance.GenericResponse(result));
+                if (model.Id == 0)
+                {
+                    var result = await _IExamSheetRepo.CreateEntity(model);
+                    return Json(ResponseData.Instance.GenericResponse(result));
+                }
+                else
+                {
+                    var result = await _IExamSheetRepo.Update(model);
+                    return Json(ResponseData.Instance.GenericResponse(result));
+                }
             }
-            else
+            catch (Exception ex)
             {
-                var result = await _IExamSheetRepo.Update(model);
-                return Json(ResponseData.Instance.GenericResponse(result));
-            }
+                string actionName = this.ControllerContext.RouteData.Values["action"].ToString();
+                string controllerName = this.ControllerContext.RouteData.Values["controller"].ToString();
 
+                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(actionName, controllerName, ex.Message, LoggingType.httpDelete.ToString(), 0);
+                var exceptionResponse = await _exceptionLoggingRepo.CreateEntity(exceptionHelper);
+                return Json(ResponseData.Instance.GenericResponse(ResponseStatus.ServerError));
+            }
         }
 
         public async Task<IActionResult> GetTimeSheet()
@@ -106,24 +118,60 @@ namespace SERP.UI.Controllers.ExamMaster
 
         public async Task<IActionResult> GetSubjectJson()
         {
-            var result = await _ISubjectRepo.GetList(x => x.IsDeleted == 0 && x.IsActive == 1);
-            return Json(result);
+            try
+            {
+                var result = await _ISubjectRepo.GetList(x => x.IsDeleted == 0 && x.IsActive == 1);
+                return Json(result);
+            }
+            catch (Exception ex)
+            {
+                string actionName = this.ControllerContext.RouteData.Values["action"].ToString();
+                string controllerName = this.ControllerContext.RouteData.Values["controller"].ToString();
+
+                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(actionName, controllerName, ex.Message, LoggingType.httpDelete.ToString(), 0);
+                var exceptionResponse = await _exceptionLoggingRepo.CreateEntity(exceptionHelper);
+                return Json(ResponseData.Instance.GenericResponse(ResponseStatus.ServerError));
+            }
         }
         public async Task<IActionResult> GetDateTimeList(int id)
         {
-            List<DateTime> allDates = new List<DateTime>();
-            if (id != 0)
+            try
             {
-                var model = await _examRepo.GetSingle(x => x.IsActive == 1 && x.IsDeleted == 0 && x.Id == id);
-                for (DateTime date = model.StartDate; date <= model.EndDate; date = date.AddDays(1))
-                    allDates.Add(date);
+                List<DateTime> allDates = new List<DateTime>();
+                if (id != 0)
+                {
+                    var model = await _examRepo.GetSingle(x => x.IsActive == 1 && x.IsDeleted == 0 && x.Id == id);
+                    for (DateTime date = model.StartDate; date <= model.EndDate; date = date.AddDays(1))
+                        allDates.Add(date);
+                }
+                return Json(allDates); ;
             }
-            return Json(allDates); ;
+            catch (Exception ex)
+            {
+                string actionName = this.ControllerContext.RouteData.Values["action"].ToString();
+                string controllerName = this.ControllerContext.RouteData.Values["controller"].ToString();
+
+                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(actionName, controllerName, ex.Message, LoggingType.httpDelete.ToString(), 0);
+                var exceptionResponse = await _exceptionLoggingRepo.CreateEntity(exceptionHelper);
+                return Json(ResponseData.Instance.GenericResponse(ResponseStatus.ServerError));
+            }
         }
 
         public async Task<IActionResult> ExamTimeSheet()
         {
-            return Json(await GetExamList());
+            try
+            {
+                return Json(await GetExamList());
+            }
+            catch (Exception ex)
+            {
+                string actionName = this.ControllerContext.RouteData.Values["action"].ToString();
+                string controllerName = this.ControllerContext.RouteData.Values["controller"].ToString();
+
+                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(actionName, controllerName, ex.Message, LoggingType.httpDelete.ToString(), 0);
+                var exceptionResponse = await _exceptionLoggingRepo.CreateEntity(exceptionHelper);
+                return Json(ResponseData.Instance.GenericResponse(ResponseStatus.ServerError));
+            }
         }
 
         private async Task<List<ExamSheetVm>> GetExamList()
@@ -159,12 +207,24 @@ namespace SERP.UI.Controllers.ExamMaster
 
         public async Task<IActionResult> DeleteExamSheet(int id)
         {
-            var model = await _IExamSheetRepo.GetSingle(x => x.Id == id);
-            await _IExamSheetRepo.CreateNewContext();
-            model.IsActive = 0;
-            model.IsDeleted = 1;
-            var result = await _IExamSheetRepo.Update(model);
-            return Json(ResponseData.Instance.GenericResponse(result));
+            try
+            {
+                var model = await _IExamSheetRepo.GetSingle(x => x.Id == id);
+                await _IExamSheetRepo.CreateNewContext();
+                model.IsActive = 0;
+                model.IsDeleted = 1;
+                var result = await _IExamSheetRepo.Update(model);
+                return Json(ResponseData.Instance.GenericResponse(result));
+            }
+            catch (Exception ex)
+            {
+                string actionName = this.ControllerContext.RouteData.Values["action"].ToString();
+                string controllerName = this.ControllerContext.RouteData.Values["controller"].ToString();
+
+                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(actionName, controllerName, ex.Message, LoggingType.httpDelete.ToString(), 0);
+                var exceptionResponse = await _exceptionLoggingRepo.CreateEntity(exceptionHelper);
+                return Json(ResponseData.Instance.GenericResponse(ResponseStatus.ServerError));
+            }
         }
     }
 }

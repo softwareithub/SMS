@@ -12,6 +12,7 @@ using SERP.Infrastructure.Repository.Infrastructure.Repo;
 using SERP.Utilities.CommanHelper;
 using SERP.Utilities.ExceptionHelper;
 using SERP.Utilities.ResponseMessage;
+using SERP.Utilities.ResponseUtilities;
 
 namespace SERP.UI.Controllers.LibraryManagement
 {
@@ -67,31 +68,55 @@ namespace SERP.UI.Controllers.LibraryManagement
         [HttpPost]
         public async Task<IActionResult> IssueBook(BookTransaction model)
         {
-            model.BookStatusId = 1;
-            model.UserTypeId = Request.Form["IssueTo"].ToString() == "stu" ? 0 : 1;
-
-            var bookitem = await _bookItemRepo.GetSingle(x => x.Id == model.BookItemId);
-            bookitem.BookStatus = 1;
-            await _bookItemRepo.CreateNewContext();
-            var updateResponse = await _bookItemRepo.Update(bookitem);
-
-            if (model.Id == 0)
+            try
             {
-                var response = await _bookTransactionRepo.CreateEntity(model);
-                return Json("Book successfully issue.");
+                model.BookStatusId = 1;
+                model.UserTypeId = Request.Form["IssueTo"].ToString() == "stu" ? 0 : 1;
+
+                var bookitem = await _bookItemRepo.GetSingle(x => x.Id == model.BookItemId);
+                bookitem.BookStatus = 1;
+                await _bookItemRepo.CreateNewContext();
+                var updateResponse = await _bookItemRepo.Update(bookitem);
+
+                if (model.Id == 0)
+                {
+                    var response = await _bookTransactionRepo.CreateEntity(model);
+                    return Json("Book successfully issue.");
+                }
+                else
+                {
+                    var updateModel = CommanDeleteHelper.CommanDeleteCode<BookTransaction>(model, 1);
+                    var response = await _bookTransactionRepo.Update(updateModel);
+                    return Json(ResponseData.Instance.GenericResponse(response));
+                }
             }
-            else
+            catch (Exception ex)
             {
-                var updateModel = CommanDeleteHelper.CommanDeleteCode<BookTransaction>(model, 1);
-                var response = await _bookTransactionRepo.Update(updateModel);
-                return Json(ResponseData.Instance.GenericResponse(response));
+                string actionName = this.ControllerContext.RouteData.Values["action"].ToString();
+                string controllerName = this.ControllerContext.RouteData.Values["controller"].ToString();
+
+                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(actionName, controllerName, ex.Message, LoggingType.httpDelete.ToString(), 0);
+                var exceptionResponse = await _exceptionLoggingRepo.CreateEntity(exceptionHelper);
+                return Json(ResponseData.Instance.GenericResponse(ResponseStatus.ServerError));
             }
         }
 
         public async Task<IActionResult> GetBookItems(int bookId)
         {
-            var bookItemList = await _bookItemRepo.GetList(x => x.IsActive == 1 && x.BookStatus == 2 && x.BookId == bookId);
-            return Json(bookItemList);
+            try
+            {
+                var bookItemList = await _bookItemRepo.GetList(x => x.IsActive == 1 && x.BookStatus == 2 && x.BookId == bookId);
+                return Json(bookItemList);
+            }
+            catch (Exception ex)
+            {
+                string actionName = this.ControllerContext.RouteData.Values["action"].ToString();
+                string controllerName = this.ControllerContext.RouteData.Values["controller"].ToString();
+
+                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(actionName, controllerName, ex.Message, LoggingType.httpDelete.ToString(), 0);
+                var exceptionResponse = await _exceptionLoggingRepo.CreateEntity(exceptionHelper);
+                return Json(ResponseData.Instance.GenericResponse(ResponseStatus.ServerError));
+            }
         }
 
         public async Task<IActionResult> BookIssueDetail()
@@ -146,10 +171,22 @@ namespace SERP.UI.Controllers.LibraryManagement
 
         public async Task<IActionResult> GetIssueInformation(string userType, string Date)
         {
-            var UserType = userType == "stu" ? "student" : "staff";
-            var responseModel = await _librarySettingRepo.GetSingle(x => x.UserType.Trim().ToLower() == UserType.Trim().ToLower());
-            var newDate = System.Convert.ToDateTime(Date).AddDays(responseModel.IssueDays);
-            return Json(newDate.ToShortDateString());
+            try
+            {
+                var UserType = userType == "stu" ? "student" : "staff";
+                var responseModel = await _librarySettingRepo.GetSingle(x => x.UserType.Trim().ToLower() == UserType.Trim().ToLower());
+                var newDate = System.Convert.ToDateTime(Date).AddDays(responseModel.IssueDays);
+                return Json(newDate.ToShortDateString());
+            }
+            catch (Exception ex)
+            {
+                string actionName = this.ControllerContext.RouteData.Values["action"].ToString();
+                string controllerName = this.ControllerContext.RouteData.Values["controller"].ToString();
+
+                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(actionName, controllerName, ex.Message, LoggingType.httpDelete.ToString(), 0);
+                var exceptionResponse = await _exceptionLoggingRepo.CreateEntity(exceptionHelper);
+                return Json(ResponseData.Instance.GenericResponse(ResponseStatus.ServerError));
+            }
         }
 
         #region PrivateMember
@@ -184,12 +221,36 @@ namespace SERP.UI.Controllers.LibraryManagement
 
         public async Task<IActionResult> GetEmployeeDetails()
         {
-            return Json(await _employeeRepo.GetList(x => x.IsActive == 1));
+            try
+            {
+                return Json(await _employeeRepo.GetList(x => x.IsActive == 1));
+            }
+            catch (Exception ex)
+            {
+                string actionName = this.ControllerContext.RouteData.Values["action"].ToString();
+                string controllerName = this.ControllerContext.RouteData.Values["controller"].ToString();
+
+                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(actionName, controllerName, ex.Message, LoggingType.httpDelete.ToString(), 0);
+                var exceptionResponse = await _exceptionLoggingRepo.CreateEntity(exceptionHelper);
+                return Json(ResponseData.Instance.GenericResponse(ResponseStatus.ServerError));
+            }
         }
 
         public async Task<IActionResult> GetStudentDetails()
         {
-            return Json(await _studentMasterRepo.GetList(x => x.IsActive == 1));
+            try
+            {
+                return Json(await _studentMasterRepo.GetList(x => x.IsActive == 1));
+            }
+            catch (Exception ex)
+            {
+                string actionName = this.ControllerContext.RouteData.Values["action"].ToString();
+                string controllerName = this.ControllerContext.RouteData.Values["controller"].ToString();
+
+                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(actionName, controllerName, ex.Message, LoggingType.httpDelete.ToString(), 0);
+                var exceptionResponse = await _exceptionLoggingRepo.CreateEntity(exceptionHelper);
+                return Json(ResponseData.Instance.GenericResponse(ResponseStatus.ServerError));
+            }
         }
 
         #endregion

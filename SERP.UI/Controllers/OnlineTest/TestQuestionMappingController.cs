@@ -100,36 +100,49 @@ namespace SERP.UI.Controllers.OnlineTest
         [HttpPost]
         public async Task<IActionResult> CreateQuestion(int TestId, int[] QuestionId,int questionMark)
         {
-            if (TestId != 0)
+            try
             {
-                var testQuestionList = await _ITestQuestionRepo.GetList(x => x.TestId == TestId);
-
-                testQuestionList.ToList().ForEach(item => {
-                    item.IsActive = 0;
-                    item.IsDeleted = 1;
-                });
-
-                await _ITestQuestionRepo.CreateNewContext();
-
-                var updateTestRepo =await _ITestQuestionRepo.Update(testQuestionList.ToArray());
-
-                List<TestQuestionMapping> models = new List<TestQuestionMapping>();
-                for (int i = 0; i < QuestionId.Count(); i++)
+                if (TestId != 0)
                 {
-                    TestQuestionMapping model = new TestQuestionMapping();
-                    model.QuestionId = QuestionId[i];
-                    model.TestId = TestId;
-                    models.Add(model);
+                    var testQuestionList = await _ITestQuestionRepo.GetList(x => x.TestId == TestId);
+
+                    testQuestionList.ToList().ForEach(item =>
+                    {
+                        item.IsActive = 0;
+                        item.IsDeleted = 1;
+                    });
+
+                    await _ITestQuestionRepo.CreateNewContext();
+
+                    var updateTestRepo = await _ITestQuestionRepo.Update(testQuestionList.ToArray());
+
+                    List<TestQuestionMapping> models = new List<TestQuestionMapping>();
+                    for (int i = 0; i < QuestionId.Count(); i++)
+                    {
+                        TestQuestionMapping model = new TestQuestionMapping();
+                        model.QuestionId = QuestionId[i];
+                        model.TestId = TestId;
+                        models.Add(model);
+                    }
+
+                    await _ITestQuestionRepo.CreateNewContext();
+
+                    var response = await _ITestQuestionRepo.Add(models.ToArray());
+                    return Json(ResponseData.Instance.GenericResponse(response));
                 }
-
-                await _ITestQuestionRepo.CreateNewContext();
-
-                var response=await _ITestQuestionRepo.Add(models.ToArray());
-                return Json(ResponseData.Instance.GenericResponse(response));
+                else
+                {
+                    return Json("Please select Test Name to proceed.");
+                }
             }
-            else
+            catch (Exception ex)
             {
-                return Json("Please select Test Name to proceed.");
+                string actionName = this.ControllerContext.RouteData.Values["action"].ToString();
+                string controllerName = this.ControllerContext.RouteData.Values["controller"].ToString();
+
+                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(actionName, controllerName, ex.Message, LoggingType.httpDelete.ToString(), 0);
+                var exceptionResponse = await _exceptionLoggingRepo.CreateEntity(exceptionHelper);
+                return Json(ResponseData.Instance.GenericResponse(ResponseStatus.ServerError));
             }
         }
 
@@ -170,39 +183,52 @@ namespace SERP.UI.Controllers.OnlineTest
 
         public async Task<IActionResult> PublishTest(string dateTime, int testId, int templateId)
         {
-            string[] DateTime = dateTime.Split('T');
-            DateTime publishDate = Convert.ToDateTime(DateTime[0]);
-            TimeSpan publishTime = TimeSpan.Parse(DateTime[1]);
-
-            var model = await _ITestRepo.GetSingle(x => x.Id == testId);
-            model.TestDateTime = publishDate + publishTime;
-            await _ITestRepo.CreateNewContext();
-            var response = await _ITestRepo.Update(model);
-
-            var notificationTemplate = await _smsTemplateRepo.GetSingle(x => x.Id == templateId);
-
-            await _ITestRepo.CreateNewContext();
-
-            var testModel = await _ITestRepo.GetSingle(x => x.Id == testId);
-
-            var studentIds = (await _studentPromoteRepo.GetList(x => x.CourseId == testModel.CourseId && x.BatchId == testModel.BatchId)).ToList();
-
-            List<Tuple<string, string>> studentinfos = new List<Tuple<string, string>>();
-
-            var studentModels = await _studentMasterRepo.GetList(x => x.IsActive == 1);
-
-            studentIds.ToList().ForEach(x => {
-                var student = studentModels.ToList().Find(z=>z.Id==x.StudentId);
-                studentinfos.Add(new Tuple<string, string>(student.Name, student.StudentEmail));
-            });
-
-            var mailResponse = new SendEmailNotification().SendOnlineTestEmail(studentinfos, new Tuple<string, string>("VipraAdmin", "Bhaweshdeepak@gmail.com"), "Exam Notification", _hostingEnviroment);
-            if(mailResponse.Count()>0)
+            try
             {
-                return Json(mailResponse);
-            }
+                string[] DateTime = dateTime.Split('T');
+                DateTime publishDate = Convert.ToDateTime(DateTime[0]);
+                TimeSpan publishTime = TimeSpan.Parse(DateTime[1]);
 
-            return Json(ResponseData.Instance.GenericResponse(response));
+                var model = await _ITestRepo.GetSingle(x => x.Id == testId);
+                model.TestDateTime = publishDate + publishTime;
+                await _ITestRepo.CreateNewContext();
+                var response = await _ITestRepo.Update(model);
+
+                var notificationTemplate = await _smsTemplateRepo.GetSingle(x => x.Id == templateId);
+
+                await _ITestRepo.CreateNewContext();
+
+                var testModel = await _ITestRepo.GetSingle(x => x.Id == testId);
+
+                var studentIds = (await _studentPromoteRepo.GetList(x => x.CourseId == testModel.CourseId && x.BatchId == testModel.BatchId)).ToList();
+
+                List<Tuple<string, string>> studentinfos = new List<Tuple<string, string>>();
+
+                var studentModels = await _studentMasterRepo.GetList(x => x.IsActive == 1);
+
+                studentIds.ToList().ForEach(x =>
+                {
+                    var student = studentModels.ToList().Find(z => z.Id == x.StudentId);
+                    studentinfos.Add(new Tuple<string, string>(student.Name, student.StudentEmail));
+                });
+
+                var mailResponse = new SendEmailNotification().SendOnlineTestEmail(studentinfos, new Tuple<string, string>("VipraAdmin", "Bhaweshdeepak@gmail.com"), "Exam Notification", _hostingEnviroment);
+                if (mailResponse.Count() > 0)
+                {
+                    return Json(mailResponse);
+                }
+
+                return Json(ResponseData.Instance.GenericResponse(response));
+            }
+            catch (Exception ex)
+            {
+                string actionName = this.ControllerContext.RouteData.Values["action"].ToString();
+                string controllerName = this.ControllerContext.RouteData.Values["controller"].ToString();
+
+                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(actionName, controllerName, ex.Message, LoggingType.httpDelete.ToString(), 0);
+                var exceptionResponse = await _exceptionLoggingRepo.CreateEntity(exceptionHelper);
+                return Json(ResponseData.Instance.GenericResponse(ResponseStatus.ServerError));
+            }
         }
 
       

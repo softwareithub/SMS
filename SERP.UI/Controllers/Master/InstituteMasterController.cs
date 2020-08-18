@@ -10,6 +10,8 @@ using SERP.Core.Entities.Entity.Core.Master;
 using SERP.Core.Entities.SERPExceptionLogging;
 using SERP.Infrastructure.Repository.Infrastructure.Repo;
 using SERP.Utilities.ExceptionHelper;
+using SERP.Utilities.ResponseMessage;
+using SERP.Utilities.ResponseUtilities;
 
 namespace SERP.UI.Controllers.Master
 {
@@ -49,37 +51,49 @@ namespace SERP.UI.Controllers.Master
         [HttpPost]
         public async Task<IActionResult> Create(InstituteMaster model,IFormFile InstituteLogo)
         {
-            model.IsActive = 1;
-            model.IsDeleted = 0;
-            if (InstituteLogo != null)
+            try
             {
-                if (model.InstituteLogo != InstituteLogo.FileName)
+                model.IsActive = 1;
+                model.IsDeleted = 0;
+                if (InstituteLogo != null)
                 {
-                    model.InstituteLogo = await UploadImage(InstituteLogo);
+                    if (model.InstituteLogo != InstituteLogo.FileName)
+                    {
+                        model.InstituteLogo = await UploadImage(InstituteLogo);
+                    }
+                }
+                else
+                {
+                    model.InstituteLogo = string.Empty;
+                }
+
+
+                if (model.Id == 0)
+                {
+                    model.CreatedBy = 1;
+                    model.CreatedDate = DateTime.Now.Date;
+                    model.UpdatedDate = DateTime.Now.Date;
+                    var result = await _IGenericRepo.CreateEntity(model);
+                    return Json("Institute Detail Created Successfully.");
+                }
+                else
+                {
+                    model.UpdatedBy = 1;
+                    model.UpdatedDate = DateTime.Now.Date;
+
+                    var result = _IGenericRepo.Update(model);
+                    return Json("Institute data updated successfully");
                 }
             }
-            else {
-                model.InstituteLogo = string.Empty;
-            }
-
-           
-            if (model.Id == 0)
+            catch (Exception ex)
             {
-                model.CreatedBy = 1;
-                model.CreatedDate = DateTime.Now.Date;
-                model.UpdatedDate = DateTime.Now.Date;
-                var result = await _IGenericRepo.CreateEntity(model);
-                return Json("Institute Detail Created Successfully.");
-            }
-            else
-            {
-                model.UpdatedBy = 1;
-                model.UpdatedDate = DateTime.Now.Date;
-                
-                var result = _IGenericRepo.Update(model);
-                return Json("Institute data updated successfully");
-            }
+                string actionName = this.ControllerContext.RouteData.Values["action"].ToString();
+                string controllerName = this.ControllerContext.RouteData.Values["controller"].ToString();
 
+                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(actionName, controllerName, ex.Message, LoggingType.httpDelete.ToString(), 0);
+                var exceptionResponse = await _exceptionLoggingRepo.CreateEntity(exceptionHelper);
+                return Json(ResponseData.Instance.GenericResponse(ResponseStatus.ServerError));
+            }
         }
 
         private async Task<string> UploadImage(IFormFile formFile)

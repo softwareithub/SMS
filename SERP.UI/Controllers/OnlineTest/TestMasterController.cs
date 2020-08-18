@@ -11,6 +11,7 @@ using SERP.Core.Model.OnlineTest;
 using SERP.Infrastructure.Repository.Infrastructure.Repo;
 using SERP.Utilities.ExceptionHelper;
 using SERP.Utilities.ResponseMessage;
+using SERP.Utilities.ResponseUtilities;
 
 namespace SERP.UI.Controllers.OnlineTest
 {
@@ -50,16 +51,28 @@ namespace SERP.UI.Controllers.OnlineTest
         [HttpPost]
         public async Task<IActionResult> CreateTest(TestMaster model)
         {
-            model.TestDateTime = DateTime.Now;
-            if (model.Id > 0)
+            try
             {
-                var response = await _TestMasterRepo.Update(model);
-                return Json(ResponseData.Instance.GenericResponse(response));
+                model.TestDateTime = DateTime.Now;
+                if (model.Id > 0)
+                {
+                    var response = await _TestMasterRepo.Update(model);
+                    return Json(ResponseData.Instance.GenericResponse(response));
+                }
+                else
+                {
+                    var response = await _TestMasterRepo.CreateEntity(model);
+                    return Json(ResponseData.Instance.GenericResponse(response));
+                }
             }
-            else
+            catch (Exception ex)
             {
-                var response = await _TestMasterRepo.CreateEntity(model);
-                return Json(ResponseData.Instance.GenericResponse(response));
+                string actionName = this.ControllerContext.RouteData.Values["action"].ToString();
+                string controllerName = this.ControllerContext.RouteData.Values["controller"].ToString();
+
+                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(actionName, controllerName, ex.Message, LoggingType.httpDelete.ToString(), 0);
+                var exceptionResponse = await _exceptionLoggingRepo.CreateEntity(exceptionHelper);
+                return Json(ResponseData.Instance.GenericResponse(ResponseStatus.ServerError));
             }
         }
         public async Task<IActionResult> GetTestDetails()
@@ -98,12 +111,24 @@ namespace SERP.UI.Controllers.OnlineTest
 
         public async Task<IActionResult> DeleteTest(int id)
         {
-            var model = await _TestMasterRepo.GetSingle(x => x.Id == id);
-            model.IsActive = 0;
-            model.IsDeleted = 1;
-            await _TestMasterRepo.CreateNewContext();
-            var response = await _TestMasterRepo.Update(model);
-            return Json(ResponseData.Instance.GenericResponse(response));
+            try
+            {
+                var model = await _TestMasterRepo.GetSingle(x => x.Id == id);
+                model.IsActive = 0;
+                model.IsDeleted = 1;
+                await _TestMasterRepo.CreateNewContext();
+                var response = await _TestMasterRepo.Update(model);
+                return Json(ResponseData.Instance.GenericResponse(response));
+            }
+            catch (Exception ex)
+            {
+                string actionName = this.ControllerContext.RouteData.Values["action"].ToString();
+                string controllerName = this.ControllerContext.RouteData.Values["controller"].ToString();
+
+                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(actionName, controllerName, ex.Message, LoggingType.httpDelete.ToString(), 0);
+                var exceptionResponse = await _exceptionLoggingRepo.CreateEntity(exceptionHelper);
+                return Json(ResponseData.Instance.GenericResponse(ResponseStatus.ServerError));
+            }
         }
     }
 }

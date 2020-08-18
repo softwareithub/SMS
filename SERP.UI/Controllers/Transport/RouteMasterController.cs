@@ -12,6 +12,7 @@ using SERP.Infrastructure.Repository.Infrastructure.Repo;
 using SERP.Utilities.CommanHelper;
 using SERP.Utilities.ExceptionHelper;
 using SERP.Utilities.ResponseMessage;
+using SERP.Utilities.ResponseUtilities;
 
 namespace SERP.UI.Controllers.Transport
 {
@@ -80,29 +81,41 @@ namespace SERP.UI.Controllers.Transport
         [HttpPost]
         public async Task<IActionResult> Create(RouteViewModel model, string[] stopageIds, string[] stopages)
         {
-            var createRouteResponse = await _routeMaster.CreateEntity(model.RouteMaster);
-            if (createRouteResponse == Utilities.ResponseUtilities.ResponseStatus.AddedSuccessfully)
+            try
             {
-                await _routeMaster.CreateNewContext();
-                var maxRouteId = (await _routeMaster.GetList(x => x.IsActive == 1)).Max(x => x.Id);
-
-                List<RouteStopageModel> rsModels = new List<RouteStopageModel>();
-
-                for (int i = 0; i < stopageIds.Count(); i++)
+                var createRouteResponse = await _routeMaster.CreateEntity(model.RouteMaster);
+                if (createRouteResponse == Utilities.ResponseUtilities.ResponseStatus.AddedSuccessfully)
                 {
-                    RouteStopageModel rsmodel = new RouteStopageModel()
-                    {
-                        RouteId = maxRouteId,
-                        StopageId = Convert.ToInt32(stopageIds[i]),
-                        RouteType = stopages[i]
-                    };
-                    rsModels.Add(rsmodel);
-                }
+                    await _routeMaster.CreateNewContext();
+                    var maxRouteId = (await _routeMaster.GetList(x => x.IsActive == 1)).Max(x => x.Id);
 
-                var response = await _routeStopageRepo.Add(rsModels.ToArray());
-                return Json(ResponseData.Instance.GenericResponse(response));
+                    List<RouteStopageModel> rsModels = new List<RouteStopageModel>();
+
+                    for (int i = 0; i < stopageIds.Count(); i++)
+                    {
+                        RouteStopageModel rsmodel = new RouteStopageModel()
+                        {
+                            RouteId = maxRouteId,
+                            StopageId = Convert.ToInt32(stopageIds[i]),
+                            RouteType = stopages[i]
+                        };
+                        rsModels.Add(rsmodel);
+                    }
+
+                    var response = await _routeStopageRepo.Add(rsModels.ToArray());
+                    return Json(ResponseData.Instance.GenericResponse(response));
+                }
+                return Json("Error please contact admin!");
             }
-            return Json("Error please contact admin!");
+            catch (Exception ex)
+            {
+                string actionName = this.ControllerContext.RouteData.Values["action"].ToString();
+                string controllerName = this.ControllerContext.RouteData.Values["controller"].ToString();
+
+                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(actionName, controllerName, ex.Message, LoggingType.httpDelete.ToString(), 0);
+                var exceptionResponse = await _exceptionLoggingRepo.CreateEntity(exceptionHelper);
+                return Json(ResponseData.Instance.GenericResponse(ResponseStatus.ServerError));
+            }
         }
 
         public async Task<IActionResult> GetRouteDetails()
@@ -230,10 +243,22 @@ namespace SERP.UI.Controllers.Transport
 
         public async Task<IActionResult> Delete(int id)
         {
-            var model = await _routeStopageRepo.GetSingle(x => x.Id == id);
-            var deleteModel = CommanDeleteHelper.CommanDeleteCode<RouteStopageModel>(model, 1);
-            await _routeStopageRepo.CreateNewContext();
-            return Json(ResponseData.Instance.GenericResponse(await _routeStopageRepo.Update(deleteModel)));
+            try
+            {
+                var model = await _routeStopageRepo.GetSingle(x => x.Id == id);
+                var deleteModel = CommanDeleteHelper.CommanDeleteCode<RouteStopageModel>(model, 1);
+                await _routeStopageRepo.CreateNewContext();
+                return Json(ResponseData.Instance.GenericResponse(await _routeStopageRepo.Update(deleteModel)));
+            }
+            catch (Exception ex)
+            {
+                string actionName = this.ControllerContext.RouteData.Values["action"].ToString();
+                string controllerName = this.ControllerContext.RouteData.Values["controller"].ToString();
+
+                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(actionName, controllerName, ex.Message, LoggingType.httpDelete.ToString(), 0);
+                var exceptionResponse = await _exceptionLoggingRepo.CreateEntity(exceptionHelper);
+                return Json(ResponseData.Instance.GenericResponse(ResponseStatus.ServerError));
+            }
         }
     }
 }

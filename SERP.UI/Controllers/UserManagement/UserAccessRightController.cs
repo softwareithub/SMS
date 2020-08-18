@@ -104,44 +104,57 @@ namespace SERP.UI.Controllers.UserManagement
         [HttpPost]
         public async Task<IActionResult> UserAccess(int [] module,int[] access)
         {
-            int roleId = Convert.ToInt32(HttpContext.Session.GetInt32("RoleId"));
-
-            //Get All the Submodules
-            var subModuleDetails = await _ISubModuleRepo.GetList(x => x.IsActive == 1);
-
-            List<int> moduleList = new List<int>();
-
-            for(int i=0; i<access.Count(); i++)
+            try
             {
-                moduleList.Add(subModuleDetails.Where(x => x.Id == access[i]).Select(x => x.ModuleId).FirstOrDefault());
+                int roleId = Convert.ToInt32(HttpContext.Session.GetInt32("RoleId"));
+
+                //Get All the Submodules
+                var subModuleDetails = await _ISubModuleRepo.GetList(x => x.IsActive == 1);
+
+                List<int> moduleList = new List<int>();
+
+                for (int i = 0; i < access.Count(); i++)
+                {
+                    moduleList.Add(subModuleDetails.Where(x => x.Id == access[i]).Select(x => x.ModuleId).FirstOrDefault());
+                }
+
+                var useRightModels = await _IUserAccessRepo.GetList(x => x.RoleId == roleId);
+                await _IUserAccessRepo.CreateNewContext();
+
+                useRightModels.ToList().ForEach(item =>
+                {
+                    item.IsActive = 0;
+                    item.IsDeleted = 1;
+                });
+
+                var updateResponse = await _IUserAccessRepo.Update(useRightModels.ToArray());
+                await _IUserAccessRepo.CreateNewContext();
+
+                List<UserAccessRight> models = new List<UserAccessRight>();
+                for (int i = 0; i < access.Count(); i++)
+                {
+                    UserAccessRight model = new UserAccessRight();
+                    model.ModuleId = moduleList[i];
+                    model.SubModuleId = access[i];
+                    model.RoleId = roleId;
+                    model.ReadAccess = 1;
+                    model.CreateAccess = 1;
+                    model.UpdateAccess = 1;
+                    models.Add(model);
+                }
+
+                var response = await _IUserAccessRepo.Add(models.ToArray());
+                return Json(ResponseData.Instance.GenericResponse(response));
             }
-
-            var useRightModels = await _IUserAccessRepo.GetList(x => x.RoleId == roleId);
-            await _IUserAccessRepo.CreateNewContext();
-
-            useRightModels.ToList().ForEach(item => {
-                item.IsActive = 0;
-                item.IsDeleted = 1;
-            });
-
-            var updateResponse = await _IUserAccessRepo.Update(useRightModels.ToArray());
-            await _IUserAccessRepo.CreateNewContext();
-
-            List<UserAccessRight> models = new List<UserAccessRight>();
-            for(int i=0; i< access.Count(); i++)
+            catch (Exception ex)
             {
-                UserAccessRight model = new UserAccessRight();
-                model.ModuleId = moduleList[i];
-                model.SubModuleId = access[i];
-                model.RoleId = roleId;
-                model.ReadAccess = 1;
-                model.CreateAccess = 1;
-                model.UpdateAccess = 1;
-                models.Add(model);
-            }
+                string actionName = this.ControllerContext.RouteData.Values["action"].ToString();
+                string controllerName = this.ControllerContext.RouteData.Values["controller"].ToString();
 
-            var response = await _IUserAccessRepo.Add(models.ToArray());
-            return Json(ResponseData.Instance.GenericResponse(response));
+                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(actionName, controllerName, ex.Message, LoggingType.httpDelete.ToString(), 0);
+                var exceptionResponse = await _exceptionLoggingRepo.CreateEntity(exceptionHelper);
+                return Json(ResponseData.Instance.GenericResponse(ResponseStatus.ServerError));
+            }
         }
 
         

@@ -12,6 +12,7 @@ using SERP.Infrastructure.Repository.Infrastructure.Repo;
 using SERP.Utilities.CommanHelper;
 using SERP.Utilities.ExceptionHelper;
 using SERP.Utilities.ResponseMessage;
+using SERP.Utilities.ResponseUtilities;
 
 namespace SERP.UI.Controllers.FrontOffice
 {
@@ -76,16 +77,28 @@ namespace SERP.UI.Controllers.FrontOffice
         [HttpPost]
         public async Task<IActionResult> CreateStudentGatePass(StudentGatePass gatePass)
         {
-            if (gatePass.Id == 0)
+            try
             {
-                var response = await _studentGatePassRepo.CreateEntity(gatePass);
-                return Json(ResponseData.Instance.GenericResponse(response));
+                if (gatePass.Id == 0)
+                {
+                    var response = await _studentGatePassRepo.CreateEntity(gatePass);
+                    return Json(ResponseData.Instance.GenericResponse(response));
+                }
+                else
+                {
+                    var updateModel = CommanDeleteHelper.CommanUpdateCode<StudentGatePass>(gatePass, 1);
+                    var response = await _studentGatePassRepo.Update(gatePass);
+                    return Json(ResponseData.Instance.GenericResponse(response));
+                }
             }
-            else
+            catch (Exception ex)
             {
-                var updateModel = CommanDeleteHelper.CommanUpdateCode<StudentGatePass>(gatePass, 1);
-                var response = await _studentGatePassRepo.Update(gatePass);
-                return Json(ResponseData.Instance.GenericResponse(response));
+                string actionName = this.ControllerContext.RouteData.Values["action"].ToString();
+                string controllerName = this.ControllerContext.RouteData.Values["controller"].ToString();
+
+                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(actionName, controllerName, ex.Message, LoggingType.httpDelete.ToString(), 0);
+                var exceptionResponse = await _exceptionLoggingRepo.CreateEntity(exceptionHelper);
+                return Json(ResponseData.Instance.GenericResponse(ResponseStatus.ServerError));
             }
         }
 
@@ -123,11 +136,23 @@ namespace SERP.UI.Controllers.FrontOffice
 
         public async Task<IActionResult> Delete(int id)
         {
-            var model = await _studentGatePassRepo.GetSingle(x => x.Id == id);
-            var deleteModel = CommanDeleteHelper.CommanDeleteCode<StudentGatePass>(model, 1);
-            await _studentGatePassRepo.CreateNewContext();
-            var response = await _studentGatePassRepo.Update(deleteModel);
-            return Json(ResponseData.Instance.GenericResponse(response));
+            try
+            {
+                var model = await _studentGatePassRepo.GetSingle(x => x.Id == id);
+                var deleteModel = CommanDeleteHelper.CommanDeleteCode<StudentGatePass>(model, 1);
+                await _studentGatePassRepo.CreateNewContext();
+                var response = await _studentGatePassRepo.Update(deleteModel);
+                return Json(ResponseData.Instance.GenericResponse(response));
+            }
+            catch (Exception ex)
+            {
+                string actionName = this.ControllerContext.RouteData.Values["action"].ToString();
+                string controllerName = this.ControllerContext.RouteData.Values["controller"].ToString();
+
+                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(actionName, controllerName, ex.Message, LoggingType.httpDelete.ToString(), 0);
+                var exceptionResponse = await _exceptionLoggingRepo.CreateEntity(exceptionHelper);
+                return Json(ResponseData.Instance.GenericResponse(ResponseStatus.ServerError));
+            }
         }
     }
 }

@@ -1,14 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using SERP.Core.Entities.Entity.Core.Master;
 using SERP.Core.Entities.SERPExceptionLogging;
 using SERP.Infrastructure.Repository.Infrastructure.Repo;
 using SERP.Utilities.CommanHelper;
 using SERP.Utilities.ExceptionHelper;
 using SERP.Utilities.ResponseMessage;
+using SERP.Utilities.ResponseUtilities;
+using System;
+using System.Threading.Tasks;
 
 namespace SERP.UI.Controllers.Master
 {
@@ -49,18 +48,30 @@ namespace SERP.UI.Controllers.Master
         [HttpPost]
         public async Task<IActionResult> Create(InstituteSettingModel model)
         {
-            var instituteModel = (await _instituteMasterRepo.GetSingle(x => x.IsActive == 1)).Id;
-            model.InstituteId = instituteModel;
-            if (model.Id == 0)
+            try
             {
-                var response = await _instituteRepo.CreateEntity(model);
-                return Json(ResponseData.Instance.GenericResponse(response));
+                var instituteModel = (await _instituteMasterRepo.GetSingle(x => x.IsActive == 1)).Id;
+                model.InstituteId = instituteModel;
+                if (model.Id == 0)
+                {
+                    var response = await _instituteRepo.CreateEntity(model);
+                    return Json(ResponseData.Instance.GenericResponse(response));
+                }
+                else
+                {
+                    var updateModel = CommanDeleteHelper.CommanUpdateCode(model, 1);
+                    var response = await _instituteRepo.Update(updateModel);
+                    return Json(ResponseData.Instance.GenericResponse(response));
+                }
             }
-            else
+            catch (Exception ex)
             {
-                var updateModel = CommanDeleteHelper.CommanUpdateCode(model, 1);
-                var response = await _instituteRepo.Update(updateModel);
-                return Json(ResponseData.Instance.GenericResponse(response));
+                string actionName = this.ControllerContext.RouteData.Values["action"].ToString();
+                string controllerName = this.ControllerContext.RouteData.Values["controller"].ToString();
+
+                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(actionName, controllerName, ex.Message, LoggingType.httpDelete.ToString(), 0);
+                var exceptionResponse = await _exceptionLoggingRepo.CreateEntity(exceptionHelper);
+                return Json(ResponseData.Instance.GenericResponse(ResponseStatus.ServerError));
             }
         }
     }

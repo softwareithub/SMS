@@ -103,35 +103,48 @@ namespace SERP.UI.Controllers.Transaction.FeeTransaction
 
         public async Task<IActionResult> AllocateStudentFee(FeeDetailModel modelData)
         {
-            var courseIds = (HttpContext.Session.GetString("CourseId").ToString().Split(',')).Select(x => Int32.Parse(x)).ToList();
-            ResponseStatus result =ResponseStatus.AddedSuccessfully ;
-            var maxFeeType = await _feeClassWiseDetailRepo.GetList(x => x.IsActive == 1 && x.IsDeleted == 0);
-            int feeTypeId = maxFeeType.Count() != 0 ? maxFeeType.Max(x => x.Type) + 1 : 1;
-
-            await _feeClassWiseDetailRepo.CreateNewContext();
-
-            var deletePreviousFee = await _feeClassWiseDetailRepo.GetList(x => x.IsActive == 1 && x.IsDeleted == 0 && courseIds.Contains(x.ClassId));
-            deletePreviousFee.ToList().ForEach(x => {
-                x.IsActive = 0;
-                x.IsDeleted = 1;
-            });
-
-            await _feeClassWiseDetailRepo.CreateNewContext();
-
-            var deleteresult = await _feeClassWiseDetailRepo.Update(deletePreviousFee.ToArray());
-
-            for (int i=0; i< courseIds.Count(); i++)
+            try
             {
-                modelData.FeeDetailModels.ToList().ForEach(x =>
-                {
-                    x.Type = feeTypeId;
-                    x.ClassId =Convert.ToInt32(courseIds[i]);
-                    x.Id = 0;
-                });
+                var courseIds = (HttpContext.Session.GetString("CourseId").ToString().Split(',')).Select(x => Int32.Parse(x)).ToList();
+                ResponseStatus result = ResponseStatus.AddedSuccessfully;
+                var maxFeeType = await _feeClassWiseDetailRepo.GetList(x => x.IsActive == 1 && x.IsDeleted == 0);
+                int feeTypeId = maxFeeType.Count() != 0 ? maxFeeType.Max(x => x.Type) + 1 : 1;
+
                 await _feeClassWiseDetailRepo.CreateNewContext();
-                result = await _feeClassWiseDetailRepo.Add(modelData.FeeDetailModels.ToArray());
+
+                var deletePreviousFee = await _feeClassWiseDetailRepo.GetList(x => x.IsActive == 1 && x.IsDeleted == 0 && courseIds.Contains(x.ClassId));
+                deletePreviousFee.ToList().ForEach(x =>
+                {
+                    x.IsActive = 0;
+                    x.IsDeleted = 1;
+                });
+
+                await _feeClassWiseDetailRepo.CreateNewContext();
+
+                var deleteresult = await _feeClassWiseDetailRepo.Update(deletePreviousFee.ToArray());
+
+                for (int i = 0; i < courseIds.Count(); i++)
+                {
+                    modelData.FeeDetailModels.ToList().ForEach(x =>
+                    {
+                        x.Type = feeTypeId;
+                        x.ClassId = Convert.ToInt32(courseIds[i]);
+                        x.Id = 0;
+                    });
+                    await _feeClassWiseDetailRepo.CreateNewContext();
+                    result = await _feeClassWiseDetailRepo.Add(modelData.FeeDetailModels.ToArray());
+                }
+                return Json(ResponseData.Instance.GenericResponse(result));
             }
-            return Json(ResponseData.Instance.GenericResponse(result));
+            catch (Exception ex)
+            {
+                string actionName = this.ControllerContext.RouteData.Values["action"].ToString();
+                string controllerName = this.ControllerContext.RouteData.Values["controller"].ToString();
+
+                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(actionName, controllerName, ex.Message, LoggingType.httpDelete.ToString(), 0);
+                var exceptionResponse = await _exceptionLoggingRepo.CreateEntity(exceptionHelper);
+                return Json(ResponseData.Instance.GenericResponse(ResponseStatus.ServerError));
+            }
         }
 
         public async Task<IActionResult> GetFeeDetail(string courseIds)

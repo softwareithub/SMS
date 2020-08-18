@@ -10,6 +10,8 @@ using SERP.Core.Model.UserManagement;
 using SERP.Infrastructure.Repository.Infrastructure.Repo;
 using SERP.UI.Extension;
 using SERP.Utilities.ExceptionHelper;
+using SERP.Utilities.ResponseMessage;
+using SERP.Utilities.ResponseUtilities;
 
 namespace SERP.UI.Controllers.DashBoard
 {
@@ -26,24 +28,59 @@ namespace SERP.UI.Controllers.DashBoard
         }
         public async Task<IActionResult> GetStudentCourseBatchStrenght()
         {
-          
-            var result = await _IDashBoardRepo.BatchCourseCount();
-            return Json(result);
+            try
+            {
+                var result = await _IDashBoardRepo.BatchCourseCount();
+                return Json(result);
+            }
+            catch (Exception ex)
+            {
+                string actionName = this.ControllerContext.RouteData.Values["action"].ToString();
+                string controllerName = this.ControllerContext.RouteData.Values["controller"].ToString();
+
+                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(actionName, controllerName, ex.Message, LoggingType.httpDelete.ToString(), 0);
+                var exceptionResponse = await _exceptionLoggingRepo.CreateEntity(exceptionHelper);
+                return Json(ResponseData.Instance.GenericResponse(ResponseStatus.ServerError));
+            }
         }
 
         public async Task<IActionResult> StudentAttendeceReport()
         {
-            var result = await _IDashBoardRepo.GetRootList<DateTime>(DateTime.Now.Date);
-            return await  Task.Run(() => Json(result));
+            try
+            {
+                var result = await _IDashBoardRepo.GetRootList<DateTime>(DateTime.Now.Date);
+                return await Task.Run(() => Json(result));
+            }
+            catch (Exception ex)
+            {
+                string actionName = this.ControllerContext.RouteData.Values["action"].ToString();
+                string controllerName = this.ControllerContext.RouteData.Values["controller"].ToString();
+
+                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(actionName, controllerName, ex.Message, LoggingType.httpDelete.ToString(), 0);
+                var exceptionResponse = await _exceptionLoggingRepo.CreateEntity(exceptionHelper);
+                return Json(ResponseData.Instance.GenericResponse(ResponseStatus.ServerError));
+            }
         }
 
         public async Task<IActionResult> StudentAttendeceReportMonthDayWise(int year, int month, int day)
         {
-            year = year == 0 ? DateTime.Now.Year : year;
-            month = month == 0 ? DateTime.Now.Month : month;
-            day = day == 0 ? DateTime.Now.Day : day;
-            var result = await _IDashBoardRepo.GetStudentAttendenceReport(year, month, day);
-            return await Task.Run(() => Json(result));
+            try
+            {
+                year = year == 0 ? DateTime.Now.Year : year;
+                month = month == 0 ? DateTime.Now.Month : month;
+                day = day == 0 ? DateTime.Now.Day : day;
+                var result = await _IDashBoardRepo.GetStudentAttendenceReport(year, month, day);
+                return await Task.Run(() => Json(result));
+            }
+            catch (Exception ex)
+            {
+                string actionName = this.ControllerContext.RouteData.Values["action"].ToString();
+                string controllerName = this.ControllerContext.RouteData.Values["controller"].ToString();
+
+                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(actionName, controllerName, ex.Message, LoggingType.httpDelete.ToString(), 0);
+                var exceptionResponse = await _exceptionLoggingRepo.CreateEntity(exceptionHelper);
+                return Json(ResponseData.Instance.GenericResponse(ResponseStatus.ServerError));
+            }
         }
 
         public async Task<IActionResult> MenuSubMenuDetails()
@@ -82,8 +119,20 @@ namespace SERP.UI.Controllers.DashBoard
 
         public async Task<IActionResult> GetFeeDetailReport()
         {
-            var result = await _IDashBoardRepo.GetFeeDetails();
-            return await Task.Run(() => Json(result));
+            try
+            {
+                var result = await _IDashBoardRepo.GetFeeDetails();
+                return await Task.Run(() => Json(result));
+            }
+            catch (Exception ex)
+            {
+                string actionName = this.ControllerContext.RouteData.Values["action"].ToString();
+                string controllerName = this.ControllerContext.RouteData.Values["controller"].ToString();
+
+                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(actionName, controllerName, ex.Message, LoggingType.httpDelete.ToString(), 0);
+                var exceptionResponse = await _exceptionLoggingRepo.CreateEntity(exceptionHelper);
+                return Json(ResponseData.Instance.GenericResponse(ResponseStatus.ServerError));
+            }
         }
     }
 }

@@ -62,33 +62,45 @@ namespace SERP.UI.Controllers.Transaction.FeeTransaction
 
         public async Task<JsonResult> GetParticularList(int id)
         {
-            if (id == 0)
+            try
             {
-                var result = await _feeCategoryRepo.GetList(x => x.IsActive == 1 && x.IsDeleted == 0);
-                return Json(result);
+                if (id == 0)
+                {
+                    var result = await _feeCategoryRepo.GetList(x => x.IsActive == 1 && x.IsDeleted == 0);
+                    return Json(result);
+                }
+                else
+                {
+                    var feeDiscount = await _feeDsicountRepo.GetList(x => x.IsActive == 1 && x.IsDeleted == 0 && x.Id == id);
+                    var feeDiscountParticularwise = await _feeDiscountParticularRepo.GetList(x => x.IsDeleted == 0 && x.IsActive == 1);
+                    var feeCategory = await _feeCategoryRepo.GetList(x => x.IsActive == 1 && x.IsDeleted == 0);
+
+                    var result = (from FD in feeDiscount
+                                  join FDP in feeDiscountParticularwise
+                                  on FD.Id equals FDP.FeeDiscountId
+                                  join FC in feeCategory
+                                  on FDP.ParticularId equals FC.Id
+                                  select new FeeDiscountParticularWiseModel
+                                  {
+                                      Id = FDP.Id,
+                                      ParticularId = FC.Id,
+                                      CategoryName = FC.Name,
+                                      DiscountValue = FDP.DiscountValue,
+                                      DiscountType = FDP.DiscountType,
+                                      Description = FDP.Description ?? string.Empty,
+                                  }).ToList();
+
+                    return Json(result);
+                }
             }
-            else
+            catch (Exception ex)
             {
-                var feeDiscount = await _feeDsicountRepo.GetList(x => x.IsActive == 1 && x.IsDeleted == 0 && x.Id == id);
-                var feeDiscountParticularwise = await _feeDiscountParticularRepo.GetList(x => x.IsDeleted == 0 && x.IsActive == 1);
-                var feeCategory = await _feeCategoryRepo.GetList(x => x.IsActive == 1 && x.IsDeleted == 0);
+                string actionName = this.ControllerContext.RouteData.Values["action"].ToString();
+                string controllerName = this.ControllerContext.RouteData.Values["controller"].ToString();
 
-                var result = (from FD in feeDiscount
-                              join FDP in feeDiscountParticularwise
-                              on FD.Id equals FDP.FeeDiscountId
-                              join FC in feeCategory
-                              on FDP.ParticularId equals FC.Id
-                              select new FeeDiscountParticularWiseModel
-                              {
-                                  Id = FDP.Id,
-                                  ParticularId = FC.Id,
-                                  CategoryName = FC.Name,
-                                  DiscountValue = FDP.DiscountValue,
-                                  DiscountType = FDP.DiscountType,
-                                  Description = FDP.Description ?? string.Empty,
-                              }).ToList();
-
-                return Json(result);
+                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(actionName, controllerName, ex.Message, LoggingType.httpDelete.ToString(), 0);
+                var exceptionResponse = await _exceptionLoggingRepo.CreateEntity(exceptionHelper);
+                return Json(ResponseData.Instance.GenericResponse(ResponseStatus.ServerError));
             }
 
         }
@@ -153,6 +165,7 @@ namespace SERP.UI.Controllers.Transaction.FeeTransaction
 
         public async Task<IActionResult> Delete(int id)
         {
+           
             try
             {
                 var model = await _feeDsicountRepo.GetSingle(x => x.Id == id);
@@ -161,9 +174,14 @@ namespace SERP.UI.Controllers.Transaction.FeeTransaction
                 var response = await _feeDsicountRepo.Update(deleteModel);
                 return Json(ResponseData.Instance.GenericResponse(response));
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
-                return Json("Unable to delete.Please contact admin.");
+                string actionName = this.ControllerContext.RouteData.Values["action"].ToString();
+                string controllerName = this.ControllerContext.RouteData.Values["controller"].ToString();
+
+                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(actionName, controllerName, ex.Message, LoggingType.httpDelete.ToString(), 0);
+                var exceptionResponse = await _exceptionLoggingRepo.CreateEntity(exceptionHelper);
+                return Json(ResponseData.Instance.GenericResponse(ResponseStatus.ServerError));
             }
         }
 

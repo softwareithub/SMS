@@ -13,6 +13,7 @@ using SERP.Infrastructure.Repository.Infrastructure.Repo;
 using SERP.Utilities.CommanHelper;
 using SERP.Utilities.ExceptionHelper;
 using SERP.Utilities.ResponseMessage;
+using SERP.Utilities.ResponseUtilities;
 
 namespace SERP.UI.Controllers.Transport
 {
@@ -53,24 +54,36 @@ namespace SERP.UI.Controllers.Transport
         [HttpPost]
         public async Task<IActionResult> Create(VehicleFuelDetail model, IFormFile RecieptImage)
         {
-            if(RecieptImage!=null && RecieptImage.Length>0)
+            try
             {
-                var upload = Path.Combine(_hostingEnviroment.WebRootPath, "Images//");
-                using (FileStream fs = new FileStream(Path.Combine(upload, RecieptImage.FileName), FileMode.Create))
+                if (RecieptImage != null && RecieptImage.Length > 0)
                 {
-                    await RecieptImage.CopyToAsync(fs);
+                    var upload = Path.Combine(_hostingEnviroment.WebRootPath, "Images//");
+                    using (FileStream fs = new FileStream(Path.Combine(upload, RecieptImage.FileName), FileMode.Create))
+                    {
+                        await RecieptImage.CopyToAsync(fs);
+                    }
+                    model.RecieptImage = "/Images/" + RecieptImage.FileName;
                 }
-                model.RecieptImage = "/Images/" + RecieptImage.FileName;
+                if (model.Id == 0)
+                {
+                    var response = await _vehicleFuelRepo.CreateEntity(model);
+                    return Json(ResponseData.Instance.GenericResponse(response));
+                }
+                else
+                {
+                    var updateModel = CommanDeleteHelper.CommanUpdateCode<VehicleFuelDetail>(model, 1);
+                    return Json(ResponseData.Instance.GenericResponse(await _vehicleFuelRepo.Update(updateModel)));
+                }
             }
-            if (model.Id == 0)
+            catch (Exception ex)
             {
-                var response = await _vehicleFuelRepo.CreateEntity(model);
-                return Json(ResponseData.Instance.GenericResponse(response));
-            }
-            else
-            {
-                var updateModel = CommanDeleteHelper.CommanUpdateCode<VehicleFuelDetail>(model, 1);
-                return Json(ResponseData.Instance.GenericResponse(await _vehicleFuelRepo.Update(updateModel)));
+                string actionName = this.ControllerContext.RouteData.Values["action"].ToString();
+                string controllerName = this.ControllerContext.RouteData.Values["controller"].ToString();
+
+                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(actionName, controllerName, ex.Message, LoggingType.httpDelete.ToString(), 0);
+                var exceptionResponse = await _exceptionLoggingRepo.CreateEntity(exceptionHelper);
+                return Json(ResponseData.Instance.GenericResponse(ResponseStatus.ServerError));
             }
         }
 
@@ -111,10 +124,22 @@ namespace SERP.UI.Controllers.Transport
 
         public async Task<IActionResult> Delete(int id)
         {
-            var model = await _vehicleFuelRepo.GetSingle(x => x.Id == id);
-            var deleteModel = CommanDeleteHelper.CommanDeleteCode<VehicleFuelDetail>(model, 1);
-            await _vehicleFuelRepo.CreateNewContext();
-            return Json(ResponseData.Instance.GenericResponse(await _vehicleFuelRepo.Update(deleteModel)));
+            try
+            {
+                var model = await _vehicleFuelRepo.GetSingle(x => x.Id == id);
+                var deleteModel = CommanDeleteHelper.CommanDeleteCode<VehicleFuelDetail>(model, 1);
+                await _vehicleFuelRepo.CreateNewContext();
+                return Json(ResponseData.Instance.GenericResponse(await _vehicleFuelRepo.Update(deleteModel)));
+            }
+            catch (Exception ex)
+            {
+                string actionName = this.ControllerContext.RouteData.Values["action"].ToString();
+                string controllerName = this.ControllerContext.RouteData.Values["controller"].ToString();
+
+                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(actionName, controllerName, ex.Message, LoggingType.httpDelete.ToString(), 0);
+                var exceptionResponse = await _exceptionLoggingRepo.CreateEntity(exceptionHelper);
+                return Json(ResponseData.Instance.GenericResponse(ResponseStatus.ServerError));
+            }
         }
     }
 }

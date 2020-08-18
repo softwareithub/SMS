@@ -13,6 +13,7 @@ using SERP.Core.Model.MasterViewModel;
 using SERP.Infrastructure.Repository.Infrastructure.Repo;
 using SERP.Utilities.ExceptionHelper;
 using SERP.Utilities.ResponseMessage;
+using SERP.Utilities.ResponseUtilities;
 using static System.Convert;
 
 namespace SERP.UI.Controllers.ExamMaster
@@ -74,8 +75,20 @@ namespace SERP.UI.Controllers.ExamMaster
 
         public async Task<IActionResult> GetSubjectDetail(int courseId)
         {
-            var result = await _ISubjectRepo.GetList(x => x.IsActive == 1 && x.CourseId == courseId);
-            return Json(result);
+            try
+            {
+                var result = await _ISubjectRepo.GetList(x => x.IsActive == 1 && x.CourseId == courseId);
+                return Json(result);
+            }
+            catch (Exception ex)
+            {
+                string actionName = this.ControllerContext.RouteData.Values["action"].ToString();
+                string controllerName = this.ControllerContext.RouteData.Values["controller"].ToString();
+
+                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(actionName, controllerName, ex.Message, LoggingType.httpDelete.ToString(), 0);
+                var exceptionResponse = await _exceptionLoggingRepo.CreateEntity(exceptionHelper);
+                return Json(ResponseData.Instance.GenericResponse(ResponseStatus.ServerError));
+            }
         }
 
         public async Task<IActionResult> GetStudentList(int courseId, int batchId, int examId, int subjectId)
@@ -105,45 +118,69 @@ namespace SERP.UI.Controllers.ExamMaster
         [HttpPost]
         public async Task<IActionResult> AllocateStudentMark()
         {
-            var theoryNumbers = Request.Form["Theory"].ToString().Split(',');
-            var labNumbers = Request.Form["lab"].ToString().Split(',');
-            var studentIds = Request.Form["studentId"].ToString().Split(',');
-
-            var previousModels = await _IStudentMarkRepo.GetList(x => x.ExamId == ToInt32(HttpContext.Session.GetInt32("examId"))
-             && x.SubjectId == ToInt32(HttpContext.Session.GetInt32("subjectId"))
-            );
-            previousModels.ToList().ForEach(item =>
+            try
             {
-                item.IsActive = 0;
-                item.IsDeleted = 1;
-            });
+                var theoryNumbers = Request.Form["Theory"].ToString().Split(',');
+                var labNumbers = Request.Form["lab"].ToString().Split(',');
+                var studentIds = Request.Form["studentId"].ToString().Split(',');
 
-            var updateExamSheet = await _IStudentMarkRepo.Update(previousModels.ToArray());
+                var previousModels = await _IStudentMarkRepo.GetList(x => x.ExamId == ToInt32(HttpContext.Session.GetInt32("examId"))
+                 && x.SubjectId == ToInt32(HttpContext.Session.GetInt32("subjectId"))
+                );
+                previousModels.ToList().ForEach(item =>
+                {
+                    item.IsActive = 0;
+                    item.IsDeleted = 1;
+                });
 
-            await _IStudentMarkRepo.CreateNewContext();
+                var updateExamSheet = await _IStudentMarkRepo.Update(previousModels.ToArray());
 
-            List<StudentMarkAllocation> models = new List<StudentMarkAllocation>();
-            for (int i = 0; i < studentIds.Count(); i++)
-            {
-                StudentMarkAllocation model = new StudentMarkAllocation();
-                model.StudentId = ToInt32(studentIds[i]);
-                model.AssignedMark = ToDecimal(theoryNumbers[i]);
-                model.LabMarks = ToDecimal(labNumbers[i]);
-                model.IsActive = 1;
-                model.CreatedBy = 1;
-                model.ExamId = Convert.ToInt32(HttpContext.Session.GetInt32("examId"));
-                model.SubjectId = ToInt32(HttpContext.Session.GetInt32("subjectId"));
-                models.Add(model);
+                await _IStudentMarkRepo.CreateNewContext();
+
+                List<StudentMarkAllocation> models = new List<StudentMarkAllocation>();
+                for (int i = 0; i < studentIds.Count(); i++)
+                {
+                    StudentMarkAllocation model = new StudentMarkAllocation();
+                    model.StudentId = ToInt32(studentIds[i]);
+                    model.AssignedMark = ToDecimal(theoryNumbers[i]);
+                    model.LabMarks = ToDecimal(labNumbers[i]);
+                    model.IsActive = 1;
+                    model.CreatedBy = 1;
+                    model.ExamId = Convert.ToInt32(HttpContext.Session.GetInt32("examId"));
+                    model.SubjectId = ToInt32(HttpContext.Session.GetInt32("subjectId"));
+                    models.Add(model);
+                }
+
+                var result = await _IStudentMarkRepo.Add(models.ToArray());
+                return Json(ResponseData.Instance.GenericResponse(result));
             }
+            catch (Exception ex)
+            {
+                string actionName = this.ControllerContext.RouteData.Values["action"].ToString();
+                string controllerName = this.ControllerContext.RouteData.Values["controller"].ToString();
 
-            var result = await _IStudentMarkRepo.Add(models.ToArray());
-            return Json(ResponseData.Instance.GenericResponse(result));
+                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(actionName, controllerName, ex.Message, LoggingType.httpDelete.ToString(), 0);
+                var exceptionResponse = await _exceptionLoggingRepo.CreateEntity(exceptionHelper);
+                return Json(ResponseData.Instance.GenericResponse(ResponseStatus.ServerError));
+            }
         }
         public async Task<IActionResult> GetGrade(int marks)
         {
-            var gradeList = await _IGradeRepo.GetList(x => x.IsActive == 1);
-            string grade =  GradeCalcullation(marks, gradeList.ToList());
-            return Json(grade);
+            try
+            {
+                var gradeList = await _IGradeRepo.GetList(x => x.IsActive == 1);
+                string grade = GradeCalcullation(marks, gradeList.ToList());
+                return Json(grade);
+            }
+            catch (Exception ex)
+            {
+                string actionName = this.ControllerContext.RouteData.Values["action"].ToString();
+                string controllerName = this.ControllerContext.RouteData.Values["controller"].ToString();
+
+                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(actionName, controllerName, ex.Message, LoggingType.httpDelete.ToString(), 0);
+                var exceptionResponse = await _exceptionLoggingRepo.CreateEntity(exceptionHelper);
+                return Json(ResponseData.Instance.GenericResponse(ResponseStatus.ServerError));
+            }
         }
 
 
@@ -168,32 +205,44 @@ namespace SERP.UI.Controllers.ExamMaster
         }
         public async Task<IActionResult> GetStudentSearcList(int courseId, int batchId)
         {
-            List<StudentPartialInfoViewModel> models = new List<StudentPartialInfoViewModel>();
-            models = (from SP in await _IStudentPromote.GetList(x => x.IsActive == 1 && x.CourseId==courseId && x.BatchId== batchId)
-                      join SM in await _IStudentMaster.GetList(x => x.IsActive == 1)
-                      on SP.StudentId equals SM.Id
-                      join CM in await _ICourseRepo.GetList(x => x.IsActive == 1)
-                      on SP.CourseId equals CM.Id
-                      join BM in await _IBatchRepo.GetList(x => x.IsActive == 1)
-                      on SP.BatchId equals BM.Id
+            try
+            {
+                List<StudentPartialInfoViewModel> models = new List<StudentPartialInfoViewModel>();
+                models = (from SP in await _IStudentPromote.GetList(x => x.IsActive == 1 && x.CourseId == courseId && x.BatchId == batchId)
+                          join SM in await _IStudentMaster.GetList(x => x.IsActive == 1)
+                          on SP.StudentId equals SM.Id
+                          join CM in await _ICourseRepo.GetList(x => x.IsActive == 1)
+                          on SP.CourseId equals CM.Id
+                          join BM in await _IBatchRepo.GetList(x => x.IsActive == 1)
+                          on SP.BatchId equals BM.Id
 
-                      select new StudentPartialInfoViewModel
-                      {
-                          Id = SP.StudentId,
-                          RollCode = SM.RollCode,
-                          Registration = SM.RegistrationNumber,
-                          CourseName = CM.Name,
-                          BatchName = BM.BatchName,
-                          StudentName = SM.Name,
-                          FatherName = SM.FatherName,
-                          MotherName = SM.MotherName,
-                          StudentPhoto = SM.StudentPhoto,
-                          DateOfBirth = SM.DateOfBirth,
-                          Gender = SM.Gender,
-                          JoiningDate = SM.JoiningDate
-                      }).ToList();
+                          select new StudentPartialInfoViewModel
+                          {
+                              Id = SP.StudentId,
+                              RollCode = SM.RollCode,
+                              Registration = SM.RegistrationNumber,
+                              CourseName = CM.Name,
+                              BatchName = BM.BatchName,
+                              StudentName = SM.Name,
+                              FatherName = SM.FatherName,
+                              MotherName = SM.MotherName,
+                              StudentPhoto = SM.StudentPhoto,
+                              DateOfBirth = SM.DateOfBirth,
+                              Gender = SM.Gender,
+                              JoiningDate = SM.JoiningDate
+                          }).ToList();
 
-            return Json(models);
+                return Json(models);
+            }
+            catch (Exception ex)
+            {
+                string actionName = this.ControllerContext.RouteData.Values["action"].ToString();
+                string controllerName = this.ControllerContext.RouteData.Values["controller"].ToString();
+
+                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(actionName, controllerName, ex.Message, LoggingType.httpDelete.ToString(), 0);
+                var exceptionResponse = await _exceptionLoggingRepo.CreateEntity(exceptionHelper);
+                return Json(ResponseData.Instance.GenericResponse(ResponseStatus.ServerError));
+            }
         }
 
         public async Task<IActionResult> StudentMarkSheet(int studentId, int examId)
