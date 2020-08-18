@@ -320,6 +320,7 @@ namespace SERP.UI.Controllers.Transaction.StudentTransaction
 
         private async Task<IActionResult> CreateStudentEntity(StudentMaster model)
         {
+            try 
             {
                 var result = await _IStudentMaster.CreateEntity(model);
 
