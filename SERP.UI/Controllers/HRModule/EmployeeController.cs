@@ -150,8 +150,9 @@ namespace SERP.UI.Controllers.HRModule
                     var response = await UpdateEmplolyeeInfo(model, employeePhoto);
                     return Json(ResponseData.Instance.GenericResponse(response));
                 }
-
+                return Json("Error in employee creation Please contact admin department.");
             }
+
             catch (Exception ex)
             {
                 string actionName = this.ControllerContext.RouteData.Values["action"].ToString();

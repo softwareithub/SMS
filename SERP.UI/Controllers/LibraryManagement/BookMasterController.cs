@@ -123,6 +123,7 @@ namespace SERP.UI.Controllers.LibraryManagement
                         return Json(ResponseData.Instance.GenericResponse(response));
                     }
                 }
+                return Json("Error in book creation please contact admin!");
             }
             catch (Exception ex)
             {
