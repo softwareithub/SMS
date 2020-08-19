@@ -64,17 +64,16 @@ namespace SERP.UI.Controllers.OnlineTest
         {
             try
             {
-                QuestionOptions optmodel = HttpContext.Session.GetObject<QuestionOptions>("questOptions");
+                var optmodel = HttpContext.Session.GetObject<List<QuestionOptions>>("questOptions");
                 var response = await _QuestionRepo.CreateEntity(model.QuestionModel);
                 await _QuestionRepo.CreateNewContext();
                 var questionId = Convert.ToInt32((await _QuestionRepo.GetList(x => x.IsActive == 1)).Max(x => x.Id));
                 List<OptionMaster> optionMasters = new List<OptionMaster>();
-
-                optmodel.Options.ForEach(item =>
+                optmodel.ForEach(item =>
                 {
                     OptionMaster optionMaster = new OptionMaster();
                     optionMaster.QuestionId = questionId;
-                    optionMaster.OptionData = item;
+                    optionMaster.OptionData = item.Options;
                     optionMaster.SortOrder = 0;
                     optionMasters.Add(optionMaster);
 
@@ -255,30 +254,38 @@ namespace SERP.UI.Controllers.OnlineTest
             }
         }
 
-        public async Task<IActionResult> AddOptionTemp(string question, string option)
+        [HttpPost]
+        public async Task<IActionResult> AddOptionTemp(QuestionOptions model)
         {
-
-            if (HttpContext.Session.GetObject<QuestionOptions>("questOptions") == null)
+            try
             {
-                List<string> options = new List<string>();
-                QuestionOptions model = new QuestionOptions();
-                model.Question = question;
-                options.Add(option);
-                model.Options = options;
+                if (HttpContext.Session.GetObject<List<QuestionOptions>>("questOptions") == null)
+                {
+                    var questionOptions = new List<QuestionOptions>();
+                    questionOptions.Add(model);
+                    HttpContext.Session.SetObject("questOptions", questionOptions);
+                    return PartialView("~/Views/OnlineTest/QuestionOptionsTempPartial.cshtml", questionOptions);
+                }
+                else
+                {
+                    var questionOptions = HttpContext.Session.GetObject<List<QuestionOptions>>("questOptions");
+                    questionOptions.Add(model);
+                    HttpContext.Session.SetObject("questOptions", questionOptions);
 
-                HttpContext.Session.SetObject("questOptions", model);
-
-                return PartialView("~/Views/OnlineTest/QuestionOptionsTempPartial.cshtml", model);
+                    return PartialView("~/Views/OnlineTest/QuestionOptionsTempPartial.cshtml", questionOptions);
+                }
             }
-            else
+            catch(Exception ex)
             {
-                QuestionOptions model = HttpContext.Session.GetObject<QuestionOptions>("questOptions");
-                model.Options.Add(option);
-                HttpContext.Session.Remove("questOptions");
-                HttpContext.Session.SetObject("questOptions", model);
+                string actionName = this.ControllerContext.RouteData.Values["action"].ToString();
+                string controllerName = this.ControllerContext.RouteData.Values["controller"].ToString();
 
-                return PartialView("~/Views/OnlineTest/QuestionOptionsTempPartial.cshtml", model);
+                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(actionName, controllerName, ex.Message, LoggingType.httpDelete.ToString(), 0);
+                var exceptionResponse = await _exceptionLoggingRepo.CreateEntity(exceptionHelper);
+                return Json(ResponseData.Instance.GenericResponse(ResponseStatus.ServerError));
             }
+
+
         }
     }
 }

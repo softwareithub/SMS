@@ -7,6 +7,6 @@ namespace SERP.Core.Model.OnlineTest
     public class QuestionOptions
     {
         public string Question { get; set; }
-        public List<string> Options { get; set; }
+        public string Options { get; set; }
     }
 }
