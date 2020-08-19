@@ -57,7 +57,6 @@ namespace SERP.UI.Controllers.OnlineTest
                 var subjectDetails = await _ISubjectMasterRepo.GetList(x => x.IsActive == 1);
                 var testDetails = await _ITestRepo.GetList(x => x.IsActive == 1);
                 var questionDetails = await _IQuestionRepo.GetList(x => x.IsActive == 1);
-                var options= await _
 
                 var response = (from QM in questionDetails
                                 join CM in courseDetails
