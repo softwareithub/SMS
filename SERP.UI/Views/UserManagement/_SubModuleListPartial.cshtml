@@ -16,6 +16,7 @@
                                 <th>Controller Name</th>
                                 <th>Action Name</th>
                                 <th>Class Name</th>
+                                <th>Display Order</th>
                                 <th>Action</th>
 
                             </tr>
@@ -36,6 +37,14 @@
                                 <td>
                                     @data.ActionName
                                 </td>
+                                <td>
+                                    @data.ClassName
+                                </td>
+                                <td>
+                                    @data.DisplayOrder
+                                </td>
+
+
                                 <td>
                                     <a class="btn btn-outline-success pull-right" data-loading-text="<i class='fa fa-circle-o-notch fa-spin'  style='color:#DD4B39'></i>" onclick="UpdateRecord(@data.SubModuleId, this)">
                                         <i class="fa fa-edit" style="color:#3C8DBC"></i>
