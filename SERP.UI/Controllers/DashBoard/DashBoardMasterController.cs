@@ -134,5 +134,23 @@ namespace SERP.UI.Controllers.DashBoard
                 return Json(ResponseData.Instance.GenericResponse(ResponseStatus.ServerError));
             }
         }
+
+        public async Task<IActionResult> GetStudentOnlineTestResult(int userId)
+        {
+            try
+            {
+                var result = await _IDashBoardRepo.GetStudentOnlineTestResult(userId);
+                return await Task.Run(() => Json(result));
+            }
+            catch (Exception ex)
+            {
+                string actionName = this.ControllerContext.RouteData.Values["action"].ToString();
+                string controllerName = this.ControllerContext.RouteData.Values["controller"].ToString();
+
+                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(actionName, controllerName, ex.Message, LoggingType.httpDelete.ToString(), 0);
+                var exceptionResponse = await _exceptionLoggingRepo.CreateEntity(exceptionHelper);
+                return Json(ResponseData.Instance.GenericResponse(ResponseStatus.ServerError));
+            }
+        }
     }
 }

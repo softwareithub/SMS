@@ -109,10 +109,10 @@
                                                 </a>
                                             </td>
                                             <td>
-                                                <input name="questionMark" value="@data.QuestionPoint" class="form-control" />
+                                                <input name="questionMark" onfocus="RemoveZero(this);" onblur="SetZeroIfEmpty(this);" value="@data.QuestionPoint" class="form-control" />
                                             </td>
                                             <td>
-                                                <input name="NegativeMark" value="@data.NegativeMark" class="form-control" />
+                                                <input name="NegativeMark" onfocus="RemoveZero(this);" onblur="SetZeroIfEmpty(this);" value="@data.NegativeMark" class="form-control" />
                                             </td>
                                         </tr>
                                     }
@@ -231,6 +231,21 @@
     }
 </script>
 <script>
+
+    //this function is not working but we need to it work to allow only numeric values
+    //function DoNotAllowAphabets(e) {
+    //    var c1 = e.keyCode;
+    //    var c2 = e.which;
+        
+    //    var a = [];
+    //    var k = e.which;
+
+    //    for (i = 48; i < 58; i++)
+    //        a.push(i);
+    //    debugger;
+    //    if (!(a.indexOf(k) >= 0))
+    //        return false;
+    //}
 
     function GetNewRecordList() {
         GetCustomRecord("/TestQuestionMapping/GetTestDetail");

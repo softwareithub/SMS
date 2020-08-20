@@ -247,5 +247,29 @@ namespace SERP.Infrastructure.Implementation.Infratructure.Implementation
 
             return models;
         }
+
+        public async Task<List<StudentOnlineTestResultVm>> GetStudentOnlineTestResult(int userId)
+        {
+            List<StudentOnlineTestResultVm> models = new List<StudentOnlineTestResultVm>();
+            var commandText = "usp_GetStudentOnlineTestResult";
+
+            SqlParameter[] sqlParams = {
+                new SqlParameter("@userId",userId){SqlDbType= System.Data.SqlDbType.Int, Direction= System.Data.ParameterDirection.Input }
+            };
+
+            var result = await SqlHelperExtension.ExecuteReader(_connectionString, commandText, System.Data.CommandType.StoredProcedure, null);
+            while (result.Read())
+            {
+                StudentOnlineTestResultVm model = new StudentOnlineTestResultVm();
+                model.ExaminationDate = result.DefaultIfNull<DateTime>("DateOfExamination");
+                model.NoOfQuestion = result.DefaultIfNull<int>("NoOfQuestion");
+                model.StudentName = result.DefaultIfNull<string>("StudentName");
+                model.TestName = result.DefaultIfNull<string>("TestName");
+                model.TestTimeLimit = result.DefaultIfNull<string>("TestTimeLimit");
+                models.Add(model);
+            }
+
+            return models;
+        }
     }
 }

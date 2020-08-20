@@ -117,3 +117,17 @@ function CustomFormSubmitComplete() {
 function GetInfo() {
     alert("Information")
 }
+
+//use onfocus in textbox
+function RemoveZero(e) {
+    if (e.value == "0") {
+        e.value = "";
+    }
+}
+//use onblur in textbox
+function SetZeroIfEmpty(e) {
+    if (e.value == "") {
+        e.value = "0";
+    }
+}
+

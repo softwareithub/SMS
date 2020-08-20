@@ -22,5 +22,6 @@ namespace SERP.Core.Model.DashBoardModel
         public decimal FineAmountTillDate { get; set; }
         public decimal AmountPaidTillDate { get; set; }
         public decimal AmountDueTillDate { get; set; }
+        public int TestCount { get; set; }
     }
 }

@@ -55,7 +55,7 @@
                     </i>
                 </div>
                 <form id="form" method="post" data-ajax="true" data-ajax-method="post" data-ajax-confirm="Are you sure want to save the Question? If you want to add more options to the question, Please cancel and proceed or else click Ok to save the question with Options"
-                      asp-action="CreateQuestion" asp-controller="OnlineTest" data-ajax-success="Success"
+                      asp-action="CreateQuestion" asp-controller="OnlineTest" data-ajax-success="SuccessQuestionBank"
                       data-ajax-begin="CustomFormSubmitBegin" data-ajax-complete="CustomFormSubmitComplete">
                     <div class="box-body">
                         <div class="col-md-6">
@@ -80,6 +80,7 @@
                             <div class="form-group">
                                 <label asp-for="QuestionModel.LessonId">Chapter/Lesson</label>
                                 <select asp-for="QuestionModel.LessonId" class="form-control" id="ddlLesson">
+                                    <option value="0">Select</option>
                                 </select>
                                 <span asp-validation-for="QuestionModel.LessonId"></span>
                             </div>
@@ -150,6 +151,22 @@
 </section>
 
 <script>
+    function SuccessQuestionBank(response) {        
+        if (response == "Server error please contact admin team") {
+            alertify.set('notifier', 'position', 'top-center');
+            alertify.error(response);
+        }
+        else {
+            alertify.set('notifier', 'position', 'top-center');
+            alertify.success(response);
+            $('#divOptions').html("");
+            $('#QuestionModel.Question').text("");
+            $('#OptionMasters.OptionData').text("");
+        }
+
+        //$("#form")[0].reset();//reset the form controll.
+        //$(".form-control").val('');//Clear the controll which is present inside the form.
+    }
     function GetLessonDetails() {
         var subjectId = $("#SubjectId").val();
         var html = "";

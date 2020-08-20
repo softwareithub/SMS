@@ -43,6 +43,10 @@ namespace SERP.UI.Controllers.OnlineTest
         {
             try
             {
+                var checkExist = HttpContext.Session.GetObject<List<QuestionOptions>>("questOptions");
+                if(checkExist!=null)
+                HttpContext.Session.SetObject("questOptions", null);
+
                 ViewBag.CourseList = await _ICourseRepo.GetAll(x => x.IsActive == 1);
                 var questionModel = await _QuestionRepo.GetSingle(x => x.Id == id);
                 return PartialView("~/Views/ExamMaster/_QuestionBankPartial.cshtml", questionModel);
@@ -69,18 +73,19 @@ namespace SERP.UI.Controllers.OnlineTest
                 await _QuestionRepo.CreateNewContext();
                 var questionId = Convert.ToInt32((await _QuestionRepo.GetList(x => x.IsActive == 1)).Max(x => x.Id));
                 List<OptionMaster> optionMasters = new List<OptionMaster>();
+                int i = 1;
                 optmodel.ForEach(item =>
                 {
                     OptionMaster optionMaster = new OptionMaster();
                     optionMaster.QuestionId = questionId;
                     optionMaster.OptionData = item.Options;
-                    optionMaster.SortOrder = 0;
+                    optionMaster.SortOrder = i++;
                     optionMasters.Add(optionMaster);
 
                 });
 
                 var optionResponse = await _OptionRepo.Add(optionMasters.ToArray());
-
+                HttpContext.Session.SetObject("questOptions", null);
                 return Json(ResponseData.Instance.GenericResponse(response));
             }
             catch (Exception ex)
