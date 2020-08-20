@@ -12,7 +12,7 @@ namespace SERP.Core.Entities.OnlineTest
         public int TestId { get; set; }
         public int QuestionId { get; set; }
         public int QuestionMark { get; set; }
-        public int NegativeMark { get; set; }
+        public decimal NegativeMark { get; set; }
         public int SessionId { get; set; }
     }
 }

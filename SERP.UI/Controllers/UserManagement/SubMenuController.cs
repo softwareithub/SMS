@@ -93,6 +93,8 @@ namespace SERP.UI.Controllers.UserManagement
                                   SubModuleName = SM.SubModuleName,
                                   ControllerName = SM.ControllerName,
                                   ActionName = SM.ActionName,
+                                  ClassName = SM.ClassName,
+                                  DisplayOrder = SM.DisplayOrder
                               }).ToList();
                 return PartialView("~/Views/UserManagement/_SubModuleListPartial.cshtml", result);
             }

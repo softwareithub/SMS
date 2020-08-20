@@ -17,5 +17,7 @@ namespace SERP.Core.Model.UserManagement
         public int UpdateAccess { get; set; }
         public string ControllerName { get; set; }
         public string ActionName { get; set; }
+        public string ClassName { get; set; }
+        public int DisplayOrder { get; set; }
     }
 }

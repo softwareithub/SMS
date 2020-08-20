@@ -9,12 +9,12 @@ namespace SERP.Core.Entities.Entity.Core.Transaction
     [Table("FeeCategory", Schema = "TransactionSch")]
     public class FeeCategory :Base<int>
     {
-        [Required(ErrorMessage ="Fee category name is required")]
+        [Required(ErrorMessage ="Please enter fee category name")]
         [Display(Name ="Category Name")]
         [MaxLength(100)]
         public string Name { get; set; }
 
-        [Required(ErrorMessage ="Fee Category code is required.")]
+        [Required(ErrorMessage ="Please enter fee category code")]
         [Display(Name ="Category Code")]
         [MaxLength(100)]
         public string Code { get; set; }

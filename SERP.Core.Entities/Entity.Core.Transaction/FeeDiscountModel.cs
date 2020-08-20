@@ -10,7 +10,7 @@ namespace SERP.Core.Entities.Entity.Core.Transaction
         [Display(Name ="Discount Name", Prompt ="Enter Display Name")]
         public string  Name { get; set; }
 
-        [Required(ErrorMessage ="Please enter the disocunt code")]
+        [Required(ErrorMessage ="Please enter the discount code")]
         [Display(Name="Discount Code", Prompt ="Enter Discount Code")]
         public string Code { get; set; }
         [Required(ErrorMessage = "Please enter description")]
