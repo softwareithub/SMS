@@ -82,10 +82,6 @@ function GetCustomRecord(getUrl) {
         }, 300)
     }).done(function () {
         $("#loading").attr('style', 'display:none');
-        setTimeout(function () {
-            table.columns.adjust().responsive.recalc();
-        }, 500)
-        
     });
 }
 

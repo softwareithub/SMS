@@ -1,0 +1,31 @@
+﻿@model IEnumerable<SERP.Core.Entities.Entity.Core.ExamDetail.OptionMaster>
+
+<script type="text/javascript"
+        src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+<script type="text/javascript">
+    if (window.MathJax) {
+        MathJax.Hub.Queue(
+            ["resetEquationNumbers", MathJax.InputJax.TeX],
+            ["Typeset", MathJax.Hub]
+        );
+    }
+</script>
+<ul>
+    @foreach (var data in Model)
+    {
+        if (data.IsCorrectAnswere == 1)
+        {
+            <li style="color:forestgreen">
+                @Html.Raw(data.OptionData)
+            </li>
+        }
+        else
+        {
+            <li>
+                @Html.Raw(data.OptionData)
+            </li>
+        }
+
+    }
+</ul>

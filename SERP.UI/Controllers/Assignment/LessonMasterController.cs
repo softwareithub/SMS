@@ -21,13 +21,15 @@ namespace SERP.UI.Controllers.Assignment
         private readonly IGenericRepository<CourseMaster, int> _ICourseMasterRepo;
         private readonly IGenericRepository<SubjectMaster, int> _ISubjectRepo;
         private readonly IGenericRepository<ExceptionLogging, int> _exceptionLoggingRepo;
+        private readonly ILessonRepository _ILessonRepository;
         public LessonMasterController(IGenericRepository<LessonMaster, int> lessonMasterRepo,
                 IGenericRepository<CourseMaster, int> courseMasterRepo, IGenericRepository<SubjectMaster, int> subjectRepo,
-                IGenericRepository<ExceptionLogging, int> exceptionLoggingRepo)
+                IGenericRepository<ExceptionLogging, int> exceptionLoggingRepo, ILessonRepository lessonRepository)
         {
             _ILessonMasterRepo = lessonMasterRepo;
             _ICourseMasterRepo = courseMasterRepo;
             _ISubjectRepo = subjectRepo;
+            _ILessonRepository = lessonRepository;
         }
         public async Task<IActionResult> CreateLesson(int id)
         {
@@ -148,6 +150,12 @@ namespace SERP.UI.Controllers.Assignment
                 var exceptionResponse = await _exceptionLoggingRepo.CreateEntity(exceptionHelper);
                 return Json(ResponseData.Instance.GenericResponse(ResponseStatus.ServerError));
             }
+        }
+
+        public async Task<IActionResult> GetLessonDetails()
+        {
+            var model = await _ILessonRepository.GetLessonMasterAsync();
+            return PartialView("~/Views/AssignmentWork/_LessonDetailPartial.cshtml", model);
         }
     }
 }

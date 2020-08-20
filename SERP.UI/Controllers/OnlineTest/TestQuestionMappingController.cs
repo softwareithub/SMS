@@ -34,9 +34,9 @@ namespace SERP.UI.Controllers.OnlineTest
         private readonly IGenericRepository<StudentMaster, int> _studentMasterRepo;
         private readonly IHostingEnvironment _hostingEnviroment;
         private readonly IGenericRepository<ExceptionLogging, int> _exceptionLoggingRepo;
-        private readonly IGenericRepository<Options, int> _optionMasterrepo;
+        private readonly IGenericRepository<OptionMaster, int> _optionMasterrepo;
 
-        public TestQuestionMappingController(IGenericRepository<QuestionModel, int> questionRepo, IGenericRepository<SubjectMaster, int> subjectReo, IGenericRepository<CourseMaster, int> courseRepo, IGenericRepository<TestMaster, int> testRepo, IGenericRepository<TestQuestionMapping, int> testQuestionRepo, IGenericRepository<SMSTemplateModel, int> smsTemplateRepo, IGenericRepository<StudentPromote, int> studentPromoteRepo, IGenericRepository<StudentMaster, int>  studentMasterRepo, IHostingEnvironment hostingEnviroment, IGenericRepository<ExceptionLogging, int> exceptionLoggingRepo, IGenericRepository<Options, int> optionsMasterRepo)
+        public TestQuestionMappingController(IGenericRepository<QuestionModel, int> questionRepo, IGenericRepository<SubjectMaster, int> subjectReo, IGenericRepository<CourseMaster, int> courseRepo, IGenericRepository<TestMaster, int> testRepo, IGenericRepository<TestQuestionMapping, int> testQuestionRepo, IGenericRepository<SMSTemplateModel, int> smsTemplateRepo, IGenericRepository<StudentPromote, int> studentPromoteRepo, IGenericRepository<StudentMaster, int> studentMasterRepo, IHostingEnvironment hostingEnviroment, IGenericRepository<ExceptionLogging, int> exceptionLoggingRepo, IGenericRepository<OptionMaster, int> optionsMasterRepo)
         {
             _IQuestionRepo = questionRepo;
             _ISubjectMasterRepo = subjectReo;
@@ -48,6 +48,7 @@ namespace SERP.UI.Controllers.OnlineTest
             _studentMasterRepo = studentMasterRepo;
             _hostingEnviroment = hostingEnviroment;
             _exceptionLoggingRepo = exceptionLoggingRepo;
+            _optionMasterrepo = optionsMasterRepo;
         }
         public async Task<IActionResult> Index()
         {
@@ -57,7 +58,7 @@ namespace SERP.UI.Controllers.OnlineTest
                 var subjectDetails = await _ISubjectMasterRepo.GetList(x => x.IsActive == 1);
                 var testDetails = await _ITestRepo.GetList(x => x.IsActive == 1);
                 var questionDetails = await _IQuestionRepo.GetList(x => x.IsActive == 1);
-                var options= await _
+                var options = await _optionMasterrepo.GetList(x => x.IsActive == 1 && x.IsDeleted == 0);
 
                 var response = (from QM in questionDetails
                                 join CM in courseDetails
@@ -71,8 +72,7 @@ namespace SERP.UI.Controllers.OnlineTest
                                     CourseName = CM.Name,
                                     SubjectName = SM.SubjectName,
                                     Question = QM.Question,
-                                    QuestionPoint = QM.QuestionPoint
-
+                                    QuestionPoint = QM.QuestionPoint,
                                 }).ToList();
 
                 ViewBag.CourseDetail = courseDetails;
@@ -100,7 +100,7 @@ namespace SERP.UI.Controllers.OnlineTest
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateQuestion(int TestId, int[] QuestionId,int questionMark)
+        public async Task<IActionResult> CreateQuestion(int TestId, int[] QuestionId, int questionMark)
         {
             try
             {
@@ -233,6 +233,23 @@ namespace SERP.UI.Controllers.OnlineTest
             }
         }
 
-      
+        public async Task<IActionResult> GetOptionsList(int questionId)
+        {
+            try
+            {
+                var optionModel = await _optionMasterrepo.GetList(x => x.IsActive == 1 && x.QuestionId == questionId);
+                return PartialView("~/Views/OnlineTest/_QuestionOptionDetailPartial.cshtml", optionModel);
+            }
+            catch(Exception ex)
+            {
+                string actionName = this.ControllerContext.RouteData.Values["action"].ToString();
+                string controllerName = this.ControllerContext.RouteData.Values["controller"].ToString();
+
+                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(actionName, controllerName, ex.Message, LoggingType.httpGet.ToString(), 0);
+                var exceptionResponse = await _exceptionLoggingRepo.CreateEntity(exceptionHelper);
+                return await Task.Run(() => PartialView("~/Views/Shared/Error.cshtml"));
+            }
+
+        }
     }
 }

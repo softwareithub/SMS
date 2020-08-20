@@ -33,6 +33,10 @@ namespace SERP.Infrastructure.Implementation.Infratructure.Implementation
             }
             catch (Exception ex)
             {
+                if(ex.InnerException.Message.Contains("The duplicate key "))
+                {
+                    return ResponseStatus.AlreadyExists;
+                }
                 return ResponseStatus.ServerError;
             }
         }

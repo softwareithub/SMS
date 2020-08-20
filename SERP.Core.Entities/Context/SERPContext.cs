@@ -27,7 +27,7 @@ namespace SERP.Core.Entities.Context
     {
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseSqlServer("Server= DESKTOP-SF1G3N8\\VIPRAIT; Database= VinobaEducationPortal; User Id=sa;Password = vi@pra91");
+            optionsBuilder.UseSqlServer("Server= DESKTOP-SF1G3N8\\VIPRAIT; Database= SERPDevelopment; User Id=sa;Password = vi@pra91");
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

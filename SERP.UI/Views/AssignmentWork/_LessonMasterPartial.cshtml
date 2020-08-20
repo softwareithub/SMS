@@ -122,19 +122,21 @@
                 </form>
             </div>
         </div>
+        @await Html.PartialAsync("~/Views/Shared/_CommanModalPartial.cshtml")
     </div>
+
 </section>
 
 <script>
 
     function GetNewRecordList() {
-        GetCustomRecord("Exam/GetExamList");
+        GetCustomRecord("/LessonMaster/GetLessonDetails");
         setTimeout(function () {
-            $("#modalTitle").text("Exam Master List")
+            $("#modalTitle").text("Subject Lesson Details")
         }, 300);
     }
     function NewAcademicMaster() {
-        var url = "AcademicMaster/Index";
+        var url = "/LessonMaster/CreateLesson";
         NewCustomRecord(url);
     }
     function GetSubjectDetails() {

@@ -13,6 +13,7 @@
     .valid {
         border: 2px solid green;
     }
+
     td {
         word-break: break-all;
     }
@@ -103,7 +104,9 @@
                                                 @data.SubjectName
                                             </td>
                                             <td style="word-break:break-all">
-                                                <label style="word-break:break-all">@Html.Raw(data.Question) </label>
+                                                <a onclick="fn_GetOptions(@data.QuestionId)">
+                                                    <label style="word-break:break-all">@Html.Raw(data.Question) </label>
+                                                </a>
                                             </td>
                                             <td>
                                                 <input type="number" name="questionMark" value="@data.QuestionPoint" class="form-control" />
@@ -121,7 +124,7 @@
 
                     <div class="box-footer">
                         <div class="col-md-8">
-                            @Html.SERPButton("btn btn-primary pull-right btnSubmit", Model == null ? 0 : Model.Count()>0? Convert.ToInt32(Model?.First()?.TestId):0)
+                            @Html.SERPButton("btn btn-primary pull-right btnSubmit", Model == null ? 0 : Model.Count() > 0 ? Convert.ToInt32(Model?.First()?.TestId) : 0)
                             <button class="buttonload" style="display:none">
                                 <i class="fa fa-refresh fa-spin"></i>Loading
                             </button>
@@ -187,6 +190,33 @@
             </div>
         </div>
 
+
+        <div class="modal fade" id="divQuestionModel" role="dialog">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                        <h4 class="modal-title">
+                            <a id="QuestionName">
+                                Question Options
+                            </a>
+                        </h4>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div id="divOptions">
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                    </div>
+                </div>
+            </div>
+        </div>
+
     </div>
 </section>
 <script type="text/javascript"
@@ -213,18 +243,18 @@
         NewCustomRecord(url);
     }
     function CheckThis(eData) {
-        
+
         $('input:checkbox').removeAttr('checked');
 
     }
     function GetSubjectList() {
-        
+
         var courseId = $("#CourseId").val();
         $("#SubjectId").empty()
         $("#SubjectId").append('<option value="0">Select</option>');
         $.get("/CommanDataForJson/SubjectJson", { courseId: courseId }, function (responseData) {
             for (var i = 0; i < responseData.length; i++) {
-                
+
                 var html = '<option value=' + responseData[i].id + '>' + responseData[i].subjectName + '</option>'
                 $("#SubjectId").append(html);
             }
@@ -258,7 +288,7 @@
         if (date.length > 0) {
             $("#txtDateTime").removeClass("invalid")
             $("#txtDateTime").addClass('valid');
-            $.get("/TestQuestionMapping/PublishTest", { dateTime: date, testId: testId, templateId: templateId}, function (data) {
+            $.get("/TestQuestionMapping/PublishTest", { dateTime: date, testId: testId, templateId: templateId }, function (data) {
                 alertify.success(data);
             });
         }
@@ -273,9 +303,16 @@
         $("#ddlNotification").empty();
         $.get("/OnlineTest/GetSMSEmailTemplate", { notificationType: notificationType }, function (data) {
             for (var i = 0; i < data.length; i++) {
-                
-                $("#ddlNotification").append("<option value=" + data[i].id+">" + data[i].templateName+"</option>")
+
+                $("#ddlNotification").append("<option value=" + data[i].id + ">" + data[i].templateName + "</option>")
             }
+        });
+    }
+
+    function fn_GetOptions(id) {
+        $.get("/TestQuestionMapping/GetOptionsList", { questionId: id }, function (data) {
+            $("#divOptions").html(data);
+            $("#divQuestionModel").modal('show');
         });
     }
 </script>

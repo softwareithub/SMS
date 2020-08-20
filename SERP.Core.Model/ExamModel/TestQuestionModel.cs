@@ -15,6 +15,7 @@ namespace SERP.Core.Model.ExamModel
         public string Question { get; set; }
         public int QuestionPoint { get; set; }
         public int NegativeMark { get; set; }
+        public OptionMaster OptionsMasters { get; set; }
 
     }
 }
