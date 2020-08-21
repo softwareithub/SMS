@@ -9,19 +9,44 @@
             <th>
                 Option
             </th>
+            <th>
+                IsChecked
+            </th>
+            <th>
+                DisplayOrder
+            </th>
+            <th>
+                Action
+            </th>
         </tr>
     </thead>
     <tbody id="tblTempQuestion">
         @foreach (var data in Model)
         {
-            <tr>
-                <td>
-                    @Html.Raw(data.Question)
-                </td>
-                <td>
-                    @Html.Raw(data.Options)
-                </td>
-            </tr>
+        <tr id="row_@data.OptionTempId">
+            <td>
+                @Html.Raw(data.Question)
+            </td>
+            <td>
+                @Html.Raw(data.Options)
+            </td>
+            <td>
+                <input type="checkbox" checked="@data.IsChecked" />
+            </td>
+            <td>
+                <input type="text" checked="@data.DisplayOrder" />
+            </td>
+                
+            <td>
+                <a id="edit_@data.OptionTempId" class="btn btn-outline-success pull-right" data-loading-text="<i class='fa fa-circle-o-notch fa-spin'  style='color:#DD4B39'></i>" onclick="editTempOption('@data.OptionTempId')">
+                    <i class="fa fa-edit" style="color:#3C8DBC"></i>
+                </a>
+                <a class="btn btn-outline-danger pull-right" data-loading-text="<i class='fa fa-circle-o-notch fa-spin'  style='color:#DD4B39'></i>" onclick="deleteTempOption('@data.OptionTempId')">
+                    <i class="fa fa-trash" style="color:#DD4B39"></i>
+
+                </a>
+            </td>
+        </tr>
         }
     </tbody>
 </table>

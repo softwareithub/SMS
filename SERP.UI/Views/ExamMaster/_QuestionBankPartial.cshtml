@@ -103,7 +103,7 @@
                                 <input type="hidden" asp-for="QuestionModel.CreatedBy" />
                                 <input type="hidden" asp-for="QuestionModel.CreatedDate" />
                                 <label asp-for="QuestionModel.Question">Question</label>
-                                <textarea asp-for="QuestionModel.Question" class="form-control ckeditor"></textarea>
+                                <textarea asp-for="QuestionModel.Question" class="form-control ckeditor" rows="3"></textarea>
                                 <span asp-validation-for="QuestionModel.Question" class="text-danger"></span>
                             </div>
                         </div>
@@ -111,19 +111,19 @@
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label asp-for="OptionMasters.OptionData">Options</label>
-                                <textarea asp-for="OptionMasters.OptionData" class="form-control ckeditor"></textarea>
+                                <textarea asp-for="OptionMasters.OptionData" class="form-control ckeditor" rows="3"></textarea>
                                 <span asp-validation-for="OptionMasters.OptionData" class="text-danger"></span>
                             </div>
                         </div>
-
+                        <div class="col-md-12">
+                            <input type="button" id="AddTempOption" class="btn btn-success pull-right" onclick="fn_AddOptions('insert','')" value="Add Options" />
+                        </div>
                         <div class="col-md-12" id="divOptions">
 
                         </div>
                     </div>
                     <div class="box-footer">
-                        <div class="col-md-4">
-                            <input type="button" class="btn btn-success pull-right" onclick="fn_AddOptions()" value="Add Options" />
-                        </div>
+                        
                         <div id="divCancelSubmit" style="display:none">
                             <div class="col-md-4">
                                 @Html.SERPButton("btn btn-primary pull-right btnSubmit", Model == null ? 0 : Model.QuestionModel.Id)
@@ -151,6 +151,30 @@
 </section>
 
 <script>
+    function editTempOption(tempOptionId) {
+        debugger;
+        var Ques = $('#row_' + tempOptionId).find('td:eq(0)').html();
+        var Option = $('#row_' + tempOptionId).find('td:eq(1)').html();
+
+        $('#cke_QuestionModel_Question').find('.cke_wysiwyg_frame').contents().find('html').find('body').html(Ques)
+        $('#cke_OptionMasters_OptionData').find('.cke_wysiwyg_frame').contents().find('html').find('body').html(Option)
+        $('#AddTempOption').val("Update Option");
+        $('#AddTempOption').attr('data-updateid', tempOptionId);
+    }
+
+    function deleteTempOption(tempoptionid) {
+        debugger;
+        $.post("/OnlineTest/DeleteOptionTemp", { tempoptionid: tempoptionid }, function (data) {
+            $("#divOptions").html(data);
+        }).done(function () {
+            $('#row_' + tempOptionId).remove();
+            $("#divCancelSubmit").removeAttr("style");
+        });
+
+
+        
+    }
+
     function SuccessQuestionBank(response) {        
         if (response == "Server error please contact admin team") {
             alertify.set('notifier', 'position', 'top-center');
@@ -229,14 +253,41 @@
     }
 
     function fn_AddOptions() {
-        var question = CKEDITOR.instances['QuestionModel_Question'].getData();
-        var options = CKEDITOR.instances['OptionMasters_OptionData'].getData();
-        var model = { question: question, options: options }
-        $.post("/OnlineTest/AddOptionTemp", { model: model }, function (data) {
-            $("#divOptions").html(data);
-        }).done(function () {
-            $("#divCancelSubmit").removeAttr("style")
-        });
+        
+        var optionUpdateId = $('#AddTempOption').attr("data-updateid");
+        var action = "";
+        if (optionUpdateId == null || optionUpdateId == "") {
+            action = "insert";
+            var question = $('#cke_QuestionModel_Question').find('.cke_wysiwyg_frame').contents().find('html').find('body').html();
+            var options = $('#cke_OptionMasters_OptionData').find('.cke_wysiwyg_frame').contents().find('html').find('body').html();
+            //var question = CKEDITOR.instances['QuestionModel_Question'].getData();
+            //var options = CKEDITOR.instances['OptionMasters_OptionData'].getData();
+            var guid = generate();
+            var ischecked = false;
+            var model = { question: question, options: options, optiontempid: guid, ischecked: ischecked, action:action }
+            $.post("/OnlineTest/AddOptionTemp", { model: model }, function (data) {
+                $("#divOptions").html(data);
+            }).done(function () {
+                $("#divCancelSubmit").removeAttr("style")
+            });
+        }
+        else {
+            action = "update";
+            var question = $('#cke_QuestionModel_Question').find('.cke_wysiwyg_frame').contents().find('html').find('body').html()
+            var options = $('#cke_OptionMasters_OptionData').find('.cke_wysiwyg_frame').contents().find('html').find('body').html()
+            //var question = CKEDITOR.instances['QuestionModel_Question'].getData();
+            //var options = CKEDITOR.instances['OptionMasters_OptionData'].getData();
+            var guid = optionUpdateId;
+            var ischecked = false;
+            var model = { question: question, options: options, optiontempid: guid, ischecked: ischecked, action: action }
+            $.post("/OnlineTest/AddOptionTemp", { model: model }, function (data) {
+                $("#divOptions").html(data);
+            }).done(function () {
+                $("#divCancelSubmit").removeAttr("style")
+                $('#AddTempOption').val('Add Options');
+                $('#AddTempOption').attr("data-updateid","");
+            });
+        }
     }
 
     function ConfirmQuestion() {
@@ -297,7 +348,7 @@
             extraPlugins: 'ckeditor_wiris',
             // For now, MathType is incompatible with CKEditor file upload plugins.
             removePlugins: 'uploadimage,uploadwidget,uploadfile,filetools,filebrowser',
-            height: 320,
+            height: 250,
             // Update the ACF configuration with MathML syntax.
             extraAllowedContent: mathElements.join(' ') + '(*)[*]{*};img[data-mathml,data-custom-editor,role](Wirisformula)'
         });
@@ -307,7 +358,7 @@
             extraPlugins: 'ckeditor_wiris',
             // For now, MathType is incompatible with CKEditor file upload plugins.
             removePlugins: 'uploadimage,uploadwidget,uploadfile,filetools,filebrowser',
-            height: 320,
+            height: 250,
             // Update the ACF configuration with MathML syntax.
             extraAllowedContent: mathElements.join(' ') + '(*)[*]{*};img[data-mathml,data-custom-editor,role](Wirisformula)'
         });
