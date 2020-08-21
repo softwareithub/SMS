@@ -10,6 +10,7 @@
 
     $("#form")[0].reset();//reset the form controll.
     $(".form-control").val('');//Clear the controll which is present inside the form.
+    $("select").each(function () { this.selectedIndex = 0 });
 }
 
 
