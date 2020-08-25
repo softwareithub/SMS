@@ -20,8 +20,8 @@
                                 </h3>
 
                                 <div class="box-tools pull-right">
-                                    <button type="button" class="btn btn-box-tool" data-toggle="collapse" href="#@item.First().SubjectId">
-                                        <i class="fa fa-minus"></i>
+                                    <button type="button" class="btn btn-box-tool" data-toggle="collapse" onclick="toggleCollapse(@item.First().SubjectId)">
+                                        <i id="collepseIcon_@item.First().SubjectId" class="fa fa-minus"></i>
                                     </button>
                                 </div>
                             </div>
@@ -91,8 +91,24 @@
         UpdateCustomRecord(id, updateUrl, event);
     }
     function toggleCollapse(id) {
-        
-        $(id).collapse("toggle");
+        $('#' + id).attr("class", "");
+        var hasClass = $('#collepseIcon_' + id).hasClass('fa-minus');
+        if (hasClass) {
+            $('#collepseIcon_' + id).removeClass('fa-minus');
+            $('#collepseIcon_' + id).addClass('fa-plus');
+
+            $('#' + id).attr('class', 'box-body collapse');
+
+            $('#' + id).attr('aria-expanded', 'false');
+        }
+        else {
+            $('#collepseIcon_' + id).addClass('fa-minus');
+            $('#collepseIcon_' + id).removeClass('fa-plus');
+
+            $('#' + id).attr('class', 'box-body collapse in');
+            $('#' + id).attr('aria-expanded', 'true');
+            $('#' + id).css('style', '');
+        }
     }
 </script>
 

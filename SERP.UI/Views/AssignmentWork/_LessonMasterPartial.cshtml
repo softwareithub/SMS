@@ -53,27 +53,29 @@
                       asp-action="CreateLesson" asp-controller="LessonMaster" data-ajax-success="Success"
                       data-ajax-begin="CustomFormSubmitBegin" data-ajax-complete="CustomFormSubmitComplete">
                     <div class="box-body">
-                        <div class="col-md-4">
+                        <div class="col-md-6">
                             <div class="form-group">
-                                <label for="classId">Select Course</label>
+                                <label for="classId">Course</label>
                                 <select class="form-control" onchange="GetSubjectDetails()" id="classId">
-                                    <option value="0" selected>Please select Course</option>
+                                    <option value="" selected>Please Select Course</option>
                                     @foreach (var data in (List<SERP.Core.Entities.Entity.Core.Master.CourseMaster>)ViewBag.ClassList)
                                     {
                                         <option value="@data.Id">@data.Name</option>
                                     }
                                 </select>
+                                <span id="spnClassId" class="text-danger"></span>
                             </div>
                         </div>
-                        <div class="col-md-4">
+                        <div class="col-md-6">
                             <div class="form-group">
-                                <label asp-for="SubjectId">Select Subject</label>
+                                <label asp-for="SubjectId">Subject</label>
                                 <select asp-for="SubjectId" class="form-control">
+                                    <option value="" selected>Please Select Subject</option>
                                 </select>
                                 <span asp-validation-for="SubjectId" class="text-danger"></span>
                             </div>
                         </div>
-                        <div class="col-md-4">
+                        <div class="col-md-6">
                             <div class="form-group">
                                 <label asp-for="LessonName">Chapter/Lesson</label>
                                 <input asp-for="LessonName" class="form-control" />
@@ -81,21 +83,21 @@
                                 <span asp-validation-for="LessonName" class="text-danger"></span>
                             </div>
                         </div>
-                        <div class="col-md-4">
+                        <div class="col-md-6">
                             <div class="form-group">
                                 <label asp-for="StartDate">Start Date</label>
                                 <input asp-for="StartDate" class="form-control">
                                 <span asp-validation-for="StartDate" class="text-danger"></span>
                             </div>
                         </div>
-                        <div class="col-md-4">
+                        <div class="col-md-6">
                             <div class="form-group">
                                 <label asp-for="EndDate">End Date</label>
                                 <input asp-for="EndDate" class="form-control">
                                 <span asp-validation-for="EndDate" class="text-danger"></span>
                             </div>
                         </div>
-                        <div class="col-md-4">
+                        <div class="col-md-6">
                             <div class="form-group">
                                 <label asp-for="ClassTestDate">Predict Class Test</label>
                                 <input asp-for="ClassTestDate" class="form-control">
@@ -109,7 +111,7 @@
 
                     <div class="box-footer">
                         <div class="col-md-8">
-                            @Html.SERPButton("btn btn-primary pull-right btnSubmit", Model == null ? 0 : Model.Id)
+                            @Html.SERPButton("btn btn-primary pull-right btnSubmit", Model == null ? 0 : Model.Id, "checkValidation();")
                             <button class="buttonload" style="display:none">
                                 <i class="fa fa-refresh fa-spin"></i>Loading
                             </button>
@@ -129,6 +131,20 @@
 
 <script>
 
+    function checkValidation() {
+        var classVal = $('#classId').children('option:selected').val();
+        var isValid = true;
+        if (classVal == 0) {
+            isValid = false;
+            $('#spnClassId').text("Please select class");
+            
+        }
+        else {
+            isValid = true;
+            $('#spnClassId').text("");
+        }
+        return isValid;
+    }
     function GetNewRecordList() {
         GetCustomRecord("/LessonMaster/GetLessonDetails");
         setTimeout(function () {
