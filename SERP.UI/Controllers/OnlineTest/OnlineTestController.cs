@@ -44,8 +44,8 @@ namespace SERP.UI.Controllers.OnlineTest
             try
             {
                 var checkExist = HttpContext.Session.GetObject<List<QuestionOptions>>("questOptions");
-                if(checkExist!=null)
-                HttpContext.Session.SetObject("questOptions", null);
+                if (checkExist != null)
+                    HttpContext.Session.SetObject("questOptions", null);
 
                 ViewBag.CourseList = await _ICourseRepo.GetAll(x => x.IsActive == 1);
                 var questionModel = await _QuestionRepo.GetSingle(x => x.Id == id);
@@ -73,13 +73,14 @@ namespace SERP.UI.Controllers.OnlineTest
                 await _QuestionRepo.CreateNewContext();
                 var questionId = Convert.ToInt32((await _QuestionRepo.GetList(x => x.IsActive == 1)).Max(x => x.Id));
                 List<OptionMaster> optionMasters = new List<OptionMaster>();
-                int i = 1;
+
                 optmodel.ForEach(item =>
                 {
                     OptionMaster optionMaster = new OptionMaster();
                     optionMaster.QuestionId = questionId;
                     optionMaster.OptionData = item.Options;
-                    optionMaster.SortOrder = i++;
+                    optionMaster.IsCorrectAnswere = item.IsChecked;
+                    optionMaster.SortOrder = Convert.ToInt32(item.DisplayOrder);
                     optionMasters.Add(optionMaster);
 
                 });
@@ -274,13 +275,50 @@ namespace SERP.UI.Controllers.OnlineTest
                 else
                 {
                     var questionOptions = HttpContext.Session.GetObject<List<QuestionOptions>>("questOptions");
-                    questionOptions.Add(model);
+                    if (model.Action == "insert")
+                    {
+                        questionOptions.Add(model);
+                    }
+                    else
+                    {
+                        questionOptions.Where(w => w.OptionTempId.ToString() == model.OptionTempId.ToString()).ToList().ForEach(s => s.Options = model.Options);
+                    }
                     HttpContext.Session.SetObject("questOptions", questionOptions);
-
                     return PartialView("~/Views/OnlineTest/QuestionOptionsTempPartial.cshtml", questionOptions);
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
+            {
+                string actionName = this.ControllerContext.RouteData.Values["action"].ToString();
+                string controllerName = this.ControllerContext.RouteData.Values["controller"].ToString();
+
+                var exceptionHelper = new LoggingHelper().GetExceptionLoggingObj(actionName, controllerName, ex.Message, LoggingType.httpDelete.ToString(), 0);
+                var exceptionResponse = await _exceptionLoggingRepo.CreateEntity(exceptionHelper);
+                return Json(ResponseData.Instance.GenericResponse(ResponseStatus.ServerError));
+            }
+
+
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> DeleteOptionTemp(string tempOptionId)
+        {
+            try
+            {
+                var questionOptions = HttpContext.Session.GetObject<List<QuestionOptions>>("questOptions");
+                
+
+                var stuffToRemove = questionOptions.SingleOrDefault(s => s.OptionTempId.ToString() == tempOptionId.ToString());
+                if (stuffToRemove.OptionTempId.ToString() != null && stuffToRemove.OptionTempId.ToString() != string.Empty)
+                {
+                    questionOptions.Remove(stuffToRemove);
+                }
+
+                HttpContext.Session.SetObject("questOptions", questionOptions);
+
+                return PartialView("~/Views/OnlineTest/QuestionOptionsTempPartial.cshtml", questionOptions);
+            }
+            catch (Exception ex)
             {
                 string actionName = this.ControllerContext.RouteData.Values["action"].ToString();
                 string controllerName = this.ControllerContext.RouteData.Values["controller"].ToString();

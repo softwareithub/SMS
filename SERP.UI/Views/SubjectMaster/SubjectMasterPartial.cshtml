@@ -14,14 +14,14 @@
                         <div class="box box-info">
                             <div class="box-header with-border">
                                 <h3 class="box-title">
-                                    <a onclick="ExpandCollapse(@item.First().SubjectId)">
-                                      Subject Name:  @item.Key <span>Subject Count : @item.Count()</span>
+                                    <a  data-toggle="collapse" href="#@item.First().SubjectId">
+                                        @item.Key (@item.Count())
                                     </a>
                                 </h3>
 
                                 <div class="box-tools pull-right">
-                                    <button type="button" class="btn btn-box-tool" onclick="ExpandCollapse(@item.First().SubjectId)">
-                                        <i data-id="@item.First().SubjectId" class="fa fa-minus"></i>
+                                    <button type="button" class="btn btn-box-tool" data-toggle="collapse" onclick="toggleCollapse(@item.First().SubjectId)">
+                                        <i id="collepseIcon_@item.First().SubjectId" class="fa fa-minus"></i>
                                     </button>
                                 </div>
                             </div>
@@ -90,14 +90,24 @@
         var updateUrl = "/SubjectMaster/Index";
         UpdateCustomRecord(id, updateUrl, event);
     }
-    function ExpandCollapse(id) {
-        $("#" + id).slideToggle();
+    function toggleCollapse(id) {
+        $('#' + id).attr("class", "");
+        var hasClass = $('#collepseIcon_' + id).hasClass('fa-minus');
+        if (hasClass) {
+            $('#collepseIcon_' + id).removeClass('fa-minus');
+            $('#collepseIcon_' + id).addClass('fa-plus');
 
-        if ($("i").find("[data-id=" + id + "]").hasClass("fa fa-minus")) {
-            $("i").find("[data-id=" + id + "]").removeClass("fa fa-minus").addClass("fa fa-plus");
+            $('#' + id).attr('class', 'box-body collapse');
+
+            $('#' + id).attr('aria-expanded', 'false');
         }
         else {
-            $("i").find("[data-id=" + id + "]").removeClass("fa fa-plus").addClass("fa fa-minus");
+            $('#collepseIcon_' + id).addClass('fa-minus');
+            $('#collepseIcon_' + id).removeClass('fa-plus');
+
+            $('#' + id).attr('class', 'box-body collapse in');
+            $('#' + id).attr('aria-expanded', 'true');
+            $('#' + id).css('style', '');
         }
     }
 </script>
