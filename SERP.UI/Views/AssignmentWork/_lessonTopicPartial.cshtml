@@ -27,15 +27,12 @@
                     <h3 class="box-title">Lesson Topic</h3>
                     <div class="col-md-12">
                         <div class="col-md-10">
-                            <a class="btn btn-primary pull-right" onclick="">
-                                <i class="fa fa-list-ul"></i>
-                            </a>
                         </div>
                     </div>
 
                 </div>
                 <form id="form" method="post" data-ajax="true" data-ajax-method="post"
-                      asp-action="PostLessonTopic" asp-controller="LessonTopic" data-ajax-success="Success"
+                      asp-action="PostLessonTopic" asp-controller="LessonTopic" data-ajax-success="SuccessLessonTopic"
                       data-ajax-begin="CustomFormSubmitBegin" data-ajax-complete="CustomFormSubmitComplete" enctype="multipart/form-data">                    
                         <div class="box-body">
 
@@ -62,7 +59,7 @@
                             <div class="col-md-4">
                                 <div class="form-group">
                                     <label for="LessonName">Chapter/Lesson</label>
-                                    <select for="LessonName" class="form-control" id="ddlLesson">
+                                    <select for="LessonName" onchange="GetLessonTopicDetails()" class="form-control" id="ddlLesson" name="ddlLesson">
                                     </select>
                                 </div>
                             </div>
@@ -97,26 +94,34 @@
                         </div>
                     
                     <div class="box-body">
-                        <div class="col-md-12  tblAddOptions">
-                            <table class="table-responsive-md table-striped table-bordered dataTable no-footer">
-                                <thead>
-                                    <tr>
-                                        <th>
-                                            Topic Name
-                                        </th>
-                                        <th>
-                                            Description
-                                        </th>
-                                        <th>Expected Class</th>
-                                        <th>
-                                            Action
-                                        </th>
-                                    </tr>
-                                </thead>
-                                <tbody id="tblbodyTopic">
-                                </tbody>
-                            </table>
+                        <div class="col-md-6">
+                            <div class="tblAddOptions">
+                                <table class="table-responsive-md table-striped table-bordered dataTable no-footer">
+                                    <thead>
+                                        <tr>
+                                            <th>
+                                                Topic Name
+                                            </th>
+                                            <th>
+                                                Description
+                                            </th>
+                                            <th>Expected Class</th>
+                                            <th>
+                                                Action
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="tblbodyTopic">
+                                    </tbody>
+                                </table>
+                            </div>
+                            
                         </div>
+
+                        <div class="col-md-6">
+                            <div id="divMappedLesson"></div>
+                        </div>
+
                     </div>
                     <!-- /.box-body -->
 
@@ -145,6 +150,25 @@
 </style>
 
 <script>
+
+    function SuccessLessonTopic(response) {
+        if (response == "Server error please contact admin team") {
+            alertify.set('notifier', 'position', 'top-center');
+            alertify.error(response);
+        }
+        else {
+            alertify.set('notifier', 'position', 'top-center');
+            alertify.success(response);
+        }
+
+        $("#form")[0].reset();//reset the form controll.
+        $(".form-control").val('');//Clear the controll which is present inside the form.
+        $("select").each(function () { this.selectedIndex = 0 });
+        $("#tblbodyTopic").empty();
+        $("#divMappedLesson").html('');
+
+    }
+
     $(document).ready(function () {
         $('.tblAddOptions').hide();
         $('.dvAddOptionBtn').hide();
@@ -185,6 +209,8 @@
 
     function GetLessonDetails() {
         var subjectId = $("#SubjectId").val();
+        $("#ddlLesson").empty();
+        $("#ddlLesson").append("<option value=''>Select</option>")
         var html = "";
         $.get("/LessonTopic/GetLessonDetail", { subjectid: subjectId }, function (data) {
             for (var i = 0; i < data.length; i++)
@@ -206,5 +232,25 @@
 
         })
     }
+
+    function GetLessonTopicDetails() {
+        var lessonId = $("#ddlLesson").val();
+        $.get("/LessonTopic/GetLessonTopics", { lessonId: lessonId }, function (data) {
+            $("#divMappedLesson").html(data);
+        })
+    }
+
+    function DeleteRecord(id) {
+        alertify.confirm("Are you sure want to Inactivate this record ?", function () {
+            $.get("/LessonTopic/DeleteLesson", { id: id }, function (data) {
+                alertify.success(data);
+            }).done(function () {
+                GetLessonTopicDetails();
+            })
+        }, function () {
+            alertify.error('There is some server Error please contact admin team .')
+        });
+    }
+
 </script>
 

@@ -17,7 +17,7 @@ using SERP.Utilities.ResponseUtilities;
 
 namespace SERP.UI.Controllers.Transaction.TimeTableTransaction
 {
-    public class TimeTableController : Controller
+    public class TimeTableRemoveController : Controller
     {
         private readonly IGenericRepository<BatchMaster, int> _IBatchMaster;
         private readonly IGenericRepository<CourseMaster, int> _ICourseMaster;
@@ -28,7 +28,7 @@ namespace SERP.UI.Controllers.Transaction.TimeTableTransaction
         private readonly IGenericRepository<TimeTableAssignSubjTeacherModel, int> _timeTableAssignRepo;
         private readonly IGenericRepository<ExceptionLogging, int> _exceptionLoggingRepo;
         
-        public TimeTableController(IGenericRepository<BatchMaster, int> batchRepo,
+        public TimeTableRemoveController(IGenericRepository<BatchMaster, int> batchRepo,
             IGenericRepository<CourseMaster, int> courseRepo,
             IGenericRepository<SubjectMaster, int> subjectRepo,
             IGenericRepository<EmployeeBasicInfoModel, int> employeeRepo,
@@ -279,7 +279,7 @@ namespace SERP.UI.Controllers.Transaction.TimeTableTransaction
                 for (int k = 0; k < periods.Count(); k++)
                 {
                     PeriodVm periodModel = new PeriodVm();
-                    periodModel.Period = periods[k];
+                    //periodModel.Period = periods[k];
                     periodVms.Add(periodModel);
                 }
                 timeTableModel.PeriodModels = periodVms;
@@ -323,8 +323,8 @@ namespace SERP.UI.Controllers.Transaction.TimeTableTransaction
                     item.PeriodModels.ForEach(data =>
                     {
                         TimeTableAssignSubjTeacherModel assignModel = new TimeTableAssignSubjTeacherModel();
-                        assignModel.PeriodName = data.Period;
-                        assignModel.SubjecId = data.SubjectId;
+                            //assignModel.PeriodName = data.Period;
+                            //assignModel.SubjecId = data.SubjectId;
                         assignModel.TeacherId = data.EmployeeId;
                         assignModel.FromTime = data.FromTime;
                         assignModel.ToTime = data.ToTime;

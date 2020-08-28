@@ -14,14 +14,14 @@
                         <div class="box box-info">
                             <div class="box-header with-border">
                                 <h3 class="box-title">
-                                    <a  data-toggle="collapse" href="#@item.First().SubjectId">
-                                        @item.Key (@item.Count())
+                                    <a onclick="ExpandCollapse(@item.First().SubjectId)">
+                                      Subject Name:  @item.Key <span>Subject Count : @item.Count()</span>
                                     </a>
                                 </h3>
 
                                 <div class="box-tools pull-right">
-                                    <button type="button" class="btn btn-box-tool" data-toggle="collapse" href="#@item.First().SubjectId">
-                                        <i class="fa fa-minus"></i>
+                                    <button type="button" class="btn btn-box-tool" onclick="ExpandCollapse(@item.First().SubjectId)">
+                                        <i data-id="@item.First().SubjectId" class="fa fa-minus"></i>
                                     </button>
                                 </div>
                             </div>
@@ -90,9 +90,15 @@
         var updateUrl = "/SubjectMaster/Index";
         UpdateCustomRecord(id, updateUrl, event);
     }
-    function toggleCollapse(id) {
-        
-        $(id).collapse("toggle");
+    function ExpandCollapse(id) {
+        $("#" + id).slideToggle();
+
+        if ($("i").find("[data-id=" + id + "]").hasClass("fa fa-minus")) {
+            $("i").find("[data-id=" + id + "]").removeClass("fa fa-minus").addClass("fa fa-plus");
+        }
+        else {
+            $("i").find("[data-id=" + id + "]").removeClass("fa fa-plus").addClass("fa fa-minus");
+        }
     }
 </script>
 

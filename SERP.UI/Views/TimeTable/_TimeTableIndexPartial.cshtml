@@ -1,20 +1,16 @@
-﻿@model SERP.Core.Entities.Entity.Core.Transaction.TimeTableMasterModel
+﻿@model SERP.Core.Entities.TimeTable.TimeTableMaster
 <script src="~/lib/jquery-validation/dist/jquery.validate.js"></script>
 <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.js"></script>
 <link href="https://cdn.datatables.net/1.10.20/css/jquery.dataTables.min.css" rel="stylesheet" />
 <script src="https://cdn.datatables.net/1.10.20/js/jquery.dataTables.min.js"></script>
-<link href="~/Multiselect/example-styles.css" rel="stylesheet" />
-<script src="~/Multiselect/jquery.multi-select.js"></script>
+
 
 <section class="content-header">
     <h1>
-        Student Master
-        <small>Create Caste Detail</small>
+        Time Table
     </h1>
     <ol class="breadcrumb">
-        <li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
-        <li><a href="#">Forms</a></li>
-        <li class="active">General Elements</li>
+        <em>*Required Fields</em>
     </ol>
 </section>
 
@@ -27,11 +23,11 @@
             <div class="box box-primary">
                 <div class="box-header with-border">
                     <h3 class="box-title">Class Time Table Details</h3>
-             
+
                 </div>
                 <div class="box-body">
                     <form id="form" method="get" data-ajax="true" data-ajax-method="post"
-                          asp-action="GetTimeTable" asp-controller="TimeTable" data-ajax-success="TimeTableInfo">
+                          asp-action="CreateTimeTable" asp-controller="TimeTable" data-ajax-success="TimeTableInfo">
                         <div class="col-md-3">
                             <div class="form-group">
                                 <label asp-for="CourseId">Course Name</label>
@@ -44,7 +40,7 @@
                         <div class="col-md-3">
                             <div class="form-group">
                                 <label asp-for="BatchId">Batch Name</label>
-                                <select asp-for="BatchId" class="form-control" onchange="IsTimeSheetExists()">
+                                <select asp-for="BatchId" class="form-control" onchange="GetTimeTableDetail()">
                                     <option value="">Select</option>
                                 </select>
                                 <span asp-validation-for="BatchId" class="text-danger"></span>
@@ -52,22 +48,26 @@
                         </div>
                         <div class="col-md-3">
                             <div class="form-group">
-                                <label>Periods</label>
-                                <select class="form-control" asp-for="Periods">
-                                    <option value="">Select</option>
-                                    @for (int i = 1; i < 11; i++)
-                                    {
-                                        <option value=@i>@i - Periods </option>
-                                    }
-
+                                <label asp-for="SubjectId">Subject</label>
+                                <select asp-for="SubjectId" class="form-control">
+                                    <option value="">SubjectId</option>
                                 </select>
-                                <span asp-validation-for="Periods" class="text-danger"></span>
+                                <span asp-validation-for="SubjectId" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label asp-for="EmployeeId">Employee</label>
+                                <select asp-for="EmployeeId" class="form-control" asp-items="@(new SelectList(ViewBag.EmployeeList ,"Id","Name"))">
+                                    <option value="">Select</option>
+                                </select>
+                                <span asp-validation-for="EmployeeId" class="text-danger"></span>
                             </div>
                         </div>
                         <div class="col-md-3">
                             <div class="form-group">
                                 <label>Select Days</label>
-                                <select id="modal-example" multiple class="form-control" asp-for="Days">
+                                <select class="selectpicker" multiple data-live-search="true" asp-for="Days">
                                     @for (int i = 0; i < 7; i++)
                                     {
                                         <option value="@i">@(((DayOfWeek)i).ToString())</option>
@@ -77,6 +77,32 @@
                             </div>
                         </div>
 
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label asp-for="FromTime">From Time</label>
+                                <input asp-for="FromTime" class="form-control" />
+                                <span asp-validation-for="FromTime" class="text-danger"></span>
+                            </div>
+                        </div>
+
+
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label asp-for="ToTime">To Time</label>
+                                <input asp-for="ToTime" class="form-control" />
+                                <span asp-validation-for="ToTime" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label asp-for="IsClassTeacher">Is Class Teacher</label>
+                                <select asp-for="IsClassTeacher" class="form-control">
+                                    <option value="0">No</option>
+                                    <option value="1">Yes</option>
+                                </select>
+                                <span asp-validation-for="IsClassTeacher" class="text-danger"></span>
+                            </div>
+                        </div>
                         <div class="col-md-12">
                             <button type="submit" class="btn btn-primary pull-right">Create Time Table</button>
                         </div>
@@ -94,51 +120,61 @@
     </div>
 </section>
 
+
+
 <script type="text/javascript">
 
     $(document).ready(function () {
-        $('[data-toggle="popover"]').popover();
-        // GetAssignFeeDetails();
-    });
-
-    $('#modal-example').multiSelect({
-        'modalHTML': '<div class="multi-select-modal">'
+        $('#Days').selectpicker();
     });
 
     function TimeTableInfo(response) {
-        $("#divTimeTable").html(response);
+        alertify.success("Time Table Created successfully.")
+        GetTimeTableDetail();
     }
 
     function GetBatchList() {
-        
-        var courseId = $("#CourseId option:selected").val();
+
+        var courseId = $("#CourseId").val();
+        $('#BatchId').empty();
+        $("#BatchId").append('<option value="0">Select</option>');
         $.get("/StudentMaster/GetBatchList", { courseId: courseId }, function (responseData) {
             $.each(responseData, function (index, value) {
-                $('#BatchId').append($('<option></option>').text(value.batchName).attr('value', value.id));
+                $('#BatchId').append($('<option value=' + value.id + '>' + value.batchName + '</option>'));
             });
+        }).done(function () {
         });
+        GetSubjectList();
     }
-    function IsTimeSheetExists() {
-        debugger
-        var courseId = $("#CourseId").val();
-        var batchId = $("#BatchId").val();
-        $.get("/TimeTable/CheckTimeSheetAvailable", { courseId: courseId, batchId: batchId }, function (responseData) {
-            if (responseData == "0") {
 
-            }
-            else {
-                if (confirm(responseData)) {
-                    $.get("/TimeTable/DeActivateTimeSheet", { courseId: courseId, batchId: batchId }, function (response) {
-                        alertify.success(response);
-                    });
-                }
-                else {
-                    $.get("/TimeTable/GetTimeSheetDetail", { courseId: courseId, batchId: batchId }, function (response) {
-                        $("#divTimeTable").html(response);
-                    });
-                }
+    function GetSubjectList() {
+
+        var courseId = $("#CourseId").val();
+        $("#SubjectId").empty()
+        $("#SubjectId").append('<option value="0">Select</option>');
+        $.get("/CommanDataForJson/SubjectJson", { courseId: courseId }, function (responseData) {
+            for (var i = 0; i < responseData.length; i++) {
+                var html = '<option value=' + responseData[i].id + '>' + responseData[i].subjectName + '</option>'
+                $("#SubjectId").append(html);
             }
         })
+    }
+
+    function GetTimeTableDetail() {
+        var courseId = $("#CourseId").val();
+        var batchId = $('#BatchId').val();
+        $.get("/TimeTable/GetTimeTableDetails", { courseId: courseId, batchId: batchId }, function (data) {
+            $("#divTimeTable").html(data);
+        })
+    }
+
+    function DeleteInfo(courseId, batchId, dayId, fromTime, toTime,subjectId) {
+        debugger;
+        $.get("/TimeTable/DeteTimeTable", { subjectId: subjectId, courseId: courseId, batchId: batchId, dayId: dayId, fromTime: fromTime, toTime: toTime }, function (data) {
+            alertify.success("Deleted successfully");
+        }).done(function () {
+            GetTimeTableDetail();
+        });
     }
 
 </script>

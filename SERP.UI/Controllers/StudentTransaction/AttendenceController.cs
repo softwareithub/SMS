@@ -70,7 +70,7 @@ namespace SERP.UI.Controllers.StudentTransaction
                     {
                         item.PeriodModels.ForEach(data =>
                         {
-                            periodsData.Add(data.Period);
+                            //periodsData.Add(data.Period);
                         });
 
                     });
