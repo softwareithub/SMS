@@ -148,7 +148,7 @@
                                     foreach (var prd in period.PeriodModels)
                                     {
                                         <th>
-                                            @prd.Period
+                                            @prd.FromTime  - @prd.ToTime
                                         </th>
                                     }
                                     break;
@@ -217,21 +217,8 @@
 
                                                             </td>
                                                             <td>
-                                                                @if (prd.TeacherAttendence == "P")
-                                                                {
-                                                                    <div class="led-box">
-                                                                        <div class="led-blue"></div>
-                                                                        <p>Present</p>
-                                                                    </div>
-                                                                }
-                                                                else
-                                                                {
-                                                                    <div class="led-box">
-                                                                        <div class="led-red"></div>
-                                                                        <a onclick="AssignTeacher(@prd.TimeTableId,'@prd.FromTime','@prd.ToTime')">Assign</a>
-                                                                    </div>
 
-                                                                }
+                                                                
                                                             </td>
                                                         </tr>
                                                     </table>

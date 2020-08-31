@@ -12,6 +12,8 @@ namespace SERP.Utilities
         public static string GetFreeTeacher = @"select MasterId,AttendenceId, CourseName,BatchName, EmployeeName, Photo, Phone, PeriodName, FromTime, ToTime, SubjectName,TimeTableDay, TeacherAttendence,CourseId,BatchId,TeacherId, Id from HR.Vw_EmployeeBatchTimeSheet where FromTime<>@fromTime and ToTime <> @toTime  and TeacherAttendence='P'";
 
         public static string GetFeeDepositReciept = @"usp_GetStudentFeeDeposiDetail";
+        public static string GetTimeTableDetail = @"Proc_GetTimeTableDetail";
+        public static string DeleteTimetable = @"Proc_UpdateDeleteTimeTable";
         #endregion
     }
 }

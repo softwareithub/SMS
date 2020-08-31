@@ -14,6 +14,8 @@ using System.Data.SqlClient;
 using Helpers;
 using SERP.Utilities;
 using SERP.Utilities.SqlHelper;
+using SERP.Core.Model.TimeTable;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 
 namespace SERP.Infrastructure.Implementation.Infratructure.Implementation
 {
@@ -86,10 +88,10 @@ namespace SERP.Infrastructure.Implementation.Infratructure.Implementation
                     {
                         PeriodVm periodModel = new PeriodVm();
                         periodModel.EmployeeId = modelData.TeacherId;
-                        periodModel.SubjectId = modelData.SubjecId;
+                        //periodModel.SubjectId = modelData.SubjecId;
                         periodModel.FromTime = modelData.FromTime;
                         periodModel.ToTime = modelData.ToTime;
-                        periodModel.Period = modelData.PeriodName;
+                        //periodModel.Period = modelData.PeriodName;
 
                         periodVms.Add(periodModel);
                     }
@@ -106,65 +108,54 @@ namespace SERP.Infrastructure.Implementation.Infratructure.Implementation
         {
             TimeSheetVm modelTimeSheet = new TimeSheetVm();
             List<TimeTableVm> modelTimeTables = new List<TimeTableVm>();
-           
-            List<CompleteTimeSheetVm> completeTimeSheetVms = new List<CompleteTimeSheetVm>();
-            
+
             var connection = baseContext.Database.GetDbConnection();
 
-            SqlParameter[] objectParams = { 
+            SqlParameter[] objectParams = {
             new SqlParameter("@courseId",courseId){SqlDbType= System.Data.SqlDbType.Int, Direction= System.Data.ParameterDirection.Input },
             new SqlParameter("@batchId",batchId){SqlDbType= System.Data.SqlDbType.Int, Direction= System.Data.ParameterDirection.Input },
             };
 
-            var result = await SqlHelperExtension.ExecuteReader(connection.ConnectionString, SqlConstant.GetTimeSheet, System.Data.CommandType.Text, objectParams);
+            var result = await SqlHelperExtension.ExecuteReader(connection.ConnectionString, SqlConstant.GetTimeTableDetail, System.Data.CommandType.Text, objectParams);
+
+            var models = new List<TimeTableModel>();
 
             while (result.Read())
             {
-                CompleteTimeSheetVm model = new CompleteTimeSheetVm();
-                model.TimeTableDay= result.DefaultIfNull<string>("TimeTableDay");
-                model.MasterId = result.DefaultIfNull<int>("MasterId");
-                model.AttendenceId = result.DefaultIfNull<int>("AttendenceId");
+                TimeTableModel model = new TimeTableModel();
                 model.CourseName = result.DefaultIfNull<string>("CourseName");
-                model.BatchName = result.DefaultIfNull<string>("BatchName");
-                model.EmployeeName = result.DefaultIfNull<string>("EmployeeName");
-                model.Photo = result.DefaultIfNull<string>("Photo");
-                model.Phone = result.DefaultIfNull<string>("Phone");
-                model.PeriodName = result.DefaultIfNull<string>("PeriodName");
-                model.ToTime = result.DefaultIfNull<TimeSpan>("ToTime");
-                model.FromTime = result.DefaultIfNull<TimeSpan>("FromTime");
-                model.SubjectName = result.DefaultIfNull<string>("SubjectName");
-                model.TimeTableDay = result.DefaultIfNull<string>("TimeTableDay");
-                model.TeacherAttendence = result.DefaultIfNull<string>("TeacherAttendence");
-                model.TeacherId = result.DefaultIfNull<int>("TeacherId");
-                model.TimeTableId = result.DefaultIfNull<int>("Id");
-                completeTimeSheetVms.Add(model);
-            }
-            foreach (var data in completeTimeSheetVms.GroupBy(x=>x.TimeTableDay))
-            {
-                List<PeriodVm> periodVms = new List<PeriodVm>();
+                model.CourseId = result.DefaultIfNull<int>("courseId");
+                model.BatchId = result.DefaultIfNull<int>("BatchId");
 
+                model.BatchName = result.DefaultIfNull<string>("BatchName");
+                model.SubjectId = result.DefaultIfNull<int>("Id");
+                model.SubjectName = result.DefaultIfNull<string>("SubjectName");
+
+                model.EmployeeDetail = result.DefaultIfNull<string>("Name") + result.DefaultIfNull<string>("EmpCode");
+                model.FromTime = result.DefaultIfNull<TimeSpan>("FromTime");
+                model.ToTime = result.DefaultIfNull<TimeSpan>("ToTime");
+                model.DayName = result.DefaultIfNull<string>("TimeTableDay");
+                model.DayId = result.DefaultIfNull<int>("DayId");
+                models.Add(model);
+            }
+
+            foreach(var data in models.GroupBy(x=>x.DayName))
+            {
                 TimeTableVm timeTableVm = new TimeTableVm();
                 timeTableVm.DayName = data.Key;
-
-                foreach(var item in data)
+                List<PeriodVm> periodVms = new List<PeriodVm>();
+                foreach (var item in data)
                 {
                     PeriodVm periodVm = new PeriodVm();
-                    periodVm.Period = item.PeriodName;
                     periodVm.BatchName = item.BatchName;
                     periodVm.CourseName = item.CourseName;
                     periodVm.FromTime = item.FromTime;
                     periodVm.ToTime = item.ToTime;
-                    periodVm.EmployeeImage = item.Photo;
-                    periodVm.Phone = item.Phone;
-                    periodVm.SubjectName = item.SubjectName;
-                    periodVm.TeacherAttendence = item.TeacherAttendence;
-                    periodVm.EmployeeName = item.EmployeeName;
-                    periodVm.TimeTableId = item.TimeTableId;
+                    periodVm.EmployeeName = item.EmployeeDetail;
 
                     periodVms.Add(periodVm);
                 }
                 timeTableVm.PeriodModels = periodVms;
-                modelTimeTables.Add(timeTableVm);
             }
             modelTimeSheet.TimeTableModels = modelTimeTables;
             return modelTimeSheet;
@@ -180,7 +171,7 @@ namespace SERP.Infrastructure.Implementation.Infratructure.Implementation
 
             var result = await SqlHelperExtension.ExecuteReader(connection.ConnectionString, SqlConstant.GetTeacherBySubjectId,
                 System.Data.CommandType.StoredProcedure, objectParams);
-            while(result.Read())
+            while (result.Read())
             {
                 PeriodVm model = new PeriodVm();
                 model.EmployeeName = result.DefaultIfNull<string>("Name");
@@ -212,8 +203,57 @@ namespace SERP.Infrastructure.Implementation.Infratructure.Implementation
                 model.EmployeeId = result.DefaultIfNull<int>("TeacherId");
                 freeEmployeeList.Add(model);
             }
-            
+
             return freeEmployeeList;
+        }
+
+        public async Task<List<TimeTableModel>> GetTimeTableModels(int courseId, int batchId)
+        {
+            var models = new List<TimeTableModel>();
+            var connection = baseContext.Database.GetDbConnection();
+
+            SqlParameter[] objectParams = {
+            new SqlParameter("@courseId",courseId){SqlDbType= System.Data.SqlDbType.Int, Direction= System.Data.ParameterDirection.Input },
+            new SqlParameter("@batchId",batchId){SqlDbType= System.Data.SqlDbType.Int, Direction= System.Data.ParameterDirection.Input },
+            };
+
+            var result = await SqlHelperExtension.ExecuteReader(connection.ConnectionString, SqlConstant.GetTimeTableDetail, System.Data.CommandType.StoredProcedure, objectParams);
+
+            while (result.Read())
+            {
+                TimeTableModel model = new TimeTableModel();
+                model.CourseName = result.DefaultIfNull<string>("CourseName");
+                model.CourseId = result.DefaultIfNull<int>("courseId");
+                model.BatchId = result.DefaultIfNull<int>("BatchId");
+
+                model.BatchName = result.DefaultIfNull<string>("BatchName");
+                model.SubjectId = result.DefaultIfNull<int>("Id");
+                model.SubjectName = result.DefaultIfNull<string>("SubjectName");
+
+                model.EmployeeDetail = result.DefaultIfNull<string>("Name") + result.DefaultIfNull<string>("EmpCode");
+                model.FromTime = result.DefaultIfNull<TimeSpan>("FromTime");
+                model.ToTime = result.DefaultIfNull<TimeSpan>("ToTime");
+                model.DayName = result.DefaultIfNull<string>("TimeTableDay");
+                model.DayId = result.DefaultIfNull<int>("DayId");
+                models.Add(model);
+            }
+            return models;
+        }
+
+        public async Task<ResponseStatus> DeleteTimeTable(int courseId, int batchId, int dayId, TimeSpan fromTime, TimeSpan toTime,int subjectId)
+        {
+            var connection = baseContext.Database.GetDbConnection();
+            SqlParameter[] objectParams = {
+            new SqlParameter("@courseId",courseId){SqlDbType= System.Data.SqlDbType.Int, Direction= System.Data.ParameterDirection.Input },
+            new SqlParameter("@batchId",batchId){SqlDbType= System.Data.SqlDbType.Int, Direction= System.Data.ParameterDirection.Input },
+            new SqlParameter("@subjectId",subjectId){SqlDbType= System.Data.SqlDbType.Int, Direction= System.Data.ParameterDirection.Input },
+            new SqlParameter("@dayId",dayId){SqlDbType= System.Data.SqlDbType.Int, Direction= System.Data.ParameterDirection.Input },
+            new SqlParameter("@fromTime",fromTime){SqlDbType= System.Data.SqlDbType.Time, Direction= System.Data.ParameterDirection.Input },
+            new SqlParameter("@toTime",toTime){SqlDbType= System.Data.SqlDbType.Time, Direction= System.Data.ParameterDirection.Input },
+            };
+
+            var result = await SqlHelperExtension.ExecuteNonQuery(connection.ConnectionString, SqlConstant.DeleteTimetable, System.Data.CommandType.StoredProcedure, objectParams);
+            return ResponseStatus.UpdatedSuccessFully;
         }
     }
 }

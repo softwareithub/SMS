@@ -27,47 +27,40 @@
                     <h3 class="box-title">Lesson Topic</h3>
                     <div class="col-md-12">
                         <div class="col-md-10">
-                            <a class="btn btn-primary pull-right" onclick="">
-                                <i class="fa fa-list-ul"></i>
-                            </a>
                         </div>
                     </div>
 
                 </div>
                 <form id="form" method="post" data-ajax="true" data-ajax-method="post"
-                      asp-action="PostLessonTopic" asp-controller="LessonTopic" data-ajax-success="Success"
+                      asp-action="PostLessonTopic" asp-controller="LessonTopic" data-ajax-success="SuccessLessonTopic"
                       data-ajax-begin="CustomFormSubmitBegin" data-ajax-complete="CustomFormSubmitComplete" enctype="multipart/form-data">                    
                         <div class="box-body">
 
                             <div class="col-md-4">
                                 <div class="form-group">
-                                    <label for="classId">Course</label>
+                                    <label for="classId">Select Course</label>
                                     <select class="form-control" onchange="GetSubjectDetails()" id="classId">
-                                        <option value="0" selected>Please Select Course</option>
+                                        <option value="0" selected>Please select Course</option>
                                         @foreach (var data in (List<SERP.Core.Entities.Entity.Core.Master.CourseMaster>)ViewBag.ClassList)
                                         {
                                             <option value="@data.Id">@data.Name</option>
                                         }
                                     </select>
-                                    <span id="spnClassId" class="text-danger"></span>
                                 </div>
                             </div>
                             <div class="col-md-4">
                                 <div class="form-group">
-                                    <label for="SubjectId">Subject</label>
+                                    <label for="SubjectId">Select Subject</label>
                                     <select for="SubjectId" id="SubjectId" onchange="GetLessonDetails()" class="form-control">
-                                        <option value="0" selected>Please Select Subject</option>
                                     </select>
-                                    <span id="spnSubjectId" class="text-danger"></span>
+                                    <span class="text-danger"></span>
                                 </div>
                             </div>
                             <div class="col-md-4">
                                 <div class="form-group">
                                     <label for="LessonName">Chapter/Lesson</label>
-                                    <select for="LessonName" class="form-control" id="ddlLesson">
-                                        <option value="0" selected>Please Select Lesson</option>
+                                    <select for="LessonName" onchange="GetLessonTopicDetails()" class="form-control" id="ddlLesson" name="ddlLesson">
                                     </select>
-                                    <span id="spnLessonId" class="text-danger"></span>
                                 </div>
                             </div>
 
@@ -78,21 +71,21 @@
                                     <input type="hidden" asp-for="CreatedDate" />
                                     <label asp-for="TopicName">Topic Name</label>
                                     <input asp-for="TopicName" class="form-control">
-                                    <span id="spnTopicName" class="text-danger"></span>
+                                    <span asp-validation-for="TopicName" class="text-danger"></span>
                                 </div>
                             </div>
                             <div class="col-md-4">
                                 <div class="form-group">
                                     <label asp-for="TopicDescription">Description</label>
                                     <input asp-for="TopicDescription" class="form-control">
-                                    <span id="spnTopicDescription" class="text-danger"></span>
+                                    <span asp-validation-for="TopicDescription" class="text-danger"></span>
                                 </div>
                             </div>
                             <div class="col-md-4">
                                 <div class="form-group">
                                     <label asp-for="ExpectedClass">Class Expected</label>
                                     <input asp-for="ExpectedClass" type="number" class="form-control">
-                                    <span id="spnExpectedClass" class="text-danger"></span>
+                                    <span asp-validation-for="ExpectedClass" class="text-danger"></span>
                                 </div>
                             </div>
                             <div class="col-md-12">
@@ -101,26 +94,34 @@
                         </div>
                     
                     <div class="box-body">
-                        <div class="col-md-12  tblAddOptions">
-                            <table class="table-responsive-md table-striped table-bordered dataTable no-footer">
-                                <thead>
-                                    <tr>
-                                        <th>
-                                            Topic Name
-                                        </th>
-                                        <th>
-                                            Description
-                                        </th>
-                                        <th>Expected Class</th>
-                                        <th>
-                                            Action
-                                        </th>
-                                    </tr>
-                                </thead>
-                                <tbody id="tblbodyTopic">
-                                </tbody>
-                            </table>
+                        <div class="col-md-6">
+                            <div class="tblAddOptions">
+                                <table class="table-responsive-md table-striped table-bordered dataTable no-footer">
+                                    <thead>
+                                        <tr>
+                                            <th>
+                                                Topic Name
+                                            </th>
+                                            <th>
+                                                Description
+                                            </th>
+                                            <th>Expected Class</th>
+                                            <th>
+                                                Action
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="tblbodyTopic">
+                                    </tbody>
+                                </table>
+                            </div>
+                            
                         </div>
+
+                        <div class="col-md-6">
+                            <div id="divMappedLesson"></div>
+                        </div>
+
                     </div>
                     <!-- /.box-body -->
 
@@ -149,87 +150,43 @@
 </style>
 
 <script>
+
+    function SuccessLessonTopic(response) {
+        if (response == "Server error please contact admin team") {
+            alertify.set('notifier', 'position', 'top-center');
+            alertify.error(response);
+        }
+        else {
+            alertify.set('notifier', 'position', 'top-center');
+            alertify.success(response);
+        }
+
+        $("#form")[0].reset();//reset the form controll.
+        $(".form-control").val('');//Clear the controll which is present inside the form.
+        $("select").each(function () { this.selectedIndex = 0 });
+        $("#tblbodyTopic").empty();
+        $("#divMappedLesson").html('');
+
+    }
+
     $(document).ready(function () {
         $('.tblAddOptions').hide();
         $('.dvAddOptionBtn').hide();
     });
-    function checkValidation() {
-        var isValid = true;
-
-        var classValue = $('#classId').children('option:selected').val();
-        var subjectValue = $('#SubjectId').children('option:selected').val();
-        var lessonValue = $('#ddlLesson').children('option:selected').val();
-        var topicName = $("#TopicName").val();
-        var description = $("#TopicDescription").val();
-        var expectedClass = $("#ExpectedClass").val();
-
-        if (classValue == 0) {
-
-            $('#spnClassId').text('Please select class');
-            isValid = false;
-        }
-        else {
-            $('#spnClassId').text('');
-            isValid = true;
-        }
-
-        if (subjectValue == 0) {
-
-            $('#spnSubjectId').text('Please select subject');
-            isValid = false;
-        }
-        else {
-            $('#spnSubjectId').text('');
-            isValid = true;
-        }
-        if (lessonValue == 0) {
-
-            $('#spnLessonId').text('Please select lesson');
-            isValid = false;
-        }
-        else {
-            $('#spnLessonId').text('');
-            isValid = true;
-        }
-        if (topicName.length == 0 || topicName.length < 1) {
-            $("#spnTopicName").text('Please enter topic name');
-            isValid = false;
-        }
-        else {
-            $("#spnTopicName").text('');
-            isValid = true;
-        }
-
-        if (description.length == 0 || description.length < 1) {
-            $("#spnTopicDescription").text('Please enter topic description');
-            isValid = false;
-        }
-        else {
-            $("#spnTopicDescription").text('');
-            isValid = true;
-        }
-
-        if (expectedClass.length == 0 || expectedClass.length < 1) {
-            $("#spnExpectedClass").text('Please enter expected class');
-            isValid = false;
-        }
-        else {
-            $("#spnExpectedClass").text('');
-            isValid = true;
-        }
-
-        return isValid;
-    }
-        
-    
-    
     function AddTopicToLesson() {
-        if (!checkValidation())
-            return false;
+        var isValid = true;
         var topicName = $("#TopicName").val();
         var description = $("#TopicDescription").val();
         var expectedClass = $("#ExpectedClass").val();
-       
+        if (topicName.length == 0 || topicName.length < 1) {
+            $("#TopicName").addClass('input-validation-error');
+            isValid = false;
+        }
+        if (description.length == 0 || description.length < 1) {
+            $("#TopicDescription").addClass('input-validation-error');
+            isValid = false;
+        }
+        if (isValid) {
                   
         var html = '<tr>';
      
@@ -240,7 +197,8 @@
         html += '</tr>';
             $("#tblbodyTopic").append(html);
             $('.tblAddOptions').show();
-        $('.dvAddOptionBtn').show();
+            $('.dvAddOptionBtn').show();
+        }
     }
 
     function rowDelete(event) {
@@ -251,10 +209,10 @@
 
     function GetLessonDetails() {
         var subjectId = $("#SubjectId").val();
+        $("#ddlLesson").empty();
+        $("#ddlLesson").append("<option value=''>Select</option>")
         var html = "";
         $.get("/LessonTopic/GetLessonDetail", { subjectid: subjectId }, function (data) {
-            $("#ddlLesson").empty();
-            $("#ddlLesson").append("<option value=''>Select Lesson</option>")
             for (var i = 0; i < data.length; i++)
              {
                 html += "<option value=" + data[i].id + ">" + data[i].lessonName + "</option>";
@@ -275,23 +233,24 @@
         })
     }
 
-    function Success(response) {
-        if (response == "Server error please contact admin team") {
-            alertify.set('notifier', 'position', 'top-center');
-            alertify.error(response);
-        }
-        else {
-            alertify.set('notifier', 'position', 'top-center');
-            alertify.success(response);
-        }
-
-        $("#form")[0].reset();//reset the form controll.
-        $(".form-control").val('');//Clear the controll which is present inside the form.
-        $("select").each(function () { this.selectedIndex = 0 });
-
-        $("#tblbodyTopic").html('');
-        $('.tblAddOptions').hide();
-        $('.dvAddOptionBtn').hide();
+    function GetLessonTopicDetails() {
+        var lessonId = $("#ddlLesson").val();
+        $.get("/LessonTopic/GetLessonTopics", { lessonId: lessonId }, function (data) {
+            $("#divMappedLesson").html(data);
+        })
     }
+
+    function DeleteRecord(id) {
+        alertify.confirm("Are you sure want to Inactivate this record ?", function () {
+            $.get("/LessonTopic/DeleteLesson", { id: id }, function (data) {
+                alertify.success(data);
+            }).done(function () {
+                GetLessonTopicDetails();
+            })
+        }, function () {
+            alertify.error('There is some server Error please contact admin team .')
+        });
+    }
+
 </script>
 

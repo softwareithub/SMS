@@ -3,9 +3,6 @@ using SERP.Core.Entities.Entity.Core.Master;
 using SERP.Core.Entities.Entity.Core.Transaction;
 using SERP.Core.Entities.Entity.Core.HRModule;
 using SERP.Core.Entities.TransactionLog;
-using System;
-using System.Collections.Generic;
-using System.Text;
 using SERP.Core.Entities.StudentTransaction;
 using SERP.Core.Entities.Entity.Core.ExamDetail;
 using SERP.Core.Entities.HomeAssignment;
@@ -19,6 +16,7 @@ using SERP.Core.Entities.Accounts;
 using SERP.Core.Entities.Student;
 using SERP.Core.Entities.FrontOffice;
 using SERP.Core.Entities.SERPExceptionLogging;
+using SERP.Core.Entities.TimeTable;
 
 namespace SERP.Core.Entities.Context
 {
@@ -118,6 +116,7 @@ namespace SERP.Core.Entities.Context
         public DbSet<VisitorBook> VisitorBooks { get; set; }
         public DbSet<ExceptionLogging> ExceptionLoggings { get; set; }
         public DbSet<QuickLink> QuickLinks { get; set; }
+        public DbSet<TimeTableMaster> TimeTableMasters { get; set; }
         #endregion
 
     }

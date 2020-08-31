@@ -50,7 +50,6 @@ namespace SERP.Utilities.BlobUtility
                 }
             }
 
-
             return imageStoragePaths;
         }
     }
