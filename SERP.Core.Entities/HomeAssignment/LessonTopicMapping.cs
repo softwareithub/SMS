@@ -21,6 +21,8 @@ namespace SERP.Core.Entities.HomeAssignment
         public DateTime? EndDate { get; set; } = default;
         [Required(ErrorMessage ="Please Enter Topic Description")]
         public string TopicDescription { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "Please Enter Expected Class")]
         public int ExpectedClass { get; set; } = default;
         public int SessionId { get; set; }
     }

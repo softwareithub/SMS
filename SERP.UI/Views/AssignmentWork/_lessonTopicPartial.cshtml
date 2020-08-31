@@ -92,7 +92,7 @@
                                 <div class="form-group">
                                     <label asp-for="ExpectedClass">Class Expected</label>
                                     <input asp-for="ExpectedClass" type="number" class="form-control">
-                                    <span asp-validation-for="ExpectedClass" class="text-danger"></span>
+                                    <span id="spnExpectedClass" class="text-danger"></span>
                                 </div>
                             </div>
                             <div class="col-md-12">
@@ -161,6 +161,7 @@
         var lessonValue = $('#ddlLesson').children('option:selected').val();
         var topicName = $("#TopicName").val();
         var description = $("#TopicDescription").val();
+        var expectedClass = $("#ExpectedClass").val();
 
         if (classValue == 0) {
 
@@ -208,6 +209,15 @@
             isValid = true;
         }
 
+        if (expectedClass.length == 0 || expectedClass.length < 1) {
+            $("#spnExpectedClass").text('Please enter expected class');
+            isValid = false;
+        }
+        else {
+            $("#spnExpectedClass").text('');
+            isValid = true;
+        }
+
         return isValid;
     }
         
@@ -244,7 +254,7 @@
         var html = "";
         $.get("/LessonTopic/GetLessonDetail", { subjectid: subjectId }, function (data) {
             $("#ddlLesson").empty();
-            $("#ddlLesson").append("<option value=''>Select Subject</option>")
+            $("#ddlLesson").append("<option value=''>Select Lesson</option>")
             for (var i = 0; i < data.length; i++)
              {
                 html += "<option value=" + data[i].id + ">" + data[i].lessonName + "</option>";
@@ -263,6 +273,25 @@
             }
 
         })
+    }
+
+    function Success(response) {
+        if (response == "Server error please contact admin team") {
+            alertify.set('notifier', 'position', 'top-center');
+            alertify.error(response);
+        }
+        else {
+            alertify.set('notifier', 'position', 'top-center');
+            alertify.success(response);
+        }
+
+        $("#form")[0].reset();//reset the form controll.
+        $(".form-control").val('');//Clear the controll which is present inside the form.
+        $("select").each(function () { this.selectedIndex = 0 });
+
+        $("#tblbodyTopic").html('');
+        $('.tblAddOptions').hide();
+        $('.dvAddOptionBtn').hide();
     }
 </script>
 
