@@ -44,7 +44,7 @@
                                 <input type="hidden" asp-for="Id" />
                                 <input type="hidden" asp-for="CreatedBy" />
                                 <input type="hidden" asp-for="CreatedDate" />
-                                <label asp-for="StudentId">Seelct Student</label>
+                                <label asp-for="StudentId">Student</label>
                                 <select class="form-control select2" onchange="ClearGuardianSelect()" asp-for="StudentId" asp-items="@(new SelectList(ViewBag.StudentList ,"Id","Name"))">
                                 </select>
                                 <span asp-validation-for="StudentId" class="text-danger"></span>

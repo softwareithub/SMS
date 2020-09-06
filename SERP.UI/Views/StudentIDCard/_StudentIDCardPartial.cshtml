@@ -59,9 +59,10 @@
         var batchId = '@Model?.BatchId';
         var courseId = $("#CourseId").val();
         $("#BatchId").empty();
-        $("#BatchId").append('<option value="">Select</option>');
+        
         $.get("/CommanDataForJson/BatchJson", { courseId: courseId }, function (responseData) {
-            for (var i = 0; i < responseData.length; i++) {
+            $("#BatchId").append('<option value="">Select</option>');
+               for (var i = 0; i < responseData.length; i++) {
                 var html = '<option value=' + responseData[i].id + '>' + responseData[i].batchName + '</option>';
                 $("#BatchId").append(html);
             }

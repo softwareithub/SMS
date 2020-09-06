@@ -85,7 +85,7 @@ namespace SERP.UI.Controllers.Assignment
         {
             try
             {
-                var response = await _ILessonMasterRepo.GetList(x => x.IsActive == 1 && x.IsDeleted == 0);
+                var response = await _ILessonMasterRepo.GetList(x => x.SubjectId == subjectid && x.IsActive == 1 && x.IsDeleted == 0);
                 return Json(response);
             }
             catch (Exception ex)

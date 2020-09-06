@@ -12,7 +12,6 @@
 <section class="content-header">
     <h1>
         Lesson Master
-        <small>Create Lesson</small>
     </h1>
     <ol class="breadcrumb">
         <li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
@@ -70,12 +69,12 @@
                             <div class="form-group">
                                 <label asp-for="SubjectId">Subject</label>
                                 <select asp-for="SubjectId" class="form-control">
-                                    <option value="" selected>Please Select Subject</option>
+                                    <option value="" selected>Select Subject</option>
                                 </select>
                                 <span asp-validation-for="SubjectId" class="text-danger"></span>
                             </div>
                         </div>
-                        <div class="col-md-6">
+                        <div class="col-md-6 clearB">
                             <div class="form-group">
                                 <label asp-for="LessonName">Chapter/Lesson</label>
                                 <input asp-for="LessonName" class="form-control" />

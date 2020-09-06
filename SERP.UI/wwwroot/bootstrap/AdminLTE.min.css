@@ -5352,3 +5352,7 @@ hr {
 table > tbody {
     font-weight: lighter !important;
 }
+
+.clearB {
+clear:both !important;
+}
