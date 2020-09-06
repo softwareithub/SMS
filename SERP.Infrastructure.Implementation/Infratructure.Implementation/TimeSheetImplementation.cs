@@ -222,6 +222,7 @@ namespace SERP.Infrastructure.Implementation.Infratructure.Implementation
             while (result.Read())
             {
                 TimeTableModel model = new TimeTableModel();
+                model.Id = result.DefaultIfNull<int>("Id");
                 model.CourseName = result.DefaultIfNull<string>("CourseName");
                 model.CourseId = result.DefaultIfNull<int>("courseId");
                 model.BatchId = result.DefaultIfNull<int>("BatchId");
@@ -234,7 +235,6 @@ namespace SERP.Infrastructure.Implementation.Infratructure.Implementation
                 model.FromTime = result.DefaultIfNull<TimeSpan>("FromTime");
                 model.ToTime = result.DefaultIfNull<TimeSpan>("ToTime");
                 model.DayName = result.DefaultIfNull<string>("TimeTableDay");
-                model.DayId = result.DefaultIfNull<int>("DayId");
                 models.Add(model);
             }
             return models;

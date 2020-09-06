@@ -30,7 +30,15 @@
                                 {
                                     <tr>
                                         <td>
-                                            <input type="checkbox" checked="checked" onchange="MasterCheckChange(this)" data-moduleId="@data.First().ModuleId" />
+                                            @if (data.First().PageAccess == 1)
+                                            {
+                                                <input type="checkbox" checked="checked" onchange="MasterCheckChange(this)" data-moduleId="@data.First().ModuleId" />
+                                            }
+                                            else
+                                            {
+                                                <input type="checkbox"  onchange="MasterCheckChange(this)" data-moduleId="@data.First().ModuleId" />
+                                            }
+
                                         </td>
                                         <td colspan="5">
                                             <a class="btn btn-outline-danger"
@@ -45,7 +53,15 @@
                                         <tr id="@data.First().ModuleId" class="collapse @data.First().ModuleId">
                                             <td>
                                                 <input type="hidden" name="module" value="@item.ModuleId" />
-                                                <input type="checkbox" data-moduleId="@item.ModuleId" name="access" checked="checked" value="@item.SubModuleId" />
+                                                @if (item.PageAccess == 1)
+                                                {
+                                                    <input type="checkbox" data-moduleId="@item.ModuleId" name="access" checked="checked" value="@item.SubModuleId" />
+                                                }
+                                                else
+                                                {
+                                                    <input type="checkbox" data-moduleId="@item.ModuleId" name="access" value="@item.SubModuleId" />
+                                                }
+
                                             </td>
                                             <td>
                                                 @item.ModuleName

@@ -16,5 +16,6 @@ namespace SERP.Core.Entities.UserManagement
         public int CreateAccess { get; set; }
         public int UpdateAccess { get; set; }
         public int SessionId { get; set; }
+        public int PageAccess { get; set; }
     }
 }

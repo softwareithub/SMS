@@ -19,5 +19,6 @@ namespace SERP.Core.Model.UserManagement
         public string ActionName { get; set; }
         public string ClassName { get; set; }
         public int DisplayOrder { get; set; }
+        public int PageAccess { get; set; }
     }
 }

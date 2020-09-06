@@ -14,7 +14,7 @@ namespace SERP.Infrastructure.Implementation.Infratructure.Implementation
 {
     public class GenericImplementation<TEntity, T> : IGenericRepository<TEntity, T> where TEntity : class
     {
-        private  SERPContext baseContext = null;
+        private SERPContext baseContext = null;
         private DbSet<TEntity> TEntities = null;
 
         public GenericImplementation()
@@ -23,7 +23,7 @@ namespace SERP.Infrastructure.Implementation.Infratructure.Implementation
             TEntities = baseContext.Set<TEntity>();
         }
 
-        public  async Task<ResponseStatus> CreateEntity(TEntity model)
+        public async Task<ResponseStatus> CreateEntity(TEntity model)
         {
             try
             {
@@ -33,7 +33,7 @@ namespace SERP.Infrastructure.Implementation.Infratructure.Implementation
             }
             catch (Exception ex)
             {
-                if(ex.InnerException.Message.Contains("The duplicate key "))
+                if (ex.InnerException.Message.Contains("The duplicate key "))
                 {
                     return ResponseStatus.AlreadyExists;
                 }
@@ -41,7 +41,7 @@ namespace SERP.Infrastructure.Implementation.Infratructure.Implementation
             }
         }
 
-        public  async Task<IList<TEntity>> GetAll(params Expression<Func<TEntity, object>>[] navigationProperties)
+        public async Task<IList<TEntity>> GetAll(params Expression<Func<TEntity, object>>[] navigationProperties)
         {
             List<TEntity> tList;
             using (baseContext)
@@ -56,25 +56,32 @@ namespace SERP.Infrastructure.Implementation.Infratructure.Implementation
             return tList;
         }
 
-        public  async Task<IList<TEntity>> GetList(Func<TEntity, bool> where, params Expression<Func<TEntity, object>>[] navigationProperties)
+        public async Task<IList<TEntity>> GetList(Func<TEntity, bool> where, params Expression<Func<TEntity, object>>[] navigationProperties)
         {
-            List<TEntity> list;
-            using (baseContext)
+            List<TEntity> list= new List<TEntity>();
+            try
             {
-                IQueryable<TEntity> dbQuery = baseContext.Set<TEntity>();
-
-                //Apply eager loading
-                foreach (Expression<Func<TEntity, object>> navigationProperty in navigationProperties)
+                using (baseContext)
                 {
-                    dbQuery = dbQuery.Include<TEntity, object>(navigationProperty);
-                }
+                    IQueryable<TEntity> dbQuery = baseContext.Set<TEntity>();
 
-                list = dbQuery.AsNoTracking().Where(where).ToList<TEntity>();
+                    //Apply eager loading
+                    foreach (Expression<Func<TEntity, object>> navigationProperty in navigationProperties)
+                    {
+                        dbQuery = dbQuery.Include<TEntity, object>(navigationProperty);
+                    }
+
+                    list = dbQuery.AsNoTracking().Where(where).ToList<TEntity>();
+                    return await Task.Run(() => list);
+                }
             }
-            return await Task.Run(() => list);
+            catch (Exception ex)
+            {
+                return await Task.Run(() => list);
+            }
         }
 
-        public  async Task<TEntity> GetSingle(Func<TEntity, bool> where, params Expression<Func<TEntity, object>>[] navigationProperties)
+        public async Task<TEntity> GetSingle(Func<TEntity, bool> where, params Expression<Func<TEntity, object>>[] navigationProperties)
         {
             TEntity item = null;
             using (baseContext)
@@ -92,7 +99,7 @@ namespace SERP.Infrastructure.Implementation.Infratructure.Implementation
             return await Task.Run(() => item);
         }
 
-        public  async Task<ResponseStatus> Add(params TEntity[] items)
+        public async Task<ResponseStatus> Add(params TEntity[] items)
         {
             try
             {
@@ -111,7 +118,7 @@ namespace SERP.Infrastructure.Implementation.Infratructure.Implementation
 
         }
 
-        public  async Task<ResponseStatus> Update(params TEntity[] items)
+        public async Task<ResponseStatus> Update(params TEntity[] items)
         {
             try
             {
@@ -129,7 +136,7 @@ namespace SERP.Infrastructure.Implementation.Infratructure.Implementation
 
         }
 
-        public  async Task<ResponseStatus> Delete(params TEntity[] items)
+        public async Task<ResponseStatus> Delete(params TEntity[] items)
         {
             try
             {
@@ -161,12 +168,12 @@ namespace SERP.Infrastructure.Implementation.Infratructure.Implementation
         public TEntity DefaultIfNullEntity<TEntity>(TEntity Entity)
         {
             PropertyInfo[] propInfos = Entity.GetType().GetProperties();
-            foreach(var prop in propInfos)
+            foreach (var prop in propInfos)
             {
                 object value = prop.GetValue(Entity, null);
-                if(value==null)
+                if (value == null)
                 {
-                    if(prop.PropertyType.Name.ToLower().Trim()=="string")
+                    if (prop.PropertyType.Name.ToLower().Trim() == "string")
                     {
                         prop.SetValue(Entity, string.Empty, null);
                     }
@@ -190,7 +197,7 @@ namespace SERP.Infrastructure.Implementation.Infratructure.Implementation
 
         public TEntity[] DefaultIfNullEntityArray(TEntity[] entities)
         {
-            foreach(var entity in entities)
+            foreach (var entity in entities)
             {
                 DefaultIfNullEntity(entity);
             }

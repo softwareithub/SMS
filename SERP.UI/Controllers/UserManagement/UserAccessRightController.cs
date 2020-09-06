@@ -84,6 +84,7 @@ namespace SERP.UI.Controllers.UserManagement
                         model.CreateAccess = data.CreateAccess;
                         model.ReadAccess = data.ReadAccess;
                         model.UpdateAccess = data.UpdateAccess;
+                        model.PageAccess = data.PageAccess;
                     }
 
                 }
@@ -137,6 +138,7 @@ namespace SERP.UI.Controllers.UserManagement
                     UserAccessRight model = new UserAccessRight();
                     model.ModuleId = moduleList[i];
                     model.SubModuleId = access[i];
+                    model.PageAccess = 1;
                     model.RoleId = roleId;
                     model.ReadAccess = 1;
                     model.CreateAccess = 1;

@@ -131,6 +131,11 @@
 
 <script>
 
+    $(document).ready(function () {
+        var subject = '@Model?.SubjectId'
+        $("#SubjectId").val(subject);
+    })
+
     function checkValidation() {
         var classVal = $('#classId').children('option:selected').val();
         var isValid = true;

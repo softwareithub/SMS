@@ -1,81 +1,92 @@
 ﻿@model SERP.Core.Model.TransactionViewModel.TimeSheetVm
-<form id="form" asp-controller="TimeTable" asp-action="CreateTimeTable" method="post" data-ajax="true" data-ajax-method="post" data-ajax-success="Success">
-    <section class="content">
-        <div class="row">
-            <div class="col-md-12">
-                <div class="row">
-                    <div class="col-md-12">
-                        <table id="tblDataList" class="table table-hover table-striped table-info" style="width:100%;" border="1">
-                            <thead>
-                                <tr>
-                                    <th>Days</th>
-                                    @foreach (var period in Model.TimeTableModels)
-                                    {
-                                        foreach (var prd in period.PeriodModels)
-                                        {
-                                            <th>
-                                                @prd.FromTime - @prd.ToTime
-                                            </th>
-                                        }
-                                        break;
-                                    }
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @{
-                                    int k = 0;
-                                    foreach (var days in Model.TimeTableModels)
-                                    {
-                                        <tr>
-                                            <td>
-                                                <input type="hidden" asp-for="TimeTableModels[k].DayName" />
-                                                @days.DayName
-                                            </td>
-                                            @foreach (var period in Model.TimeTableModels.Where(x => x.DayName == days.DayName))
-                                            {
-                                                int i = 0;
-                                                var totalDyas = Model.TimeTableModels.Count();
-                                                <input type="hidden" id="totalDays" value="@totalDyas" />
-                                                @foreach (var prd in period.PeriodModels)
-                                                {
-                                                    <td>
 
-                                                        <label>Assign Employee</label>
-                                                        <select asp-for="TimeTableModels[k].PeriodModels[i].EmployeeId" asp-items="@(new SelectList(ViewBag.EmployeeList, "Id", "Name"))" class="form-control" onchange="AssignChildEmployee(@k, @i, this)">
-                                                        </select>
-                                                       
-                                                        <label>From Time</label>
-                                                        <input asp-for="TimeTableModels[k].PeriodModels[i].FromTime" type="time" class="form-control" onblur="AssignChildFromTime(@k, @i, this)" />
-                                                        <label>To Time</label>
-                                                        <input asp-for="TimeTableModels[k].PeriodModels[i].ToTime" type="time" class="form-control" onblur="AssignChildToTime(@k, @i, this)" />
-                                                    </td>
-                                                    i++;
-                                                }
+<style>
+    table {
+        display: block;
+        overflow-x: auto;
+        white-space: nowrap;
+    }
+</style>
+<section class="content">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="row">
+                <div class="col-md-12" id="myCanvas">
+                    <h3 style="text-align:center">
+                        Time Table for Class : @Model.TimeTableModels.First().PeriodModels.First().CourseName -  @Model.TimeTableModels.First().PeriodModels.First().BatchName
+                    </h3>
 
+                    <table id="tblDataList" class="table table-hover table-striped table-info" style="width:100%;" border="1">
+                        <thead>
+                            <tr>
+                                <th>Days</th>
+                                @foreach (var period in Model.TimeTableModels)
+                                {
+                                    foreach (var prd in period.PeriodModels)
+                                    {
+                                        <th>
+                                            @{
+                                                var fromTime = string.Format("{0:00}:{1:00}", prd.FromTime.Hours, prd.FromTime.Minutes);
+                                                var toTIme = string.Format("{0:00}:{1:00}", prd.ToTime.Hours, prd.ToTime.Minutes);
                                             }
-                                        </tr>
-                                        k++;
+                                            @fromTime - @toTIme
+                                        </th>
                                     }
+                                    break;
                                 }
-                            </tbody>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @{
+                                int k = 0;
+                                foreach (var days in Model.TimeTableModels)
+                                {
+                                    <tr>
+                                        <td>
+                                            <input type="hidden" asp-for="TimeTableModels[k].DayName" />
+                                            @days.DayName
+                                        </td>
+                                        @foreach (var period in Model.TimeTableModels.Where(x => x.DayName == days.DayName))
+                                        {
+                                            int i = 0;
+                                            var totalDyas = Model.TimeTableModels.Count();
+                                            @foreach (var prd in period.PeriodModels)
+                                            {
+                                                <td>
+                                                    <strong>
+                                                        @prd.SubjectName
+                                                    </strong>
+                                                    <br />
+                                                </td>
+                                                i++;
+                                            }
 
-                        </table>
-                    </div>
-                    <div class="col-md-12">
-                        <input type="submit" class="btn btn-success" value="Submit" />
-                    </div>
+                                        }
+                                    </tr>
+                                    k++;
+                                }
+                            }
+                        </tbody>
+
+                    </table>
+                </div>
+                <div class="col-md-12">
+                    <input type="button" onclick="PrintAll()" class="btn btn-success pull-right" value="Print" />
                 </div>
             </div>
         </div>
-    </section>
-</form>
+    </div>
+</section>
 
+<script src="https://kendo.cdn.telerik.com/2017.2.621/js/jquery.min.js"></script>
+<script src="https://kendo.cdn.telerik.com/2017.2.621/js/jszip.min.js"></script>
+<script src="https://kendo.cdn.telerik.com/2017.2.621/js/kendo.all.min.js"></script>
 <script>
     function AssignChildEmployee(k, i, event) {
-        
+
         var totalCount = $("#totalDays").val();
-        for (var j = k+1; j < totalCount; j++) {
-            var employeeId = "TimeTableModels_" + j + "__PeriodModels_"+i+"__EmployeeId"
+        for (var j = k + 1; j < totalCount; j++) {
+            var employeeId = "TimeTableModels_" + j + "__PeriodModels_" + i + "__EmployeeId"
             $("#" + employeeId).val(event.value);
         }
     }
@@ -83,14 +94,14 @@
     function AssignChildSubject(k, i, event) {
         var totalCount = $("#totalDays").val();
         for (var j = k + 1; j < totalCount; j++) {
-            var subjectId = "TimeTableModels_" + j + "__PeriodModels_"+i+"__SubjectId"
+            var subjectId = "TimeTableModels_" + j + "__PeriodModels_" + i + "__SubjectId"
             $("#" + subjectId).val(event.value);
         }
     }
     function AssignChildFromTime(k, i, event) {
         var totalCount = $("#totalDays").val();
         for (var j = k + 1; j < totalCount; j++) {
-            var fromTime = "TimeTableModels_" + j + "__PeriodModels_"+i+"__FromTime"
+            var fromTime = "TimeTableModels_" + j + "__PeriodModels_" + i + "__FromTime"
             $("#" + fromTime).val(event.value);
         }
     }
@@ -98,9 +109,24 @@
         var totalCount = $("#totalDays").val();
         for (var j = k + 1; j < totalCount; j++) {
 
-            var toTime = "TimeTableModels_" + j + "__PeriodModels_"+i+"__ToTime"
+            var toTime = "TimeTableModels_" + j + "__PeriodModels_" + i + "__ToTime"
             $("#" + toTime).val(event.value);
         }
+    }
+
+    function PrintAll() {
+        kendo.drawing
+            .drawDOM("#myCanvas",
+                {
+                    paperSize: "A4",
+                    margin: { top: "1cm", bottom: "1cm" },
+                    scale: 0.8,
+                    height: 500,
+                    landscape: true
+                })
+            .then(function (group) {
+                kendo.drawing.pdf.saveAs(group, "Class Time Table")
+            });
     }
 </script>
 

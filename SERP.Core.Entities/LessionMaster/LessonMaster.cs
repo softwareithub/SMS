@@ -20,5 +20,7 @@ namespace SERP.Core.Entities.LessionMaster
         [DataType(DataType.Date)]
         public DateTime? ClassTestDate { get; set; }
         public int SessionId { get; set; }
+        [NotMapped]
+        public int CourseId { get; set; }
     }
 }

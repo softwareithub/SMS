@@ -4,11 +4,14 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using SERP.Core.Entities.Entity.Core.HRModule;
 using SERP.Core.Entities.Entity.Core.Master;
 using SERP.Core.Entities.Entity.Core.Transaction;
 using SERP.Core.Entities.TimeTable;
+using SERP.Core.Model.TransactionViewModel;
 using SERP.Infrastructure.Repository.Infrastructure.Repo;
+using SERP.Utilities.CommanHelper;
 using SERP.Utilities.ResponseMessage;
 
 namespace SERP.UI.Controllers.TimeTable
@@ -50,35 +53,53 @@ namespace SERP.UI.Controllers.TimeTable
             int totalDays = (academicDetail.EndDate - academicDetail.StartDate).Days;
 
             List<TimeTableMaster> models = new List<TimeTableMaster>();
-
-            for(int i=1; i<= totalDays; i++)
+            for(int i=0; i<model.Days.Count(); i++)
             {
-              
-                if (model.Days.Contains(((int)academicDetail.StartDate.AddDays(i).DayOfWeek).ToString()))
-                {
-                    TimeTableMaster dataModel = new TimeTableMaster();
-                    dataModel.BatchId = model.BatchId;
-                    dataModel.CourseId = model.CourseId;
-                    dataModel.SubjectId = model.SubjectId;
-                    dataModel.EmployeeId = model.EmployeeId;
-                    dataModel.FromTime = model.FromTime;
-                    dataModel.ToTime = model.ToTime;
-                    dataModel.TimeTableDate = academicDetail.StartDate.AddDays(i);
-                    dataModel.IsAttendClass = 0;
-                    dataModel.IsClassTeacher = model.IsClassTeacher;
-                    dataModel.SessionId = academicDetail.Id;
-                    models.Add(dataModel);
-                }
-              
+                TimeTableMaster dataModel = new TimeTableMaster();
+                dataModel.BatchId = model.BatchId;
+                dataModel.CourseId = model.CourseId;
+                dataModel.SubjectId = model.SubjectId;
+                dataModel.EmployeeId = model.EmployeeId;
+                dataModel.FromTime = model.FromTime;
+                dataModel.ToTime = model.ToTime;
+                dataModel.DayName = model.Days[i].ToString();
+                dataModel.IsAttendClass = 0;
+                dataModel.IsClassTeacher = model.IsClassTeacher;
+                dataModel.SessionId = academicDetail.Id;
+                models.Add(dataModel);
             }
+
+            //for(int i=1; i<= totalDays; i++)
+            //{
+
+            //    if (model.Days.Contains(((int)academicDetail.StartDate.AddDays(i).DayOfWeek).ToString()))
+            //    {
+            //        TimeTableMaster dataModel = new TimeTableMaster();
+            //        dataModel.BatchId = model.BatchId;
+            //        dataModel.CourseId = model.CourseId;
+            //        dataModel.SubjectId = model.SubjectId;
+            //        dataModel.EmployeeId = model.EmployeeId;
+            //        dataModel.FromTime = model.FromTime;
+            //        dataModel.ToTime = model.ToTime;
+            //        dataModel.TimeTableDate = academicDetail.StartDate.AddDays(i);
+            //        dataModel.IsAttendClass = 0;
+            //        dataModel.IsClassTeacher = model.IsClassTeacher;
+            //        dataModel.SessionId = academicDetail.Id;
+            //        models.Add(dataModel);
+            //    }
+
+            //}
             var response = await _ITimeTableRepository.Add(models.ToArray());
             return Json(ResponseData.Instance.GenericResponse(response));
         }
 
-        public async Task<IActionResult> DeteTimeTable(int subjectId, int courseId , int batchId, int dayId, string fromTime, string toTime)
+        public async Task<IActionResult> DeteTimeTable(int id)
         {
-            var model = await _ITimeSheetRepo.DeleteTimeTable(courseId, batchId, dayId, TimeSpan.Parse(fromTime), TimeSpan.Parse(toTime), subjectId);
-            return Json("Deleted successfully");
+            var model = await _ITimeTableRepository.GetSingle(x => x.Id == id);
+            var deleteModel = CommanDeleteHelper.CommanDeleteCode(model, 1);
+            await _ITimeTableRepository.CreateNewContext();
+            var response = await _ITimeTableRepository.Update(deleteModel);
+            return Json(ResponseData.Instance.GenericResponse(response));
         }
 
         public async Task<IActionResult> GetTimeTableDetails(int courseId, int batchId)
@@ -92,7 +113,7 @@ namespace SERP.UI.Controllers.TimeTable
             try
             {
                 ViewBag.CourseList = await _ICourseMasterRepository.GetList(x => x.IsActive == 1 && x.IsDeleted == 0);
-                return PartialView("~/Views/TimeTable/TimeSheetDetailPartial.cshtml");
+                return PartialView("~/Views/TimeTable/_CourseBatchTimetablePartial.cshtml");
             }
             catch (Exception ex)
             {
@@ -102,5 +123,38 @@ namespace SERP.UI.Controllers.TimeTable
                 return await Task.Run(() => PartialView("~/Views/Shared/Error.cshtml"));
             }
         }
+
+        public async Task<IActionResult> CourseBatchTimeSheet(int courseId, int batchId)
+        {
+            var models = await _ITimeSheetRepo.GetTimeTableModels(courseId, batchId);
+            TimeSheetVm timeSheetVm = new TimeSheetVm();
+            List<TimeTableVm> timeTableModels = new List<TimeTableVm>();
+            foreach (var data in models.GroupBy(x=>x.DayName))
+            {
+                
+                TimeTableVm timeTableVm = new TimeTableVm();
+                timeTableVm.DayName = data.First().DayName;
+                List<PeriodVm> periodVms = new List<PeriodVm>();
+                foreach (var item in data)
+                {
+                    PeriodVm periodVm = new PeriodVm();
+                    periodVm.CourseName = item.CourseName;
+                    periodVm.BatchName = item.BatchName;
+                    periodVm.FromTime = item.FromTime;
+                    periodVm.ToTime = item.ToTime;
+                    periodVm.EmployeeName = item.EmployeeDetail;
+                    periodVm.SubjectName = item.SubjectName;
+
+                    periodVms.Add(periodVm);
+                }
+                timeTableVm.PeriodModels = periodVms;
+                timeTableModels.Add(timeTableVm);
+            }
+            timeSheetVm.TimeTableModels = timeTableModels;
+
+            return PartialView("~/Views/TimeTable/_TimeTableListPartial.cshtml", timeSheetVm);
+        }
+
+        
     }
 }   

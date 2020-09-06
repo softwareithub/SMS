@@ -34,11 +34,12 @@ namespace SERP.Core.Entities.TimeTable
 		[DataType(DataType.Time)]
 		[Required(ErrorMessage = "To Time is required.")]
 		public TimeSpan ToTime { get; set; }
-		public DateTime TimeTableDate { get; set; }
 		public int SessionId { get; set; }
 
 		[NotMapped]
 		[Required(ErrorMessage ="Please select Days")]
 		public string[] Days { get; set; }
+
+		public string DayName { get; set; }
 	}
 }

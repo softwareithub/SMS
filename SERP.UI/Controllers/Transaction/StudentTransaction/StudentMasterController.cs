@@ -70,7 +70,7 @@ namespace SERP.UI.Controllers.Transaction.StudentTransaction
 
                 return PartialView("~/Views/StudentMaster/_StudentMasterPartial.cshtml", studentModel);
             }
-            catch (Exception ex)
+                catch (Exception ex)
             {
                 string actionName = this.ControllerContext.RouteData.Values["action"].ToString();
                 string controllerName = this.ControllerContext.RouteData.Values["controller"].ToString();

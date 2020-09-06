@@ -46,7 +46,7 @@ namespace SERP.UI.Controllers.Account
            
             try
             {
-                
+                model.SessionId = SessionData.SessionValue;
                 if (model.Id > 0)
                 {
                     var updateModel = CommanDeleteHelper.CommanUpdateCode<AccountDetail>(model, 1);
@@ -70,7 +70,7 @@ namespace SERP.UI.Controllers.Account
         {
             try
             {                
-                return PartialView("~/Views/Accounts/_AccountDetailPartial.cshtml", await _accountRepo.GetList(x => x.IsActive == 1));
+                return PartialView("~/Views/Accounts/_AccountDetailPartial.cshtml", await _accountRepo.GetList(x => x.IsActive == 1 && x.SessionId==SessionData.SessionValue));
             }
             catch (Exception ex)
             {
