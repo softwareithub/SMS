@@ -4,9 +4,6 @@
 @{
     var testLimit = httpContextAccessor.HttpContext.Session.GetString("TestLimit");
 }
-<style>
-   
-</style>
 <section class="content-header">
     <h1>
         Exam Name
@@ -24,7 +21,7 @@
                 <div class="box-header with-border panel-body ">
                     <h3 class="box-title"></h3>
                     <div class="col-md-6">
-                        Test Duration : 
+                        Test Duration :
                     </div>
                     <div class="col-md-6">
                         Time Left   <h3 id="countdown" style="text-align:right"></h3>
@@ -80,12 +77,23 @@
                     </div>
                 </div>
 
-                
+
             </div>
         </div>
     </div>
 </section>
 
+
+<style>
+    .mjx-chtml {
+        white-space: normal !important;
+        min-width: unset !important;
+    }
+</style>
+
+<script type="text/javascript"
+        src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
 <script>
 
     var timer2 = ExamTime('@testLimit');
