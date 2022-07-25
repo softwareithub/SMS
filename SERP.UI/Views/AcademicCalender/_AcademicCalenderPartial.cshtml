@@ -15,9 +15,8 @@
         Academic Calender
     </h1>
     <ol class="breadcrumb">
-        <li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
-        <li><a href="#">Forms</a></li>
-        <li class="active">General Elements</li>
+        <em>*</em>
+        <span style="color:#ff6a00">Required Fields</span>
     </ol>
 </section>
 
@@ -64,21 +63,21 @@
                                 <input type="hidden" asp-for="Id" />
                                 <input type="hidden" asp-for="CreatedBy" />
                                 <input type="hidden" asp-for="CreatedDate" />
-                                <label asp-for="EventName">Event</label>
+                                <label asp-for="EventName">Event <em>*</em></label>
                                 <input asp-for="EventName" class="form-control">
                                 <span asp-validation-for="EventName" class="text-danger"></span>
                             </div>
                         </div>
                         <div class="col-md-4">
                             <div class="form-group">
-                                <label asp-for="FromDate">Start Date</label>
+                                <label asp-for="FromDate">Start Date <em>*</em></label>
                                 <input asp-for="FromDate" class="form-control">
                                 <span asp-validation-for="FromDate" class="text-danger"></span>
                             </div>
                         </div>
                         <div class="col-md-4">
                             <div class="form-group">
-                                <label asp-for="ToDate">End Date</label>
+                                <label asp-for="ToDate">End Date <em>*</em></label>
                                 <input asp-for="ToDate" class="form-control">
                                 <span asp-validation-for="ToDate" class="text-danger"></span>
                             </div>
@@ -118,7 +117,7 @@
             </div>
         </div>
 
-        @await Html.PartialAsync("~/Views/Shared/_CommanModalPartial.cshtml")
+         @Html.Partial("~/Views/Shared/SERPModalPopUp.cshtml")
 
     </div>
 </section>
@@ -137,8 +136,10 @@
     }
 
     $(document).ready(function () {
+        GetNewRecordList();
         CKEDITOR.replace("EventDescription");
         GetBatchList();
+      
     })
 </script>
 

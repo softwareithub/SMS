@@ -1,0 +1,100 @@
+﻿@model IEnumerable<SERP.Core.Model.DashBoardModel.YearMonthWiseFeeDetail>
+
+<style>
+    #datatable {
+        font-family: Verdana, sans-serif;
+        border-collapse: collapse;
+        border: 1px solid #EBEBEB;
+        margin: 10px auto;
+        text-align: center;
+        width: 100%;
+    }
+
+        #datatable caption {
+            padding: 1em 0;
+            font-size: 1.2em;
+            color: #555;
+        }
+
+        #datatable th {
+            font-weight: 600;
+            padding: 0.5em;
+        }
+
+        #datatable td, #datatable th, #datatable caption {
+            padding: 0.5em;
+        }
+
+        #datatable thead tr, #datatable tr:nth-child(even) {
+            background: #f8f8f8;
+        }
+
+        #datatable tr:hover {
+            background: #f1f7ff;
+        }
+</style>
+<section class="content">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="row">
+                <div class="col-md-12">
+                    <table id="datatable" class="table-responsive-md table-striped table-bordered" style="width:100%">
+                        <thead>
+                            <tr>
+                                <th>Payable </th>
+                                <th> Paid</th>
+                                <th>Due </th>
+                                <th>Fine </th>
+                                <th>Month </th>
+                                <th>Year</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var data in Model)
+                            {
+                                <tr>
+                                    <td>
+                                        @data.PayableAmount
+                                    </td>
+                                    <td>
+                                        @data.AmountPaid
+                                    </td>
+                                    <td>
+                                        <a onclick="GetDefaulterList('@data.MonthName', '@data.Year')"> @data.DueAmount</a>
+                                    </td>
+                                    <td>
+                                        @data.FineAmount
+                                    </td>
+                                    <td>
+                                        @data.MonthName
+                                    </td>
+                                    <td>
+                                        <input type="hidden" id="hidden_Year" value=@data.Year />
+                                        <input type="hidden" id="hidden_Month" value=@data.MonthName />
+                                        @data.Year
+                                    </td>
+
+                                </tr>
+                            }
+                        <tr style="background-color:#b6ff00">
+                            <td>
+                                <b style="color:forestgreen">@Model.Sum(x => x.PayableAmount)</b>
+                            </td>
+                            <td>
+                                <b style="color:green"> @Model.Sum(x => x.AmountPaid)</b>
+                            </td>
+                            <td>
+                                <b style="color:orangered">@Model.Sum(x => x.DueAmount)</b>
+                            </td>
+                            <td>
+                                <b style="color:red">@Model.Sum(x => x.FineAmount)</b>
+                            </td>
+                        </tr>
+                        </tbody>
+
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

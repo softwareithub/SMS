@@ -87,47 +87,113 @@
         <!-- Navbar Right Menu -->
         <div class="navbar-custom-menu">
             <ul class="nav navbar-nav">
-                <!-- Messages: style can be found in dropdown.less-->
+
+                <li class="dropdown messages-menu">
+                    <a title="WhatsApp (Send and Receive Message)"
+                       onclick="AfectedClass()">
+                        <i class="fa fa-fire"></i>
+                    </a>
+                </li>
+
+                <li class="dropdown messages-menu">
+                    <a title="WhatsApp (Send and Receive Message)" href="https://web.whatsapp.com/  "
+                       target="popup"
+                       onclick="window.open('https://web.whatsapp.com/','popup','width=1000,height=600'); return false;">
+                        <i class="fa fa-whatsapp"></i>
+                    </a>
+                </li>
+
+
+
+                <li class="dropdown messages-menu">
+                    <a data-ajax="true" data-ajax-mode="replace"
+                       asp-action="CreateStudent" asp-controller="StudentMaster"
+                       data-ajax-update="#divSERP"
+                       data-ajax-begin="AjaxOnBegin" data-ajax-complete="AjaxComplete"
+                       class="nav-link">
+                        <i class="fa fa-users"></i>
+                    </a>
+                </li>
+                <li class="dropdown messages-menu">
+                    <!-- Menu toggle button -->
+                    <a href="https://mail.google.com/mail/u/0/#inbox"
+                       target="popup"
+                       onclick="window.open('https://mail.google.com/mail/u/0/#inbox','popup','width=1000,height=600'); return false;">
+                        <i class="fa fa-envelope-open"></i>
+                    </a>
+                </li>
+                <li class="dropdown messages-menu">
+                    <!-- Menu toggle button -->
+                    <a href="https://teams.microsoft.com/dl/launcher/launcher.html?url=%2F_%23%2Fl%2Fmeetup-join%2F19%3Ameeting_Zjc3YmFiMTctZGU1Mi00ZjlkLTk3MzktZGVhN2FjY2JiODdm%40thread.v2%2F0%3Fcontext%3D%257b%2522Tid%2522%253a%25229d3c49d7-dc9e-44e4-918a-bf924eb68c39%2522%252c%2522Oid%2522%253a%2522c9a6a6a6-e912-42ee-b5f7-bb68d69b3392%2522%257d%26anon%3Dtrue&type=meetup-join&deeplinkId=ffa10d0b-221c-4e92-a743-5a0084fee678&directDl=true&msLaunch=true&enableMobilePage=true&suppressPrompt=true"
+                       target="popup"
+                       onclick="window.open('https://teams.microsoft.com/dl/launcher/launcher.html?url=%2F_%23%2Fl%2Fmeetup-join%2F19%3Ameeting_Zjc3YmFiMTctZGU1Mi00ZjlkLTk3MzktZGVhN2FjY2JiODdm%40thread.v2%2F0%3Fcontext%3D%257b%2522Tid%2522%253a%25229d3c49d7-dc9e-44e4-918a-bf924eb68c39%2522%252c%2522Oid%2522%253a%2522c9a6a6a6-e912-42ee-b5f7-bb68d69b3392%2522%257d%26anon%3Dtrue&type=meetup-join&deeplinkId=ffa10d0b-221c-4e92-a743-5a0084fee678&directDl=true&msLaunch=true&enableMobilePage=true&suppressPrompt=true','popup','width=1000,height=600'); return false;">
+                        <i class="fa fa-file-video-o"></i>
+                    </a>
+                </li>
+                <li class="dropdown messages-menu">
+                    <!-- Menu toggle button -->
+                    <a onclick="AcademicCalender()" class="dropdown-toggle" data-toggle="dropdown">
+                        <i class="fa fa-calendar"></i>
+                    </a>
+                </li>
+                <li class="dropdown messages-menu">
+                    <!-- Menu toggle button -->
+                    <a href="https://meet.google.com/"
+                       target="popup"
+                       onclick="window.open('https://meet.google.com/','popup','width=1000,height=600'); return false;">
+                        <i class="fa fa-meetup"></i>
+                    </a>
+                </li>
+
+                <li class="dropdown messages-menu">
+                    <!-- Menu toggle button -->
+                    <a href="https://mail.google.com/chat"
+                       target="popup"
+                       onclick="window.open('https://mail.google.com/chat','popup','width=1000,height=600'); return false;">
+                        <i class="fa fa-flash"></i>
+                    </a>
+                </li>
+
+                <li class="dropdown messages-menu">
+                    <!-- Menu toggle button -->
+                    <a href="https://translate.google.co.in/"
+                       target="popup"
+                       onclick="window.open('https://translate.google.co.in/','popup','width=1000,height=600'); return false;">
+                        <i class="fa fa-book"></i>
+                    </a>
+                </li>
+
+                <li class="dropdown messages-menu">
+                    <!-- Menu toggle button -->
+                    <a href="https://duo.google.com/"
+                       target="popup"
+                       onclick="window.open('https://duo.google.com/','popup','width=1000,height=600'); return false;">
+                        <i class="fa fa-video-camera"></i>
+                    </a>
+                </li>
+                <li class="dropdown messages-menu">
+                    <a data-ajax="true" data-ajax-mode="replace"
+                       asp-action="Index" asp-controller="FeeDeposit"
+                       data-ajax-update="#divSERP"
+                       data-ajax-begin="AjaxOnBegin" data-ajax-complete="AjaxComplete"
+                       class="nav-link">
+                        <i class="fa fa-money"></i>
+                    </a>
+                </li>
                 <li class="dropdown messages-menu">
                     <!-- Menu toggle button -->
                     <a onclick="AdvanceSearch()" class="dropdown-toggle" data-toggle="dropdown">
                         <i class="fa fa-search"></i>
                     </a>
                 </li>
-                <!-- /.messages-menu -->
-                <!-- Notifications Menu -->
-                <li class="dropdown notifications-menu">
-                    <!-- Menu toggle button -->
-                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-                        <i class="fa fa-bell-o"></i>
-                        <span class="label label-warning">10</span>
-                    </a>
-                    <ul class="dropdown-menu">
-                        <li class="header">You have 10 notifications</li>
-                        <li>
-                            <!-- Inner Menu: contains the notifications -->
-                            <ul class="menu">
-                                <li>
-                                    <!-- start notification -->
-                                    <a href="#">
-                                        <i class="fa fa-users text-aqua"></i> 5 new members joined today
-                                    </a>
-                                </li>
-                                <!-- end notification -->
-                            </ul>
-                        </li>
-                        <li class="footer"><a href="#">View all</a></li>
-                    </ul>
-                </li>
-                <!-- Tasks Menu -->
-                <!-- User Account Menu -->
+
                 <li class="dropdown user user-menu">
                     <!-- Menu Toggle Button -->
                     <a href="#" class="dropdown-toggle" data-toggle="dropdown">
                         <!-- The user image in the navbar-->
                         @if (string.IsNullOrEmpty(studentDetail.ImagePath))
                         {
-                            <img src="~/Images/UserLogo.jpg"  style="width:25px;height:25px" class="img-circle" alt="User Image">
+                            <img src="~/Images/UserLogo.jpg" style="width:25px;height:25px" class="img-circle" alt="User Image">
                         }
                         else
                         {
@@ -162,6 +228,7 @@
                 </li>
             </ul>
         </div>
+
     </nav>
 </header>
 
@@ -187,7 +254,7 @@
                                     </div>
                                     <div class="panel-body">
                                         <div class="col-md-12">
-                                            <div class="autocomplete" style="width:300px;">
+                                            <div class="autocomplete" style="width:250px;">
                                                 <input type="text" id="txtStudentName" placeholder="Enter Student Name" class="form-control" />
                                             </div>
 
@@ -268,7 +335,53 @@
         <!--modal-content end-->
     </div><!--modal-dialog end-->
 </div>
+
+
+<div class="modal fade" id="ModalAcademicCalender" role="dialog" style="overflow:auto">
+    <div class="modal-dialog modal-dialog-centered  modal-lg" style="width:90%">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">
+                    <a>Academic Calender</a>
+                </h4>
+            </div><!--modal-header end-->
+
+            <div class="modal-body">
+                @await Html.PartialAsync("~/Views/DashBoard/_InstituteCalenderPartial.cshtml")
+
+            </div><!--modal-body end-->
+        </div>
+        <!--modal-content end-->
+    </div><!--modal-dialog end-->
+</div>
+
+
+<div class="modal fade" id="ModalClassAfected" role="dialog" style="overflow:auto">
+    <div class="modal-dialog modal-dialog-centered  modal-lg" style="width:90%">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">
+                    <a>Afected Class Due To Absent Teacher</a>
+                </h4>
+            </div><!--modal-header end-->
+
+            <div class="modal-body">
+                @await Component.InvokeAsync("AbsentTeacher", DateTime.Now.Date)
+
+            </div><!--modal-body end-->
+        </div>
+        <!--modal-content end-->
+    </div><!--modal-dialog end-->
+</div>
+
+
 <script src="~/Custom/AutoComplete.js"></script>
+
+
 <script>
     $(document).ready(function () {
         var studentList = [];
@@ -304,7 +417,7 @@
     }
 
     function fn_StudentDetails() {
-        $.get("/MasterQuickSearch/Index", { studentName: $("#txtStudentName").val()}, function (data) {
+        $.get("/MasterQuickSearch/Index", { studentName: $("#txtStudentName").val() }, function (data) {
             $("#divSERP").html(data);
             $("#ModalAdvanceSearch").modal('hide');
         })
@@ -322,4 +435,17 @@
             $("#ModalAdvanceSearch").modal('hide');
         })
     }
+
+    function AcademicCalender() {
+        $("#ModalAcademicCalender").modal('show');
+        setTimeout(function () {
+            $(".fc-month-button").trigger('click');
+        }, 700)
+    }
+
+    function AfectedClass() {
+        $("#ModalClassAfected").modal('show');
+    }
+
+    
 </script>

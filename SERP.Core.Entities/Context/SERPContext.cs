@@ -17,6 +17,7 @@ using SERP.Core.Entities.Student;
 using SERP.Core.Entities.FrontOffice;
 using SERP.Core.Entities.SERPExceptionLogging;
 using SERP.Core.Entities.TimeTable;
+using SERP.Core.Entities.QuickMessage;
 
 namespace SERP.Core.Entities.Context
 {
@@ -25,7 +26,7 @@ namespace SERP.Core.Entities.Context
     {
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseSqlServer("Server= DESKTOP-SF1G3N8\\VIPRAIT; Database= SERPDevelopment; User Id=sa;Password = vi@pra91");
+            optionsBuilder.UseSqlServer("server=89.163.218.70\\MSSQLSERVER2017; Database= SERP; User Id=igl;Password = Manoj@12345");
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -117,6 +118,7 @@ namespace SERP.Core.Entities.Context
         public DbSet<ExceptionLogging> ExceptionLoggings { get; set; }
         public DbSet<QuickLink> QuickLinks { get; set; }
         public DbSet<TimeTableMaster> TimeTableMasters { get; set; }
+        public DbSet<MessageTemplate> MessageTemplates { get; set; }
         #endregion
 
     }

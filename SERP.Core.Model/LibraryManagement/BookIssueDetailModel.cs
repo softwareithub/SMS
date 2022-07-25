@@ -28,5 +28,8 @@ namespace SERP.Core.Model.LibraryManagement
         [Required(ErrorMessage ="Actual return date is required.")]
         [DataType(DataType.Date)]
         public DateTime ActualReturnDate { get; set; }
+        public string BookIssueDate { get; set; }
+        public string BookReturnDate { get; set; }
+        public string BookActualReturnDate { get; set; }
     }
 }

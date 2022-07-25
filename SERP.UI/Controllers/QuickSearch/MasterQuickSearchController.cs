@@ -50,7 +50,7 @@ namespace SERP.UI.Controllers.QuickSearch
             try
             {
                 studentName = studentName.Split("(")[0];
-                var studentId = (await _studentRepo.GetSingle(x => x.Name.ToLower().Trim() == studentName.ToLower().Trim())).Id;
+                var studentId = (await _studentRepo.GetSingle(x => x.Name.ToLower().Trim() == studentName.ToLower().Trim() && x.IsActive==1 )).Id;
                 HttpContext.Session.SetInt32("StudentId", studentId);
                 return await Task.Run(() => PartialView("~/Views/QuickMasterSearch/_QuickStudentSearchPartial.cshtml"));
             }

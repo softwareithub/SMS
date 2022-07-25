@@ -1,0 +1,77 @@
+﻿<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/qtip2/3.0.3/jquery.qtip.min.css" />
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/fullcalendar/2.9.1/fullcalendar.min.css" />
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/fullcalendar/2.9.1/fullcalendar.print.css" media="print" />
+
+
+
+<section class="content">
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="box box-primary">
+                <div class="box-body no-padding">
+                    <div id="calendar"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        $('#calendar').fullCalendar({
+            header:
+            {
+                left: 'prev,next today',
+                center: 'title',
+                right: 'month,agendaWeek,agendaDay'
+            },
+            buttonText: {
+                today: 'today',
+                month: 'month',
+                week: 'week',
+                day: 'day'
+            },
+            height: 500,
+            width: 300,
+            hemeSystem: 'bootstrap5',
+
+            events: function (start, end, timezone, callback) {
+                $.ajax({
+                    url: '/DashboardMaster/GetCalenderDetails',
+                    type: "GET",
+                    dataType: "JSON",
+
+                    success: function (result) {
+                        var events = [];
+
+                        $.each(result, function (i, data) {
+                            debugger
+                            events.push(
+                                {
+                                    title: data.title,
+                                    description: 'Holiday',
+                                    start: moment(data.startDate).format('YYYY-MM-DD'),
+                                    end: moment(data.endDate).format('YYYY-MM-DD'),
+                                    backgroundColor: "red",
+                                    borderColor: "#fc0101"
+                                });
+                        });
+
+                        callback(events);
+                    }
+                });
+            },
+
+            eventRender: function (event, element) {
+                element.qtip(
+                    {
+                        content: event.description
+                    });
+            },
+
+            editable: false
+        });
+    });
+</script>

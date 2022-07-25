@@ -14,6 +14,8 @@ namespace SERP.Utilities
         public static string GetFeeDepositReciept = @"usp_GetStudentFeeDeposiDetail";
         public static string GetTimeTableDetail = @"Proc_GetTimeTableDetail";
         public static string DeleteTimetable = @"Proc_UpdateDeleteTimeTable";
+        public static string GetMappedTeacher = @"Proc_GetMappedTeacher";
+        public static string GetStudentAttendance = @"usp_GetAttendenceReport";
         #endregion
     }
 }

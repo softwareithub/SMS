@@ -1,0 +1,93 @@
+﻿@model IEnumerable<SERP.Core.Model.DashBoardModel.DefaulterListModel>
+
+<style>
+    #datatable {
+        font-family: Verdana, sans-serif;
+        border-collapse: collapse;
+        border: 1px solid #EBEBEB;
+        margin: 10px auto;
+        text-align: center;
+        width: 100%;
+    }
+
+        #datatable caption {
+            padding: 1em 0;
+            font-size: 1.2em;
+            color: #555;
+        }
+
+        #datatable th {
+            font-weight: 600;
+            padding: 0.5em;
+        }
+
+        #datatable td, #datatable th, #datatable caption {
+            padding: 0.5em;
+        }
+
+        #datatable thead tr, #datatable tr:nth-child(even) {
+            background: #f8f8f8;
+        }
+
+        #datatable tr:hover {
+            background: #f1f7ff;
+        }
+</style>
+<section class="content">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="row">
+                <div class="col-md-12">
+                    <table id="datatable" class="table-responsive-md table-striped table-bordered" style="width:100%">
+                        <thead>
+                            <tr>
+                                <th>Student Name </th>
+                                <th> Payable Amount</th>
+                                <th>Amount Paid </th>
+                                <th>Due Amount </th>
+                                <th>Date Of Deposit </th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var data in Model)
+                            {
+                                <tr>
+                                    <td>
+                                        @data.StudentName
+                                    </td>
+                                    <td>
+                                        @data.PayableAmount
+                                    </td>
+                                    <td>
+                                        <a> @data.AmountPaid</a>
+                                    </td>
+                                    <td>
+                                        @data.DueAmount
+                                    </td>
+                                    <td>
+                                        @data.DateOfDeposit.ToShortDateString()
+                                    </td>
+                                    <td>
+                                        @{
+                                            string message = @$"Dear Parent,Please pay the due amount : of Rs. {data.DueAmount} which is due from the date {data.DateOfDeposit.ToShortDateString()} Thanks School Admin Team";
+
+                                        }
+                                        <a asp-action="SendWhatsAppMessage" asp-route-message="@message" asp-controller="DashboardMaster">Send</a>
+                                        <a title="WhatsApp (Send and Receive Message)" href="https://api.whatsapp.com/send?phone=9315775084&text= +@message"
+                                           target="popup"
+                                           onclick="window.open('https://api.whatsapp.com/send?phone=9315775084&text= +@message', 'popup', 'width=1000,height=600'); return false;">
+                                            <i class="fa fa-flash"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                            }
+
+                        </tbody>
+
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

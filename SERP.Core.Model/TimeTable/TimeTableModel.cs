@@ -19,5 +19,7 @@ namespace SERP.Core.Model.TimeTable
         public TimeSpan ToTime { get; set; }
         public string DayName { get; set; }
         public int DayId { get; set; }
+        public string FromT { get; set; }
+        public string ToT { get; set; }
     }
 }

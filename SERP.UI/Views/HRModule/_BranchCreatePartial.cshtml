@@ -146,7 +146,7 @@
             </div>
         </div>
 
-        @await Html.PartialAsync("~/Views/Shared/_CommanModalPartial.cshtml")
+       @Html.Partial("~/Views/Shared/SERPModalPopUp.cshtml")
 
     </div>
 </section>
@@ -154,7 +154,7 @@
 <script>
 
     function GetRecordList() {
-        GetCustomRecord("Branch/GetBranchList");
+        GetCustomRecord("/Branch/GetBranchList");
         setTimeout(function () {
             $("#modalTitle").text("Branch List")
         }, 300);

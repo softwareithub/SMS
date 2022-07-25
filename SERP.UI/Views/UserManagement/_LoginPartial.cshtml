@@ -1,6 +1,7 @@
 ﻿
 @{
     Layout = null;
+    ViewBag.Logo = string.IsNullOrEmpty(ViewBag.Logo) ? "https://ui-avatars.com/api/"+ViewBag.Name : ViewBag.Logo;
 }
 @model SERP.Core.Entities.UserManagement.Authenticate
 <link href="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">

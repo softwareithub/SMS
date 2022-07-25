@@ -9,11 +9,7 @@
     <h1>
         Batch Master
     </h1>
-    <ol class="breadcrumb">
-        <li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
-        <li><a href="#">Forms</a></li>
-        <li class="active">General Elements</li>
-    </ol>
+   
 </section>
 
 
@@ -42,7 +38,7 @@
                 <!-- /.box-header -->
                 <!-- form start -->
                 <form id="form" method="post" data-ajax="true" data-ajax-method="post"
-                      asp-action="CreateBatch" asp-controller="BatchMaster"  data-ajax-success="Success"
+                      asp-action="CreateBatch" asp-controller="BatchMaster" data-ajax-success="Success"
                       data-ajax-begin="CustomFormSubmitBegin" data-ajax-complete="CustomFormSubmitComplete">
                     <div class="box-body">
                         <div class="col-md-4">
@@ -93,7 +89,7 @@
                 </form>
             </div>
         </div>
-        @await Html.PartialAsync("~/Views/Shared/_CommanModalPartial.cshtml")
+        @Html.Partial("~/Views/Shared/SERPModalPopUp.cshtml")
 
     </div>
 </section>
@@ -106,4 +102,8 @@
             $("#modalTitle").text("Batch Master List")
         }, 300);
     }
+
+    $(document).ready(function () {
+        GetBatchDetail();
+    })
 </script>

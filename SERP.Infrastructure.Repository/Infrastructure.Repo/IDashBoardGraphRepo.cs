@@ -17,5 +17,8 @@ namespace SERP.Infrastructure.Repository.Infrastructure.Repo
         Task<DashBoardDetailVm> GetDashBoardDetails();
         Task<List<FeeDetailVm>> GetFeeDetails();
         Task<List<StudentOnlineTestResultVm>> GetStudentOnlineTestResult(int userId);
+
+        Task<List<YearMonthWiseFeeDetail>> YearWiseFeeDetails();
+        Task<List<DefaulterListModel>> DefaulterList(string monthName, int year);
     }
 }

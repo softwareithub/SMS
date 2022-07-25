@@ -28,20 +28,20 @@ namespace SERP.Infrastructure.Implementation.Infratructure.Implementation
             List<AccountTransactionModel> models = new List<AccountTransactionModel>();
             var commandText = "proc_GetAccountTransactionDetail";
             var result = await SqlHelperExtension.ExecuteReader(_connectionString, commandText, System.Data.CommandType.StoredProcedure, null);
-            while (result.Read())
-            {
-                AccountTransactionModel model = new AccountTransactionModel();
-                model.Id = result.DefaultIfNull<int>("Id");
-                model.AccountName = result.DefaultIfNull<string>("AccountName");
-                model.OpeningBalance = result.DefaultIfNull<decimal>("OpeningBalance");
-                model.IncomeName = result.DefaultIfNull<string>("IncomeName");
-                model.ExpenseName = result.DefaultIfNull<string>("ExpenseName");
-                model.Amount = result.DefaultIfNull<decimal>("Amount");
-                model.Purpose = result.DefaultIfNull<string>("Purpose");
-                model.RecieptNumber = result.DefaultIfNull<string>("RecieptNumber");
-                model.IncomeExpenseDate = result.DefaultIfNull<DateTime>("DateOfIncomeExpense");
-                models.Add(model);
-            }
+                while (result.Read())
+                {
+                    AccountTransactionModel model = new AccountTransactionModel();
+                    model.Id = result.DefaultIfNull<int>("Id");
+                    model.AccountName = result.DefaultIfNull<string>("AccountName");
+                    model.OpeningBalance = result.DefaultIfNull<decimal>("OpeningBalance");
+                    model.IncomeName = result.DefaultIfNull<string>("IncomeName");
+                    model.ExpenseName = result.DefaultIfNull<string>("ExpenseName");
+                    model.Amount = result.DefaultIfNull<decimal>("Amount");
+                    model.Purpose = result.DefaultIfNull<string>("Purpose");
+                    model.RecieptNumber = result.DefaultIfNull<string>("RecieptNumber");
+                    model.IncomeExpenseDate = result.DefaultIfNull<DateTime>("DateOfIncomeExpense");
+                    models.Add(model);
+                }
 
             return models;
         }

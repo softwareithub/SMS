@@ -11,7 +11,7 @@ namespace SERP.Infrastructure.Repository.Infrastructure.Repo
     {
         Task<IList<TEntity>> GetAll(params Expression<Func<TEntity, object>>[] navigationProperties);
         Task<IList<TEntity>> GetList(Func<TEntity, bool> where, params Expression<Func<TEntity, object>>[] navigationProperties);
-        Task<TEntity> GetSingle(Func<TEntity, bool> where, params Expression<Func<TEntity, object>>[] navigationProperties);
+        Task<TEntity> GetSingle(Func<TEntity, bool> where);
         Task<ResponseStatus> Add(params TEntity[] items);
         Task<ResponseStatus> Update(params TEntity[] items);
         Task<ResponseStatus> Delete(params TEntity[] items);

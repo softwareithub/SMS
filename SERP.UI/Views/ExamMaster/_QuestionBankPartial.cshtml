@@ -123,7 +123,7 @@
                         </div>
                     </div>
                     <div class="box-footer">
-                        
+
                         <div id="divCancelSubmit" style="display:none">
                             <div class="col-md-4">
                                 @Html.SERPButton("btn btn-primary pull-right btnSubmit", Model == null ? 0 : Model.QuestionModel.Id)
@@ -142,7 +142,7 @@
             </div>
         </div>
 
-        @await Html.PartialAsync("~/Views/Shared/_CommanModalPartial.cshtml")
+        @Html.Partial("~/Views/Shared/SERPModalPopUp.cshtml")
 
 
 

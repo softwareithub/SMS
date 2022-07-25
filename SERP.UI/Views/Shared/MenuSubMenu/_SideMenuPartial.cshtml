@@ -87,10 +87,8 @@
 <script type="text/javascript">
     $(document).ready(function () {
         $("#txtMenu").on("keyup", function () {
-            
             if (this.value.length > 0) {
                 $(".menuList li").hide().filter(function () {
-                    
                     return $(this).text().toLowerCase().indexOf($("#txtMenu").val().toLowerCase()) != -1;
                 }).show();
             }
@@ -98,7 +96,6 @@
                 $(".menuList li").show();
             }
         });
-
     });
 
     function AdvanceSearch() {

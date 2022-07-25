@@ -72,6 +72,18 @@ namespace SERP.API
            });
             services.AddTransient(typeof(IGenericRepository<,>), typeof(GenericImplementation<,>));
             services.AddTransient<ITimeSheetRepo, TimeSheetImplementation>();
+            services.AddTransient<ISubjectMasterRepo, SubjectImplementation>();
+            services.AddTransient<ITimeSheetRepo, TimeSheetImplementation>();
+            services.AddTransient<IFeeDetailRepo, FeeDetailImplementation>();
+            services.AddTransient<IDashBoardGraphRepo, DashBoardRepo>();
+            services.AddTransient<IFeeDepositRecieptRepo, FeeDepositRepo>();
+            services.AddTransient<IBookDetailReport, BookDetailReportImplementation>();
+            services.AddTransient<ISalaryHeadRepo, SalarySlipImplementation>();
+            services.AddTransient<IAccountTransactionRepo, AccountTransactionImplementation>();
+            services.AddTransient<IOnlineTestSubmitRepository, OnlineTestSubmitImplementation>();
+            services.AddTransient<IQuickSearchRepo, QuickSearchImplementation>();
+            services.AddTransient<ILessonRepository, LessonImplmentation>();
+            services.AddTransient<IReportRepository, ReportImplementation>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -93,6 +105,8 @@ namespace SERP.API
             app.UseCors();
 
             app.UseAuthorization();
+
+            app.UseStaticFiles();
 
             app.UseEndpoints(endpoints =>
             {

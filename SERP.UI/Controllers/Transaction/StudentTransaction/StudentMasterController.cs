@@ -30,6 +30,7 @@ namespace SERP.UI.Controllers.Transaction.StudentTransaction
         private readonly IHostingEnvironment _hostingEnvironment;
         private readonly IGenericRepository<FeeDiscountModel, int> _IFeeDiscountRepo;
         private readonly IGenericRepository<ExceptionLogging, int> _exceptionLoggingRepo;
+        
 
 
         public StudentMasterController(IGenericRepository<StudentMaster, int> studentRepo,
@@ -109,25 +110,20 @@ namespace SERP.UI.Controllers.Transaction.StudentTransaction
                 formFiles.Add(StudentPhoto);
                 formFiles.Add(ParentsPhoto);
                 var imagePaths = await UploadImage.UploadImageOnFolder(formFiles, _hostingEnvironment);
-                if (imagePaths.Count() == 0)
+                switch (imagePaths.Count)
                 {
-                    model.ParentsPhoto = string.Empty;
-                    model.StudentPhoto = string.Empty;
-                }
-                else
-                {
-                    if (imagePaths.Count() == 1)
-                    {
-                        model.StudentPhoto = string.IsNullOrEmpty(model.StudentPhoto) ? imagePaths[0] : model?.StudentPhoto;
+                    case 0:
                         model.ParentsPhoto = string.Empty;
-                    }
-                    else if (imagePaths.Count() == 2)
-                    {
-                        model.StudentPhoto = string.IsNullOrEmpty(model.StudentPhoto) ? imagePaths[0] : model?.StudentPhoto;
-                        model.ParentsPhoto = string.IsNullOrEmpty(model.ParentsPhoto) ? imagePaths[1] : model?.ParentsPhoto;
-                    }
-
-
+                        model.StudentPhoto = string.Empty;
+                        break;
+                    case 1:
+                        model.StudentPhoto = string.IsNullOrEmpty(imagePaths[0]) ? model.StudentPhoto : imagePaths[0];
+                        model.ParentsPhoto = string.Empty;
+                        break;
+                    case 2:
+                        model.StudentPhoto =string.IsNullOrEmpty(imagePaths[0])? model.StudentPhoto: imagePaths[0] ;
+                        model.ParentsPhoto = string.IsNullOrEmpty(imagePaths[1]) ?  model?.ParentsPhoto: imagePaths[1];
+                        break;
                 }
 
 
@@ -256,14 +252,17 @@ namespace SERP.UI.Controllers.Transaction.StudentTransaction
                                         FatherEmail = sl.FatherEmail,
                                         StudentEmail = sl.StudentEmail,
                                         FatherPhone = sl.FatherPhone,
-                                        StudentPhoto = sl.StudentPhoto,
+                                        StudentPhoto = string.IsNullOrEmpty(sl.StudentPhoto) ? $"https://ui-avatars.com/api/{sl.FatherName}" : sl.StudentPhoto,
                                         StudentPhone = sl.StudentPhone,
                                         MotherPhone = sl.MotherPhone,
                                         MotherName = sl.MotherName,
                                         P_Address = sl.P_Address,
                                         C_Address = sl.C_Address,
                                         Religion = "",
-                                        ParentPhoto = sl.ParentsPhoto
+                                        ParentPhoto =string.IsNullOrEmpty(sl.ParentsPhoto)? $"https://ui-avatars.com/api/{sl.FatherName}": sl.ParentsPhoto,
+                                        FatherName= sl.FatherName,
+                                        Gender= sl.Gender,
+                                        BloodGroup= sl.BloodGroup
                                     }).ToList();
             return studentViewModel;
         }

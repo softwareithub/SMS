@@ -17,11 +17,7 @@
         Leave Allotment
         <small>Create Leave Allotment</small>
     </h1>
-    <ol class="breadcrumb">
-        <li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
-        <li><a href="#">Forms</a></li>
-        <li class="active">General Elements</li>
-    </ol>
+    
 </section>
 
 
@@ -103,7 +99,7 @@
             </div>
         </div>
 
-        @await Html.PartialAsync("~/Views/Shared/_CommanModalPartial.cshtml")
+        @Html.Partial("~/Views/Shared/SERPModalPopUp.cshtml")
 
     </div>
 </section>
@@ -120,6 +116,10 @@
         var url = "/LeaveAllotment/Index";
         NewCustomRecord(url);
     }
+    $(document).ready(function () {
+        GetNewRecordList();
+
+    })
 </script>
 
 

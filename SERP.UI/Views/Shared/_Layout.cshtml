@@ -1,17 +1,12 @@
 ﻿@using Microsoft.AspNetCore.Http
 @inject IHttpContextAccessor HttpContextAccessor
 <!DOCTYPE html>
-<!--
-This is a starter template page. Use this page to start your new project from
-scratch. This page gets rid of all links and provides the needed markup only.
--->
 <html>
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <title>@HttpContextAccessor.HttpContext.Session.GetString("InstituteName") </title>
-    <!-- Tell the browser to be responsive to screen width -->
     <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
 
 
@@ -37,7 +32,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
             crossorigin="anonymous"></script>
     <link href="~/AlertifyJs/build/css/themes/bootstrap.css" rel="stylesheet" />
     <link href="~/bootstrap/loader.css" rel="stylesheet" />
-    <script src="~/Custom/Custom.js"></script>
+
 
 
     <link href="~/bootstrap/CustomModal.css" rel="stylesheet" />
@@ -46,8 +41,8 @@ scratch. This page gets rid of all links and provides the needed markup only.
     <link href="//netdna.bootstrapcdn.com/bootstrap/3.1.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
     <link href="~/Iconic/ionicons.min.css" rel="stylesheet" />
 
-    <link rel="stylesheet"
-          href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600,700,300italic,400italic,600italic">
+    @*<link rel="stylesheet"
+        href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600,700,300italic,400italic,600italic">*@
     @*<script src="~/bootstrap/Select2.js"></script>*@
     <link href="~/select2/dist/css/select2.css" rel="stylesheet" />
 
@@ -191,9 +186,17 @@ scratch. This page gets rid of all links and provides the needed markup only.
     <!-- AdminLTE App -->
     <script src="~/Jquery/adminlte.min.js"></script>
     @*<script src="~/Jquery/SearchDropDown.js"></script>
-    <script src="~/select2/dist/js/select2.full.js"></script>*@
+        <script src="~/select2/dist/js/select2.full.js"></script>*@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.1/css/bootstrap-select.css" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.1/js/bootstrap-select.min.js"></script>
+
+    <script src="https://momentjs.com/downloads/moment.min.js"></script>
+    <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/qtip2/3.0.3/jquery.qtip.min.js"></script>
+
+    <script src='https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.1.0/fullcalendar.js'></script>
+    @*<script src="~/WebCam/jquery.webcam.js"></script>*@
+
+    <script src="~/Custom/Custom.js"></script>
 </body>
 </html>
 

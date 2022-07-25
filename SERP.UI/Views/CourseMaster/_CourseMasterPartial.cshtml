@@ -10,17 +10,12 @@
         Course Master
         <small>Create Course Detail</small>
     </h1>
-    <ol class="breadcrumb">
-        <li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
-        <li><a href="#">Forms</a></li>
-        <li class="active">General Elements</li>
-    </ol>
+  
 </section>
 
 
 <section class="content">
     <div class="row">
-
         <div class="col-md-12">
             <!-- general form elements -->
             <div class="box box-primary">
@@ -108,7 +103,7 @@
             </div>
         </div>
 
-        @await Html.PartialAsync("~/Views/Shared/_CommanModalPartial.cshtml")
+        @Html.Partial("~/Views/Shared/SERPModalPopUp.cshtml")
 
     </div>
 </section>
@@ -116,6 +111,17 @@
 <script type="text/javascript">
     function GetClassDetail() {
         GetCustomRecord("/Course/GetCourseList");
+        //$.get("/Course/GetCourseList", function (response) {
+        //    $("#divStudentPartialData").html(response);
+        //    $("#divStudentModal").modal('show');
+        //    setTimeout(function () {
+        //        $("#tblDataList").DataTable({
+        //            fixedHeader: true,
+        //            select: true,
+        //            responsive: true
+        //        });
+        //    }, 300)
+        //});
         setTimeout(function () {
             $("#modalTitle").text("Course Master List")
         }, 300);
@@ -124,4 +130,6 @@
         var url = "/Course/Index";
         NewCustomRecord(url);
     }
+
+
 </script>

@@ -12,9 +12,8 @@
         <small>Create Assignment Master</small>
     </h1>
     <ol class="breadcrumb">
-        <li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
-        <li><a href="#">Forms</a></li>
-        <li class="active">General Elements</li>
+        <em>*</em>
+        <span style="color:#ff6a00">Required Fields</span>
     </ol>
 </section>
 
@@ -142,12 +141,13 @@
             </div>
         </div>
 
-        @await Html.PartialAsync("~/Views/Shared/_CommanModalPartial.cshtml")
+        @Html.Partial("~/Views/Shared/SERPModalPopUp.cshtml")
       </div>
 </section>
 
 <script>
     $(document).ready(function () {
+        GetNewRecordList();
         CKEDITOR.replace("Assignment");
         GetBatchList();
     })

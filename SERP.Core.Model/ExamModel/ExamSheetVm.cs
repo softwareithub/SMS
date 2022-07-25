@@ -18,5 +18,8 @@ namespace SERP.Core.Model.ExamModel
         public string TeacherName { get; set; }
         public int MaxMark { get; set; }
         public int PassMark { get; set; }
+        public string  ExamDateStr { get; set; }
+        public string ExamFromTime { get; set; }
+        public string ExamToTime { get; set; }
     }
 }

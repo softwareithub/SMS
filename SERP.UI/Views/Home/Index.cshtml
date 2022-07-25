@@ -7,13 +7,56 @@
 <script src="https://www.gstatic.com/charts/loader.js"></script>
 
 <div class="row">
-    @await Component.InvokeAsync("DashBoardHeader");
+    @await Component.InvokeAsync("DashBoardHeader")
     <div class="row">
         <div class="col-md-12">
             <div id="divModuleDetails">
 
             </div>
         </div>
+        <div class="col-md-12">
+            <div class="col-md-6">
+                <div class="box box-info">
+                    <div class="box-header with-border">
+                        <h3 class="box-title">Fee Details Report </h3>
+
+                        <div class="box-tools pull-right">
+                            <button type="button" class="btn btn-box-tool" data-widget="collapse">
+                                <i class="fa fa-minus"></i>
+                            </button>
+                            <button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
+                        </div>
+                    </div>
+                    <div class="box-body">
+                        <div id="FeeDetailMonthWise"></div>
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="col-md-6">
+                <div class="box box-info">
+                    <div class="box-header with-border">
+                        <h3 class="box-title" style="text-align:center"><a>Defaulter List</a> </h3>
+
+                        <div class="box-tools pull-right">
+                            <button type="button" class="btn btn-box-tool" data-widget="collapse">
+                                <i class="fa fa-minus"></i>
+                            </button>
+                            <button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
+                        </div>
+                    </div>
+                    <div class="box-body">
+                        <div id="defaulterList"></div>
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+
+        
         <div class="col-md-12">
 
             <div class="col-md-6">
@@ -30,7 +73,7 @@
                         </div>
                     </div>
                     <div class="box-body">
-                        @await Component.InvokeAsync("FeeDetail") 
+                        @await Component.InvokeAsync("FeeDetail")
                     </div>
 
                 </div>
@@ -59,6 +102,7 @@
 
 
             </div>
+
             <div class="col-md-6">
                 <div class="box box-info">
                     <div class="box-header with-border">
@@ -79,6 +123,9 @@
                 </div>
 
             </div>
+
+
+
             <div class="col-md-6">
                 <div class="box box-info">
                     <div class="box-header with-border">
@@ -149,7 +196,6 @@
 
             <div class="col-md-6">
                 <!-- USERS LIST -->
-                @await Component.InvokeAsync("NewPortal", DateTime.Now.Date)
                 <!--/.box -->
             </div>
         </div>
@@ -158,8 +204,21 @@
 
 <script>
     //$(document).ready(function () {
-    //    $.get("/DashBoardMaster/MenuSubMenuDetails", function (response) {
-    //        $("#divModuleDetails").html(response)
+    //    $.get("/DashboardMaster/GetFeeDetailMonthWise", function (data) {
+    //        $("#FeeDetailMonthWise").html(data);
+    //    }).then(function () {
+    //        $.get("/DashboardMaster/DefaulterList", { year: $("#hidden_Year").val(), month: $("#hidden_Month").val() }, function (data) {
+    //            $("#defaulterList").html(data);
+    //        })
     //    })
     //})
+
+    //function GetDefaulterList(month, year) {
+    //    $.get("/DashboardMaster/DefaulterList", { year: year, month: month }, function (data) {
+    //        $("#defaulterList").html(data);
+    //    })
+    //}
+
+
+
 </script>

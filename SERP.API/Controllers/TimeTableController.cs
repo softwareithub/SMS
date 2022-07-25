@@ -26,7 +26,15 @@ namespace SERP.API.Controllers
         public async Task<IActionResult> GetTimeTableDetails(int studentId)
         {
             var studentPromote = await _IStudentPromoteRepo.GetSingle(x => x.IsActive == 1 && x.StudentId == studentId);
-            return Ok( await _timeSheetRepo.GetTimeSheetDetailsByCourseIdBatchId(studentPromote.CourseId, studentPromote.BatchId));
+            return Ok(await _timeSheetRepo.GetTimeTableModels(studentPromote.CourseId, studentPromote.BatchId));
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetMappedEmployee(int studentId)
+        {
+            var studentPromote = await _IStudentPromoteRepo.GetSingle(x => x.IsActive == 1 && x.StudentId == studentId);
+            var response = await _timeSheetRepo.GetMappedTecherModel(studentPromote.CourseId, studentPromote.BatchId);
+            return Ok(response);
         }
     }
 }

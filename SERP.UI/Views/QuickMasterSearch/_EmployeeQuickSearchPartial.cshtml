@@ -156,7 +156,7 @@
                                                             </td>
                                                             <td>
                                                                 @{
-                                                                    var attandenceType = data.AttendenceType == "P" ? "Present" : "Absent";
+                                                                    var attandenceType = data.AttendenceType == "P" ? "Present" : data.AttendenceType == "HL" ? "Holiday (Present)":"Absent";
                                                                 }
                                                                 @attandenceType
                                                             </td>
@@ -177,7 +177,7 @@
                                                             </td>
                                                             <td>
                                                                 @{
-                                                                    var attandenceType = data.AttendenceType == "P" ? "Present" : "Absent";
+                                                                    var attandenceType = data.AttendenceType == "P" ? "Present" : data.AttendenceType == "HL" ? "Holiday (Present)" : "Absent";
                                                                 }
                                                                 @attandenceType
                                                             </td>

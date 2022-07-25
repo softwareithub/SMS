@@ -1,0 +1,117 @@
+﻿@model SERP.Core.Entities.QuickMessage.MessageTemplate
+
+<script src="~/lib/jquery-validation/dist/jquery.validate.js"></script>
+<script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.js"></script>
+<link href="~/DataTable/DataTable.css" rel="stylesheet" />
+<script src="https://cdn.datatables.net/1.10.20/js/jquery.dataTables.min.js"></script>
+<script src="~/ckeditor/ckeditor.js"></script>
+
+<section class="content-header">
+    <h1>
+        Message Template
+    </h1>
+    <ol class="breadcrumb">
+        <em>*</em>
+        <span style="color:#ff6a00">Required Fields</span>
+    </ol>
+</section>
+
+<section class="content">
+    <div class="row">
+
+        <div class="col-md-12">
+            <!-- general form elements -->
+            <div class="box box-primary">
+                <div class="box-header with-border">
+                    <h3 class="box-title">Create Message Template</h3>
+                    <div class="col-md-12">
+                        <div class="col-md-10">
+                            <a class="btn btn-primary pull-right" onclick="GetNewRecordList()">
+                                <i class="fa fa-list-ul"></i>
+                            </a>
+                        </div>
+                        <div class="col-md-2">
+                            <a class="btn btn-primary pull-left" onclick="NewRecord()">
+                                <i class="fa fa-plus-square"></i>
+                            </a>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="overlay divHidding" id="divFormData">
+                    <i class="fa fa-refresh fa-spin">
+
+                    </i>
+                </div>
+                <form id="form" method="post" data-ajax="true" data-ajax-method="post"
+                      asp-action="CreateTemplate" asp-controller="Template" data-ajax-success="Success"
+                      data-ajax-begin="CustomFormSubmitBegin" data-ajax-complete="CustomFormSubmitComplete">
+                    <div class="box-body">
+                        <div class="col-md-4">
+                            <label>Template Type</label>
+                            <select id="CourseId" asp-for="TemplateTypeName" class="form-control">
+                                <option value="">Select</option>
+                                <option value="Email">Email</option>
+                                <option value="SMS">SMS Messgae</option>
+                                <option value="WhatsApp">WhatsApp Message</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <input type="hidden" asp-for="Id" />
+                                <input type="hidden" asp-for="CreatedBy" />
+                                <input type="hidden" asp-for="CreatedDate" />
+                                <label asp-for="TemplateName">Template Name <em>*</em></label>
+                                <input asp-for="TemplateName" class="form-control">
+                                <span asp-validation-for="TemplateName" class="text-danger"></span>
+                            </div>
+                        </div>
+                     
+
+                        <div class="col-md-12">
+                            <label asp-for="Template">Template</label>
+                            <textarea asp-for="Template" class="form-control ckeditor"></textarea>
+                            <span asp-validation-for="Template" class="text-danger"></span>
+                        </div>
+                    </div>
+                    <!-- /.box-body -->
+
+                    <div class="box-footer">
+                        <div class="col-md-8">
+                            @Html.SERPButton("btn btn-primary pull-right btnSubmit", Model == null ? 0 : Model.Id)
+                            <button class="buttonload" style="display:none">
+                                <i class="fa fa-refresh fa-spin"></i>Loading
+                            </button>
+                        </div>
+                        <div class="col-md-4">
+                            <button type="reset" class="btn btn-danger pull-left">Cancel</button>
+                        </div>
+
+                    </div>
+                </form>
+            </div>
+        </div>
+
+       @Html.Partial("~/Views/Shared/SERPModalPopUp.cshtml")
+
+    </div>
+</section>
+
+<script>
+    $(document).ready(function () {
+        CKEDITOR.replace("Template");
+        GetBatchList();
+
+    })
+
+    function GetNewRecordList() {
+        GetCustomRecord("/Template/GetMessageTemplate");
+        setTimeout(function () {
+            $("#modalTitle").text("Message Template Details")
+        }, 300);
+    }
+    function NewRecord() {
+        var url = "/Template/MessageTemplate";
+        NewCustomRecord(url);
+    }
+</script>

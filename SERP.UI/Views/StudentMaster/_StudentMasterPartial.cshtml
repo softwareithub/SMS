@@ -30,7 +30,7 @@
                 <!-- /.box-header -->
                 <!-- form start -->
                 <form id="form" method="post" data-ajax="true" data-ajax-method="post"
-                      asp-action="CreateStudent" asp-controller="StudentMaster" data-ajax-success="Success"   data-ajax-begin="AjaxOnBegin" data-ajax-complete="AjaxComplete"
+                      asp-action="CreateStudent" asp-controller="StudentMaster" data-ajax-success="Success" data-ajax-begin="AjaxOnBegin" data-ajax-complete="AjaxComplete"
                       enctype="multipart/form-data">
                     <div class="box-body">
                         <div class="col-md-4">
@@ -245,7 +245,7 @@
                                     else
                                     {
                                         <input type="hidden" asp-for="ParentsPhoto" />
-                                        <input type="hidden" asp-for="BatchId"id="_hidenBatchId" />
+                                        <input type="hidden" asp-for="BatchId" id="_hidenBatchId" />
                                         @Html.SerpImageHelper(Model.ParentsPhoto, 125, 125, "stdImage")
                                     }
 
@@ -263,7 +263,7 @@
             </div>
         </div>
 
-        <div class="modal fade" id="divModalPop" role="dialog">
+        <div class="modal fade" id="divStudentModal" role="dialog">
             <div class="modal-dialog modal-dialog-centered  modal-lg">
                 <!-- Modal content-->
                 <div class="modal-content">
@@ -274,7 +274,28 @@
 
                     <div class="modal-body">
                         <fieldset class="fieldset marB0">
-                            <div class="table-outer" style="min-height: 250px;" id="divPartialData">
+                            <div class="table-outer" style="min-height: 250px;" id="divStudentPartialData">
+
+                            </div>
+                        </fieldset>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="modal fade" id="divStudentDetail" role="dialog">
+            <div class="modal-dialog modal-dialog-centered  modal-lg">
+                <!-- Modal content-->
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close TopMar16" data-dismiss="modal">&times;</button>
+                        <h4 class="modal-title">Student List</h4>
+                    </div><!--modal-header end-->
+
+                    <div class="modal-body">
+                        <fieldset class="fieldset marB0">
+                            <div class="table-outer" style="min-height: 250px;" id="divStudentDetailPartial">
 
                             </div>
                         </fieldset>
@@ -289,8 +310,9 @@
 <script type="text/javascript">
     function GetList() {
         $.get("/StudentMaster/GetStudentList", function (response) {
-            $("#divPartialData").html(response);
-            $("#divModalPop").modal('show');
+            debugger
+            $("#divStudentPartialData").html(response);
+            $("#divStudentModal").modal('show');
             setTimeout(function () {
                 $("#tblDataList").DataTable({
                     fixedHeader: true,
@@ -396,8 +418,8 @@
 
     function StudentInfo(id) {
         $.get("/StudentMaster/GetStudentCompleteList", { id: id }, function (response) {
-            $("#divPartialData").html(response);
-            $("#divModalPop").modal('show');
+            $("#divStudentDetailPartial").html(response);
+            $("#divStudentDetail").modal('show');
         });
 
     }

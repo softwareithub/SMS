@@ -16,6 +16,7 @@ using SERP.Utilities;
 using SERP.Utilities.SqlHelper;
 using SERP.Core.Model.TimeTable;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using SERP.Core.Entities.TimeTable;
 
 namespace SERP.Infrastructure.Implementation.Infratructure.Implementation
 {
@@ -104,11 +105,9 @@ namespace SERP.Infrastructure.Implementation.Infratructure.Implementation
             return modelVm;
         }
 
-        public async Task<TimeSheetVm> GetTimeSheetDetailsByCourseIdBatchId(int courseId, int batchId)
+        public async Task<List<TimeTableModel>> GetTimeSheetDetailsByCourseIdBatchId(int courseId, int batchId)
         {
-            TimeSheetVm modelTimeSheet = new TimeSheetVm();
-            List<TimeTableVm> modelTimeTables = new List<TimeTableVm>();
-
+            var models = new List<TimeTableModel>();
             var connection = baseContext.Database.GetDbConnection();
 
             SqlParameter[] objectParams = {
@@ -116,13 +115,12 @@ namespace SERP.Infrastructure.Implementation.Infratructure.Implementation
             new SqlParameter("@batchId",batchId){SqlDbType= System.Data.SqlDbType.Int, Direction= System.Data.ParameterDirection.Input },
             };
 
-            var result = await SqlHelperExtension.ExecuteReader(connection.ConnectionString, SqlConstant.GetTimeTableDetail, System.Data.CommandType.Text, objectParams);
-
-            var models = new List<TimeTableModel>();
+            var result = await SqlHelperExtension.ExecuteReader(connection.ConnectionString, SqlConstant.GetTimeTableDetail, System.Data.CommandType.StoredProcedure, objectParams);
 
             while (result.Read())
             {
                 TimeTableModel model = new TimeTableModel();
+                model.Id = result.DefaultIfNull<int>("Id");
                 model.CourseName = result.DefaultIfNull<string>("CourseName");
                 model.CourseId = result.DefaultIfNull<int>("courseId");
                 model.BatchId = result.DefaultIfNull<int>("BatchId");
@@ -135,30 +133,10 @@ namespace SERP.Infrastructure.Implementation.Infratructure.Implementation
                 model.FromTime = result.DefaultIfNull<TimeSpan>("FromTime");
                 model.ToTime = result.DefaultIfNull<TimeSpan>("ToTime");
                 model.DayName = result.DefaultIfNull<string>("TimeTableDay");
-                model.DayId = result.DefaultIfNull<int>("DayId");
                 models.Add(model);
             }
+            return models;
 
-            foreach(var data in models.GroupBy(x=>x.DayName))
-            {
-                TimeTableVm timeTableVm = new TimeTableVm();
-                timeTableVm.DayName = data.Key;
-                List<PeriodVm> periodVms = new List<PeriodVm>();
-                foreach (var item in data)
-                {
-                    PeriodVm periodVm = new PeriodVm();
-                    periodVm.BatchName = item.BatchName;
-                    periodVm.CourseName = item.CourseName;
-                    periodVm.FromTime = item.FromTime;
-                    periodVm.ToTime = item.ToTime;
-                    periodVm.EmployeeName = item.EmployeeDetail;
-
-                    periodVms.Add(periodVm);
-                }
-                timeTableVm.PeriodModels = periodVms;
-            }
-            modelTimeSheet.TimeTableModels = modelTimeTables;
-            return modelTimeSheet;
         }
 
         public async Task<List<PeriodVm>> GetSubjectTeacher(int subjectId)
@@ -235,12 +213,14 @@ namespace SERP.Infrastructure.Implementation.Infratructure.Implementation
                 model.FromTime = result.DefaultIfNull<TimeSpan>("FromTime");
                 model.ToTime = result.DefaultIfNull<TimeSpan>("ToTime");
                 model.DayName = result.DefaultIfNull<string>("TimeTableDay");
+                model.FromT = result.DefaultIfNull<TimeSpan>("FromTime").ToString();
+                model.ToT = result.DefaultIfNull<TimeSpan>("ToTime").ToString();
                 models.Add(model);
             }
             return models;
         }
 
-        public async Task<ResponseStatus> DeleteTimeTable(int courseId, int batchId, int dayId, TimeSpan fromTime, TimeSpan toTime,int subjectId)
+        public async Task<ResponseStatus> DeleteTimeTable(int courseId, int batchId, int dayId, TimeSpan fromTime, TimeSpan toTime, int subjectId)
         {
             var connection = baseContext.Database.GetDbConnection();
             SqlParameter[] objectParams = {
@@ -254,6 +234,36 @@ namespace SERP.Infrastructure.Implementation.Infratructure.Implementation
 
             var result = await SqlHelperExtension.ExecuteNonQuery(connection.ConnectionString, SqlConstant.DeleteTimetable, System.Data.CommandType.StoredProcedure, objectParams);
             return ResponseStatus.UpdatedSuccessFully;
+        }
+
+        Task<TimeSheetVm> ITimeSheetRepo.GetTimeSheetDetailsByCourseIdBatchId(int courseId, int batchId)
+        {
+            throw new NotImplementedException();
+        }
+
+        public async Task<IEnumerable<MappedTeacherModel>> GetMappedTecherModel(int courseId, int batchId)
+        {
+            var models= new List<MappedTeacherModel>();
+            var connection = baseContext.Database.GetDbConnection();
+            SqlParameter[] objectParams = {
+            new SqlParameter("@courseId",courseId){SqlDbType= System.Data.SqlDbType.Int, Direction= System.Data.ParameterDirection.Input },
+            new SqlParameter("@batchId",batchId){SqlDbType= System.Data.SqlDbType.Int, Direction= System.Data.ParameterDirection.Input },
+            };
+
+            var result = await SqlHelperExtension.ExecuteReader(connection.ConnectionString, SqlConstant.GetMappedTeacher, System.Data.CommandType.StoredProcedure, objectParams);
+
+            while (result.Read())
+            {
+                MappedTeacherModel model = new MappedTeacherModel();
+                model.Id = result.DefaultIfNull<int>("Id");
+                model.EmployeeName = result.DefaultIfNull<string>("Name");
+                model.Phone = result.DefaultIfNull<string>("Phone");
+                model.Email = result.DefaultIfNull<string>("Email");
+                model.Photo = result.DefaultIfNull<string>("Photo");
+                model.SubjectName = result.DefaultIfNull<string>("SubjectName");
+                models.Add(model);
+            }
+            return models;
         }
     }
 }

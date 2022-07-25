@@ -39,7 +39,7 @@ function CustomDeleteRecord(id, getUrl, deleteUrl, event) {
             alertify.success("Record deleted successfully");
         }).done(function () {
             $.get(getUrl, function (response) {
-                $("#divPartialData").html(response);
+                $("#divStudentPartialData").html(response);
             }).done(function () {
                 $("#tblDataList").DataTable({
                     fixedHeader: true,
@@ -69,20 +69,18 @@ function UpdateCustomRecord(id, updateUrl, event) {
 }
 
 function GetCustomRecord(getUrl) {
-    var table;
+    debugger
     $("#loading").removeAttr('style');
     $.get(getUrl, function (response) {
-        $("#divPartialData").html(response);
-        $("#divModalPop").modal('show');
-        setTimeout(function () {
-          table=  $("#tblDataList").DataTable({
+        $("#divStudentPartialData").html(response);
+        $("#divStudentModal").modal('show');
+        setTimeout(function() {
+            $("#tblDataList").DataTable({
                 fixedHeader: true,
                 select: true,
                 responsive: true
             });
         }, 300)
-    }).done(function () {
-        $("#loading").attr('style', 'display:none');
     });
 }
 
@@ -132,15 +130,3 @@ function SetZeroIfEmpty(e) {
     }
 }
 
-function generate() {
-    var d = new Date().getTime();
-
-    var guid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
-        var r = (d + Math.random() * 16) % 16 | 0;
-        d = Math.floor(d / 16);
-
-        return (c == 'x' ? r : (r & 0x3 | 0x8)).toString(16);
-    });
-
-    return guid;
-}

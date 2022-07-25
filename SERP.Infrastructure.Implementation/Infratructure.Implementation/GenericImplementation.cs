@@ -81,17 +81,13 @@ namespace SERP.Infrastructure.Implementation.Infratructure.Implementation
             }
         }
 
-        public async Task<TEntity> GetSingle(Func<TEntity, bool> where, params Expression<Func<TEntity, object>>[] navigationProperties)
+        public async Task<TEntity> GetSingle(Func<TEntity, bool> where)
         {
             TEntity item = null;
             using (baseContext)
             {
                 IQueryable<TEntity> dbQuery = baseContext.Set<TEntity>();
-
-                //Apply eager loading
-                foreach (Expression<Func<TEntity, object>> navigationProperty in navigationProperties)
-                    dbQuery = dbQuery.Include<TEntity, object>(navigationProperty);
-
+                
                 item = dbQuery
                     .AsNoTracking() //Don't track any changes for the selected item
                     .FirstOrDefault(where); //Apply where clause
@@ -203,5 +199,7 @@ namespace SERP.Infrastructure.Implementation.Infratructure.Implementation
             }
             return entities;
         }
+
+       
     }
 }

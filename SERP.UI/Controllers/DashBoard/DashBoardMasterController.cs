@@ -1,9 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using SERP.Core.Entities.Calender;
+using SERP.Core.Entities.Entity.Core.Master;
 using SERP.Core.Entities.SERPExceptionLogging;
 using SERP.Core.Model.DashBoardModel;
 using SERP.Core.Model.UserManagement;
@@ -19,12 +23,15 @@ namespace SERP.UI.Controllers.DashBoard
     {
         private readonly IDashBoardGraphRepo _IDashBoardRepo;
         private readonly IGenericRepository<ExceptionLogging, int> _exceptionLoggingRepo;
+        private readonly IGenericRepository<AcademicCalender, int> _IAcademicCalenderRepo;
         public DashBoardMasterController(IDashBoardGraphRepo dashBoardRepo,
-                                         IGenericRepository<ExceptionLogging, int> exceptionLoggingRepo
+                                         IGenericRepository<ExceptionLogging, int> exceptionLoggingRepo,
+                                         IGenericRepository<AcademicCalender, int> academicCalender
                                             )
         {
             _IDashBoardRepo = dashBoardRepo;
             _exceptionLoggingRepo = exceptionLoggingRepo;
+            _IAcademicCalenderRepo = academicCalender;
         }
         public async Task<IActionResult> GetStudentCourseBatchStrenght()
         {
@@ -151,6 +158,66 @@ namespace SERP.UI.Controllers.DashBoard
                 var exceptionResponse = await _exceptionLoggingRepo.CreateEntity(exceptionHelper);
                 return Json(ResponseData.Instance.GenericResponse(ResponseStatus.ServerError));
             }
+        }
+
+        public async Task<IActionResult> InstituteCalender()
+        {
+            return await Task.Run(() => PartialView("~/Views/DashBoard/_InstituteCalenderPartial.cshtml"));
+        }
+
+        public async Task<IActionResult> GetCalenderDetails()
+        {
+            var calenderModels = await _IAcademicCalenderRepo.GetList(x => x.IsActive == 1);
+            var models = new List<CIrcularCalender>();
+            calenderModels.ToList().ForEach(data =>
+            {
+                var model = new CIrcularCalender();
+                model.StartDate = data.FromDate;
+                model.EndDate = data.ToDate;
+                model.Title = data.EventName;
+                model.Description = data.EventDescription;
+                models.Add(model);
+
+            });
+            return Json(models);
+
+        }
+
+
+        public async Task<IActionResult> GetFeeDetailMonthWise()
+        {
+            var responseModels = await _IDashBoardRepo.YearWiseFeeDetails();
+            return PartialView("~/Views/DashBoard/YearWiseFeeDetailRepository.cshtml", responseModels);
+
+        }
+
+        public async Task<IActionResult> DefaulterList(string month, int year)
+        {
+            var responseModels = await _IDashBoardRepo.DefaulterList(month, year);
+            return PartialView("~/Views/DashBoard/DefaulterPartial.cshtml", responseModels);
+
+        }
+
+        public async Task<IActionResult> SendWhatsAppMessageC(string message)
+        {
+            using (var httpClient = new HttpClient())
+            {
+                using (var request = new HttpRequestMessage(new HttpMethod("POST"), "https://api.ultramsg.com/instance11520/messages/chat"))
+                {
+                    var contentList = new List<string>();
+                    contentList.Add("token=216tq4ry5y9cbhek");
+                    contentList.Add("to=+919315775084");
+                    contentList.Add("body=" + message + "");
+                    contentList.Add("priority=10");
+                    contentList.Add("referenceId=");
+                    request.Content = new StringContent(string.Join("&", contentList));
+                    request.Content.Headers.ContentType = MediaTypeHeaderValue.Parse("application/x-www-form-urlencoded");
+
+                    var response = await httpClient.SendAsync(request);
+                }
+            }
+
+            return Json("Message Sent !");
         }
     }
 }

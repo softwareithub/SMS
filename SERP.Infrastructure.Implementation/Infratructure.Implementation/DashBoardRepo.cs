@@ -271,5 +271,61 @@ namespace SERP.Infrastructure.Implementation.Infratructure.Implementation
 
             return models;
         }
+
+        public async Task<List<YearMonthWiseFeeDetail>> YearWiseFeeDetails()
+        {
+            List<YearMonthWiseFeeDetail> models = new List<YearMonthWiseFeeDetail>();
+            var commandText = "usp_GetFeeDetailMonthWise";
+            
+            var result = await SqlHelperExtension.ExecuteReader(_connectionString, commandText, System.Data.CommandType.StoredProcedure, null);
+            while (result.Read())
+            {
+                YearMonthWiseFeeDetail model = new YearMonthWiseFeeDetail();
+                model.PayableAmount = result.DefaultIfNull<decimal>("PyableAmount");
+                model.AmountPaid = result.DefaultIfNull<decimal>("AmountPaid");
+                model.FineAmount = result.DefaultIfNull<decimal>("FineAmount");
+                model.DueAmount = result.DefaultIfNull<decimal>("DueAmount");
+                model.MonthName = result.DefaultIfNull<string>("MonthName");
+                model.Year = result.DefaultIfNull<int>("Year");
+                models.Add(model);
+            }
+
+            return models;
+        }
+
+        public async Task<List<DefaulterListModel>> DefaulterList(string monthName, int year)
+        {
+            List<DefaulterListModel> models = new List<DefaulterListModel>();
+            try
+            {
+                var commandText = "usp_GetDefaulterList";
+
+                SqlParameter[] sqlParams = {
+                new SqlParameter("@in_montName",monthName){SqlDbType= System.Data.SqlDbType.VarChar,
+                    Direction= System.Data.ParameterDirection.Input },
+
+                                new SqlParameter("@in_year",year){SqlDbType= System.Data.SqlDbType.Int,
+                    Direction= System.Data.ParameterDirection.Input },
+            };
+
+                var result = await SqlHelperExtension.ExecuteReader(_connectionString, commandText,
+                    System.Data.CommandType.StoredProcedure, sqlParams);
+                while (result.Read())
+                {
+                    DefaulterListModel model = new DefaulterListModel();
+                    model.PayableAmount = result.DefaultIfNull<decimal>("PayableAmount");
+                    model.AmountPaid = result.DefaultIfNull<decimal>("AmountPaid");
+                    model.StudentName = result.DefaultIfNull<string>("StudentId");
+                    model.DueAmount = result.DefaultIfNull<decimal>("DueAmount");
+                    model.DateOfDeposit = result.DefaultIfNull<DateTime>("DateOfDeposit");
+                    models.Add(model);
+                }
+            }
+            catch (Exception ex) {
+                string exceptionMessage = ex.Message;
+                throw new Exception(ex.Message, ex);
+            }
+            return models;
+        }
     }
 }
